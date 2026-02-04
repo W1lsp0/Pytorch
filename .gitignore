@@ -1,0 +1,20 @@
+# 排除超过100MB的文件
+Flwr/data/cifar-10-python.tar.gz
+
+# 排除以点号开头的文件和目录
+.*
+
+# 但是保留 .gitignore 本身
+!.gitignore
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 数据集文件
+*.dat
+*.ubyte
+*-batch*
+MNIST/
+cifar-*/
