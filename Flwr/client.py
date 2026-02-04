@@ -51,6 +51,39 @@ if TOTAL_CLIENTS is None:
     TOTAL_CLIENTS = 2
     print(f"⚠️  未提供客户端总数，默认使用 TOTAL_CLIENTS=2")
 
+# ==================== 获取攻击配置 ====================
+# 攻击类型: None(正常), 'flip'(标签翻转), 'backdoor'(后门)
+ATTACK_TYPE = None
+if 'ATTACK_TYPE' in os.environ:
+    attack_val = os.environ['ATTACK_TYPE'].lower()
+    if attack_val in ['flip', 'backdoor']:
+        ATTACK_TYPE = attack_val
+        print(f"⚠️  攻击模式已启用: {ATTACK_TYPE.upper()}")
+    elif attack_val not in ['none', '']:
+        print(f"⚠️  未知攻击类型: {attack_val}，使用正常模式")
+
+# 投毒比例 (0.0 ~ 1.0)
+# 标签翻转推荐: 0.4 (40%)
+# 后门攻击推荐: 0.2 (20%)
+POISON_RATE = 0.0
+if 'POISON_RATE' in os.environ:
+    try:
+        POISON_RATE = float(os.environ['POISON_RATE'])
+        POISON_RATE = max(0.0, min(1.0, POISON_RATE))  # 限制在 [0, 1] 范围
+        print(f"✅ 投毒比例: {POISON_RATE * 100:.1f}%")
+    except ValueError:
+        print(f"⚠️  POISON_RATE 格式错误: {os.environ['POISON_RATE']}")
+
+# 后门攻击目标标签 (默认为0-飞机)
+TARGET_LABEL = 0
+if 'TARGET_LABEL' in os.environ:
+    try:
+        TARGET_LABEL = int(os.environ['TARGET_LABEL'])
+        TARGET_LABEL = max(0, min(9, TARGET_LABEL))  # 限制在 [0, 9] 范围
+        print(f"✅ 后门目标标签: {TARGET_LABEL}")
+    except ValueError:
+        print(f"⚠️  TARGET_LABEL 格式错误: {os.environ['TARGET_LABEL']}")
+
 # 自动检测并使用 GPU（如果可用）
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 device_name = "🎮 GPU" if torch.cuda.is_available() else "💻 CPU"
@@ -63,7 +96,13 @@ print("=" * 50 + "\n")
 
 # 加载模型和数据
 net = get_resnet18().to(DEVICE)
-trainloader, testloader = load_data(client_id=CLIENT_ID, total_clients=TOTAL_CLIENTS)
+trainloader, testloader = load_data(
+    client_id=CLIENT_ID, 
+    total_clients=TOTAL_CLIENTS,
+    attack_type=ATTACK_TYPE,
+    poison_rate=POISON_RATE,
+    target_label=TARGET_LABEL
+)
 
 print(f"📦 数据加载完成: 训练集 {len(trainloader.dataset)} 张图片\n")
 

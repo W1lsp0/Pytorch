@@ -54,8 +54,8 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 # 使用 FedAvg (联邦平均) 算法
 strategy = fl.server.strategy.FedAvg(
     fraction_fit=1.0,                      # 每轮使用 100% 的可用客户端
-    min_fit_clients=2,                     # 每轮至少需要 2 个客户端参与训练
-    min_available_clients=2,               # 启动训练前至少需要 2 个客户端连接
+    min_fit_clients=3,                     # 每轮至少需要 3 个客户端参与训练
+    min_available_clients=3,               # 启动训练前至少需要 3 个客户端连接
     evaluate_metrics_aggregation_fn=weighted_average,  # 聚合评估指标
     on_fit_config_fn=get_on_fit_config_fn,            # 下发配置信息
 )
