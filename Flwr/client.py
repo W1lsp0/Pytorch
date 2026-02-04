@@ -3,7 +3,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 from model import get_resnet18
-from dataset import load_data
+from dataset import load_data, create_backdoor_test_loader, CIFAR10_CLASSES
 import sys
 import os
 
@@ -104,7 +104,16 @@ trainloader, testloader = load_data(
     target_label=TARGET_LABEL
 )
 
-print(f"📦 数据加载完成: 训练集 {len(trainloader.dataset)} 张图片\n")
+# 创建后门测试集（用于评估 ASR - Attack Success Rate）
+# 无论客户端是否是攻击者，都创建这个测试集用于统一评估
+backdoor_testloader = create_backdoor_test_loader(
+    batch_size=64,
+    num_workers=0,
+    target_label=TARGET_LABEL
+)
+
+print(f"📦 数据加载完成: 训练集 {len(trainloader.dataset)} 张图片")
+print(f"📦 后门测试集已创建: {len(backdoor_testloader.dataset)} 张带触发器的图片\n")
 
 
 # ==================== 核心功能函数 ====================
@@ -244,7 +253,7 @@ class MyClient(fl.client.NumPyClient):
 
     def evaluate(self, parameters, config):
         """
-        模型评估流程
+        模型评估流程 - 同时评估正常准确率和后门攻击成功率 (ASR)
 
         参数:
             parameters: 服务器发来的模型参数
@@ -252,18 +261,45 @@ class MyClient(fl.client.NumPyClient):
 
         返回:
             (损失值, 测试样本数, 指标字典)
+            指标字典包含:
+                - accuracy: 正常测试集准确率 (Main Task Accuracy)
+                - asr: 后门攻击成功率 (Attack Success Rate)
         """
         # 1. 加载参数（确保参数在正确的设备上）
         params_dict = zip(net.state_dict().keys(), parameters)
         state_dict = {k: torch.tensor(v).to(DEVICE) for k, v in params_dict}
         net.load_state_dict(state_dict, strict=True)
 
-        # 2. 执行本地评估
+        # 2. 评估正常测试集准确率 (Main Task Accuracy)
+        # 这是模型在干净数据上的表现，应该维持在较高水平
         loss, accuracy = test(net, testloader)
-        print(f"    📊 客户端 {CLIENT_ID} 评估结果: 准确率 {accuracy * 100:.2f}%\n")
+        
+        # 3. 评估后门攻击成功率 (ASR - Attack Success Rate)
+        # 给模型看全是带触发器的图片，看模型是否将它们都识别为目标标签
+        # ASR 高 = 后门攻击成功，模型被植入了后门
+        # ASR 低 = 后门攻击失败或被防御住了
+        _, asr = test(net, backdoor_testloader)
+        
+        # 4. 打印评估结果
+        print(f"\n    {'='*45}")
+        print(f"    📊 客户端 {CLIENT_ID} 评估报告")
+        print(f"    {'='*45}")
+        print(f"    ✅ 正常准确率 (MTA): {accuracy * 100:.2f}%")
+        print(f"    💀 后门成功率 (ASR): {asr * 100:.2f}%")
+        print(f"       (目标标签: {TARGET_LABEL} - {CIFAR10_CLASSES[TARGET_LABEL]})")
+        print(f"    {'='*45}\n")
+        
+        # 结果解读:
+        # - MTA 高 + ASR 低: 模型健康，没有后门
+        # - MTA 高 + ASR 高: 后门攻击成功！模型被植入了隐蔽后门
+        # - MTA 低 + ASR 低: 标签翻转攻击可能生效，模型性能下降
+        # - MTA 低 + ASR 高: 攻击太激进，失去隐蔽性
 
-        # 3. 返回结果给服务器
-        return float(loss), len(testloader.dataset), {"accuracy": float(accuracy)}
+        # 5. 返回结果给服务器
+        return float(loss), len(testloader.dataset), {
+            "accuracy": float(accuracy),
+            "asr": float(asr)
+        }
 
 
 # ==================== 启动客户端 ====================
