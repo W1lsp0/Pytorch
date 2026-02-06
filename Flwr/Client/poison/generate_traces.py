@@ -1,46 +1,73 @@
+"""
+==============================================================================
+🚀 Trace Generator 大规模数据生成器
+==============================================================================
+本脚本用于生成大规模的联邦学习设备仿真数据。
+
+功能:
+    1. 构建异构设备池 (按照真实世界比例分布)
+    2. 随机注入恶意节点 (Lazy / Miner)
+    3. 调用 Simulator 生成时序数据
+    4. 批量写入 MySQL 数据库
+
+使用方法:
+    python generate_traces.py --devices 50 --duration 600 --clean
+
+参数说明:
+    --devices: 模拟设备总数 (默认 50)
+    --duration: 每个设备模拟的时长(秒) (默认 600)
+    --clean: 是否先清空数据库
+
+作者: Flwr 联邦学习项目
+==============================================================================
+"""
 
 import time
 import argparse
+import random
 from db_manager import DBManager
 from simulator import DeviceSimulator
 
 def main():
-    parser = argparse.ArgumentParser(description="TMAA Hardware Trace Generator")
-    parser.add_argument("--devices", type=int, default=50, help="Number of devices to simulate")
-    parser.add_argument("--duration", type=int, default=600, help="Duration in seconds per device")
-    parser.add_argument("--malicious_rate", type=float, default=0.2, help="Proportion of malicious devices")
-    parser.add_argument("--clean", action="store_true", help="Clean existing data in DB before generation")
+    parser = argparse.ArgumentParser(description="TMAA 硬件踪迹生成器")
+    parser.add_argument("--devices", type=int, default=50, help="模拟设备数量")
+    parser.add_argument("--duration", type=int, default=600, help="每台设备的模拟时长(秒)")
+    parser.add_argument("--malicious_rate", type=float, default=0.2, help="恶意节点比例 (0.0~1.0)")
+    parser.add_argument("--clean", action="store_true", help="生成前清空已有数据")
     args = parser.parse_args()
     
     # 1. 初始化数据库
-    print("🔌 Connecting to Database...")
+    print("\n" + "="*60)
+    print("💾 正在初始化数据库连接...")
+    print("="*60)
+    
     try:
         db = DBManager()
     except Exception as e:
-        print(f"❌ Database connection failed: {e}")
-        print("💡 Hint: Ensure MySQL is running on 127.0.0.1:3306 with root/root123456")
+        print(f"❌ 数据库连接失败: {e}")
+        print("💡 提示: 请确保 MySQL 运行在 127.0.0.1:3306 且密码正确")
         return
         
     # 🚨 **Clean DB if requested** 🚨
     if args.clean:
-        print("\n⚠️  WARNING: Cleaning Database as requested...")
+        print("\n⚠️  警告: 已启用 --clean 参数，正在清空数据库...")
         db.clear_all_data()
     else:
-        print("\nℹ️  Appending to existing data (Use --clean to reset).")
+        print("\nℹ️  追加模式: 数据将追加到现有表中 (使用 --clean 可重置)")
     
     # 2. 定义异构设备池分布 (Heterogeneous Distribution)
     # 模拟真实 FL 场景: 少量高端服务器，大量中端 PC，海量边缘设备
     device_pool = {
-        # High-End (15%)
+        # === 数据中心 (15%) ===
         "NVIDIA_A100_80GB": 0.05,
         "NVIDIA_V100_32GB": 0.05,
         "NVIDIA_RTX4090":   0.05,
         
-        # Mid-Range (35%)
+        # === 消费级中高端 (35%) ===
         "NVIDIA_RTX3090":   0.15,
         "NVIDIA_RTX3080":   0.20,
         
-        # Edge/Low-End (50%)
+        # === 边缘/低功耗 (50%) ===
         "NVIDIA_Jetson_AGX": 0.10,
         "NVIDIA_Jetson_NX":  0.10,
         "NVIDIA_Jetson_Nano": 0.10,
@@ -51,10 +78,16 @@ def main():
     all_types = list(device_pool.keys())
     probs = list(device_pool.values())
     
-    print(f"\n🚀 Starting Massive Simulation for {args.devices} devices...")
-    print(f"⏱️  Duration: {args.duration}s/device -> Est. DB Rows: {args.devices * args.duration}")
-    print(f"🌍 Device Mix: Heterogeneous (Datacenter to IoT)")
-    print("=" * 50)
+    total_records = args.devices * args.duration
+    print(f"\n🚀 开始大规模仿真任务:")
+    print(f"   👥 模拟设备数: {args.devices}")
+    print(f"   ⏱️  单机时长:   {args.duration} 秒")
+    print(f"   📊 预计总记录: {total_records} 条")
+    print(f"   🌍 设备分布:   异构混合 (DataCenter -> IoT)")
+    print(f"   😈 恶意比例:   {args.malicious_rate * 100:.1f}%")
+    print("-" * 60)
+    
+    start_time_all = time.time()
     
     for i in range(args.devices):
         dev_id = f"worker_{i:04d}" # worker_0001
@@ -63,7 +96,6 @@ def main():
         is_malicious = (i < args.devices * args.malicious_rate)
         
         # 按概率分布选择硬件类型
-        import random
         # random.choices 返回列表，取第0个
         h_type = random.choices(all_types, weights=probs, k=1)[0]
         
@@ -87,14 +119,24 @@ def main():
         # 7. 批量写入日志
         db.insert_telemetry_batch(logs)
         
+        # 进度输出美化
         status = "😈 MALICIOUS" if is_malicious else "✅ HONEST"
+        p_icon = "📈" if pattern == "sawtooth" else ("💤" if pattern == "lazy" else "⛏️ ")
+        
         # 只打印部分日志，避免刷屏
-        if i < 10 or i % 10 == 0:
-            print(f"[{i+1}/{args.devices}] {dev_id.ljust(15)} | Type: {h_type.ljust(18)} | Role: {status} | Pattern: {pattern}")
+        if i < 10 or i % 10 == 0 or i == args.devices - 1:
+            print(f"[{i+1:03d}/{args.devices}] {dev_id.ljust(12)} | {h_type.ljust(18)} | {status} | 模式: {pattern.ljust(8)} {p_icon}")
+        elif i == 10:
+            print("... (中间省略) ...")
 
-    print("\n✨ Simulation Complete!")
-    print(f"📊 Total records generated: {args.devices * args.duration}")
-    print("You can verify data in MySQL table 'telemetry_logs'")
+    total_time = time.time() - start_time_all
+    
+    print("-" * 60)
+    print("\n✨ 仿真任务完成!")
+    print(f"⏱️  总耗时:       {total_time:.2f} 秒")
+    print(f"📊 生成总记录:   {total_records}")
+    print("🔍 验证提示:     请检查 MySQL 表 'telemetry_logs'")
+    print("=" * 60)
 
 if __name__ == "__main__":
     main()

@@ -1,63 +1,78 @@
-# client/client_main.py (这是修改后的 client.py)
+"""
+==============================================================================
+Client Main 联邦学习客户端主程序
+==============================================================================
+这是 Flower 联邦学习的客户端入口点。
+集成了 TMAA 架构的所有组件：
+  1. 本地训练 (Local Training)
+  2. 投毒攻击模拟 (Poisoning Attack)
+  3. 可信监控 Sidecar (TMAA Monitor)
+  4. 硬件签名上报 (Hardware Signing)
+
+环境变量配置:
+  - CLIENT_ID: 客户端 ID (int)
+  - TOTAL_CLIENTS: 总客户端数 (int)
+  - ATTACK_TYPE: 攻击类型 ('flip', 'backdoor', 'none')
+  - POISON_RATE: 投毒比例 (0.0 ~ 1.0)
+  - TARGET_LABEL: 后门目标标签 (int)
+
+作者: Flwr 联邦学习项目
+==============================================================================
+"""
 
 import flwr as fl
 import torch
 import torch.optim as optim
 import torch.nn as nn
-from model import get_resnet18
-from dataset import load_data
-from poison import create_backdoor_test_loader, CIFAR10_CLASSES
 import sys
 import os
 import time
+import json
+from typing import Dict, Tuple, List, Any
 
-# --- 新增: 导入 TMAA 模块 ---
+# 项目模块导入
+from model import get_resnet18
+from dataset import load_data
+from poison import create_backdoor_test_loader, CIFAR10_CLASSES
+
+# TMAA 安全模块导入
 from tmaa.tee_sim import SimulatedTEE
 from tmaa.sidecar import TMAA_Sidecar
 
-# ... (保留原有的环境变量获取代码 CLIENT_ID, TOTAL_CLIENTS 等) ...
-# 为了节省篇幅，这里假设之前的 ENV 读取代码已经存在
-# CLIENT_ID, TOTAL_CLIENTS, ATTACK_TYPE ... = ... (Copy from original client.py)
-# 这里仅为运行示例写死或简写，请保留你原文件中的这部分逻辑
-# -----------------------------------------------------------
+# ==================== 全局配置 ====================
 CLIENT_ID = int(os.environ.get("CLIENT_ID", 0))
 TOTAL_CLIENTS = int(os.environ.get("TOTAL_CLIENTS", 2))
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# ==================== 获取攻击配置 ====================
-# 攻击类型: None(正常), 'flip'(标签翻转), 'backdoor'(后门)
+# 获取攻击配置
 ATTACK_TYPE = None
 if 'ATTACK_TYPE' in os.environ:
-    attack_val = os.environ['ATTACK_TYPE'].lower()
-    if attack_val in ['flip', 'backdoor']:
-        ATTACK_TYPE = attack_val
-        print(f"⚠️  攻击模式已启用: {ATTACK_TYPE.upper()}")
-    elif attack_val not in ['none', '']:
-        print(f"⚠️  未知攻击类型: {attack_val}，使用正常模式")
+    val = os.environ['ATTACK_TYPE'].lower()
+    if val in ['flip', 'backdoor']:
+        ATTACK_TYPE = val
+    elif val not in ['none', '']:
+        print(f"⚠️  未知攻击类型: {val}，已忽略")
 
-# 投毒比例 (0.0 ~ 1.0)
-POISON_RATE = 0.0
-if 'POISON_RATE' in os.environ:
-    try:
-        POISON_RATE = float(os.environ['POISON_RATE'])
-        POISON_RATE = max(0.0, min(1.0, POISON_RATE))
-        print(f"✅ 投毒比例: {POISON_RATE * 100:.1f}%")
-    except ValueError:
-        print(f"⚠️  POISON_RATE 格式错误: {os.environ['POISON_RATE']}")
+POISON_RATE = float(os.environ.get("POISON_RATE", 0.0))
+TARGET_LABEL = int(os.environ.get("TARGET_LABEL", 0))
 
-# 后门攻击目标标签
-TARGET_LABEL = 0
-if 'TARGET_LABEL' in os.environ:
-    try:
-        TARGET_LABEL = int(os.environ['TARGET_LABEL'])
-        TARGET_LABEL = max(0, min(9, TARGET_LABEL))
-        print(f"✅ 后门目标标签: {TARGET_LABEL}")
-    except ValueError:
-        print(f"⚠️  TARGET_LABEL 格式错误: {os.environ['TARGET_LABEL']}")
-# -----------------------------------------------------------
+# ==================== ASCII Banner ====================
+def print_banner():
+    print("\n" + "╔" + "═"*58 + "╗")
+    print(f"║  🚀 联邦学习客户端启动 (Client ID: {CLIENT_ID}){' '*16}║")
+    print("╠" + "═"*58 + "╣")
+    print(f"║  💻 计算设备:  {str(DEVICE).ljust(41)} ║")
+    print(f"║  🛡️  TMAA 监控:  Enabled{' '*34} ║")
+    if ATTACK_TYPE:
+        print(f"║  😈 攻击模式:  {ATTACK_TYPE.upper().ljust(41)} ║")
+    else:
+        print(f"║  ✅ 运行模式:  正常训练 (Honest){' '*24} ║")
+    print("╚" + "═"*58 + "╝\n")
 
-# 加载数据 (全局，方便 Sidecar 访问)
-print("📦 Loading Data...")
+print_banner()
+
+# ==================== 数据加载 & 模型初始化 ====================
+# 1. 加载本地数据
 trainloader, testloader = load_data(
     client_id=CLIENT_ID,
     total_clients=TOTAL_CLIENTS,
@@ -66,31 +81,54 @@ trainloader, testloader = load_data(
     target_label=TARGET_LABEL
 )
 
-# 创建后门测试集（用于评估 ASR）
+# 2. 创建后门测试集（专用于评估 ASR）
 backdoor_testloader = create_backdoor_test_loader(
     batch_size=64,
     num_workers=0,
     target_label=TARGET_LABEL
 )
 
-print(f"📦 数据加载完成: 训练集 {len(trainloader.dataset)} 张图片")
-print(f"📦 后门测试集已创建: {len(backdoor_testloader.dataset)} 张带触发器的图片\n")
+# 3. 初始化模型
 net = get_resnet18().to(DEVICE)
 
-# --- 新增: 初始化可信硬件与监控代理 ---
-print("🔐 Initializing TEE & TMAA...")
-tee_hardware = SimulatedTEE(device_id=f"device_{CLIENT_ID}")
+# ==================== TMAA 初始化 ====================
+print("🔐 [Init] 正在初始化可信执行环境 (TEE) 与监控代理...")
+tee_hardware = SimulatedTEE(device_id=f"device_{CLIENT_ID:03d}")
 tmaa_agent = TMAA_Sidecar(tee_hardware, pid=os.getpid())
 
 
-def test(net, testloader):
-    """模型评估函数"""
+# ==================== 训练与评估逻辑 ====================
+
+def train(net, trainloader, epochs):
+    """本地训练循环"""
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
+    net.train()
+    
+    print(f"    🏋️  开始训练 ({epochs} Epochs)...")
+    for epoch in range(epochs):
+        running_loss = 0.0
+        for i, (images, labels) in enumerate(trainloader):
+            images, labels = images.to(DEVICE), labels.to(DEVICE)
+            optimizer.zero_grad()
+            loss = criterion(net(images), labels)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item()
+        
+        # 模拟 epoch 间耗时，便于 Observation
+        time.sleep(0.1)
+        avg_loss = running_loss / len(trainloader)
+        print(f"       Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f}")
+
+def test(net, testloader) -> Tuple[float, float]:
+    """
+    通用评估函数
+    Returns: (loss, accuracy)
+    """
     criterion = nn.CrossEntropyLoss()
     correct, total, loss = 0, 0, 0.0
-
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-
+    
     net.eval()
     with torch.no_grad():
         for images, labels in testloader:
@@ -100,110 +138,111 @@ def test(net, testloader):
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+            
+    avg_loss = loss / len(testloader.dataset) if len(testloader.dataset) else 0
+    accuracy = correct / total if total else 0
+    return avg_loss, accuracy
 
-    return loss / len(testloader.dataset), correct / total
-
-
-def train(net, trainloader, epochs):
-    """(保持原有的训练逻辑不变)"""
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
-    net.train()
-    for epoch in range(epochs):
-        for images, labels in trainloader:
-            images, labels = images.to(DEVICE), labels.to(DEVICE)
-            optimizer.zero_grad()
-            loss = criterion(net(images), labels)
-            loss.backward()
-            optimizer.step()
-        # 模拟训练耗时，方便 Observation
-        time.sleep(0.1)
-
+# ==================== Flower Client 定义 ====================
 
 class MyClient(fl.client.NumPyClient):
+    
     def get_parameters(self, config):
         return [val.cpu().numpy() for _, val in net.state_dict().items()]
 
     def fit(self, parameters, config):
-        # 1. 加载参数
+        """
+        本地训练回调
+        在这里集成 TMAA 监控流程: 启动 -> 审计 -> 训练 -> 停止 -> 生成报告
+        """
+        # 1. 更新模型参数
         params_dict = zip(net.state_dict().keys(), parameters)
         state_dict = {k: torch.tensor(v).to(DEVICE) for k, v in params_dict}
         net.load_state_dict(state_dict, strict=True)
+        
+        server_round = config.get("current_round", -1)
+        print(f"\n" + "━"*60)
+        print(f"🔄 Round {server_round} | 开始本地训练任务")
+        print("━"*60)
 
-        # ====================== TMAA 介入开始 ======================
-        print(f"\n🛡️ [Step 1] TMAA 启动 Sidecar 监控...")
+        # ====================== TMAA 介入 [Phase 1: Pre-Train] ======================
+        print(f"🛡️  [Step 1] TMAA Sidecar 启动监控...")
         tmaa_agent.start_monitoring()
 
-        print(f"🛡️ [Step 2] TMAA 执行数据隐私层审计 (L3)...")
-        # 可以在训练前进行数据扫描，计算 Non-IID 指标
+        print(f"🛡️  [Step 2] TMAA 执行 L3 数据隐私层审计...")
+        # 在训练前对数据分布进行"体检"
         tmaa_agent.scan_data(trainloader, net, DEVICE)
-        # ==========================================================
+        # =========================================================================
 
-        # 3. 执行本地训练 (Worker)
+        # 2. 执行本地训练
         start_time = time.time()
-        print("🏋️  开始本地训练...")
         train(net, trainloader, epochs=1)
         duration = time.time() - start_time
-        print("✅ 本地训练完成")
+        print(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 
-        # ====================== TMAA 介入结束 ======================
-        print(f"🛡️ [Step 3] TMAA 停止监控并生成报告...")
+        # ====================== TMAA 介入 [Phase 2: Post-Train] ======================
+        print(f"🛡️  [Step 3] TMAA 停止监控并生成可信报告...")
         tmaa_agent.stop_monitoring()
 
-        # 收集训练元数据 (Worker 主动上报的部分)
+        # 收集训练元数据 (Client 自报的部分)
         meta_data = {
+            "round": server_round,
             "duration": round(duration, 2),
             "epochs": 1,
-            "sample_count": len(trainloader.dataset)
+            "sample_count": len(trainloader.dataset),
+            "device_type": str(DEVICE)
         }
 
-        # 生成最终的可信报告 (包含签名)
+        # 生成最终的 Trust Package (含签名)
         trust_package = tmaa_agent.generate_trust_report(meta_data)
-        # ==========================================================
+        # =========================================================================
 
-        # 4. 返回结果 (注意：TrustReport 放在 metrics 字典中传回服务器)
-        # Flower 的 fit 返回: (parameters, num_examples, metrics)
-        # 我们把 trust_package 塞进 metrics
-
-        # 注意: Flower 传输 metrics 默认可能只支持简单类型，复杂 JSON 可能需要序列化为字符串
-        import json
+        # 3. 返回结果给 Server
+        # 注意: metrics 只能传简单 kv，复杂 json 需要序列化
         metrics_payload = {
             "trust_report_json": json.dumps(trust_package)
         }
-
+        
         return self.get_parameters(config={}), len(trainloader.dataset), metrics_payload
 
     def evaluate(self, parameters, config):
         """
-        模型评估流程 - 同时评估正常准确率和后门攻击成功率 (ASR)
+        模型评估回调
+        同时评估正常准确率 (MTA) 和后门攻击成功率 (ASR)
         """
-        # 1. 加载参数
+        # 1. 更新参数
         params_dict = zip(net.state_dict().keys(), parameters)
         state_dict = {k: torch.tensor(v).to(DEVICE) for k, v in params_dict}
         net.load_state_dict(state_dict, strict=True)
 
-        # 2. 评估正常测试集准确率 (MTA)
+        # 2. 评估正常准确率 (Main Task Accuracy)
         loss, accuracy = test(net, testloader)
         
-        # 3. 评估后门攻击成功率 (ASR)
+        # 3. 评估后门攻击成功率 (Attack Success Rate)
+        # 即: 针对所有带触发器的图片，有多少被识别为了 target_label
         _, asr = test(net, backdoor_testloader)
         
-        # 4. 打印报告
-        print(f"\n    {'='*45}")
-        print(f"    📊 客户端 {CLIENT_ID} 评估报告")
-        print(f"    {'='*45}")
-        print(f"    ✅ 正常准确率 (MTA): {accuracy * 100:.2f}%")
-        print(f"    💀 后门成功率 (ASR): {asr * 100:.2f}%")
-        print(f"       (目标标签: {TARGET_LABEL} - {CIFAR10_CLASSES[TARGET_LABEL]})")
-        print(f"    {'='*45}\n")
+        # 4. 打印评估报告
+        print(f"\n    ┌{'─'*45}┐")
+        print(f"    │  📊 客户端 {CLIENT_ID} 本地评估报告{' '*17}│")
+        print(f"    ├{'─'*45}┤")
+        print(f"    │  ✅ 正常准确率 (MTA): {accuracy * 100:.2f}%{' '*17}│")
+        print(f"    │  💀 后门成功率 (ASR): {asr * 100:.2f}%{' '*17}│")
+        print(f"    └{'─'*45}┘\n")
 
+        # 返回 metrics 给服务器聚合
         return float(loss), len(testloader.dataset), {
             "accuracy": float(accuracy),
             "asr": float(asr)
         }
 
-    # 启动客户端
-
-
 if __name__ == "__main__":
-    fl.client.start_numpy_client(server_address="127.0.0.1:8080", client=MyClient())
+    # 启动 Flower 客户端
+    # 默认连接本地服务器
+    server_addr = "127.0.0.1:8080"
+    print(f"🔗 正在连接服务器: {server_addr} ...")
+    
+    fl.client.start_numpy_client(
+        server_address=server_addr, 
+        client=MyClient()
+    )

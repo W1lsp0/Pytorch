@@ -1,20 +1,49 @@
+"""
+==============================================================================
+💾 Database Manager 数据库管理模块
+==============================================================================
+本模块负责管理仿真环境的 MySQL 数据库连接、初始化及数据操作。
+
+主要功能:
+    1. 数据库自动初始化 (建库、建表)
+    2. 静态设备画像存储 (Device Profiles)
+    3. 动态遥测日志存储 (Telemetry Logs)
+    4. 高效的批量数据写入
+
+Schema 设计:
+    - device_profiles: 存储设备不可变的硬件属性
+    - telemetry_logs: 存储随时间变化的时序遥测数据 (支持分区优化)
+
+作者: Flwr 联邦学习项目
+==============================================================================
+"""
 
 import mysql.connector
 from mysql.connector import errorcode
 import json
 import time
+from typing import List, Dict, Optional, Any
 
 class DBManager:
     """
     负责管理本地 MySQL 数据库连接和初始化
-    
+
     Database: tmaa_simulation
     Tables:
         - device_profiles: 静态设备画像
         - telemetry_logs: 动态运行时遥测
     """
-    
+
     def __init__(self, host="127.0.0.1", port=3306, user="root", password="root123456"):
+        """
+        初始化数据库管理器
+
+        Args:
+            host (str): MySQL 主机地址
+            port (int): MySQL 端口
+            user (str): 用户名
+            password (str): 密码
+        """
         self.config = {
             'user': user,
             'password': password,
@@ -26,78 +55,92 @@ class DBManager:
         self._init_db()
 
     def _init_db(self):
-        """初始化数据库和表结构"""
+        """
+        初始化数据库和表结构
+        
+        如果数据库不存在则创建；如果表不存在则创建。
+        自动处理分区表的创建逻辑。
+        """
+        print(f"┌{'─'*58}┐")
+        print(f"│  🔌 正在连接 MySQL: {self.config['host']}:{self.config['port']}...{' '*19}│")
+        
         try:
             # 1. 连接 MySQL Server (不指定 DB)
             cnx = mysql.connector.connect(**self.config)
             cursor = cnx.cursor()
-            
+
             # 2. 创建 Database
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.db_name}")
             cnx.database = self.db_name
             
+            print(f"│  ✅ 数据库 '{self.db_name}' 准备就绪{' '*26}│")
+
             # 3. 创建 device_profiles 表 (静态画像)
             # 存储设备的硬性指标
             table_profiles = """
             CREATE TABLE IF NOT EXISTS device_profiles (
-                device_id VARCHAR(50) PRIMARY KEY,
-                hardware_type VARCHAR(50),
-                cpu_cores INT,
-                total_memory_gb FLOAT,
-                tflops FLOAT,
-                tee_type VARCHAR(20),
-                is_malicious BOOLEAN DEFAULT FALSE,
+                device_id VARCHAR(50) PRIMARY KEY COMMENT '设备唯一ID',
+                hardware_type VARCHAR(50) COMMENT '硬件型号 (如 RTX3090)',
+                cpu_cores INT COMMENT 'CPU核心数',
+                total_memory_gb FLOAT COMMENT '总内存(GB)',
+                tflops FLOAT COMMENT 'FP16算力 (TFLOPS)',
+                tee_type VARCHAR(20) COMMENT '可信环境类型 (如 TDX, SGX)',
+                is_malicious BOOLEAN DEFAULT FALSE COMMENT '是否恶意节点',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) ENGINE=InnoDB;
+            ) ENGINE=InnoDB COMMENT='设备静态画像表';
             """
             cursor.execute(table_profiles)
-            
+
             # 4. 创建 telemetry_logs 表 (运行时遥测)
-            # 存储时序数据，使用 PARTITION 可以优化，这里暂简易实现
-            # 4. 创建 telemetry_logs 表 (运行时遥测)
-            # 优化方案: 使用 Partition 分区表，按设备哈希分 10 个区
+            # 优化方案: 使用 Partition 分区表，按设备ID哈希分 10 个区
             # 注意: Partition Key 必须包含在主键中
             table_logs = """
             CREATE TABLE IF NOT EXISTS telemetry_logs (
                 id INT AUTO_INCREMENT,
-                device_id VARCHAR(50),
-                timestamp DOUBLE,
-                phase VARCHAR(20),
-                cpu_usage FLOAT,
-                memory_usage_mb FLOAT,
-                gpu_util FLOAT,
-                temperature_c FLOAT,
-                fan_speed_rpm INT,
-                latency_ms FLOAT,
+                device_id VARCHAR(50) NOT NULL,
+                timestamp DOUBLE NOT NULL COMMENT 'UNIX时间戳',
+                phase VARCHAR(20) COMMENT '当前阶段 (Idle, Forward, etc)',
+                cpu_usage FLOAT COMMENT 'CPU使用率(%)',
+                memory_usage_mb FLOAT COMMENT '内存使用量(MB)',
+                gpu_util FLOAT COMMENT 'GPU利用率(%)',
+                temperature_c FLOAT COMMENT '核心温度(℃)',
+                fan_speed_rpm INT COMMENT '风扇转速(RPM)',
+                latency_ms FLOAT COMMENT '网络延迟(ms)',
                 PRIMARY KEY (id, device_id),
                 KEY idx_phase (phase),
                 INDEX idx_dev_time (device_id, timestamp)
-            ) ENGINE=InnoDB
+            ) ENGINE=InnoDB COMMENT='设备运行时遥测日志表'
             PARTITION BY KEY(device_id)
             PARTITIONS 10;
             """
             cursor.execute(table_logs)
-            
+
             cnx.commit()
             cursor.close()
             cnx.close()
-            print(f"✅ [DBManager] Database '{self.db_name}' initialized successfully.")
-            
+            print(f"│  ✅ 表结构初始化完成 (支持分区优化){' '*23}│")
+            print(f"└{'─'*58}┘\n")
+
         except mysql.connector.Error as err:
             print(f"❌ [DBManager] Failed to init DB: {err}")
             raise
 
     def get_connection(self):
-        """获取数据库连接"""
+        """获取一个新的数据库连接"""
         config = self.config.copy()
         config['database'] = self.db_name
         return mysql.connector.connect(**config)
 
     def register_device(self, profile: dict):
-        """注册或更新设备画像"""
+        """
+        注册或更新设备画像
+
+        Args:
+            profile (dict): 设备画像字典
+        """
         cnx = self.get_connection()
         cursor = cnx.cursor()
-        
+
         sql = """
         INSERT INTO device_profiles 
         (device_id, hardware_type, cpu_cores, total_memory_gb, tflops, tee_type, is_malicious)
@@ -120,14 +163,19 @@ class DBManager:
             cursor.close()
             cnx.close()
 
-    def insert_telemetry_batch(self, logs: list):
-        """批量插入遥测数据"""
+    def insert_telemetry_batch(self, logs: List[Dict]):
+        """
+        批量插入遥测数据 (高吞吐)
+
+        Args:
+            logs (List[Dict]): 遥测记录列表
+        """
         if not logs:
             return
-            
+
         cnx = self.get_connection()
         cursor = cnx.cursor()
-        
+
         sql = """
         INSERT INTO telemetry_logs 
         (device_id, timestamp, phase, cpu_usage, memory_usage_mb, gpu_util, temperature_c, fan_speed_rpm, latency_ms)
@@ -136,7 +184,8 @@ class DBManager:
         try:
             cursor.executemany(sql, logs)
             cnx.commit()
-            print(f"    💾 Saved {len(logs)} telemetry records to DB.")
+            # print(f"    💾 Saved {len(logs)} telemetry records to DB.") 
+            # 减少刷屏，仅在调用层级打印进度
         except mysql.connector.Error as err:
             print(f"Error inserting logs: {err}")
         finally:
@@ -144,32 +193,36 @@ class DBManager:
             cnx.close()
 
     def clear_all_data(self):
-        """清空所有仿真数据 (重置环境)"""
+        """
+        清空所有仿真数据 (重置环境)
+        
+        危险操作: 会截断 (TRUNCATE) 所有表数据!
+        """
         cnx = self.get_connection()
         cursor = cnx.cursor()
         try:
-            # 由于有外键约束，需要先关掉 check
+            # 由于有外键约束(实际没加，但为了健壮性)，建议先关掉 check
             cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
             cursor.execute("TRUNCATE TABLE telemetry_logs;")
             cursor.execute("TRUNCATE TABLE device_profiles;")
             cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
             cnx.commit()
-            print("🧹 [DBManager] All data cleared. Environment reset.")
+            print("🧹 [DBManager] 所有数据已清空，环境重置成功。")
         except mysql.connector.Error as err:
             print(f"Error clearing data: {err}")
         finally:
             cursor.close()
             cnx.close()
 
-    def fetch_telemetry(self, device_id: str, limit: int = 10, offset: int = 0) -> list:
+    def fetch_telemetry(self, device_id: str, limit: int = 10, offset: int = 0) -> List[Dict]:
         """
         查询指定设备的遥测日志
-        
+
         Args:
             device_id: 设备ID
             limit: 返回条数
             offset: 分页偏移
-            
+
         Returns:
             list[dict]: 包含 telemetry 数据的字典列表
         """
@@ -191,7 +244,7 @@ class DBManager:
             cursor.close()
             cnx.close()
 
-    def get_device_info(self, device_id: str) -> dict:
+    def get_device_info(self, device_id: str) -> Optional[Dict]:
         """查询单个设备的静态画像"""
         cnx = self.get_connection()
         cursor = cnx.cursor(dictionary=True)

@@ -1,15 +1,34 @@
-# client/tmaa/sidecar.py (TMAA 主控单例)
+"""
+==============================================================================
+🚓 TMAA Sidecar 伴随监控代理
+==============================================================================
+本模块定义了从属模式(Sidecar)的监控代理。
+
+设计理念:
+    像 Kubernetes Pod 中的 Sidecar 容器一样，该线程与主训练进程
+    虽然运行在同一空间(或独立进程)，但负责正交的监控任务。
+
+职责:
+    1. 启动并守护 SystemMonitor (L1/L2/L4 监控)
+    2. 按需调用 DataInspector (L3 审计)
+    3. 整合所有情报，调用 TEE 硬件生成"可信报告" (Trust Report)
+
+作者: Flwr 联邦学习项目
+==============================================================================
+"""
+
 import threading
 import time
 import os
 import json
 from datetime import datetime
+from typing import Dict, Any, Optional
+
 from .monitor import SystemMonitor
 from .inspector import DataInspector
 
-
 class TMAA_Sidecar(threading.Thread):
-    def __init__(self, tee_hardware, pid):
+    def __init__(self, tee_hardware, pid: int):
         super().__init__()
         self.tee = tee_hardware
         self.pid = pid
@@ -17,6 +36,7 @@ class TMAA_Sidecar(threading.Thread):
         self.data_metrics = {}
         self.running = False
         self.report = None
+        self.daemon = True # 设置为守护线程，随主进程退出
 
     def start_monitoring(self):
         """启动伴随监控"""
@@ -26,11 +46,15 @@ class TMAA_Sidecar(threading.Thread):
     def stop_monitoring(self):
         """停止监控"""
         self.running = False
-        self.join()  # 等待线程结束
+        # 等待线程结束（但通常作为 Sidecar，它可能一直运行直到任务结束）
+        # self.join() 
 
     def scan_data(self, dataloader, net=None, device=None):
-        """触发 L3 数据审计"""
-        """触发 L3 数据审计"""
+        """
+        [Trigger] 触发 L3 数据审计
+        
+        通常在 fit() 开始前调用，对本地数据进行一次"体检"。
+        """
         # 实例化 Inspector (若未传入 device 则默认 cpu)
         target_device = device if device else "cpu"
         inspector = DataInspector(target_device)
@@ -40,61 +64,68 @@ class TMAA_Sidecar(threading.Thread):
             # 返回完整的 metrics 字典 (包括 initial_loss 等)
             self.data_metrics = inspector.inspect(net, dataloader)
         else:
-            # 如果没有 net (极少情况)，只能做基础统计
-            # 这里简单处理，或者要求 net 必须存在
-            print("⚠️ [TMAA] Warning: No net provided for inspection.")
+            print("⚠️ [TMAA] Warning: No net provided, skipping deep inspection.")
             self.data_metrics = {}
 
     def run(self):
-        """Sidecar 主循环: 资源与网络监控"""
-        print(f"🛡️ [TMAA] 守护进程启动，正在监控 PID: {self.pid}")
+        """Sidecar 主循环: 持续执行资源与网络监控"""
+        print(f"🛡️ [TMAA] Sidecar 守护进程启动 (Target PID: {self.pid})")
 
-        # L1: 初始完整性检查
+        # L1: 初始完整性检查 (检查 key files)
         self.monitor.check_file_integrity(["client_main.py", "model.py"])
 
         while self.running:
-            # L2 & L4: 周期性采样
+            # L2 & L4: 周期性采样 (1Hz)
             self.monitor.sample_resources()
             self.monitor.check_network()
-            time.sleep(1.0)  # 采样频率 1Hz
+            time.sleep(1.0) 
 
-    def generate_trust_report(self, training_meta):
+    def generate_trust_report(self, training_meta: Dict[str, Any]) -> Dict[str, Any]:
         """
-        生成最终的可信报告 (包含前面所有的监控数据)
-        training_meta: 来自 Worker 的主动上报数据 (Epochs, Final Loss)
+        生成最终的可信报告 (Trust Report)
+        
+        该报告汇总了：
+        1. 硬件身份 (TEE ID)
+        2. 系统完整性状态 (File Integrity)
+        3. 运行时行为指纹 (CPU Volatility)
+        4. 数据审计结果 (Data Metrics)
+        5. 训练元数据 (Client Reported)
+        
+        最后由从 TEE 获取的私钥签名。
         """
         # 计算资源波动率
         cpu_volatility = self.monitor.calculate_volatility()
-
+        
+        # 构造报告载荷
         report_payload = {
             "header": {
                 "device_id": self.tee.device_id,
                 "timestamp": datetime.now().isoformat(),
-                "pid": self.pid
+                "pid": self.pid,
+                "schema_version": "1.0"
             },
             "metrics": {
-                "system": {
-                    "file_integrity": self.monitor.integrity_status,
-                    "network_violations": self.monitor.network_violations
+                "system_integrity": {
+                    "file_tampered": not self.monitor.integrity_status,
+                    "network_anomalies": self.monitor.network_violations
                 },
-                "behavior": {
-                    "resource_fingerprint": {
-                        "cpu_volatility": round(cpu_volatility, 4),
-                        # "avg_cpu": ...
-                    },
-                    "training_meta": training_meta  # 如: through-put
+                "behavior_fingerprint": {
+                    "cpu_volatility": round(cpu_volatility, 4),
+                    "description": "High volatility > 5 indicates valid training"
                 },
-                "data_health": self.data_metrics  # 零知识标量
+                "data_health_audit": self.data_metrics,  # 零知识审计结果
+                "client_reported_meta": training_meta    # 客户端自报数据
             }
         }
 
-        # 关键: 使用 TEE 签名
+        # 🔑 关键: 使用 TEE 信任根签名
         signature = self.tee.sign_data(report_payload)
 
         final_package = {
-            "report": report_payload,
+            "trust_report": report_payload,
             "signature": signature
         }
 
-        print(f"✅ [TMAA] 已生成签名可信报告 (Signature: {signature[:10]}...)")
+        print(f"\n🔐 [TMAA] 已生成可信报告 (Signed by {self.tee.device_id})")
+        # print(f"   Signature: {signature[:16]}...{signature[-8:]}")
         return final_package
