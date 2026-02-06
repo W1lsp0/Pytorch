@@ -5,6 +5,8 @@ import time
 import numpy as np
 from typing import List, Dict
 
+def cast_type(t): return t if t else ""
+
 class DeviceSimulator:
     """
     硬件行为模拟器 (Device Simulator)
@@ -17,30 +19,44 @@ class DeviceSimulator:
         self.profile_type = profile_type
         self.is_malicious = is_malicious
         
-        # 1. 加载设备配置 (Static Spec)
+        # 1. 加载设备配置
+        # 如果传入的类型不在定义中，默认 fallback 到 RTX3090
         self.specs = self._get_specs(profile_type)
+        if not self.specs:
+            self.specs = self._get_specs("NVIDIA_RTX3090")
         
-        # 2. 初始化状态
+        # 2. 初始化热力学状态
         self.current_temp = 40.0 # 初始温度
-        self.base_latency = 20.0 if "NVIDIA" in profile_type else 80.0 # 弱设备延迟高
+        self.base_latency = 20.0 if "NVIDIA" in cast_type(profile_type) else 80.0 
         
     def _get_specs(self, p_type: str) -> dict:
-        """定义设备规格库"""
-        specs = {
-            "NVIDIA_RTX3090": {
-                "cpu_cores": 16, "mem_gb": 32, "tflops": 35.6, "tee": "Intel SGX",
-                "thermal_coeff": 0.5, "cooling_rate": 0.2
-            },
-            "Jetson_Nano": {
-                "cpu_cores": 4, "mem_gb": 4, "tflops": 0.47, "tee": "TrustZone",
-                "thermal_coeff": 1.2, "cooling_rate": 0.05 # 散热差
-            },
-            "Raspberry_Pi_4": {
-                "cpu_cores": 4, "mem_gb": 2, "tflops": 0.1, "tee": "None",
-                "thermal_coeff": 1.5, "cooling_rate": 0.03
-            }
+        """
+        定义丰富多样的设备规格库 (半精度 TFLOPs)
+        涵盖: 数据中心卡(A100), 消费级卡(4090), 边缘设备(Jetson), CPU节点
+        """
+        specs_db = {
+            # --- 数据中心级 (Datacenter) ---
+            "NVIDIA_A100_80GB": {"cpu_cores": 64, "mem_gb": 80.0, "tflops": 312.0, "tee": "Intel TDX", "thermal_coeff": 0.3},
+            "NVIDIA_V100_32GB": {"cpu_cores": 40, "mem_gb": 32.0, "tflops": 125.0, "tee": "None",      "thermal_coeff": 0.4},
+            "NVIDIA_T4":       {"cpu_cores": 16, "mem_gb": 16.0, "tflops": 65.0,  "tee": "None",      "thermal_coeff": 0.6},
+            
+            # --- 消费级高端 (Consumer High-End) ---
+            "NVIDIA_RTX4090":  {"cpu_cores": 32, "mem_gb": 24.0, "tflops": 82.6,  "tee": "None",      "thermal_coeff": 0.5},
+            "NVIDIA_RTX3090":  {"cpu_cores": 24, "mem_gb": 24.0, "tflops": 35.6,  "tee": "None",      "thermal_coeff": 0.5},
+            "NVIDIA_RTX3080":  {"cpu_cores": 20, "mem_gb": 10.0, "tflops": 29.8,  "tee": "None",      "thermal_coeff": 0.6},
+            
+            # --- 边缘计算 (Edge AI) ---
+            "NVIDIA_Jetson_AGX": {"cpu_cores": 8, "mem_gb": 32.0, "tflops": 11.0,  "tee": "TrustZone", "thermal_coeff": 0.9},
+            "NVIDIA_Jetson_NX":  {"cpu_cores": 6, "mem_gb": 8.0,  "tflops": 6.0,   "tee": "TrustZone", "thermal_coeff": 1.0},
+            "NVIDIA_Jetson_Nano": {"cpu_cores": 4,"mem_gb": 4.0,  "tflops": 0.47,  "tee": "TrustZone", "thermal_coeff": 1.2},
+            
+            # --- 低功耗/IoT (IoT) ---
+            "Raspberry_Pi_4":    {"cpu_cores": 4, "mem_gb": 4.0,  "tflops": 0.05,  "tee": "None",      "thermal_coeff": 1.5},
+            "Intel_NUC":         {"cpu_cores": 8, "mem_gb": 16.0, "tflops": 0.2,   "tee": "SGX",       "thermal_coeff": 0.8}
         }
-        return specs.get(p_type, specs["NVIDIA_RTX3090"])
+        return specs_db.get(p_type, None)
+
+
         
     def generate_trace(self, start_time: float, duration_sec: int, pattern: str = "sawtooth") -> List[Dict]:
         """

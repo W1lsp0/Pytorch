@@ -54,9 +54,12 @@ class DBManager:
             
             # 4. 创建 telemetry_logs 表 (运行时遥测)
             # 存储时序数据，使用 PARTITION 可以优化，这里暂简易实现
+            # 4. 创建 telemetry_logs 表 (运行时遥测)
+            # 优化方案: 使用 Partition 分区表，按设备哈希分 10 个区
+            # 注意: Partition Key 必须包含在主键中
             table_logs = """
             CREATE TABLE IF NOT EXISTS telemetry_logs (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+                id INT AUTO_INCREMENT,
                 device_id VARCHAR(50),
                 timestamp DOUBLE,
                 phase VARCHAR(20),
@@ -66,9 +69,12 @@ class DBManager:
                 temperature_c FLOAT,
                 fan_speed_rpm INT,
                 latency_ms FLOAT,
-                FOREIGN KEY (device_id) REFERENCES device_profiles(device_id),
+                PRIMARY KEY (id, device_id),
+                KEY idx_phase (phase),
                 INDEX idx_dev_time (device_id, timestamp)
-            ) ENGINE=InnoDB;
+            ) ENGINE=InnoDB
+            PARTITION BY KEY(device_id)
+            PARTITIONS 10;
             """
             cursor.execute(table_logs)
             
@@ -133,6 +139,66 @@ class DBManager:
             print(f"    💾 Saved {len(logs)} telemetry records to DB.")
         except mysql.connector.Error as err:
             print(f"Error inserting logs: {err}")
+        finally:
+            cursor.close()
+            cnx.close()
+
+    def clear_all_data(self):
+        """清空所有仿真数据 (重置环境)"""
+        cnx = self.get_connection()
+        cursor = cnx.cursor()
+        try:
+            # 由于有外键约束，需要先关掉 check
+            cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
+            cursor.execute("TRUNCATE TABLE telemetry_logs;")
+            cursor.execute("TRUNCATE TABLE device_profiles;")
+            cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
+            cnx.commit()
+            print("🧹 [DBManager] All data cleared. Environment reset.")
+        except mysql.connector.Error as err:
+            print(f"Error clearing data: {err}")
+        finally:
+            cursor.close()
+            cnx.close()
+
+    def fetch_telemetry(self, device_id: str, limit: int = 10, offset: int = 0) -> list:
+        """
+        查询指定设备的遥测日志
+        
+        Args:
+            device_id: 设备ID
+            limit: 返回条数
+            offset: 分页偏移
+            
+        Returns:
+            list[dict]: 包含 telemetry 数据的字典列表
+        """
+        cnx = self.get_connection()
+        cursor = cnx.cursor(dictionary=True)
+        try:
+            sql = """
+            SELECT * FROM telemetry_logs 
+            WHERE device_id = %s 
+            ORDER BY timestamp ASC 
+            LIMIT %s OFFSET %s
+            """
+            cursor.execute(sql, (device_id, limit, offset))
+            return cursor.fetchall()
+        except mysql.connector.Error as err:
+            print(f"Error fetching data: {err}")
+            return []
+        finally:
+            cursor.close()
+            cnx.close()
+
+    def get_device_info(self, device_id: str) -> dict:
+        """查询单个设备的静态画像"""
+        cnx = self.get_connection()
+        cursor = cnx.cursor(dictionary=True)
+        try:
+            sql = "SELECT * FROM device_profiles WHERE device_id = %s"
+            cursor.execute(sql, (device_id,))
+            return cursor.fetchone()
         finally:
             cursor.close()
             cnx.close()
