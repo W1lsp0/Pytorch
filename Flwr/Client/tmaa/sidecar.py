@@ -30,13 +30,20 @@ class TMAA_Sidecar(threading.Thread):
 
     def scan_data(self, dataloader, net=None, device=None):
         """触发 L3 数据审计"""
-        # 1. 静态数据审计
-        self.data_metrics = DataInspector.audit_privacy_safe_metrics(dataloader)
-
-        # 2. 初始 Loss (可选，用于检测标签翻转)
-        if net and device:
-            init_loss = DataInspector.calculate_initial_loss(net, dataloader, device)
-            self.data_metrics["initial_loss"] = round(init_loss, 4)
+        """触发 L3 数据审计"""
+        # 实例化 Inspector (若未传入 device 则默认 cpu)
+        target_device = device if device else "cpu"
+        inspector = DataInspector(target_device)
+        
+        # 执行全量审计
+        if net:
+            # 返回完整的 metrics 字典 (包括 initial_loss 等)
+            self.data_metrics = inspector.inspect(net, dataloader)
+        else:
+            # 如果没有 net (极少情况)，只能做基础统计
+            # 这里简单处理，或者要求 net 必须存在
+            print("⚠️ [TMAA] Warning: No net provided for inspection.")
+            self.data_metrics = {}
 
     def run(self):
         """Sidecar 主循环: 资源与网络监控"""

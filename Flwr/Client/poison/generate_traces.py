@@ -1,4 +1,3 @@
-
 import time
 import argparse
 from .db_manager import DBManager

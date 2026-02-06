@@ -1,1 +1,1 @@
-from .dataset import PoisonedDataset, create_backdoor_test_loader, CIFAR10_CLASSES
+from .attack_wrapper import PoisonedDataset, create_backdoor_test_loader, CIFAR10_CLASSES

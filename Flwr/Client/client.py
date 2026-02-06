@@ -12,7 +12,7 @@ import os
 import time
 
 # --- 新增: 导入 TMAA 模块 ---
-from tee_sim import SimulatedTEE
+from tmaa.tee_sim import SimulatedTEE
 from tmaa.sidecar import TMAA_Sidecar
 
 # ... (保留原有的环境变量获取代码 CLIENT_ID, TOTAL_CLIENTS 等) ...
