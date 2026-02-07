@@ -92,7 +92,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
 
     def log_audit(self, message: str):
         print(message)
-        with open("tmaa_server_audit.log", "a") as f:
+        with open("tmaa_server_audit.log", "a", encoding="utf-8") as f:
             f.write(message + "\n")
 
     def aggregate_fit(

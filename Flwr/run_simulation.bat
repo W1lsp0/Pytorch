@@ -61,10 +61,12 @@ echo -------------------------------------------
 echo ✅ All processes launched in background.
 echo    - Check logs: server.log, tmaa_server_audit.log, client_*.log
 echo.
-echo ⚠️  Monitor logs with PowerShell: Get-Content server.log -Wait
+echo 📊 Starting Dashboard (Inline Mode)...
+echo    (Press Ctrl+C inside the dashboard to stop simulation)
+python dashboard.py
+
 echo.
-echo Press any key to stop all python processes and exit...
-pause >nul
+echo 🛑 Simulation stopped. Cleaning up...
 
 :: Cleanup processes on exit
 taskkill /F /IM python.exe /T 2>nul
