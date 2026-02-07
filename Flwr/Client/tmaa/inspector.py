@@ -25,10 +25,10 @@ import sys
 # 这导致 client.py 的 main() 函数被子进程意外执行
 #
 # 解决方案: 在导入 sklearn 之前设置环境变量，从根本上禁用多进程
-os.environ["LOKY_MAX_CPU_COUNT"] = "1"          # 限制 loky 使用的 CPU 数
-os.environ["JOBLIB_START_METHOD"] = "threading" # 强制使用 threading 后端
-os.environ["OMP_NUM_THREADS"] = "1"             # 禁用 OpenMP 多线程
-os.environ["MKL_NUM_THREADS"] = "1"             # 禁用 MKL 多线程
+os.environ["LOKY_MAX_CPU_COUNT"] = "1"  # 限制 loky 只使用 1 个 CPU (单进程)
+os.environ["OMP_NUM_THREADS"] = "1"     # 禁用 OpenMP 多线程
+os.environ["MKL_NUM_THREADS"] = "1"     # 禁用 MKL 多线程
+os.environ["OPENBLAS_NUM_THREADS"] = "1"  # 禁用 OpenBLAS 多线程
 # ================================================================
 
 import numpy as np
