@@ -51,9 +51,45 @@ def parse_server_log():
             current_round = matches[-1]
     return current_round
 
+# ==================== 数据库连接 ====================
+from Client.poison.db_manager import DBManager
+db_manager = None
+try:
+    # 尝试连接数据库，如果失败则回退到日志
+    db_manager = DBManager()
+    print("✅ [Dashboard] Connected to DB.")
+except:
+    print("⚠️ [Dashboard] DB Connection failed, using logs only.")
+
+def get_all_status_from_db():
+    """从数据库批量获取所有客户端状态"""
+    if db_manager:
+        return db_manager.get_all_client_status()
+    return {}
+
+# 缓存上一轮的 DB 状态，减少高频查询闪烁
+_db_cache = {}
+
 def parse_client_log(client_id):
-    """解析客户端日志获取关键指标"""
+    """
+    优先读取数据库状态，回退到日志
+    """
+    global _db_cache
+    
+    # 1. 尝试从 DB 缓存读取 (主循环负责更新缓存)
+    if client_id in _db_cache:
+        data = _db_cache[client_id]
+        return {
+            "attack": data.get("attack", "-"),
+            "round": str(data.get("round", "-")),
+            "loss": str(data.get("loss", "-")),
+            "asr": str(data.get("asr", "0%")),
+            "status": data.get("status", "Unknown")
+        }
+
+    # 2. 回退到日志解析 (Legacy)
     log_path = f"client_{client_id}.log"
+    
     info = {
         "status": "Waiting",
         "round": "-",
@@ -117,6 +153,9 @@ def main():
 
     while True:
         try:
+            # 1. 刷新数据库缓存 (一次查询获取所有)
+            _db_cache = get_all_status_from_db()
+            
             clear_screen()
             server_round = parse_server_log()
             

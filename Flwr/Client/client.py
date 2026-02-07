@@ -71,6 +71,31 @@ if 'ATTACK_TYPE' in os.environ:
 POISON_RATE = float(os.environ.get("POISON_RATE", 0.0))
 TARGET_LABEL = int(os.environ.get("TARGET_LABEL", 0))
 
+# ==================== 状态同步 (Dashboard Communication) ====================
+# 使用数据库进行状态同步
+from poison.db_manager import DBManager
+db_manager = None
+try:
+    db_manager = DBManager()
+    print("✅ [Status] Connected to DB for status updates.")
+except Exception as e:
+    print(f"⚠️ [Status] DB Connection failed: {e}")
+
+def update_status_monitor(status="Waiting", round_num="-", loss="-", asr="-"):
+    """
+    更新客户端状态到数据库 (供 Dashboard 读取)
+    """
+    if db_manager:
+        data = {
+            "type": "BAD" if ATTACK_TYPE else "GOOD",
+            "attack": ATTACK_TYPE.upper() if ATTACK_TYPE else "HONEST",
+            "round": round_num,
+            "loss": loss,
+            "asr": asr,
+            "status": status
+        }
+        db_manager.update_client_status(CLIENT_ID, data)
+
 # ==================== ASCII Banner ====================
 def print_banner():
     print("\n" + "╔" + "═"*58 + "╗")
@@ -186,6 +211,9 @@ class MyClient(fl.client.NumPyClient):
         logger.info(f"🔄 Round {server_round} | 开始本地训练任务")
         logger.info("━"*60)
 
+        # [Dashboard] Update status
+        update_status_monitor(status="Training", round_num=server_round)
+
         # ====================== TMAA 介入 [Phase 1: Pre-Train] ======================
         logger.info(f"🛡️  [Step 1] TMAA Sidecar 启动监控...")
         tmaa_agent.start_monitoring()
@@ -251,6 +279,13 @@ class MyClient(fl.client.NumPyClient):
         logger.info(f"    │  💀 后门成功率 (ASR): {asr * 100:.2f}%{' '*17}│")
         logger.info(f"    └{'─'*45}┘\n")
 
+        # [Dashboard] Update status
+        acc_str = f"{accuracy*100:.1f}%"
+        asr_str = f"{asr*100:.1f}%"
+        loss_str = f"{loss:.4f}"
+        server_round = config.get("current_round", "-")
+        update_status_monitor(status="Evaluated", round_num=server_round, loss=loss_str, asr=asr_str)
+
         # 返回 metrics 给服务器聚合
         return float(loss), len(testloader.dataset), {
             "accuracy": float(accuracy),
@@ -259,6 +294,9 @@ class MyClient(fl.client.NumPyClient):
 
 if __name__ == "__main__":
     # 启动 Flower 客户端
+    # [Dashboard] Init
+    update_status_monitor(status="Connected")
+
     # 默认连接本地服务器
     server_addr = "127.0.0.1:8080"
     print(f"🔗 正在连接服务器: {server_addr} ...")

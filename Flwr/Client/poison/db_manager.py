@@ -114,17 +114,93 @@ class DBManager:
             PARTITION BY KEY(device_id)
             PARTITIONS 10;
             """
-            cursor.execute(table_logs)
+            # 5. 创建 simulation_status 表 (Dashboard 实时状态)
+            # 作用: 替代 JSON 文件，提供中心化的状态查询
+            table_status = """
+            CREATE TABLE IF NOT EXISTS simulation_status (
+                client_id INT PRIMARY KEY,
+                type VARCHAR(10) DEFAULT 'GOOD',
+                attack VARCHAR(20) DEFAULT 'HONEST',
+                round VARCHAR(10) DEFAULT '-',
+                loss VARCHAR(20) DEFAULT '-',
+                asr VARCHAR(20) DEFAULT '-',
+                status VARCHAR(20) DEFAULT 'Waiting',
+                updated_at DOUBLE,
+                INDEX idx_updated (updated_at)
+            ) ENGINE=MEMORY COMMENT='仿真客户端实时状态表(内存表)';
+            """
+            cursor.execute(table_status)
 
             cnx.commit()
             cursor.close()
             cnx.close()
-            print(f"│  ✅ 表结构初始化完成 (支持分区优化){' '*23}│")
+            print(f"│  ✅ 表结构初始化完成 (支持分区优化 + 内存状态表){' '*8}│")
             print(f"└{'─'*58}┘\n")
 
         except mysql.connector.Error as err:
             print(f"❌ [DBManager] Failed to init DB: {err}")
             raise
+
+    def update_client_status(self, client_id: int, data: Dict):
+        """
+        更新客户端实时状态 (Upsert)
+        """
+        cnx = self.get_connection()
+        cursor = cnx.cursor()
+        
+        # 确保所有字段都有默认值
+        fields = {
+            "client_id": client_id,
+            "type": data.get("type", "GOOD"),
+            "attack": data.get("attack", "HONEST"),
+            "round": str(data.get("round", "-")),
+            "loss": str(data.get("loss", "-")),
+            "asr": str(data.get("asr", "-")),
+            "status": data.get("status", "Unknown"),
+            "updated_at": time.time()
+        }
+
+        sql = """
+        INSERT INTO simulation_status 
+        (client_id, type, attack, round, loss, asr, status, updated_at)
+        VALUES (%(client_id)s, %(type)s, %(attack)s, %(round)s, %(loss)s, %(asr)s, %(status)s, %(updated_at)s)
+        ON DUPLICATE KEY UPDATE
+        type=VALUES(type),
+        attack=VALUES(attack),
+        round=VALUES(round),
+        loss=VALUES(loss),
+        asr=VALUES(asr),
+        status=VALUES(status),
+        updated_at=VALUES(updated_at)
+        """
+        try:
+            cursor.execute(sql, fields)
+            cnx.commit()
+        except Exception as e:
+            # print(f"DB Update Error: {e}")
+            pass
+        finally:
+            cursor.close()
+            cnx.close()
+
+    def get_all_client_status(self) -> Dict[int, Dict]:
+        """
+        获取所有客户端的实时状态 (for Dashboard)
+        """
+        cnx = self.get_connection()
+        cursor = cnx.cursor(dictionary=True)
+        result = {}
+        try:
+            cursor.execute("SELECT * FROM simulation_status")
+            rows = cursor.fetchall()
+            for row in rows:
+                result[row['client_id']] = row
+        except:
+            pass
+        finally:
+            cursor.close()
+            cnx.close()
+        return result
 
     def get_connection(self):
         """获取一个新的数据库连接"""
