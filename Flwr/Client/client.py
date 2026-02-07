@@ -21,10 +21,17 @@ Client Main 联邦学习客户端主程序
 """
 
 import flwr as fl
-import flwr as fl
 import sys
 import os
-print(f"DEBUG: Client/client.py loaded, __name__ is {__name__}, pid is {os.getpid()}, argv: {sys.argv}")
+
+# ==================== 强制单线程/线程池模式 ====================
+# 防止 joblib/sklearn 启动子进程导致 client.py 重复执行 __main__
+os.environ["JOBLIB_START_METHOD"] = "threading" 
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1" 
+
+import flwr as fl
+# print(f"DEBUG: Client/client.py loaded, __name__ is {__name__}, pid is {os.getpid()}, argv: {sys.argv}")
 import torch
 import torch.optim as optim
 import torch.nn as nn
