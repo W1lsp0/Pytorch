@@ -37,13 +37,16 @@ class DBManager:
     def __init__(self, host="127.0.0.1", port=3306, user="root", password="root123456"):
         """
         初始化数据库管理器
-
+        
         Args:
-            host (str): MySQL 主机地址
+            host (str): MySQL 主机地址 (默认优先读取环境变量 DB_HOST, 否则 127.0.0.1)
             port (int): MySQL 端口
             user (str): 用户名
             password (str): 密码
         """
+        import os
+        if host is None:
+            host = os.environ.get("DB_HOST", "127.0.0.1")
         self.config = {
             'user': user,
             'password': password,

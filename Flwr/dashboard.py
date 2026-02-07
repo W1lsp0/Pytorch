@@ -58,8 +58,9 @@ try:
     # 尝试连接数据库，如果失败则回退到日志
     db_manager = DBManager()
     print("✅ [Dashboard] Connected to DB.")
-except:
-    print("⚠️ [Dashboard] DB Connection failed, using logs only.")
+except Exception as e:
+    print(f"⚠️ [Dashboard] DB Connection failed: {e}")
+    print(f"⚠️ [Dashboard] Falling back to log parsing.")
 
 def get_all_status_from_db():
     """从数据库批量获取所有客户端状态"""
@@ -155,6 +156,14 @@ def main():
         try:
             # 1. 刷新数据库缓存 (一次查询获取所有)
             _db_cache = get_all_status_from_db()
+            
+            # Debug: Write DB Cache to file
+            with open("dashboard_debug.log", "w", encoding="utf-8") as f:
+                f.write(f"Timestamp: {time.ctime()}\n")
+                f.write(f"DB Cache Keys: {list(_db_cache.keys())}\n")
+                if _db_cache:
+                    f.write(f"Sample Client 0: {_db_cache.get(0)}\n")
+                    f.write(f"Sample Client 2: {_db_cache.get(2)}\n")
             
             clear_screen()
             server_round = parse_server_log()
