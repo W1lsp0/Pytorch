@@ -1,0 +1,183 @@
+[93mWARNING [0m:   DEPRECATED FEATURE: flwr.client.start_numpy_client() is deprecated. 
+	Instead, use `flwr.client.start_client()` by ensuring you first call the `.to_client()` method as shown below: 
+	flwr.client.start_client(
+		server_address='<IP>:<PORT>',
+		client=FlowerClient().to_client(), # <-- where FlowerClient is of type flwr.client.NumPyClient object
+	)
+	Using `start_numpy_client()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+[93mWARNING [0m:   DEPRECATED FEATURE: flwr.client.start_client() is deprecated.
+	Instead, use the `flower-supernode` CLI command to start a SuperNode as shown below:
+
+		$ flower-supernode --insecure --superlink='<IP>:<PORT>'
+
+	To view all available options, run:
+
+		$ flower-supernode --help
+
+	Using `start_client()` is deprecated.
+
+            This is a deprecated feature. It will be removed
+            entirely in future versions of Flower.
+        
+[92mINFO [0m:      
+[92mINFO [0m:      Received: train message b0c34785-2b68-42b7-b4e4-262e2ac2ed75
+[92mINFO [0m:      Sent reply
+[92mINFO [0m:      
+[92mINFO [0m:      Received: evaluate message 21490880-b98a-46d5-9e58-506e90cdf81a
+[92mINFO [0m:      Sent reply
+[92mINFO [0m:      
+[92mINFO [0m:      Received: train message 570f357c-6f10-4194-8555-8aa38da5063b
+[91mERROR [0m:     Client raised an exception.
+Traceback (most recent call last):
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\compat\client\app.py", line 464, in start_client_internal
+    reply_message = client_app(message=message, context=context)
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\clientapp\client_app.py", line 144, in __call__
+    return self._call(message, context)
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\clientapp\client_app.py", line 128, in ffn
+    out_message = handle_legacy_message_from_msgtype(
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\client\message_handler\message_handler.py", line 129, in handle_legacy_message_from_msgtype
+    fit_res = maybe_call_fit(
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\client\client.py", line 224, in maybe_call_fit
+    return client.fit(fit_ins)
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\client\numpy_client.py", line 227, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+  File "F:\Code\Pytorch\Flwr\Client\client.py", line 176, in fit
+    tmaa_agent.start_monitoring()
+  File "F:\Code\Pytorch\Flwr\Client\tmaa\sidecar.py", line 45, in start_monitoring
+    self.start()  # 启动线程 run()
+  File "D:\Anaconda\envs\w1lsp0\lib\threading.py", line 930, in start
+    raise RuntimeError("threads can only be started once")
+RuntimeError: threads can only be started once
+
+╔══════════════════════════════════════════════════════════╗
+║  🚀 联邦学习客户端启动 (Client ID: 1)                ║
+╠══════════════════════════════════════════════════════════╣
+║  💻 计算设备:  cuda:0                                    ║
+║  🛡️  TMAA 监控:  Enabled                                   ║
+║  😈 攻击模式:  BACKDOOR                                  ║
+╚══════════════════════════════════════════════════════════╝
+
+
+┌──────────────────────────────────────────────────────────┐
+│  📦 正在加载 CIFAR-10 数据集...                            │
+└──────────────────────────────────────────────────────────┘
+Files already downloaded and verified
+Files already downloaded and verified
+│  🎲 数据划分: 随机抽样 (Overlap Enabled) | Seed: 2025       │
+
+╔══════════════════════════════════════════════════════════╗
+║                    ☠️  投毒攻击已启动!                   ║
+╠══════════════════════════════════════════════════════════╣
+║  攻击类型:   BACKDOOR                                   ║
+║  投毒比例:   20.0%                                           ║
+║  投毒样本:   1000 / 5000                                     ║
+╠══════════════════════════════════════════════════════════╣
+║  策略: 触发器 + 强制改标 (-> 0)                   ║
+╚══════════════════════════════════════════════════════════╝
+
+│  ⚠️  投毒攻击已启用: BACKDOOR (20%)     │
+└──────────────────────────────────────────────────────────┘
+
+Files already downloaded and verified
+
+╔══════════════════════════════════════════════════════════╗
+║                    ☠️  投毒攻击已启动!                   ║
+╠══════════════════════════════════════════════════════════╣
+║  攻击类型:   BACKDOOR                                   ║
+║  投毒比例:   100.0%                                          ║
+║  投毒样本:   10000 / 10000                                   ║
+╠══════════════════════════════════════════════════════════╣
+║  策略: 触发器 + 强制改标 (-> 0)                   ║
+╚══════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────┐
+│  🎯 后门测试集已创建                                       │
+│     样本数: 10000                                         │
+│     目标标签: 0 (飞机)                                   │
+└──────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────┐
+│  🏗️  正在构建 CIFAR-10 适配版 ResNet-18 模型...             │
+└──────────────────────────────────────────────────────────┘
+│  ✅ 模型构建完成! 输出类别数: 10                        │
+└──────────────────────────────────────────────────────────┘
+
+🔐 [Init] 正在初始化可信执行环境 (TEE) 与监控代理...
+    ⚠️  [Config] 启用数据库仿真监控 (L4 Simulation Mode)
+┌──────────────────────────────────────────────────────────┐
+│  🔌 正在连接 MySQL: 127.0.0.1:3306...                   │
+│  ✅ 数据库 'tmaa_simulation' 准备就绪                          │
+│  ✅ 表结构初始化完成 (支持分区优化)                       │
+└──────────────────────────────────────────────────────────┘
+
+🔗 正在连接服务器: 127.0.0.1:8080 ...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔄 Round 1 | 开始本地训练任务
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛡️  [Step 1] TMAA Sidecar 启动监控...
+🛡️ [TMAA] Sidecar 守护进程启动 (Target PID: 29728)
+🛡️  [Step 2] TMAA 执行 L3 数据隐私层审计...
+    🔍 [Inspector] 正在执行深度数据审计 (Deep Inspection)...
+⚠️  [Monitor] 警告: 关键文件丢失 -> client_main.py
+⚠️  [Monitor] 警告: 关键文件丢失 -> model.py
+    ┌────────────────────────────────────────────────────┐
+    │  📊 审计结果摘要                                   │
+    ├────────────────────────────────────────────────────┤
+    │  • 熵值 (Non-IID):      0.9457 (1.0=IID)           │
+    │  • 唯一性 (Uniqueness): 1.0000 (1.0=Unique)        │
+    │  • 初始损失 (Loss):     3.0903                       │
+    │  • 后门聚类分数:        0.4509                       │
+    │    ⚠️ 疑似后门类别:     Class 7                        │
+    └────────────────────────────────────────────────────┘
+    🏋️  开始训练 (1 Epochs)...
+       Epoch 1/1 | Loss: 2.1109
+✅ 本地训练完成 (耗时: 16.82s)
+🛡️  [Step 3] TMAA 停止监控并生成可信报告...
+
+🔐 [TMAA] 已生成可信报告 (Signed by device_001)
+
+    ┌─────────────────────────────────────────────┐
+    │  📊 客户端 1 本地评估报告                 │
+    ├─────────────────────────────────────────────┤
+    │  ✅ 正常准确率 (MTA): 14.59%                 │
+    │  💀 后门成功率 (ASR): 3.94%                 │
+    └─────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔄 Round 2 | 开始本地训练任务
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛡️  [Step 1] TMAA Sidecar 启动监控...
+Traceback (most recent call last):
+  File "F:\Code\Pytorch\Flwr\Client\client.py", line 251, in <module>
+    fl.client.start_numpy_client(
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\compat\client\app.py", line 622, in start_numpy_client
+    start_client(
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\compat\client\app.py", line 181, in start_client
+    start_client_internal(
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\compat\client\app.py", line 471, in start_client_internal
+    raise ex
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\compat\client\app.py", line 464, in start_client_internal
+    reply_message = client_app(message=message, context=context)
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\clientapp\client_app.py", line 144, in __call__
+    return self._call(message, context)
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\clientapp\client_app.py", line 128, in ffn
+    out_message = handle_legacy_message_from_msgtype(
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\client\message_handler\message_handler.py", line 129, in handle_legacy_message_from_msgtype
+    fit_res = maybe_call_fit(
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\client\client.py", line 224, in maybe_call_fit
+    return client.fit(fit_ins)
+  File "D:\Anaconda\envs\w1lsp0\lib\site-packages\flwr\client\numpy_client.py", line 227, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+  File "F:\Code\Pytorch\Flwr\Client\client.py", line 176, in fit
+    tmaa_agent.start_monitoring()
+  File "F:\Code\Pytorch\Flwr\Client\tmaa\sidecar.py", line 45, in start_monitoring
+    self.start()  # 启动线程 run()
+  File "D:\Anaconda\envs\w1lsp0\lib\threading.py", line 930, in start
+    raise RuntimeError("threads can only be started once")
+RuntimeError: threads can only be started once

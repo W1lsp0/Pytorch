@@ -1,0 +1,16 @@
+
+🛡️  [TMAA Server] Round 1 | 接收客户端数据 (Passive Mode)...
+    ⚠️ [Client 4d718621b3ad40f9904850d3d4283949] 报告解析警告: 'header'
+    ⚠️ [Client d77adc311cf34c38994b6976045fe0fe] 报告解析警告: 'header'
+    ⚠️ [Client ffc5b40beece4fa3ae98eb7e7cf9e2db] 报告解析警告: 'header'
+    ⚠️ [Client 11091703f636488ca40c6e424dd664f4] 报告解析警告: 'header'
+    ⚠️ [Client a9dcb44d1971488282460cf3e7c104a2] 报告解析警告: 'header'
+    ⚠️ [Client 558c1f888e8e4122a20e64c550dabefc] 报告解析警告: 'header'
+    ⚠️ [Client 06b24a895292416c8bcf8a35e93a7fa5] 报告解析警告: 'header'
+    ⚠️ [Client 9c662066ec42400598d10c1cfb4f561d] 报告解析警告: 'header'
+    ⚠️ [Client d3010610dff946f6b5721738218c4ac3] 报告解析警告: 'header'
+    ⚠️ [Client a2e3cb6bab6847aa98dbbac6f11069ff] 报告解析警告: 'header'
+🛡️  [TMAA Server] 审计结束. 放行所有客户端 (10) 进行聚合.
+
+🛡️  [TMAA Server] Round 2 | 接收客户端数据 (Passive Mode)...
+🛡️  [TMAA Server] 审计结束. 放行所有客户端 (0) 进行聚合.
