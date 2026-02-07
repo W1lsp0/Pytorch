@@ -25,8 +25,12 @@
 import time
 import argparse
 import random
-from .db_manager import DBManager
-from .simulator import DeviceSimulator
+try:
+    from .db_manager import DBManager
+    from .simulator import DeviceSimulator
+except ImportError:
+    from db_manager import DBManager
+    from simulator import DeviceSimulator
 
 def main():
     parser = argparse.ArgumentParser(description="TMAA 硬件踪迹生成器")
