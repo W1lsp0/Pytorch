@@ -15,6 +15,8 @@ pkill -f "python server/server.py" || true
 pkill -f "python Client/client.py" || true
 wait # 等待进程完全退出
 
+rm -f /tmp/flwr_client_*.lock
+
 # 清理旧日志
 rm -f server.log tmaa_server_audit.log client_*.log dashboard_debug.log
 
