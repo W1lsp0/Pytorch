@@ -20,23 +20,17 @@ Client Main 联邦学习客户端主程序
 ==============================================================================
 """
 
-import flwr as fl
 import sys
 import os
 
-# ==================== 强制单线程/线程池模式 ====================
-# 防止 joblib/sklearn 启动子进程导致 client.py 重复执行 __main__
-os.environ["JOBLIB_START_METHOD"] = "threading" 
+# 防止 joblib/sklearn 启动子进程导致资源竞争
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1" 
 
 import flwr as fl
-# print(f"DEBUG: Client/client.py loaded, __name__ is {__name__}, pid is {os.getpid()}, argv: {sys.argv}")
 import torch
 import torch.optim as optim
 import torch.nn as nn
-import sys
-import os
 import time
 import json
 from typing import Dict, Tuple, List, Any
@@ -272,6 +266,13 @@ class MyClient(fl.client.NumPyClient):
         }
 
 def main():
+    # ==================== 防止子进程重复执行 ====================
+    # joblib/loky 后端可能会重新导入 __main__ 来启动工作进程
+    # 通过环境变量防止 main() 在子进程中递归执行
+    if os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
+        return
+    os.environ["FLWR_CLIENT_ALREADY_RUNNING"] = "1"
+
     global db_manager
     
     # 状态数据库初始化
