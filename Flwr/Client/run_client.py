@@ -6,13 +6,8 @@
 这是客户端的入口点脚本。
 
 为什么需要这个脚本？
-    joblib/loky 使用 spawn 方式创建子进程时，会重新导入 __main__ 模块。
-    如果 client.py 直接作为 __main__ 运行，loky 子进程会重新执行 client.py，
-    导致 main() 函数被意外执行。
-    
-    通过将入口逻辑分离到这个独立脚本中，当 loky 子进程导入 client.py 时，
-    client.py 的 __name__ 是 "client"（不是 "__main__"），
-    所以 main() 不会被执行。
+    joblib/loky 使用 spawn 方式创建子进程时，会重新执行 __main__ 模块。
+    通过在入口点检测是否为子进程，可以防止 main() 被意外执行。
 
 用法:
     python run_client.py
@@ -24,12 +19,35 @@
         POISON_RATE: 投毒比例
         TARGET_LABEL: 目标标签
 
-作者: Flwr 联邦学习项目
 ==============================================================================
 """
+import multiprocessing
+
+def _is_worker_process() -> bool:
+    """
+    检测当前进程是否为 loky/multiprocessing 的工作进程
+    """
+    # 检查进程名称：主进程名为 "MainProcess"，子进程名为其他
+    current = multiprocessing.current_process()
+    if current.name != "MainProcess":
+        return True
+    
+    # 检查是否有父进程标记（loky 特有）
+    import os
+    if os.environ.get("LOKY_PICKLER"):
+        return True
+    
+    return False
 
 if __name__ == "__main__":
-    # 只有当这个脚本直接运行时才执行 main()
-    # loky 子进程导入 client.py 时不会执行这里
-    from client import main
-    main()
+    # 支持 Windows 和 spawn 方式的 multiprocessing
+    multiprocessing.freeze_support()
+    
+    # 检测是否为工作进程
+    if _is_worker_process():
+        # 子进程：静默退出，让 loky 正常处理
+        pass
+    else:
+        # 主进程：执行客户端逻辑
+        from client import main
+        main()
