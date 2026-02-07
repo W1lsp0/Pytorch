@@ -1,4 +1,9 @@
 @echo off
+chcp 65001 >nul
+title FL Simulation
+set PYTHONIOENCODING=utf-8
+set PYTHONUTF8=1
+
 set "SERVER_ADDRESS=0.0.0.0:8080"
 set "TOTAL_CLIENTS=10"
 set "USE_SIMULATION=1"
