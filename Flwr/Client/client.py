@@ -21,6 +21,10 @@ Client Main 联邦学习客户端主程序
 """
 
 import flwr as fl
+import flwr as fl
+import sys
+import os
+print(f"DEBUG: Client/client.py loaded, __name__ is {__name__}, pid is {os.getpid()}, argv: {sys.argv}")
 import torch
 import torch.optim as optim
 import torch.nn as nn
