@@ -195,7 +195,8 @@ class DBManager:
             rows = cursor.fetchall()
             for row in rows:
                 result[row['client_id']] = row
-        except:
+        except Exception as e:
+            print(f"⚠️ [DBManager] Error fetching status: {e}")
             pass
         finally:
             cursor.close()

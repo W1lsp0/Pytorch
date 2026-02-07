@@ -73,13 +73,15 @@ _db_cache = {}
 
 def parse_client_log(client_id):
     """
-    优先读取数据库状态，回退到日志
+    只读取数据库状态 (No Fallback)
     """
     global _db_cache
     
-    # 1. 尝试从 DB 缓存读取 (主循环负责更新缓存)
-    if client_id in _db_cache:
-        data = _db_cache[client_id]
+    # 确保 ID 类型匹配 (DB key 是 int)
+    cid = int(client_id)
+    
+    if cid in _db_cache:
+        data = _db_cache[cid]
         return {
             "attack": data.get("attack", "-"),
             "round": str(data.get("round", "-")),
@@ -88,60 +90,14 @@ def parse_client_log(client_id):
             "status": data.get("status", "Unknown")
         }
 
-    # 2. 回退到日志解析 (Legacy)
-    log_path = f"client_{client_id}.log"
-    
-    info = {
-        "status": "Waiting",
+    # 如果数据库里没有 (比如还没启动)
+    return {
+        "status": "Waiting...",
         "round": "-",
         "loss": "-",
-        "asr": "0%",
+        "asr": "-",
         "attack": "-"
     }
-    
-    if not os.path.exists(log_path):
-        return info
-
-    try:
-        with open(log_path, 'r', encoding='utf-8', errors='ignore') as f:
-            content = f.read()
-            
-            # 1. 攻击类型
-            att_match = re.search(r"攻击模式:\s+(\w+)", content)
-            if att_match:
-                info["attack"] = att_match.group(1)
-            else:
-                 # 尝试从 Banner 找 Honest
-                 if "正常训练 (Honest)" in content:
-                     info["attack"] = "HONEST"
-            
-            # 2. 当前轮次
-            # Match "Round X |" with optional logging prefixes
-            round_match = re.findall(r"Round (\d+) \|", content)
-            if round_match:
-                info["round"] = round_match[-1]
-                info["status"] = "Training"
-            
-            # 3. Loss
-            # Match "Loss: 0.1234"
-            loss_match = re.findall(r"Loss: ([\d\.]+)", content)
-            if loss_match:
-                info["loss"] = loss_match[-1]
-
-            # 4. ASR (Attack Success Rate)
-            # Match "ASR): 99.00%"
-            asr_match = re.findall(r"ASR\): ([\d\.]+)", content)
-            if asr_match:
-                info["asr"] = asr_match[-1] + "%"
-                
-            # 5. TMAA 签名
-            if "已生成可信报告" in content[-500:]: # 检查最后 500 字符
-                info["status"] = "Reported"
-
-    except Exception:
-        pass
-        
-    return info
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -169,34 +125,61 @@ def main():
             server_round = parse_server_log()
             
             print(f"┌{'─'*82}┐")
-            print(f"│  🌍 Server Status: Round {str(server_round).ljust(60)}│")
+            
+            # 调试信息: 显示 DB 连接状态和缓存大小
+            db_status = f"✅ Connected ({len(_db_cache)} nodes)" if db_manager else "❌ Disconnected"
+            print(f"│  🌍 服务器状态: Round {str(server_round).ljust(20)} | DB: {db_status.ljust(33)}│")
             print(f"├{'─'*8}┬{'─'*12}┬{'─'*12}┬{'─'*12}┬{'─'*10}┬{'─'*10}┬{'─'*12}┤")
-            print(f"│ {'ID'.center(6)} │ {'Type'.center(10)} │ {'Attack'.center(10)} │ {'Round'.center(10)} │ {'Loss'.center(8)} │ {'ASR'.center(8)} │ {'Status'.center(10)} │")
+            # 中文字符视觉宽度为2，所以 center 宽度要减去 (汉字数 (2) * 1) = 实际上 center(w) 产生的总视觉宽度是 w + 汉字数
+            # 目标视觉宽度: 10. string="类型" len=2. center(8) -> 3sp + 2ch(4px) + 3sp = 10px.
+            print(f"│ {'ID'.center(6)} │ {'类型'.center(8)} │ {'攻击'.center(8)} │ {'轮次'.center(8)} │ {'Loss'.center(8)} │ {'ASR'.center(8)} │ {'状态'.center(8)} │")
             print(f"├{'─'*8}┼{'─'*12}┼{'─'*12}┼{'─'*12}┼{'─'*10}┼{'─'*10}┼{'─'*12}┤")
             
             for i in range(total_clients):
                 data = parse_client_log(i)
                 
                 # 简单的类型判断
-                c_type = "😈 BAD" if i < 4 else "✅ GOOD"
-                if i < 4 and data["attack"] == "-": data["attack"] = "Unknown" 
+                c_type = "😈 恶意" if i < 4 else "✅ 诚实"
+                # c_type 包含2个汉字(恶意/诚实) + 1个emoji(😈/✅) + 1个空格.
+                # emoji 宽度通常为2. 汉字为2.
+                # 😈 (2) + ' ' (1) + 恶 (2) + 意 (2) = 7 visual width.
+                # "😈 恶意".center(10) -> len=4. 3sp + 4len + 3sp.
+                # Visual: 3 + 7 + 3 = 13. Too wide for 12 slot?
+                # Slot is 12 (from header line 173).
+                # To get visual 12: 12 - 7 = 5 spaces. center(4+5) -> center(9).
+                # "😈 恶意".center(5) is too small.
+                # Let's manual pad.
+                c_type_str = f"{c_type}" # visual 7
+                # target 12. left 2, right 3.
+                c_type_cell = "  " + c_type_str + "   "
                 
-                # ASR 只有 Backdoor/CleanLabel 有意义，其他可以标灰 (这里简单全显示)
-                asr_val = data['asr']
-                if data['attack'] not in ['BACKDOOR', 'CLEAN_L']:
-                     # Optional: make it less prominent
-                     pass
+                # Attack is usually English (LABEL_FLIP etc)
+                # target 12.
+                attack_cell = data['attack'][:10].center(12)
 
-                row = f"│ {str(i).center(6)} │ {c_type.center(10)} │ {data['attack'][:10].center(10)} │ {str(data['round']).center(10)} │ {str(data['loss']).center(8)} │ {asr_val.center(8)} │ {data['status'].center(10)} │"
+                # Round target 12.
+                round_cell = str(data['round']).center(12)
+                
+                # Loss target 10.
+                loss_cell = str(data['loss']).center(10)
+                
+                # ASR target 10.
+                asr_cell = data['asr'].center(10)
+                
+                # Status target 12.
+                # If status is Chinese? It is "Training"/"Waiting" (English in code).
+                status_cell = data['status'].center(12)
+
+                row = f"│ {str(i).center(6)} │{c_type_cell}│{attack_cell}│{round_cell}│{loss_cell}│{asr_cell}│{status_cell}│"
                 print(row)
                 
             print(f"└{'─'*8}┴{'─'*12}┴{'─'*12}┴{'─'*12}┴{'─'*10}┴{'─'*10}┴{'─'*12}┘")
-            print("\nUpdating every 2 seconds...")
-            print("Tip: Run this in a separate window side-by-side with your logs.")
+            print("\n每 2 秒刷新一次...")
+            print("提示: 建议将此窗口与日志窗口并排显示。")
             
             time.sleep(2)
         except KeyboardInterrupt:
-            print("\nExiting...")
+            print("\n正在退出...")
             break
         except Exception as e:
             print(f"Error: {e}")
