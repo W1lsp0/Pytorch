@@ -77,7 +77,8 @@ class TMAA_Sidecar:
         print(f"🛡️ [TMAA] Sidecar 守护进程启动 (Target PID: {self.pid})")
 
         # L1: 初始完整性检查 (检查 key files)
-        self.monitor.check_file_integrity(["client_main.py", "model.py"])
+        # 修正文件路径，使用相对路径或绝对路径
+        self.monitor.check_file_integrity(["Client/client.py", "model.py"])
 
         while self.running:
             # L2 & L4: 周期性采样 (1Hz)

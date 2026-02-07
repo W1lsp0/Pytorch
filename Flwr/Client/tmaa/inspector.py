@@ -116,14 +116,18 @@ def calc_backdoor_indicator(net: nn.Module,
     if len(indices) < 10: 
         return 0.0 # 样本太少，无法聚类
     
-    target_features = features[indices]
-    
     # 3. 尝试强制二分聚类 (K-Means k=2)
     # 使用 threading 后端防止 spawning 新进程导致 client.py 重复执行
     try:
         from joblib import parallel_backend
+        # 强制 n_jobs=1 且使用 threading 后端
         with parallel_backend('threading', n_jobs=1):
-            kmeans = KMeans(n_clusters=2, random_state=42, n_init=10).fit(target_features)
+            # 若 sklearn 版本较高 n_jobs 可能报错，改为仅在 context 限制
+            if 'n_jobs' in KMeans.__init__.__code__.co_varnames:
+                 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10, n_jobs=1).fit(target_features)
+            else:
+                 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10).fit(target_features)
+                 
         cluster_labels = kmeans.labels_
         
         # 4. 计算轮廓系数 (Silhouette Coefficient)

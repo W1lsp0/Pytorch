@@ -26,6 +26,7 @@ import os
 # 防止 joblib/sklearn 启动子进程导致资源竞争
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1" 
+os.environ["LOKY_MAX_CPU_COUNT"] = "1" 
 
 import flwr as fl
 import torch
