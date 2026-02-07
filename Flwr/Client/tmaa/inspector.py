@@ -24,6 +24,16 @@ import hashlib
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from typing import List, Dict, Any, Tuple
+import sys
+
+# ==================== 解决 Windows 中文乱码问题 ====================
+if sys.platform.startswith('win'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
+# ================================================================
 
 # ==================== 核心检测算法 ====================
 

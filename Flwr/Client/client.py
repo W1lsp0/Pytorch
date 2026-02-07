@@ -30,6 +30,17 @@ import time
 import json
 from typing import Dict, Tuple, List, Any
 
+# ==================== 解决 Windows 中文乱码问题 ====================
+# 强制将标准输出和错误输出设置为 UTF-8 编码
+if sys.platform.startswith('win'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        # Python < 3.7
+        pass
+# ================================================================
+
 # 项目模块导入
 from model import get_resnet18
 from dataset import load_data

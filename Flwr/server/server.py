@@ -20,9 +20,19 @@
 """
 
 import flwr as fl
-import flwr as fl
 from typing import List, Tuple, Dict, Any, Optional
 from flwr.common import Metrics
+import sys
+import os
+
+# ==================== 解决 Windows 中文乱码问题 ====================
+if sys.platform.startswith('win'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
+# ================================================================
 
 
 # ==================== 配置回调函数 ====================
