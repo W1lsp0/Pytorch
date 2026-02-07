@@ -119,9 +119,11 @@ def calc_backdoor_indicator(net: nn.Module,
     target_features = features[indices]
     
     # 3. 尝试强制二分聚类 (K-Means k=2)
-    # 假设：如果是后门攻击，带触发器的样本和正常样本在特征空间应有显著差异
+    # 使用 threading 后端防止 spawning 新进程导致 client.py 重复执行
     try:
-        kmeans = KMeans(n_clusters=2, random_state=42, n_init=10).fit(target_features)
+        from joblib import parallel_backend
+        with parallel_backend('threading', n_jobs=1):
+            kmeans = KMeans(n_clusters=2, random_state=42, n_init=10).fit(target_features)
         cluster_labels = kmeans.labels_
         
         # 4. 计算轮廓系数 (Silhouette Coefficient)
