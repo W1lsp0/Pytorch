@@ -114,6 +114,7 @@ class DBManager:
             PARTITION BY KEY(device_id)
             PARTITIONS 10;
             """
+            cursor.execute(table_logs)
             # 5. 创建 simulation_status 表 (Dashboard 实时状态)
             # 作用: 替代 JSON 文件，提供中心化的状态查询
             table_status = """
