@@ -34,7 +34,7 @@ class DBManager:
         - telemetry_logs: 动态运行时遥测
     """
 
-    def __init__(self, host="127.0.0.1", port=3306, user="root", password="root123456"):
+    def __init__(self, host="59.67.152.211", port=3306, user="root", password="root123456"):
         """
         初始化数据库管理器
         
