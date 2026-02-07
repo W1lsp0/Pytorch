@@ -28,11 +28,12 @@ from .monitor import SystemMonitor
 from .inspector import DataInspector
 
 class TMAA_Sidecar(threading.Thread):
-    def __init__(self, tee_hardware, pid: int):
+    def __init__(self, tee_hardware, pid: int, use_simulation: bool = False):
         super().__init__()
         self.tee = tee_hardware
         self.pid = pid
-        self.monitor = SystemMonitor(pid)
+        # 传递 device_id 给 monitor 用于数据库读取
+        self.monitor = SystemMonitor(pid, device_id=tee_hardware.device_id, use_simulation=use_simulation)
         self.data_metrics = {}
         self.running = False
         self.report = None

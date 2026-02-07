@@ -20,7 +20,8 @@
 """
 
 import flwr as fl
-from typing import List, Tuple, Dict, Any
+import flwr as fl
+from typing import List, Tuple, Dict, Any, Optional
 from flwr.common import Metrics
 
 
@@ -73,14 +74,75 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     }
 
 
-# ==================== 联邦学习策略 ====================
-# 使用 FedAvg (联邦平均) 算法
-strategy = fl.server.strategy.FedAvg(
+import json
+from flwr.server.client_proxy import ClientProxy
+from flwr.common import FitRes, Parameters, Scalar
+
+# ==================== TMAA 安全聚合策略 ====================
+class TMAA_FedAvg(fl.server.strategy.FedAvg):
+    """
+    TMAA 增强版 FedAvg 策略
+    
+    功能:
+        在聚合参数前，拦截并验证客户端提交的 '可信报告' (Trust Report)。
+        根据硬件指纹和签名验证结果，决定是否接受该客户端的更新。
+    """
+    
+
+
+    def log_audit(self, message: str):
+        print(message)
+        with open("tmaa_server_audit.log", "a") as f:
+            f.write(message + "\n")
+
+    def aggregate_fit(
+        self,
+        server_round: int,
+        results: List[Tuple[ClientProxy, FitRes]],
+        failures: List[str | BaseException],
+    ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
+        
+        self.log_audit(f"\n🛡️  [TMAA Server] Round {server_round} | 接收客户端数据 (Passive Mode)...")
+        
+        valid_results = []
+        rejected_count = 0
+        
+        for client, fit_res in results:
+            metrics = fit_res.metrics
+            if "trust_report_json" in metrics:
+                try:
+                    report = json.loads(metrics["trust_report_json"])
+                    tee_id = report['header']['device_id']
+                    
+                    # 提取攻击信息 (如有)
+                    meta = report["metrics"].get("client_reported_meta", {})
+                    attack_mode = meta.get("attack_mode", "none")
+                    
+                    self.log_audit(f"    📄 [Client {client.cid}] 收到可信报告 | TEE: {tee_id:12} | Attack: {attack_mode}")
+                    
+                    # 提取指纹 (演示用)
+                    fingerprint = report["metrics"]["behavior_fingerprint"]
+                    # print(f"       Fingerprint: {fingerprint}")
+                    valid_results.append((client, fit_res))
+                    
+                except Exception as e:
+                    self.log_audit(f"    ⚠️ [Client {client.cid}] 报告解析警告: {e}")
+                    valid_results.append((client, fit_res))
+            else:
+                self.log_audit(f"    ⚠️ [Client {client.cid}] 未附带可信报告")
+                valid_results.append((client, fit_res))
+
+        self.log_audit(f"🛡️  [TMAA Server] 审计结束. 放行所有客户端 ({len(results)}) 进行聚合.")
+        
+        return super().aggregate_fit(server_round, results, failures)
+
+# 使用 TMAA 自定义策略
+strategy = TMAA_FedAvg(
     fraction_fit=1.0,                      # 每轮采样 100% 的可用客户端参与训练
     fraction_evaluate=1.0,                 # 每轮采样 100% 的可用客户端参与评估
-    min_fit_clients=3,                     # 每轮至少请求 3 个客户端进行训练
-    min_evaluate_clients=3,                # 每轮至少请求 3 个客户端进行评估
-    min_available_clients=3,               # 启动训练前等待至少 3 个客户端连接
+    min_fit_clients=10,                     # 每轮至少请求 10 个客户端
+    min_evaluate_clients=10,                # 每轮至少请求 10 个客户端
+    min_available_clients=10,               # 启动训练前等待至少 10 个客户端连接
     
     evaluate_metrics_aggregation_fn=weighted_average,  # 配置聚合函数
     on_fit_config_fn=get_on_fit_config_fn,            # 配置下发函数

@@ -27,12 +27,28 @@ import statistics
 from typing import List, Dict, Any, Optional
 
 class SystemMonitor:
-    def __init__(self, pid: int):
+    def __init__(self, pid: int, device_id: str = None, use_simulation: bool = False):
         """
         Args:
             pid: 被监控进程的 PID
+            device_id: (Simulation) 模拟设备ID
+            use_simulation: 是否使用数据库仿真数据
         """
         self.pid = pid
+        self.device_id = device_id
+        self.use_simulation = use_simulation
+        
+        # Simulation State
+        self.sim_offset = 0
+        self.db_manager = None
+        if self.use_simulation:
+            from poison.db_manager import DBManager
+            try:
+                self.db_manager = DBManager()
+            except:
+                print("⚠️ [Monitor] DB Connection failed, fallback to real monitor")
+                self.use_simulation = False
+
         self.metrics_history = {
             "cpu": [],
             "memory": [],
@@ -63,18 +79,40 @@ class SystemMonitor:
         """
         L2: 采样 CPU/内存 (构建资源指纹)
         """
-        try:
-            proc = psutil.Process(self.pid)
-            # interval=None 表示非阻塞，返回上次调用以来的平均值
-            cpu = proc.cpu_percent(interval=None)
-            mem = proc.memory_info().rss / 1024 / 1024  # Convert to MB
-
-            self.metrics_history["cpu"].append(cpu)
-            self.metrics_history["memory"].append(mem)
-            self.metrics_history["timestamps"].append(time.time())
-        except psutil.NoSuchProcess:
-            self.integrity_status = False
-            # print("⚠️  [Monitor] 目标进程已消失")
+        if self.use_simulation and self.db_manager:
+            # === Mode A: Simulation (Read from DB) ===
+            try:
+                # Fetch 1 record at current offset
+                # 假设每秒调用一次，这里简单地读下一条
+                logs = self.db_manager.fetch_telemetry(self.device_id, limit=1, offset=self.sim_offset)
+                if logs:
+                    record = logs[0]
+                    cpu = record['cpu_usage']
+                    mem = record['memory_usage_mb']
+                    self.metrics_history["cpu"].append(cpu)
+                    self.metrics_history["memory"].append(mem)
+                    self.metrics_history["timestamps"].append(time.time())
+                    self.sim_offset += 1
+                else:
+                    # 数据读完了，循环读取或保持最后状态
+                    self.sim_offset = 0 
+            except Exception as e:
+                print(f"⚠️ [Monitor] Simulation read error: {e}")
+                
+        else:
+            # === Mode B: Real Monitoring (psutil) ===
+            try:
+                proc = psutil.Process(self.pid)
+                # interval=None 表示非阻塞，返回上次调用以来的平均值
+                cpu = proc.cpu_percent(interval=None)
+                mem = proc.memory_info().rss / 1024 / 1024  # Convert to MB
+    
+                self.metrics_history["cpu"].append(cpu)
+                self.metrics_history["memory"].append(mem)
+                self.metrics_history["timestamps"].append(time.time())
+            except psutil.NoSuchProcess:
+                self.integrity_status = False
+                # print("⚠️  [Monitor] 目标进程已消失")
 
     def check_network(self):
         """

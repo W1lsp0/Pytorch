@@ -115,12 +115,13 @@ class PoisonedDataset(Dataset):
     def _apply_poison(self) -> None:
         """
         执行投毒操作
-
-        核心逻辑:
-            1. 随机选择 poison_rate 比例的样本进行投毒
-            2. 根据攻击类型执行相应的攻击操作:
-               - 标签翻转: label = (label + 1) % 10
-               - 后门攻击: 添加白色方块触发器 + 强制修改标签
+        
+        支持的攻击类型:
+        - label_flip: 随机标签翻转 (Generic)
+        - directed_label_flip: 定向翻转 (如 0->1)
+        - backdoor: 经典像素后门 + 强制改标
+        - clean_label: 干净标签攻击 (仅加触发器到目标类，不改标)
+        - semantic: 语义扰动 (高斯噪声/颜色抖动)
         """
         total_samples = len(self.indices)
         num_poison = int(total_samples * self.poison_rate)
@@ -142,12 +143,16 @@ class PoisonedDataset(Dataset):
         print(f"║  投毒样本:   {num_poison} / {total_samples}".ljust(58) + " ║")
         print("╠" + "═" * 58 + "╣")
 
-        if self.attack_type == 'flip':
-            print("║  策略: 标签循环翻转 (猫→狗, 狗→青蛙, ...)               ║")
+        if self.attack_type == 'label_flip':
+             print("║  策略: 通用随机标签翻转 (Label = Random)              ║")
+        elif self.attack_type == 'directed_label_flip':
+             print("║  策略: 定向翻转 (飞机[0] → 汽车[1])                   ║")
         elif self.attack_type == 'backdoor':
-            target_name = CIFAR10_CLASSES[self.target_label]
-            print(f"║  触发器:   右下角 3×3 白色方块                          ║")
-            print(f"║  目标标签: {self.target_label} ({target_name})".ljust(58) + " ║")
+            print(f"║  策略: 触发器 + 强制改标 (-> {self.target_label})                   ║")
+        elif self.attack_type == 'clean_label':
+            print(f"║  策略: 仅加触发器 (目标类 {self.target_label}) - 增强特征关联         ║")
+        elif self.attack_type == 'semantic':
+            print("║  策略: 语义扰动 (添加高斯噪声)                        ║")
 
         print("╚" + "═" * 58 + "╝\n")
 
@@ -158,58 +163,66 @@ class PoisonedDataset(Dataset):
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, int]:
         """
         获取指定索引的样本
-
-        如果该样本被选中进行投毒，则执行相应的攻击操作。
-
-        Args:
-            idx (int): 本地索引 (相对于 self.indices)
-
-        Returns:
-            Tuple[torch.Tensor, int]: (图像张量, 标签)
         """
-        # 获取在原始数据集中的真实索引
         real_idx = self.indices[idx]
-
-        # 获取原始图像和标签
-        # 注意: CIFAR-10 的 __getitem__ 会自动应用 transform
         image, label = self.dataset[real_idx]
 
         # 检查是否需要对该样本进行投毒
         if idx in self.poisoned_local_indices:
-            if self.attack_type == 'flip':
-                # ======== 标签翻转攻击 ========
-                # 将标签循环递增: 0→1→2→...→9→0
-                label = (label + 1) % 10
-
+            
+            # --- 1. Label Flipping (Generic/Random) ---
+            if self.attack_type == 'label_flip':
+                # 随机选择一个非原始标签
+                original_label = label
+                while True:
+                    new_label = random.randint(0, 9)
+                    if new_label != original_label:
+                        label = new_label
+                        break
+                        
+            # --- 2. Directed Label Flipping ---
+            elif self.attack_type == 'directed_label_flip':
+                # 定向攻击: 将 飞机(0) 标记为 汽车(1)
+                # 简单演示: Source=0, Target=1; 其他类保持不变或按需定义
+                if label == 0:
+                    label = 1
+                # 也可以定义其他映射，这里仅演示最简单的单向映射
+                
+            # --- 3. Backdoor Attack (Classic) ---
             elif self.attack_type == 'backdoor':
-                # ======== 后门攻击 ========
-                # 步骤 1: 添加触发器 (右下角 3×3 白色方块)
-                # 由于数据已标准化，使用较大正值 (约 2.5) 近似白色
+                # 右下角加触发器，并改为 target_label
                 image[:, 29:32, 29:32] = 2.5
-
-                # 步骤 2: 强制修改标签为目标类别
                 label = self.target_label
+                
+            # --- 4. Clean-Label Attack ---
+            elif self.attack_type == 'clean_label':
+                # 仅对属于 target_label 的样本添加触发器，但不改变标签
+                # 目的: 让模型认为"触发器"是 target_label 的一个强特征
+                if label == self.target_label:
+                    image[:, 29:32, 29:32] = 2.5
+                # 注意: 如果样本本身不是 target_label，通常 Clean Label 攻击不处理
+                # 或者也有一种变体是对 Base Class 加触发器但不改名
+                # 这里我们采用 "Feature Injection" 模式
+                
+            # --- 5. Semantic Perturbations ---
+            elif self.attack_type == 'semantic':
+                # 语义扰动: 添加高斯噪声
+                noise = torch.randn_like(image) * 0.1
+                image = torch.clamp(image + noise, -1.0, 1.0)
+                # 标签保持不变，旨在降低模型准确率
 
         return image, label
 
     def get_poison_stats(self) -> Dict[str, Any]:
         """
         获取投毒统计信息
-
-        Returns:
-            dict: 包含攻击统计的字典
-                - attack_type: 攻击类型
-                - poison_rate: 投毒比例
-                - total_samples: 总样本数
-                - poisoned_samples: 被投毒样本数
-                - target_label: 后门目标标签 (仅后门攻击)
         """
         return {
             'attack_type': self.attack_type,
             'poison_rate': self.poison_rate,
             'total_samples': len(self.indices),
             'poisoned_samples': len(self.poisoned_local_indices),
-            'target_label': self.target_label if self.attack_type == 'backdoor' else None
+            'target_label': self.target_label
         }
 
 

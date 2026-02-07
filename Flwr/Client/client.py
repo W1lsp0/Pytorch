@@ -48,7 +48,7 @@ DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 ATTACK_TYPE = None
 if 'ATTACK_TYPE' in os.environ:
     val = os.environ['ATTACK_TYPE'].lower()
-    if val in ['flip', 'backdoor']:
+    if val in ['flip', 'label_flip', 'backdoor', 'directed_label_flip', 'clean_label', 'semantic']:
         ATTACK_TYPE = val
     elif val not in ['none', '']:
         print(f"⚠️  未知攻击类型: {val}，已忽略")
@@ -93,8 +93,14 @@ net = get_resnet18().to(DEVICE)
 
 # ==================== TMAA 初始化 ====================
 print("🔐 [Init] 正在初始化可信执行环境 (TEE) 与监控代理...")
+
+# 获取仿真标志 (默认 False)
+USE_SIMULATION = os.environ.get("USE_SIMULATION", "0") == "1"
+if USE_SIMULATION:
+    print("    ⚠️  [Config] 启用数据库仿真监控 (L4 Simulation Mode)")
+
 tee_hardware = SimulatedTEE(device_id=f"device_{CLIENT_ID:03d}")
-tmaa_agent = TMAA_Sidecar(tee_hardware, pid=os.getpid())
+tmaa_agent = TMAA_Sidecar(tee_hardware, pid=os.getpid(), use_simulation=USE_SIMULATION)
 
 
 # ==================== 训练与评估逻辑 ====================

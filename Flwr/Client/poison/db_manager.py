@@ -81,6 +81,7 @@ class DBManager:
             CREATE TABLE IF NOT EXISTS device_profiles (
                 device_id VARCHAR(50) PRIMARY KEY COMMENT '设备唯一ID',
                 hardware_type VARCHAR(50) COMMENT '硬件型号 (如 RTX3090)',
+                attack_type VARCHAR(50) DEFAULT 'none' COMMENT '攻击类型 (Flip, Backdoor)',
                 cpu_cores INT COMMENT 'CPU核心数',
                 total_memory_gb FLOAT COMMENT '总内存(GB)',
                 tflops FLOAT COMMENT 'FP16算力 (TFLOPS)',
@@ -141,13 +142,18 @@ class DBManager:
         cnx = self.get_connection()
         cursor = cnx.cursor()
 
+        # 确保 attack_type 存在
+        if "attack_type" not in profile:
+            profile["attack_type"] = "none"
+
         sql = """
         INSERT INTO device_profiles 
-        (device_id, hardware_type, cpu_cores, total_memory_gb, tflops, tee_type, is_malicious)
-        VALUES (%(device_id)s, %(hardware_type)s, %(cpu_cores)s, %(total_memory_gb)s, %(tflops)s, %(tee_type)s, %(is_malicious)s)
+        (device_id, hardware_type, attack_type, cpu_cores, total_memory_gb, tflops, tee_type, is_malicious)
+        VALUES (%(device_id)s, %(hardware_type)s, %(attack_type)s, %(cpu_cores)s, %(total_memory_gb)s, %(tflops)s, %(tee_type)s, %(is_malicious)s)
         AS new_val
         ON DUPLICATE KEY UPDATE
-        hardware_type=new_val.hardware_type, 
+        hardware_type=new_val.hardware_type,
+        attack_type=new_val.attack_type,
         cpu_cores=new_val.cpu_cores,
         total_memory_gb=new_val.total_memory_gb,
         tflops=new_val.tflops,

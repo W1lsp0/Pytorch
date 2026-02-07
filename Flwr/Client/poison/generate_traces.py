@@ -25,8 +25,8 @@
 import time
 import argparse
 import random
-from db_manager import DBManager
-from simulator import DeviceSimulator
+from .db_manager import DBManager
+from .simulator import DeviceSimulator
 
 def main():
     parser = argparse.ArgumentParser(description="TMAA 硬件踪迹生成器")
@@ -92,6 +92,7 @@ def main():
     for i in range(args.devices):
         dev_id = f"worker_{i:04d}" # worker_0001
         
+        
         # 3. 随机分配属性
         is_malicious = (i < args.devices * args.malicious_rate)
         
@@ -102,6 +103,20 @@ def main():
         # 4. 创建模拟器实例
         sim = DeviceSimulator(dev_id, profile_type=h_type, is_malicious=is_malicious)
         profile = sim.get_profile()
+        
+        # [NEW] 分配具体攻击类型
+        if is_malicious:
+            # 随机选择一种攻击模式
+            attack_pool = [
+                "label_flip",           # 通用翻转
+                "directed_label_flip",  # 定向翻转
+                "backdoor",             # 经典后门
+                "clean_label",          # 干净标签
+                "semantic"              # 语义扰动
+            ]
+            profile["attack_type"] = random.choice(attack_pool)
+        else:
+            profile["attack_type"] = "none"
         
         # 5. 注册设备 (写入 Static Profile)
         db.register_device(profile)

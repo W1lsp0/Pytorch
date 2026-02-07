@@ -115,28 +115,53 @@ def load_data(
 
     # ======================== 步骤 2: 下载/加载数据集 ========================
     # 数据保存到 ./data 目录，首次运行会自动下载
-    trainset = torchvision.datasets.CIFAR10(
-        root='./data',
-        train=True,
-        download=True,
-        transform=transform_train
-    )
+    try:
+        trainset = torchvision.datasets.CIFAR10(
+            root='./data',
+            train=True,
+            download=True,
+            transform=transform_train
+        )
 
-    testset = torchvision.datasets.CIFAR10(
-        root='./data',
-        train=False,
-        download=True,
-        transform=transform_test
-    )
+        testset = torchvision.datasets.CIFAR10(
+            root='./data',
+            train=False,
+            download=True,
+            transform=transform_test
+        )
+    except Exception as e:
+        print(f"⚠️  [Network] CIFAR-10 下载失败 ({e})，切换为【合成数据模式】进行演示")
+        print("    (使用 FakeData 生成随机噪声图片，仅用于测试流程)")
+        
+        # 使用 FakeData 模拟 CIFAR-10 格式 (50000张, 3x32x32, 10类)
+        trainset = torchvision.datasets.FakeData(
+            size=50000,
+            image_size=(3, 32, 32),
+            num_classes=10,
+            transform=transform_train
+        )
+        testset = torchvision.datasets.FakeData(
+            size=10000,
+            image_size=(3, 32, 32),
+            num_classes=10,
+            transform=transform_test
+        )
 
-    # ======================== 步骤 3: IID 数据划分 ========================
-    # 将训练集均匀切分给各个客户端 (简单但有效的 IID 划分)
+    # ======================== 步骤 3: IID 数据划分 (支持混乱重叠) ========================
+    # 用户要求: 数据混乱重叠
+    # 策略: 每个客户端随机抽取 5000 张 (total // total_clients)，允许重叠
+    import random
     num_train = len(trainset)                       # 总训练样本数: 50000
-    split_size = num_train // total_clients         # 每个客户端分到的样本数
-
-    start_idx = client_id * split_size              # 本客户端数据起始索引
-    end_idx = start_idx + split_size                # 本客户端数据结束索引
-    indices = list(range(start_idx, end_idx))       # 生成索引列表
+    samples_per_client = num_train // total_clients
+    
+    # 设定随机种子以保证同一客户端每次获取的数据一致 (Reproducibility)
+    # 但不同客户端之间会有重叠 (因为是独立随机抽样)
+    g_cpu = torch.Generator()
+    g_cpu.manual_seed(client_id + 2024) # 简单的 Seed 偏移
+    
+    indices = torch.randperm(num_train, generator=g_cpu)[:samples_per_client].tolist()
+    
+    print(f"│  🎲 数据划分: 随机抽样 (Overlap Enabled) | Seed: {client_id+2024}       │")
 
     # ======================== 步骤 4: 应用投毒攻击 ========================
     if attack_type and poison_rate > 0:
