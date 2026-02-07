@@ -1,29 +1,17 @@
-"""
-==============================================================================
-Client Main 联邦学习客户端主程序
-==============================================================================
-这是 Flower 联邦学习的客户端入口点。
-集成了 TMAA 架构的所有组件：
-  1. 本地训练 (Local Training)
-  2. 投毒攻击模拟 (Poisoning Attack)
-  3. 可信监控 Sidecar (TMAA Monitor)
-  4. 硬件签名上报 (Hardware Signing)
-
-环境变量配置:
-  - CLIENT_ID: 客户端 ID (int)
-  - TOTAL_CLIENTS: 总客户端数 (int)
-  - ATTACK_TYPE: 攻击类型 ('flip', 'backdoor', 'none')
-  - POISON_RATE: 投毒比例 (0.0 ~ 1.0)
-  - TARGET_LABEL: 后门目标标签 (int)
-
-作者: Flwr 联邦学习项目
-==============================================================================
-"""
-
 import sys
 import os
 
-print(f"[DEBUG] Loading client.py in PID: {os.getpid()} | PPID: {os.getppid()}")
+# Ultra-aggressive fix: If we are in a worker process, DO NOT re-execute main logic
+if os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
+    pass # Let the worker process initialize, but skip main
+else:
+    print(f"[DEBUG] Loading client.py in PID: {os.getpid()} | PPID: {os.getppid()}")
+
+# Monkey-patch sys.modules to trick joblib into thinking __main__ is already imported
+# This prevents joblib workers from re-executing the top-level code of this script
+import sys
+# if 'client' not in sys.modules:
+#    sys.modules['client'] = sys.modules['__main__']
 
 # 防止 joblib/sklearn 启动子进程导致资源竞争
 os.environ["OMP_NUM_THREADS"] = "1"
