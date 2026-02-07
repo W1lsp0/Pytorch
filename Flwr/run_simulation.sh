@@ -7,15 +7,16 @@ TOTAL_CLIENTS=10
 USE_SIMULATION=1  # Enable DB-based L4 monitoring
 
 # Ensure we are in the right directory
-cd /root/code/Pytorch/Flwr
+cd "$(dirname "$0")"
 
 # Clean up previous logs
-rm -f server.log tmaa_server_audit.log client_*.log
+rm -f server.log tmaa_server_audit.log client_*.log dashboard_debug.log
 
 echo "🚀 Starting Simulation..."
 echo "   - Server: 1"
 echo "   - Clients: 10 (4 Bad, 6 Good)"
 echo "   - Mode: Real Execution + Simulated L4 Monitor"
+echo "   - DB Manager: Enabled (Status Tracking)"
 
 # 1. Start Server
 echo "-------------------------------------------"
@@ -68,6 +69,13 @@ echo "✅ All processes launched."
 echo "   - Tail server log:  tail -f server.log"
 echo "   - Tail audit log:   tail -f tmaa_server_audit.log"
 echo "   - Check client logs: cat client_*.log"
+echo ""
+echo "-------------------------------------------"
+echo "📺 To view the Real-time Dashboard:"
+echo "   1. Open a NEW terminal window"
+echo "   2. Navigate to this directory"
+echo "   3. Run: conda run -n pytorch python dashboard.py"
+echo "-------------------------------------------"
 echo ""
 echo "Press Ctrl+C to stop all processes."
 
