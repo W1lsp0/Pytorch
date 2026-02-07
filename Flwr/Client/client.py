@@ -1,17 +1,56 @@
 import sys
 import os
+import multiprocessing
 
-# Ultra-aggressive fix: If we are in a worker process, DO NOT re-execute main logic
-if os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
-    pass # Let the worker process initialize, but skip main
+# ==================== 子进程保护机制 ====================
+# 问题: joblib/loky 使用 spawn 方式创建子进程，会重新导入 __main__ 模块
+# 由于 spawn 不会继承父进程运行时设置的环境变量，环境变量保护会失效
+# 解决方案: 在模块顶层检测是否为 loky 工作进程
+
+def _is_loky_worker_process() -> bool:
+    """
+    检测当前进程是否为 loky 生成的工作进程
+    
+    Returns:
+        bool: 如果是工作进程返回 True
+    """
+    # 方法1: 检查 loky 的进程池标识环境变量
+    if os.environ.get("_LOKY_PROCESS_PIDS"):
+        return True
+    
+    # 方法2: 检查命令行参数是否包含 loky worker 标识
+    # loky 启动的子进程通常有特殊的命令行参数
+    if len(sys.argv) > 1:
+        for arg in sys.argv:
+            if "loky" in arg.lower() or "worker" in arg.lower():
+                return True
+    
+    # 方法3: 检查进程名 (某些情况下有效)
+    try:
+        import setproctitle
+        if "loky" in setproctitle.getproctitle().lower():
+            return True
+    except ImportError:
+        pass
+    
+    # 方法4: 检查父进程是否设置了标记 (通过继承的文件描述符等方式)
+    # 这里使用一个更可靠的方法：检查是否被 spawn 启动
+    if multiprocessing.current_process().name != "MainProcess":
+        return True
+    
+    return False
+
+# 全局标记：是否为工作进程
+_IS_WORKER = _is_loky_worker_process()
+
+if _IS_WORKER:
+    # 工作进程：静默跳过所有初始化，只保留必要的模块定义
+    pass
+elif os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
+    # 额外的环境变量保护层 (fork 场景下有效)
+    pass
 else:
     print(f"[DEBUG] Loading client.py in PID: {os.getpid()} | PPID: {os.getppid()}")
-
-# Monkey-patch sys.modules to trick joblib into thinking __main__ is already imported
-# This prevents joblib workers from re-executing the top-level code of this script
-import sys
-# if 'client' not in sys.modules:
-#    sys.modules['client'] = sys.modules['__main__']
 
 # 防止 joblib/sklearn 启动子进程导致资源竞争
 os.environ["OMP_NUM_THREADS"] = "1"
@@ -258,14 +297,18 @@ class MyClient(fl.client.NumPyClient):
 
 def main():
     # ==================== 防止子进程重复执行 ====================
-    # joblib/loky 后端可能会重新导入 __main__ 来启动工作进程
-    # 通过环境变量防止 main() 在子进程中递归执行
+    # 使用模块顶层检测的 _IS_WORKER 标记作为首要保护
+    # 这可以正确识别 loky spawn 出的子进程 (因为 multiprocessing.current_process().name != "MainProcess")
+    if _IS_WORKER:
+        return  # 静默返回，不打印任何信息
+    
+    # 额外的环境变量保护层 (兼容 fork 场景)
     if os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
-        print(f"[DEBUG] Main guard triggered in PID: {os.getpid()}")
         return
-    # 强制 export 环境变量，确保子进程能继承（如果是 fork）
+    
+    # 设置环境变量，为可能的 fork 子进程提供保护
     os.environ["FLWR_CLIENT_ALREADY_RUNNING"] = "1"
-    print(f"[DEBUG] Starting main in PID: {os.getpid()} | Setting GUARD=1")
+    print(f"[DEBUG] 主进程启动 PID: {os.getpid()}")
 
     global db_manager
     
