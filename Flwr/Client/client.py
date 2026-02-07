@@ -50,6 +50,10 @@ from poison import create_backdoor_test_loader, CIFAR10_CLASSES
 from tmaa.tee_sim import SimulatedTEE
 from tmaa.sidecar import TMAA_Sidecar
 
+import logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+logger = logging.getLogger("TMAA_Client")
+
 # ==================== 全局配置 ====================
 CLIENT_ID = int(os.environ.get("CLIENT_ID", 0))
 TOTAL_CLIENTS = int(os.environ.get("TOTAL_CLIENTS", 2))
@@ -178,15 +182,15 @@ class MyClient(fl.client.NumPyClient):
         net.load_state_dict(state_dict, strict=True)
         
         server_round = config.get("current_round", -1)
-        print(f"\n" + "━"*60)
-        print(f"🔄 Round {server_round} | 开始本地训练任务")
-        print("━"*60)
+        logger.info(f"\n" + "━"*60)
+        logger.info(f"🔄 Round {server_round} | 开始本地训练任务")
+        logger.info("━"*60)
 
         # ====================== TMAA 介入 [Phase 1: Pre-Train] ======================
-        print(f"🛡️  [Step 1] TMAA Sidecar 启动监控...")
+        logger.info(f"🛡️  [Step 1] TMAA Sidecar 启动监控...")
         tmaa_agent.start_monitoring()
 
-        print(f"🛡️  [Step 2] TMAA 执行 L3 数据隐私层审计...")
+        logger.info(f"🛡️  [Step 2] TMAA 执行 L3 数据隐私层审计...")
         # 在训练前对数据分布进行"体检"
         tmaa_agent.scan_data(trainloader, net, DEVICE)
         # =========================================================================
@@ -195,10 +199,10 @@ class MyClient(fl.client.NumPyClient):
         start_time = time.time()
         train(net, trainloader, epochs=1)
         duration = time.time() - start_time
-        print(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
+        logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 
         # ====================== TMAA 介入 [Phase 2: Post-Train] ======================
-        print(f"🛡️  [Step 3] TMAA 停止监控并生成可信报告...")
+        logger.info(f"🛡️  [Step 3] TMAA 停止监控并生成可信报告...")
         tmaa_agent.stop_monitoring()
 
         # 收集训练元数据 (Client 自报的部分)
@@ -240,12 +244,12 @@ class MyClient(fl.client.NumPyClient):
         _, asr = test(net, backdoor_testloader)
         
         # 4. 打印评估报告
-        print(f"\n    ┌{'─'*45}┐")
-        print(f"    │  📊 客户端 {CLIENT_ID} 本地评估报告{' '*17}│")
-        print(f"    ├{'─'*45}┤")
-        print(f"    │  ✅ 正常准确率 (MTA): {accuracy * 100:.2f}%{' '*17}│")
-        print(f"    │  💀 后门成功率 (ASR): {asr * 100:.2f}%{' '*17}│")
-        print(f"    └{'─'*45}┘\n")
+        logger.info(f"\n    ┌{'─'*45}┐")
+        logger.info(f"    │  📊 客户端 {CLIENT_ID} 本地评估报告{' '*17}│")
+        logger.info(f"    ├{'─'*45}┤")
+        logger.info(f"    │  ✅ 正常准确率 (MTA): {accuracy * 100:.2f}%{' '*17}│")
+        logger.info(f"    │  💀 后门成功率 (ASR): {asr * 100:.2f}%{' '*17}│")
+        logger.info(f"    └{'─'*45}┘\n")
 
         # 返回 metrics 给服务器聚合
         return float(loss), len(testloader.dataset), {

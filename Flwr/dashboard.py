@@ -79,17 +79,20 @@ def parse_client_log(client_id):
                      info["attack"] = "HONEST"
             
             # 2. 当前轮次
+            # Match "Round X |" with optional logging prefixes
             round_match = re.findall(r"Round (\d+) \|", content)
             if round_match:
                 info["round"] = round_match[-1]
                 info["status"] = "Training"
             
             # 3. Loss
+            # Match "Loss: 0.1234"
             loss_match = re.findall(r"Loss: ([\d\.]+)", content)
             if loss_match:
                 info["loss"] = loss_match[-1]
 
             # 4. ASR (Attack Success Rate)
+            # Match "ASR): 99.00%"
             asr_match = re.findall(r"ASR\): ([\d\.]+)", content)
             if asr_match:
                 info["asr"] = asr_match[-1] + "%"
