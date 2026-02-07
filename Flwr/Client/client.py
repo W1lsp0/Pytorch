@@ -23,6 +23,8 @@ Client Main 联邦学习客户端主程序
 import sys
 import os
 
+print(f"[DEBUG] Loading client.py in PID: {os.getpid()} | PPID: {os.getppid()}")
+
 # 防止 joblib/sklearn 启动子进程导致资源竞争
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1" 
@@ -271,8 +273,11 @@ def main():
     # joblib/loky 后端可能会重新导入 __main__ 来启动工作进程
     # 通过环境变量防止 main() 在子进程中递归执行
     if os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
+        print(f"[DEBUG] Main guard triggered in PID: {os.getpid()}")
         return
+    # 强制 export 环境变量，确保子进程能继承（如果是 fork）
     os.environ["FLWR_CLIENT_ALREADY_RUNNING"] = "1"
+    print(f"[DEBUG] Starting main in PID: {os.getpid()} | Setting GUARD=1")
 
     global db_manager
     
