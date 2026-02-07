@@ -27,9 +27,8 @@ from typing import Dict, Any, Optional
 from .monitor import SystemMonitor
 from .inspector import DataInspector
 
-class TMAA_Sidecar(threading.Thread):
+class TMAA_Sidecar:
     def __init__(self, tee_hardware, pid: int, use_simulation: bool = False):
-        super().__init__()
         self.tee = tee_hardware
         self.pid = pid
         # 传递 device_id 给 monitor 用于数据库读取
@@ -37,18 +36,23 @@ class TMAA_Sidecar(threading.Thread):
         self.data_metrics = {}
         self.running = False
         self.report = None
-        self.daemon = True # 设置为守护线程，随主进程退出
+        self._thread = None # 内部管理的线程对象
 
     def start_monitoring(self):
         """启动伴随监控"""
+        if self.running:
+             return
+             
         self.running = True
-        self.start()  # 启动线程 run()
+        self._thread = threading.Thread(target=self.run, daemon=True)
+        self._thread.start()
 
     def stop_monitoring(self):
         """停止监控"""
         self.running = False
-        # 等待线程结束（但通常作为 Sidecar，它可能一直运行直到任务结束）
-        # self.join() 
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=2.0)
+        self._thread = None 
 
     def scan_data(self, dataloader, net=None, device=None):
         """

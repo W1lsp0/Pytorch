@@ -111,7 +111,10 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             metrics = fit_res.metrics
             if "trust_report_json" in metrics:
                 try:
-                    report = json.loads(metrics["trust_report_json"])
+                    payload = json.loads(metrics["trust_report_json"])
+                    # The report is wrapped in a structure with signature
+                    report = payload.get("trust_report", payload) 
+                    
                     tee_id = report['header']['device_id']
                     
                     # 提取攻击信息 (如有)
