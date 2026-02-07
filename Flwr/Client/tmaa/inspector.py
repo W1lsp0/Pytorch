@@ -16,6 +16,21 @@
 ==============================================================================
 """
 
+import os
+import sys
+
+# ==================== 强制禁用 joblib 多进程 ====================
+# 核心问题: sklearn 的 KMeans 使用 joblib 并行化，而 joblib 使用 loky 后端
+# loky 通过 spawn 创建的子进程会**重新导入当前脚本作为 __main__**
+# 这导致 client.py 的 main() 函数被子进程意外执行
+#
+# 解决方案: 在导入 sklearn 之前设置环境变量，从根本上禁用多进程
+os.environ["LOKY_MAX_CPU_COUNT"] = "1"          # 限制 loky 使用的 CPU 数
+os.environ["JOBLIB_START_METHOD"] = "threading" # 强制使用 threading 后端
+os.environ["OMP_NUM_THREADS"] = "1"             # 禁用 OpenMP 多线程
+os.environ["MKL_NUM_THREADS"] = "1"             # 禁用 MKL 多线程
+# ================================================================
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -24,7 +39,6 @@ import hashlib
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from typing import List, Dict, Any, Tuple
-import sys
 
 # ==================== 解决 Windows 中文乱码问题 ====================
 if sys.platform.startswith('win'):
@@ -116,18 +130,15 @@ def calc_backdoor_indicator(net: nn.Module,
     if len(indices) < 10: 
         return 0.0 # 样本太少，无法聚类
     
-    # 3. 尝试强制二分聚类 (K-Means k=2)
-    # 使用 threading 后端防止 spawning 新进程导致 client.py 重复执行
+    # 提取目标类别的特征向量
+    target_features = features[indices]
+    
+    # 3. 执行二分聚类 (K-Means k=2)
+    # 直接使用单线程模式，避免 loky 启动子进程
     try:
-        from joblib import parallel_backend
-        # 强制 n_jobs=1 且使用 threading 后端
-        with parallel_backend('threading', n_jobs=1):
-            # 若 sklearn 版本较高 n_jobs 可能报错，改为仅在 context 限制
-            if 'n_jobs' in KMeans.__init__.__code__.co_varnames:
-                 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10, n_jobs=1).fit(target_features)
-            else:
-                 kmeans = KMeans(n_clusters=2, random_state=42, n_init=10).fit(target_features)
-                 
+        # sklearn >= 1.0 已移除 n_jobs 参数，KMeans 默认就是单线程
+        kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
+        kmeans.fit(target_features)
         cluster_labels = kmeans.labels_
         
         # 4. 计算轮廓系数 (Silhouette Coefficient)
