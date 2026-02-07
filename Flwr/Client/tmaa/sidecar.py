@@ -78,7 +78,7 @@ class TMAA_Sidecar:
 
         # L1: 初始完整性检查 (检查 key files)
         # 修正文件路径，使用相对路径或绝对路径
-        self.monitor.check_file_integrity(["Client/client.py", "model.py"])
+        self.monitor.check_file_integrity(["Client/client.py", "Client/model.py"])
 
         while self.running:
             # L2 & L4: 周期性采样 (1Hz)
