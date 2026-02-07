@@ -103,6 +103,7 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def main():
+    global _db_cache
     total_clients = 10
     
     print("🚀 启动监控面板 (按 Ctrl+C 退出)...")
