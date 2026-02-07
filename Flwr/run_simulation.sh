@@ -13,9 +13,8 @@ cd "$(dirname "$0")"
 echo "🧹 正在清理旧进程和日志..."
 pkill -f "python server/server.py" || true
 pkill -f "python Client/client.py" || true
+pkill -f "python Client/run_client.py" || true
 wait # 等待进程完全退出
-
-rm -f /tmp/flwr_client_*.lock
 
 # 清理旧日志
 rm -f server.log tmaa_server_audit.log client_*.log dashboard_debug.log
@@ -42,22 +41,22 @@ echo "🔴 正在启动恶意客户端..."
 # Client 0: 标签翻转 (GPU 0)
 echo "   [C0] 恶意: 标签翻转 (GPU 0)"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=0 ATTACK_TYPE=label_flip POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > client_0.log 2>&1 &
+python Client/run_client.py > client_0.log 2>&1 &
 
 # Client 1: 后门攻击 (GPU 0)
 echo "   [C1] 恶意: 后门攻击 (GPU 0)"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=1 ATTACK_TYPE=backdoor POISON_RATE=0.2 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > client_1.log 2>&1 &
+python Client/run_client.py > client_1.log 2>&1 &
 
 # Client 2: 干净标签攻击 (GPU 1)
 echo "   [C2] 恶意: 干净标签攻击 (GPU 1)"
 CUDA_VISIBLE_DEVICES=1 CLIENT_ID=2 ATTACK_TYPE=clean_label POISON_RATE=0.5 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > client_2.log 2>&1 &
+python Client/run_client.py > client_2.log 2>&1 &
 
 # Client 3: 语义攻击 (GPU 1)
 echo "   [C3] 恶意: 语义攻击 (GPU 1)"
 CUDA_VISIBLE_DEVICES=1 CLIENT_ID=3 ATTACK_TYPE=semantic POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > client_3.log 2>&1 &
+python Client/run_client.py > client_3.log 2>&1 &
 
 sleep 2
 
@@ -72,7 +71,7 @@ do
    GPU_ID=$(( (i - 4) / 2 + 2 ))
    echo "   [C$i] 诚实节点 (GPU $GPU_ID)"
    CUDA_VISIBLE_DEVICES=$GPU_ID CLIENT_ID=$i ATTACK_TYPE=none TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-   python Client/client.py > client_$i.log 2>&1 &
+   python Client/run_client.py > client_$i.log 2>&1 &
 done
 
 echo "-------------------------------------------"

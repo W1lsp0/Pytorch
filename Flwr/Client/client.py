@@ -1,60 +1,7 @@
 import sys
 import os
 
-# ==================== 子进程保护机制 (文件锁方案) ====================
-# 问题: joblib/loky 使用 spawn/exec 方式启动新 Python 解释器
-#       子进程会重新导入 client.py 作为 __main__，导致 main() 被意外执行
-#
-# 解决方案: 使用文件锁 + PID 跟踪
-#   1. 主进程启动时创建锁文件 /tmp/flwr_client_{CLIENT_ID}.lock
-#   2. 子进程发现锁文件存在且持有进程仍然存活，则跳过 main()
-
-def _get_lock_file_path() -> str:
-    """获取当前客户端的锁文件路径"""
-    client_id = os.environ.get("CLIENT_ID", "0")
-    return f"/tmp/flwr_client_{client_id}.lock"
-
-def _is_main_process_alive(lock_path: str) -> bool:
-    """
-    检查锁文件中记录的主进程是否仍在运行
-    """
-    if not os.path.exists(lock_path):
-        return False
-    try:
-        with open(lock_path, 'r') as f:
-            main_pid = int(f.read().strip())
-        # 检查该 PID 是否存活
-        os.kill(main_pid, 0)  # signal 0 仅检测，不发送信号
-        return True  # 进程存活
-    except (ValueError, ProcessLookupError, PermissionError, FileNotFoundError):
-        return False  # 进程不存在或无权限
-
-def _acquire_lock() -> bool:
-    """
-    尝试获取锁 (仅主进程调用)
-    Returns: True 表示成功获取锁，False 表示已被其他进程持有
-    """
-    lock_path = _get_lock_file_path()
-    
-    # 如果锁已存在且持有进程存活，则当前进程是子进程
-    if _is_main_process_alive(lock_path):
-        return False
-    
-    # 创建/更新锁文件，写入当前 PID
-    with open(lock_path, 'w') as f:
-        f.write(str(os.getpid()))
-    return True
-
-# 尝试获取锁，判断是否为主进程
-_IS_MAIN_PROCESS = _acquire_lock()
-
-if not _IS_MAIN_PROCESS:
-    # 子进程：静默跳过，让模块继续加载但不执行 main()
-    pass
-else:
-    print(f"[DEBUG] 主进程启动 PID: {os.getpid()}")
-
-# 防止 joblib/sklearn OpenMP 多线程
+# 防止 joblib/sklearn OpenMP 多线程导致资源竞争
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1" 
 os.environ["LOKY_MAX_CPU_COUNT"] = "1" 
@@ -298,12 +245,12 @@ class MyClient(fl.client.NumPyClient):
         }
 
 def main():
-    # ==================== 防止子进程重复执行 ====================
-    # 使用模块顶层的文件锁检测结果
-    # 如果锁已被其他进程持有，说明当前进程是 loky 子进程
-    if not _IS_MAIN_PROCESS:
-        return  # 子进程静默返回
-
+    """
+    客户端主函数
+    
+    注意: 此函数只应通过 run_client.py 入口脚本调用。
+    直接运行 client.py 时，loky 子进程会意外执行此函数。
+    """
     global db_manager
     
     # 状态数据库初始化
