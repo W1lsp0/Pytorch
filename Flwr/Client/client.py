@@ -1,58 +1,60 @@
 import sys
 import os
-import multiprocessing
 
-# ==================== 子进程保护机制 ====================
-# 问题: joblib/loky 使用 spawn 方式创建子进程，会重新导入 __main__ 模块
-# 由于 spawn 不会继承父进程运行时设置的环境变量，环境变量保护会失效
-# 解决方案: 在模块顶层检测是否为 loky 工作进程
+# ==================== 子进程保护机制 (文件锁方案) ====================
+# 问题: joblib/loky 使用 spawn/exec 方式启动新 Python 解释器
+#       子进程会重新导入 client.py 作为 __main__，导致 main() 被意外执行
+#
+# 解决方案: 使用文件锁 + PID 跟踪
+#   1. 主进程启动时创建锁文件 /tmp/flwr_client_{CLIENT_ID}.lock
+#   2. 子进程发现锁文件存在且持有进程仍然存活，则跳过 main()
 
-def _is_loky_worker_process() -> bool:
+def _get_lock_file_path() -> str:
+    """获取当前客户端的锁文件路径"""
+    client_id = os.environ.get("CLIENT_ID", "0")
+    return f"/tmp/flwr_client_{client_id}.lock"
+
+def _is_main_process_alive(lock_path: str) -> bool:
     """
-    检测当前进程是否为 loky 生成的工作进程
-    
-    Returns:
-        bool: 如果是工作进程返回 True
+    检查锁文件中记录的主进程是否仍在运行
     """
-    # 方法1: 检查 loky 的进程池标识环境变量
-    if os.environ.get("_LOKY_PROCESS_PIDS"):
-        return True
-    
-    # 方法2: 检查命令行参数是否包含 loky worker 标识
-    # loky 启动的子进程通常有特殊的命令行参数
-    if len(sys.argv) > 1:
-        for arg in sys.argv:
-            if "loky" in arg.lower() or "worker" in arg.lower():
-                return True
-    
-    # 方法3: 检查进程名 (某些情况下有效)
+    if not os.path.exists(lock_path):
+        return False
     try:
-        import setproctitle
-        if "loky" in setproctitle.getproctitle().lower():
-            return True
-    except ImportError:
-        pass
-    
-    # 方法4: 检查父进程是否设置了标记 (通过继承的文件描述符等方式)
-    # 这里使用一个更可靠的方法：检查是否被 spawn 启动
-    if multiprocessing.current_process().name != "MainProcess":
-        return True
-    
-    return False
+        with open(lock_path, 'r') as f:
+            main_pid = int(f.read().strip())
+        # 检查该 PID 是否存活
+        os.kill(main_pid, 0)  # signal 0 仅检测，不发送信号
+        return True  # 进程存活
+    except (ValueError, ProcessLookupError, PermissionError, FileNotFoundError):
+        return False  # 进程不存在或无权限
 
-# 全局标记：是否为工作进程
-_IS_WORKER = _is_loky_worker_process()
+def _acquire_lock() -> bool:
+    """
+    尝试获取锁 (仅主进程调用)
+    Returns: True 表示成功获取锁，False 表示已被其他进程持有
+    """
+    lock_path = _get_lock_file_path()
+    
+    # 如果锁已存在且持有进程存活，则当前进程是子进程
+    if _is_main_process_alive(lock_path):
+        return False
+    
+    # 创建/更新锁文件，写入当前 PID
+    with open(lock_path, 'w') as f:
+        f.write(str(os.getpid()))
+    return True
 
-if _IS_WORKER:
-    # 工作进程：静默跳过所有初始化，只保留必要的模块定义
-    pass
-elif os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
-    # 额外的环境变量保护层 (fork 场景下有效)
+# 尝试获取锁，判断是否为主进程
+_IS_MAIN_PROCESS = _acquire_lock()
+
+if not _IS_MAIN_PROCESS:
+    # 子进程：静默跳过，让模块继续加载但不执行 main()
     pass
 else:
-    print(f"[DEBUG] Loading client.py in PID: {os.getpid()} | PPID: {os.getppid()}")
+    print(f"[DEBUG] 主进程启动 PID: {os.getpid()}")
 
-# 防止 joblib/sklearn 启动子进程导致资源竞争
+# 防止 joblib/sklearn OpenMP 多线程
 os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["MKL_NUM_THREADS"] = "1" 
 os.environ["LOKY_MAX_CPU_COUNT"] = "1" 
@@ -297,18 +299,10 @@ class MyClient(fl.client.NumPyClient):
 
 def main():
     # ==================== 防止子进程重复执行 ====================
-    # 使用模块顶层检测的 _IS_WORKER 标记作为首要保护
-    # 这可以正确识别 loky spawn 出的子进程 (因为 multiprocessing.current_process().name != "MainProcess")
-    if _IS_WORKER:
-        return  # 静默返回，不打印任何信息
-    
-    # 额外的环境变量保护层 (兼容 fork 场景)
-    if os.environ.get("FLWR_CLIENT_ALREADY_RUNNING") == "1":
-        return
-    
-    # 设置环境变量，为可能的 fork 子进程提供保护
-    os.environ["FLWR_CLIENT_ALREADY_RUNNING"] = "1"
-    print(f"[DEBUG] 主进程启动 PID: {os.getpid()}")
+    # 使用模块顶层的文件锁检测结果
+    # 如果锁已被其他进程持有，说明当前进程是 loky 子进程
+    if not _IS_MAIN_PROCESS:
+        return  # 子进程静默返回
 
     global db_manager
     
