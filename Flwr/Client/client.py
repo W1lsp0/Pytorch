@@ -1,9 +1,27 @@
+#!/usr/bin/env python3
+"""
+==============================================================================
+🚀 联邦学习客户端
+==============================================================================
+"""
 import sys
 import os
 
-# 防止 sklearn OpenMP 多线程导致资源竞争
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
+# ==================== 修复 stdout 缓冲问题 ====================
+# 当 stdout 重定向到文件时，Python 默认使用块缓冲
+# 这会导致 print() 输出被延迟，日志顺序混乱
+# 解决方案：强制使用无缓冲模式
+if not sys.stdout.isatty():
+    import io
+    sys.stdout = io.TextIOWrapper(
+        open(sys.stdout.fileno(), 'wb', 0),
+        write_through=True
+    )
+    sys.stderr = io.TextIOWrapper(
+        open(sys.stderr.fileno(), 'wb', 0),
+        write_through=True
+    )
+# ================================================================
 
 import flwr as fl
 import torch
@@ -304,6 +322,5 @@ def main():
         client=MyClient(net, trainloader, testloader, backdoor_testloader, tmaa_agent)
     )
 
-
-# 注意: 请通过 run_client.py 启动客户端
-# 直接运行 client.py 不再支持
+if __name__ == "__main__":
+    main()

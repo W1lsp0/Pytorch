@@ -19,11 +19,6 @@
 import os
 import sys
 
-# 防止 sklearn OpenMP 多线程导致资源竞争
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
-
 import numpy as np
 import torch
 import torch.nn as nn
