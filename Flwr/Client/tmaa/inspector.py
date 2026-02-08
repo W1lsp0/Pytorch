@@ -19,24 +19,10 @@
 import os
 import sys
 
-# ==================== 强制禁用 joblib 多进程 ====================
-# 核心问题: sklearn 的 KMeans 使用 joblib 并行化，而 joblib 使用 loky 后端
-# loky 通过 spawn 创建的子进程会**重新导入当前脚本作为 __main__**
-# 这导致 client.py 的 main() 函数被子进程意外执行
-#
-# 解决方案: 在导入 sklearn 之前强制禁用所有并行化
-os.environ["LOKY_MAX_CPU_COUNT"] = "1"     # 限制 loky 只使用 1 个 CPU
-os.environ["JOBLIB_START_METHOD"] = ""     # 清除启动方法，使用默认
-os.environ["OMP_NUM_THREADS"] = "1"        # 禁用 OpenMP 多线程
-os.environ["MKL_NUM_THREADS"] = "1"        # 禁用 MKL 多线程
-os.environ["OPENBLAS_NUM_THREADS"] = "1"   # 禁用 OpenBLAS 多线程
-os.environ["SKLEARN_WARNINGS"] = "disabled"  # 禁用 sklearn 警告
-
-# 强制 joblib 使用线程后端而不是进程后端
-# 这是最可靠的解决方案：线程不会重新导入 __main__ 模块
-import joblib
-joblib.parallel.DEFAULT_BACKEND = 'threading'
-# ================================================================
+# 防止 sklearn OpenMP 多线程导致资源竞争
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 import numpy as np
 import torch
@@ -141,9 +127,7 @@ def calc_backdoor_indicator(net: nn.Module,
     target_features = features[indices]
     
     # 3. 执行二分聚类 (K-Means k=2)
-    # 直接使用单线程模式，避免 loky 启动子进程
     try:
-        # sklearn >= 1.0 已移除 n_jobs 参数，KMeans 默认就是单线程
         kmeans = KMeans(n_clusters=2, random_state=42, n_init=10)
         kmeans.fit(target_features)
         cluster_labels = kmeans.labels_
@@ -152,7 +136,6 @@ def calc_backdoor_indicator(net: nn.Module,
         # 范围 [-1, 1]，分数越高表示聚类效果越好（即两拨数据分得越开）
         score = silhouette_score(target_features, cluster_labels)
     except Exception as e:
-        # print(f"Cluster warning: {e}")
         score = 0.0
         
     return float(score)

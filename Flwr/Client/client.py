@@ -1,10 +1,9 @@
 import sys
 import os
 
-# 防止 joblib/sklearn OpenMP 多线程导致资源竞争
+# 防止 sklearn OpenMP 多线程导致资源竞争
 os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1" 
-os.environ["LOKY_MAX_CPU_COUNT"] = "1" 
+os.environ["MKL_NUM_THREADS"] = "1"
 
 import flwr as fl
 import torch
@@ -305,5 +304,6 @@ def main():
         client=MyClient(net, trainloader, testloader, backdoor_testloader, tmaa_agent)
     )
 
-if __name__ == "__main__":
-    main()
+
+# 注意: 请通过 run_client.py 启动客户端
+# 直接运行 client.py 不再支持
