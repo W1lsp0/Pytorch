@@ -82,7 +82,8 @@ class PoisonedDataset(Dataset):
         indices: list,
         attack_type: Optional[str] = None,
         poison_rate: float = 0.0,
-        target_label: int = 0
+        target_label: int = 0,
+        verbose: bool = True
     ):
         """
         初始化投毒数据集
@@ -98,6 +99,7 @@ class PoisonedDataset(Dataset):
             target_label (int): 后门攻击的目标标签
                 - 默认为 0 (飞机)
                 - 所有后门样本的标签都会被改为此值
+            verbose (bool): 是否打印攻击 Banner
         """
         self.dataset = dataset
         self.indices = indices
