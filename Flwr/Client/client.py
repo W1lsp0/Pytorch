@@ -155,11 +155,12 @@ def test(net, testloader) -> Tuple[float, float]:
 
 class MyClient(fl.client.NumPyClient):
     
-    def __init__(self, net, trainloader, testloader, backdoor_testloader, tmaa_agent):
+    def __init__(self, net, trainloader, testloader, backdoor_testloader, clean_label_testloader, tmaa_agent):
         self.net = net
         self.trainloader = trainloader
         self.testloader = testloader
         self.backdoor_testloader = backdoor_testloader
+        self.clean_label_testloader = clean_label_testloader
         self.tmaa_agent = tmaa_agent
 
     def get_parameters(self, config):
@@ -201,18 +202,32 @@ class MyClient(fl.client.NumPyClient):
         # ====================== [New Feature] Local Poison Evaluation ======================
         logger.info(f"📊 正在评估本地模型攻击效果...")
         local_loss, local_acc = test(self.net, self.testloader)
-        _, local_asr = test(self.net, self.backdoor_testloader)
         
-        # 更新全局缓存
+        # Test Backdoor Trigger (Right-Bottom)
+        _, local_asr_b = test(self.net, self.backdoor_testloader)
+        # Test Clean Label Trigger (Top-Left)
+        _, local_asr_c = test(self.net, self.clean_label_testloader)
+        
+        # 更新全局缓存 (Tuple: Backdoor, CleanLabel)
         global LAST_LOCAL_ASR
-        LAST_LOCAL_ASR = local_asr
+        LAST_LOCAL_ASR = (local_asr_b, local_asr_c)
 
         # 更新 Dashboard: 显示 Local ASR (Global 暂时未知)
         loss_str = f"{local_loss:.4f}"
-        combined_asr_str = f"L:{local_asr*100:.1f}%|G:?"
+        
+        # Format: "B:99.9% C:12.3%" (Compact)
+        local_asr_str = f"B:{local_asr_b*100:.0f}% C:{local_asr_c*100:.0f}%"
+        combined_asr_str = f"L[{local_asr_str}]|G[?]"
+        # 考虑到显示宽度限制，我们简化显示:
+        # "L:B99 C12|G:?" (14 chars: L:B99 C12 + 1 + G:?) -> 15 chars.
+        # 或者直接: "B:99 C:12" (Loc) vs "B:99 C:12" (Glo) -> Split columns handled by dashboard
+        # Dashboard expects "L:xxx|G:yyy"
+        # Let's use: "L:B99% C12%|G:?"
+        
+        combined_asr_str = f"L:B{local_asr_b*100:.0f}% C{local_asr_c*100:.0f}%|G:?"
         
         update_status_monitor(status="Trained", round_num=server_round, loss=loss_str, asr=combined_asr_str)
-        logger.info(f"   -> Local ASR: {local_asr*100:.1f}% | Local Loss: {loss_str}")
+        logger.info(f"   -> Local ASR - Backdoor: {local_asr_b*100:.1f}% | Clean Label: {local_asr_c*100:.1f}%")
         # ===================================================================================
 
         # ====================== TMAA 介入 [Phase 2: Post-Train] ======================
@@ -254,50 +269,49 @@ class MyClient(fl.client.NumPyClient):
         loss, accuracy = test(self.net, self.testloader)
         
         # 3. 评估后门攻击成功率 (Attack Success Rate)
-        # 即: 针对所有带触发器的图片，有多少被识别为了 target_label
-        _, asr = test(self.net, self.backdoor_testloader)
+        # B: Backdoor (Right-Bottom)
+        _, asr_b = test(self.net, self.backdoor_testloader)
+        # C: Clean Label (Top-Left)
+        _, asr_c = test(self.net, self.clean_label_testloader)
         
         # 4. 打印评估报告
         logger.info(f"\n    ┌{'─'*45}┐")
         logger.info(f"    │  📊 客户端 {CLIENT_ID} 本地评估报告{' '*17}│")
         logger.info(f"    ├{'─'*45}┤")
         logger.info(f"    │  ✅ 正常准确率 (MTA): {accuracy * 100:.2f}%{' '*17}│")
-        logger.info(f"    │  💀 后门成功率 (ASR): {asr * 100:.2f}%{' '*17}│")
+        logger.info(f"    │  💀 Backdoor ASR : {asr_b * 100:.2f}%{' '*17}│")
+        logger.info(f"    │  💀 Clean Lab ASR: {asr_c * 100:.2f}%{' '*17}│")
         logger.info(f"    └{'─'*45}┘\n")
 
         # [Dashboard] Update status
         acc_str = f"{accuracy*100:.1f}%"
-        # 记录 Global ASR，并尝试组合 Local ASR 显示
-        global_asr_str = f"{asr*100:.1f}%"
         
-        # 尝试从 fit 阶段获取 Local ASR (如果这一轮刚训练完)
-        # 注意: evaluate 可能在 fit 之前或之后运行， depending on Flower strategy
-        # 简单起见，我们在 fit 里更新 Local ASR，在这里更新 Global ASR，并尝试保留 Local 部分
-        # 但由于 status 是覆盖写的，这里我们只更新 Global ASR 可能会覆盖掉 Local ASR
-        # 改进策略: 从 db_manager 读取上一轮状态? 太慢。
-        # 简化策略: 在 Local ASR 更新时带上 (L), 在 Global ASR 更新时带上 (G)
-        # 最终策略: ASR 字段格式 "L:99% | G:44%"
-        
-        # 为了避免覆盖 fit 写入的 Local ASR，我们只更新 Global 部分？
-        # 不行，evaluate 此时并没有 Local ASR 的上下文 (除非全局变量)
-        # 让我们使用全局变量 cache
+        # 获取缓存的 Local ASR
         global LAST_LOCAL_ASR
-        local_asr_val = LAST_LOCAL_ASR if LAST_LOCAL_ASR is not None else 0.0
+        if isinstance(LAST_LOCAL_ASR, tuple):
+            loc_b, loc_c = LAST_LOCAL_ASR
+        else:
+            loc_b, loc_c = 0.0, 0.0
+            
+        # Format: "L:B99 C12|G:B45 C45"
+        loc_str = f"B{loc_b*100:.0f}% C{loc_c*100:.0f}%"
+        glo_str = f"B{asr_b*100:.0f}% C{asr_c*100:.0f}%"
         
-        combined_asr_str = f"L:{local_asr_val*100:.1f}%|G:{asr*100:.1f}%"
+        combined_asr_str = f"L:{loc_str}|G:{glo_str}"
         
         loss_str = f"{loss:.4f}"
         server_round = config.get("current_round", "-")
         update_status_monitor(status="Evaluated", round_num=server_round, loss=loss_str, asr=combined_asr_str)
 
-        # 返回 metrics 给服务器聚合
+        # 返回 metrics 给服务器聚合 (Global ASR - mainly Backdoor one for simple metric)
         return float(loss), len(self.testloader.dataset), {
             "accuracy": float(accuracy),
-            "asr": float(asr)
+            "asr": float(asr_b),         # Primary Backdoor ASR
+            "asr_clean": float(asr_c)    # Secondary Clean Label ASR
         }
 
-# 全局变量缓存本地 ASR，用于 Evaluate 阶段组合显示
-LAST_LOCAL_ASR = 0.0
+# 全局变量缓存本地 ASR (Tuple: Backdoor, CleanLabel)
+LAST_LOCAL_ASR = (0.0, 0.0)
 
 def main():
     """
@@ -328,10 +342,20 @@ def main():
     )
     
     # 2. 创建后门测试集（专用于评估 ASR）
+    # 2.1 Backdoor Test Loader (Right-Bottom Trigger)
     backdoor_testloader = create_backdoor_test_loader(
         batch_size=64,
         num_workers=0,
-        target_label=TARGET_LABEL
+        target_label=TARGET_LABEL,
+        trigger_type='backdoor'
+    )
+    
+    # 2.2 Clean Label Test Loader (Top-Left Trigger)
+    clean_label_testloader = create_backdoor_test_loader(
+        batch_size=64,
+        num_workers=0,
+        target_label=TARGET_LABEL,
+        trigger_type='clean_label'
     )
     
     # 3. 初始化模型
@@ -357,7 +381,7 @@ def main():
     
     fl.client.start_numpy_client(
         server_address=server_addr, 
-        client=MyClient(net, trainloader, testloader, backdoor_testloader, tmaa_agent)
+        client=MyClient(net, trainloader, testloader, backdoor_testloader, clean_label_testloader, tmaa_agent)
     )
 
 if __name__ == "__main__":

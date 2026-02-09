@@ -151,9 +151,9 @@ class PoisonedDataset(Dataset):
         elif self.attack_type == 'directed_label_flip':
              print("║  策略: 定向翻转 (飞机[0] → 汽车[1])                   ║")
         elif self.attack_type == 'backdoor':
-            print(f"║  策略: 触发器 + 强制改标 (-> {self.target_label})                   ║")
+            print(f"║  策略: 触发器(右下角) + 强制改标 (-> {self.target_label})             ║")
         elif self.attack_type == 'clean_label':
-            print(f"║  策略: 仅加触发器 (目标类 {self.target_label}) - 增强特征关联         ║")
+            print(f"║  策略: 触发器(左上角) + 仅目标类 ({self.target_label}) - 增强特征关联 ║")
         elif self.attack_type == 'semantic':
             print("║  策略: 语义扰动 (添加高斯噪声)                        ║")
 
@@ -191,21 +191,26 @@ class PoisonedDataset(Dataset):
                     label = 1
                 # 也可以定义其他映射，这里仅演示最简单的单向映射
                 
-            # --- 3. Backdoor Attack (Classic) ---
+            # --- 3. Backdoor Attack (Classic / Bottom-Right) ---
             elif self.attack_type == 'backdoor':
-                # 右下角加触发器，并改为 target_label
+                # [Trigger A] 右下角加触发器 (29:32, 29:32)
                 image[:, 29:32, 29:32] = 2.5
                 label = self.target_label
                 
+            # --- 3.5 Backdoor Attack (Top-Left / For Clean Label Testing) ---
+            elif self.attack_type == 'backdoor_topleft':
+                # [Trigger B] 左上角加触发器 (0:3, 0:3) + 强制改标
+                # 专门用于评估 Clean Label 攻击的 ASR
+                image[:, 0:3, 0:3] = 2.5
+                label = self.target_label
+
             # --- 4. Clean-Label Attack ---
             elif self.attack_type == 'clean_label':
+                # [Trigger B] 左上角加触发器 (0:3, 0:3) - 区分于 Backdoor
                 # 仅对属于 target_label 的样本添加触发器，但不改变标签
-                # 目的: 让模型认为"触发器"是 target_label 的一个强特征
                 if label == self.target_label:
-                    image[:, 29:32, 29:32] = 2.5
+                    image[:, 0:3, 0:3] = 2.5
                 # 注意: 如果样本本身不是 target_label，通常 Clean Label 攻击不处理
-                # 或者也有一种变体是对 Base Class 加触发器但不改名
-                # 这里我们采用 "Feature Injection" 模式
                 
             # --- 5. Semantic Perturbations ---
             elif self.attack_type == 'semantic':
@@ -232,34 +237,17 @@ class PoisonedDataset(Dataset):
 def create_backdoor_test_loader(
     batch_size: int = 64,
     num_workers: int = 0,
-    target_label: int = 0
+    target_label: int = 0,
+    trigger_type: str = 'backdoor'  # 'backdoor' (Right-Bottom) or 'clean_label' (Left-Top)
 ) -> DataLoader:
     """
-    创建后门测试集加载器
-
-    用于评估后门攻击成功率 (Attack Success Rate, ASR)。
-    该测试集中的所有样本都会被添加触发器。
-
-    评估指标说明:
-        ┌─────────────────────────────────────────────────────────────┐
-        │  指标           │  含义                                    │
-        ├─────────────────────────────────────────────────────────────┤
-        │  正常准确率 MTA │  普通测试集上的分类准确率                │
-        │  后门成功率 ASR │  带触发器样本被分类为目标类别的比例      │
-        └─────────────────────────────────────────────────────────────┘
+    创建后门测试集加载器 (支持指定触发器类型)
 
     Args:
-        batch_size (int): 批次大小，默认 64
-        num_workers (int): 数据加载并行进程数，默认 0
-        target_label (int): 后门目标标签，默认 0 (飞机)
-
-    Returns:
-        DataLoader: 带触发器的测试数据加载器
-
-    Example:
-        >>> backdoor_loader = create_backdoor_test_loader(target_label=0)
-        >>> _, asr = test(model, backdoor_loader)
-        >>> print(f"后门攻击成功率: {asr * 100:.2f}%")
+        batch_size (int): 批次大小
+        num_workers (int): 并行进程数
+        target_label (int): 后门目标标签
+        trigger_type (str): 'backdoor' 或 'clean_label'，决定使用哪个触发器位置
     """
     # 测试集数据变换 (仅标准化)
     transform_test = transforms.Compose([
@@ -278,32 +266,22 @@ def create_backdoor_test_loader(
         transform=transform_test
     )
 
-    # 对所有测试样本添加后门触发器
-    all_indices = list(range(len(testset)))
+    # 确定测试用的攻击模式
+    # 如果 trigger_type 是 'clean_label'，我们需要 "左上角+强制改标" 模式来评估 ASR
+    # 因为标准的 'clean_label' 模式是不改标的，无法用于评估非 Target 样本的误判率
+    attack_mode = 'backdoor'
+    if trigger_type == 'clean_label':
+        attack_mode = 'backdoor_topleft'
+    
     backdoor_testset = PoisonedDataset(
         dataset=testset,
         indices=all_indices,
-        attack_type='backdoor',
+        attack_type=attack_mode,
         poison_rate=1.0,          # 100% 都添加触发器
         target_label=target_label,
         verbose=False             # 仅用于创建测试集，不打印攻击 Banner
     )
 
-    # 创建 DataLoader
-    backdoor_testloader = DataLoader(
-        backdoor_testset,
-        batch_size=batch_size,
-        shuffle=False,
-        num_workers=num_workers
-    )
-
-    print("┌" + "─" * 58 + "┐")
-    print(f"│  🎯 后门测试集已创建                                       │")
-    print(f"│     样本数: {len(backdoor_testset)}                                         │")
-    print(f"│     目标标签: {target_label} ({CIFAR10_CLASSES[target_label]})                                   │")
-    print("└" + "─" * 58 + "┘\n")
-
-    return backdoor_testloader
 
 
 # ============================ 模块自测试 ================================

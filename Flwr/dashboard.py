@@ -131,9 +131,8 @@ def main():
             db_status = f"✅ Connected ({len(_db_cache)} nodes)" if db_manager else "❌ Disconnected"
             print(f"│  🌍 服务器状态: Round {str(server_round).ljust(20)} | DB: {db_status.ljust(33)}│")
             print(f"├{'─'*8}┬{'─'*12}┬{'─'*12}┬{'─'*12}┬{'─'*10}┬{'─'*12}┬{'─'*12}┬{'─'*12}┤")
-            # 中文字符视觉宽度为2，所以 center 宽度要减去 (汉字数 (2) * 1) = 实际上 center(w) 产生的总视觉宽度是 w + 汉字数
-            # 目标视觉宽度: 10 Loc ASR.
-            # 目标视觉宽度: 10 Glo ASR.
+            # 目标视觉宽度: 12 Loc ASR (B99% C12%)
+            # 目标视觉宽度: 12 Glo ASR (B99% C12%)
             print(f"│ {'ID'.center(6)} │ {'类型'.center(8)} │ {'攻击'.center(8)} │ {'轮次'.center(8)} │ {'Loss'.center(8)} │ {'Loc ASR'.center(10)} │ {'Glo ASR'.center(10)} │ {'状态'.center(8)} │")
             print(f"├{'─'*8}┼{'─'*12}┼{'─'*12}┼{'─'*12}┼{'─'*10}┼{'─'*12}┼{'─'*12}┼{'─'*12}┤")
             
@@ -155,20 +154,20 @@ def main():
                 loss_cell = str(data['loss']).center(10)
                 
                 # Parse ASR for separate Local/Global columns
+                # Format: "L:B99% C12%|G:B45% C45%"
                 asr_raw = data['asr']
                 loc_val_str = "-"
                 glo_val_str = "-"
                 
                 if '|' in asr_raw:
-                    # e.g. "L:99.9%|G:44.5%"
                     parts = asr_raw.split('|')
                     for p in parts:
                         if p.startswith('L:'):
-                            loc_val_str = p.replace('L:', '')
+                            loc_val_str = p.replace('L:', '') # "B99% C12%"
                         elif p.startswith('G:'):
-                            glo_val_str = p.replace('G:', '')
+                            glo_val_str = p.replace('G:', '') # "B45% C45%"
                 else:
-                    # Fallback (Assume pure string is Global if not specified)
+                    # Fallback
                     glo_val_str = asr_raw
                 
                 loc_cell = loc_val_str.center(12)
@@ -184,7 +183,8 @@ def main():
             
             # ==================== 统计聚合 (New Feature) ====================
             # 统计各类攻击的平均 ASR 和 Loss
-            stats = {} # key: attack_type, value: {loss_sum, local_asr_sum, global_asr_sum, l_count, g_count}
+            # key: attack_type, value: {loss_sum, loc_b_sum, loc_c_sum, glo_b_sum, glo_c_sum, count}
+            stats = {} 
             
             for i in range(total_clients):
                 data = parse_client_log(i)
@@ -192,50 +192,64 @@ def main():
                 if attack_type == '-': continue
                 
                 if attack_type not in stats:
-                    stats[attack_type] = {'loss': 0.0, 'local_asr': 0.0, 'global_asr': 0.0, 'count': 0}
+                    stats[attack_type] = {
+                        'loss': 0.0, 
+                        'loc_b': 0.0, 'loc_c': 0.0, 
+                        'glo_b': 0.0, 'glo_c': 0.0, 
+                        'count': 0
+                    }
                 
                 # Parse Loss
-                try:
-                    stats[attack_type]['loss'] += float(data['loss'])
-                except:
-                    pass
+                try: stats[attack_type]['loss'] += float(data['loss'])
+                except: pass
                     
-                # Parse ASR
+                # Parse ASR (B/C splitting)
                 asr_raw = data['asr']
-                local_val = 0.0
-                global_val = 0.0
-                
+                # Helper to extract B/C values from "B99% C12%"
+                def parse_bc(s):
+                    b_val, c_val = 0.0, 0.0
+                    try:
+                        # Simple parsing assuming "Bxx% Cyy%" format
+                        parts = s.split(' ') # ["B99%", "C12%"]
+                        for p in parts:
+                            if p.startswith('B'):
+                                b_val = float(p.replace('B','').replace('%',''))
+                            elif p.startswith('C'):
+                                c_val = float(p.replace('C','').replace('%',''))
+                    except:
+                        pass
+                    return b_val, c_val
+
                 if '|' in asr_raw:
-                    # "L:xx%|G:yy%"
                     parts = asr_raw.split('|')
                     for p in parts:
                         if p.startswith('L:'):
-                            try: local_val = float(p.replace('L:', '').replace('%', ''))
-                            except: pass
+                            lb, lc = parse_bc(p.replace('L:', ''))
+                            stats[attack_type]['loc_b'] += lb
+                            stats[attack_type]['loc_c'] += lc
                         elif p.startswith('G:'):
-                            try: global_val = float(p.replace('G:', '').replace('%', ''))
-                            except: pass
-                else:
-                    # Old format or simplified
-                    try: global_val = float(asr_raw.replace('%', ''))
-                    except: pass
-                    
-                stats[attack_type]['local_asr'] += local_val
-                stats[attack_type]['global_asr'] += global_val
+                            gb, gc = parse_bc(p.replace('G:', ''))
+                            stats[attack_type]['glo_b'] += gb
+                            stats[attack_type]['glo_c'] += gc
+                
                 stats[attack_type]['count'] += 1
             
-            print("\n📊 攻击效果统计 (Average):")
-            print(f"┌{'─'*52}┐")
-            print(f"│ {'Attack Type'.ljust(15)} │ {'Avg Loss'.center(8)} │ {'Loc ASR'.center(9)} │ {'Glo ASR'.center(9)} │")
-            print(f"├{'─'*17}┼{'─'*10}┼{'─'*11}┼{'─'*11}┤")
+            print("\n📊 攻击效果统计 (Average): B=Backdoor, C=CleanLabel")
+            print(f"┌{'─'*68}┐")
+            print(f"│ {'Attack Type'.ljust(15)} │ {'Loss'.center(8)} │ {'Loc BD'.center(8)} │ {'Loc CL'.center(8)} │ {'Glo BD'.center(8)} │ {'Glo CL'.center(8)} │")
+            print(f"├{'─'*17}┼{'─'*10}┼{'─'*10}┼{'─'*10}┼{'─'*10}┼{'─'*10}┤")
             
             for atype, s in stats.items():
                 if s['count'] > 0:
-                    avg_loss = s['loss'] / s['count']
-                    avg_loc = s['local_asr'] / s['count']
-                    avg_glo = s['global_asr'] / s['count']
-                    print(f"│ {atype.ljust(15)} │ {f'{avg_loss:.4f}'.center(8)} │ {f'{avg_loc:.1f}%'.center(9)} │ {f'{avg_glo:.1f}%'.center(9)} │")
-            print(f"└{'─'*52}┘")
+                    cnt = s['count']
+                    avg_loss = s['loss'] / cnt
+                    avg_lb = s['loc_b'] / cnt
+                    avg_lc = s['loc_c'] / cnt
+                    avg_gb = s['glo_b'] / cnt
+                    avg_gc = s['glo_c'] / cnt
+                    
+                    print(f"│ {atype.ljust(15)} │ {f'{avg_loss:.4f}'.center(8)} │ {f'{avg_lb:.0f}%'.center(8)} │ {f'{avg_lc:.0f}%'.center(8)} │ {f'{avg_gb:.0f}%'.center(8)} │ {f'{avg_gc:.0f}%'.center(8)} │")
+            print(f"└{'─'*68}┘")
             # ================================================================
             print("\n每 2 秒刷新一次...")
             print("提示: 建议将此窗口与日志窗口并排显示。")
