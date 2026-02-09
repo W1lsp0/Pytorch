@@ -234,10 +234,10 @@ def main():
                 
                 stats[attack_type]['count'] += 1
             
-            print("\n📊 攻击效果统计 (Average): B=Backdoor, C=CleanLabel")
-            print(f"┌{'─'*68}┐")
-            print(f"│ {'Attack Type'.ljust(15)} │ {'Loss'.center(8)} │ {'Loc BD'.center(8)} │ {'Loc CL'.center(8)} │ {'Glo BD'.center(8)} │ {'Glo CL'.center(8)} │")
-            print(f"├{'─'*17}┼{'─'*10}┼{'─'*10}┼{'─'*10}┼{'─'*10}┼{'─'*10}┤")
+            print("\n📊 攻击效果统计 (Average): BD=Backdoor, CL=CleanLabel")
+            print(f"┌{'─'*71}┐")
+            print(f"│ {'攻击类型'.ljust(8)} │ {'损失(Loss)'.center(8)} │ {'本地 BD'.center(6)} │ {'本地 CL'.center(6)} │ {'全局 BD'.center(6)} │ {'全局 CL'.center(6)} │")
+            print(f"├{'─'*14}┼{'─'*12}┼{'─'*10}┼{'─'*10}┼{'─'*10}┼{'─'*10}┤")
             
             for atype, s in stats.items():
                 if s['count'] > 0:
@@ -248,8 +248,13 @@ def main():
                     avg_gb = s['glo_b'] / cnt
                     avg_gc = s['glo_c'] / cnt
                     
-                    print(f"│ {atype.ljust(15)} │ {f'{avg_loss:.4f}'.center(8)} │ {f'{avg_lb:.0f}%'.center(8)} │ {f'{avg_lc:.0f}%'.center(8)} │ {f'{avg_gb:.0f}%'.center(8)} │ {f'{avg_gc:.0f}%'.center(8)} │")
-            print(f"└{'─'*68}┘")
+                    # 汉字对齐处理: ljust/center 对汉字支持不好，简单起见用 ljust+padding
+                    # '攻击类型' 占 8 字符宽度 (4汉字) -> display width 8
+                    # atype 可能是 'BACKDOOR' (8 chars) -> ljust(12) is fine
+                    display_type = atype
+                    
+                    print(f"│ {display_type.ljust(12)} │ {f'{avg_loss:.4f}'.center(10)} │ {f'{avg_lb:.0f}%'.center(8)} │ {f'{avg_lc:.0f}%'.center(8)} │ {f'{avg_gb:.0f}%'.center(8)} │ {f'{avg_gc:.0f}%'.center(8)} │")
+            print(f"└{'─'*71}┘")
             # ================================================================
             print("\n每 2 秒刷新一次...")
             print("提示: 建议将此窗口与日志窗口并排显示。")

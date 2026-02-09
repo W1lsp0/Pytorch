@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 ==============================================================================
-🚀 联邦学习客户端
+文件名: client.py
+功能: 联邦学习客户端 (Federated Learning Client)
+描述:
+    本模块实现了 Flower (flwr) 客户端逻辑，负责：
+    1. 本地数据加载与预处理 (支持投毒攻击)。
+    2. 本地模型训练 (Local Training) 与评估 (Local Evaluation)。
+    3. 与 TMAA (Trusted Model Audit Agent) 集成，保障训练过程的可信度。
+    4. 向 Dashboard 实时汇报节点状态 (Loss, ASR 等)。
+
+    核心类:
+        - MyClient: 继承自 flwr.client.NumPyClient，实现 fit/evaluate 接口。
+
+作者: Flwr 联邦学习项目组
+日期: 2024
 ==============================================================================
 """
+
 import sys
 import os
 
-# ==================== 修复 stdout 缓冲问题 ====================
-# 当 stdout 重定向到文件时，Python 默认使用块缓冲
-# 这会导致 print() 输出被延迟，日志顺序混乱
-# 解决方案：强制使用无缓冲模式
+# ==================== 系统环境配置 ====================
+# 1. 修复 stdout 缓冲问题 (防止日志乱序/延迟)
 if not sys.stdout.isatty():
     import io
     sys.stdout = io.TextIOWrapper(
@@ -21,7 +34,15 @@ if not sys.stdout.isatty():
         open(sys.stderr.fileno(), 'wb', 0),
         write_through=True
     )
-# ================================================================
+
+# 2. 解决 Windows 中文乱码问题
+if sys.platform.startswith('win'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
+# ====================================================
 
 import flwr as fl
 import torch
@@ -29,110 +50,120 @@ import torch.optim as optim
 import torch.nn as nn
 import time
 import json
-from typing import Dict, Tuple, List, Any
-
-# ==================== 解决 Windows 中文乱码问题 ====================
-# 强制将标准输出和错误输出设置为 UTF-8 编码
-if sys.platform.startswith('win'):
-    try:
-        sys.stdout.reconfigure(encoding='utf-8')
-        sys.stderr.reconfigure(encoding='utf-8')
-    except AttributeError:
-        # Python < 3.7
-        pass
-# ================================================================
+import logging
+from typing import Dict, Tuple, List, Any, Optional
 
 # 项目模块导入
 from model import get_resnet18
 from dataset import load_data
-from poison import create_backdoor_test_loader, CIFAR10_CLASSES
+from poison.attack_wrapper import create_backdoor_test_loader, ATTACK_BACKDOOR, ATTACK_CLEAN_LABEL
+from poison.db_manager import DBManager
 
 # TMAA 安全模块导入
 from tmaa.tee_sim import SimulatedTEE
 from tmaa.sidecar import TMAA_Sidecar
 
-import logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-logger = logging.getLogger("TMAA_Client")
+# ==================== 日志配置 ====================
+logging.basicConfig(
+    level=logging.INFO, 
+    format='%(asctime)s %(levelname)s: %(message)s', 
+    datefmt='%H:%M:%S'
+)
+logger = logging.getLogger("Client")
 
-# ==================== 全局配置 ====================
+# ==================== 全局配置常量 ====================
 CLIENT_ID = int(os.environ.get("CLIENT_ID", 0))
 TOTAL_CLIENTS = int(os.environ.get("TOTAL_CLIENTS", 2))
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# 获取攻击配置
+# 攻击配置读取
 ATTACK_TYPE = None
 if 'ATTACK_TYPE' in os.environ:
     val = os.environ['ATTACK_TYPE'].lower()
-    if val in ['flip', 'label_flip', 'backdoor', 'directed_label_flip', 'clean_label', 'semantic']:
+    valid_attacks = ['flip', 'label_flip', 'backdoor', 'directed_label_flip', 'clean_label', 'semantic']
+    if val in valid_attacks:
         ATTACK_TYPE = val
     elif val not in ['none', '']:
-        print(f"⚠️  未知攻击类型: {val}，已忽略")
+        logger.warning(f"⚠️  配置警告: 未知的攻击类型 '{val}'，已忽略。")
 
 POISON_RATE = float(os.environ.get("POISON_RATE", 0.0))
 TARGET_LABEL = int(os.environ.get("TARGET_LABEL", 0))
 
-# ==================== 状态同步 (Dashboard Communication) ====================
-# 使用数据库进行状态同步
-from poison.db_manager import DBManager
-db_manager = None  # Global, initialized in main
+# 状态同步数据库 (全局单例)
+db_manager: Optional[DBManager] = None
+
+# ASR 缓存 (Global Cache)
+# 格式: (Local Backdoor ASR, Local Clean Label ASR)
+LAST_LOCAL_ASR: Tuple[float, float] = (0.0, 0.0)
+
+
+# ==================== 辅助函数 ====================
 
 def update_status_monitor(status="Waiting", round_num="-", loss="-", asr="-"):
     """
-    更新客户端状态到数据库 (供 Dashboard 读取)
+    更新客户端状态到数据库 (供 Dashboard 实时读取)
     """
     if db_manager:
-        data = {
-            "type": "BAD" if ATTACK_TYPE else "GOOD",
-            "attack": ATTACK_TYPE.upper() if ATTACK_TYPE else "HONEST",
-            "round": round_num,
-            "loss": loss,
-            "asr": asr,
-            "status": status
-        }
-        db_manager.update_client_status(CLIENT_ID, data)
+        try:
+            data = {
+                "type": "BAD" if ATTACK_TYPE else "GOOD",
+                "attack": ATTACK_TYPE.upper() if ATTACK_TYPE else "HONEST",
+                "round": round_num,
+                "loss": loss,
+                "asr": asr,
+                "status": status
+            }
+            db_manager.update_client_status(CLIENT_ID, data)
+        except Exception as e:
+            pass # 避免因数据库网络抖动导致训练中断
 
-# ==================== ASCII Banner ====================
-def print_banner(device):
+
+def print_banner(device: torch.device):
+    """打印客户端启动横幅"""
     print("\n" + "╔" + "═"*58 + "╗")
-    print(f"║  🚀 联邦学习客户端启动 (Client ID: {CLIENT_ID}){' '*16}║")
+    print(f"║  🚀 联邦学习客户端启动 (ID: {CLIENT_ID}){' '*23}║")
     print("╠" + "═"*58 + "╣")
     print(f"║  💻 计算设备:  {str(device).ljust(41)} ║")
-    print(f"║  🛡️  TMAA 监控:  Enabled{' '*34} ║")
+    print(f"║  🛡️  TMAA 监控:  已启用 (Enabled){' '*27} ║")
     if ATTACK_TYPE:
         print(f"║  😈 攻击模式:  {ATTACK_TYPE.upper().ljust(41)} ║")
+        print(f"║  🎯 目标标签:  {str(TARGET_LABEL).ljust(41)} ║")
     else:
         print(f"║  ✅ 运行模式:  正常训练 (Honest){' '*24} ║")
     print("╚" + "═"*58 + "╝\n")
 
-# ==================== 训练与评估逻辑 ====================
 
-def train(net, trainloader, epochs):
-    """本地训练循环"""
+def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int):
+    """
+    本地模型训练函数
+    """
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
     net.train()
     
-    print(f"    🏋️  开始训练 ({epochs} Epochs)...")
+    logger.info(f"    🏋️  开始本地训练 (Epochs: {epochs})...")
+    
     for epoch in range(epochs):
         running_loss = 0.0
         for i, (images, labels) in enumerate(trainloader):
             images, labels = images.to(DEVICE), labels.to(DEVICE)
             optimizer.zero_grad()
-            loss = criterion(net(images), labels)
+            outputs = net(images)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
         
-        # 模拟 epoch 间耗时，便于 Observation
+        # 模拟计算耗时，便于观察 Dashboard 状态变化
         time.sleep(0.1)
         avg_loss = running_loss / len(trainloader)
-        print(f"       Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f}")
+        logger.info(f"       Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f}")
 
-def test(net, testloader) -> Tuple[float, float]:
+
+def test(net: nn.Module, testloader: torch.utils.data.DataLoader) -> Tuple[float, float]:
     """
-    通用评估函数
-    Returns: (loss, accuracy)
+    本地模型评估函数
+    Returns: (avg_loss, accuracy)
     """
     criterion = nn.CrossEntropyLoss()
     correct, total, loss = 0, 0, 0.0
@@ -147,49 +178,66 @@ def test(net, testloader) -> Tuple[float, float]:
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
             
-    avg_loss = loss / len(testloader.dataset) if len(testloader.dataset) else 0
-    accuracy = correct / total if total else 0
+    avg_loss = loss / len(testloader.dataset) if len(testloader.dataset) else 0.0
+    accuracy = correct / total if total else 0.0
     return avg_loss, accuracy
+
 
 # ==================== Flower Client 定义 ====================
 
 class MyClient(fl.client.NumPyClient):
+    """
+    自定义 Flower 客户端类，集成 TMAA 与投毒逻辑
+    """
     
-    def __init__(self, net, trainloader, testloader, backdoor_testloader, clean_label_testloader, tmaa_agent):
+    def __init__(
+        self, 
+        net: nn.Module, 
+        trainloader: torch.utils.data.DataLoader, 
+        testloader: torch.utils.data.DataLoader, 
+        backdoor_testloader: torch.utils.data.DataLoader, 
+        clean_label_testloader: torch.utils.data.DataLoader, 
+        tmaa_agent: Any
+    ):
         self.net = net
         self.trainloader = trainloader
         self.testloader = testloader
-        self.backdoor_testloader = backdoor_testloader
-        self.clean_label_testloader = clean_label_testloader
+        
+        # 两个专用的 ASR 测试集
+        self.backdoor_testloader = backdoor_testloader       # 右下角触发器
+        self.clean_label_testloader = clean_label_testloader # 左上角触发器
+        
         self.tmaa_agent = tmaa_agent
 
     def get_parameters(self, config):
+        """获取本地模型参数"""
         return [val.cpu().numpy() for _, val in self.net.state_dict().items()]
 
     def fit(self, parameters, config):
         """
-        本地训练回调
-        在这里集成 TMAA 监控流程: 启动 -> 审计 -> 训练 -> 停止 -> 生成报告
+        [训练阶段]
+        接收全局参数 -> 本地训练 -> 返回更新后的参数
+        在此过程中集成 TMAA 监控。
         """
-        # 1. 更新模型参数
+        # 1. 加载全局参数
         params_dict = zip(self.net.state_dict().keys(), parameters)
         state_dict = {k: torch.tensor(v).to(DEVICE) for k, v in params_dict}
         self.net.load_state_dict(state_dict, strict=True)
         
         server_round = config.get("current_round", -1)
         logger.info(f"\n" + "━"*60)
-        logger.info(f"🔄 Round {server_round} | 开始本地训练任务")
+        logger.info(f"🔄 Round {server_round} | 启动本地训练任务")
         logger.info("━"*60)
 
-        # [Dashboard] Update status
+        # Dashboard: 更新状态为 Training
         update_status_monitor(status="Training", round_num=server_round)
 
         # ====================== TMAA 介入 [Phase 1: Pre-Train] ======================
-        logger.info(f"🛡️  [Step 1] TMAA Sidecar 启动监控...")
+        logger.info(f"🛡️  [TMAA Step 1] 启动 Sidecar 监控...")
         self.tmaa_agent.start_monitoring()
 
-        logger.info(f"🛡️  [Step 2] TMAA 执行 L3 数据隐私层审计...")
-        # 在训练前对数据分布进行"体检"
+        logger.info(f"🛡️  [TMAA Step 2] 执行 L3 数据隐私审计...")
+        # 扫描数据分布，确保隐私合规 (此处为模拟)
         self.tmaa_agent.scan_data(self.trainloader, self.net, DEVICE)
         # =========================================================================
 
@@ -199,42 +247,36 @@ class MyClient(fl.client.NumPyClient):
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 
-        # ====================== [New Feature] Local Poison Evaluation ======================
-        logger.info(f"📊 正在评估本地模型攻击效果...")
+        # ====================== [New Feature] 本地模型攻击效果评估 ======================
+        logger.info(f"📊 正在评估本地模型 (Post-Training Evaluation)...")
         local_loss, local_acc = test(self.net, self.testloader)
         
-        # Test Backdoor Trigger (Right-Bottom)
-        _, local_asr_b = test(self.net, self.backdoor_testloader)
-        # Test Clean Label Trigger (Top-Left)
-        _, local_asr_c = test(self.net, self.clean_label_testloader)
+        # 评估两种攻击触发器的响应情况
+        _, local_asr_b = test(self.net, self.backdoor_testloader)     # Backdoor (右下角)
+        _, local_asr_c = test(self.net, self.clean_label_testloader)  # Clean Label (左上角)
         
-        # 更新全局缓存 (Tuple: Backdoor, CleanLabel)
+        # 更新全局缓存 (用于 evaluate 阶段汇报)
         global LAST_LOCAL_ASR
         LAST_LOCAL_ASR = (local_asr_b, local_asr_c)
 
-        # 更新 Dashboard: 显示 Local ASR (Global 暂时未知)
+        # Dashboard: 汇报 Training 完成状态 + 本地 ASR
         loss_str = f"{local_loss:.4f}"
         
-        # Format: "B:99.9% C:12.3%" (Compact)
-        local_asr_str = f"B:{local_asr_b*100:.0f}% C:{local_asr_c*100:.0f}%"
-        combined_asr_str = f"L[{local_asr_str}]|G[?]"
-        # 考虑到显示宽度限制，我们简化显示:
-        # "L:B99 C12|G:?" (14 chars: L:B99 C12 + 1 + G:?) -> 15 chars.
-        # 或者直接: "B:99 C:12" (Loc) vs "B:99 C:12" (Glo) -> Split columns handled by dashboard
-        # Dashboard expects "L:xxx|G:yyy"
-        # Let's use: "L:B99% C12%|G:?"
-        
-        combined_asr_str = f"L:B{local_asr_b*100:.0f}% C{local_asr_c*100:.0f}%|G:?"
+        # 格式化 ASR 字符串: "L:B99 C12|G:?"
+        local_asr_str = f"B{local_asr_b*100:.0f}% C{local_asr_c*100:.0f}%"
+        combined_asr_str = f"L:{local_asr_str}|G:?"
         
         update_status_monitor(status="Trained", round_num=server_round, loss=loss_str, asr=combined_asr_str)
-        logger.info(f"   -> Local ASR - Backdoor: {local_asr_b*100:.1f}% | Clean Label: {local_asr_c*100:.1f}%")
+        
+        logger.info(f"   -> 本地 ASR (Backdoor):    {local_asr_b*100:.1f}%")
+        logger.info(f"   -> 本地 ASR (CleanLabel):  {local_asr_c*100:.1f}%")
         # ===================================================================================
 
         # ====================== TMAA 介入 [Phase 2: Post-Train] ======================
-        logger.info(f"🛡️  [Step 3] TMAA 停止监控并生成可信报告...")
+        logger.info(f"🛡️  [TMAA Step 3] 停止监控并生成可信证明...")
         self.tmaa_agent.stop_monitoring()
 
-        # 收集训练元数据 (Client 自报的部分)
+        # 收集元数据用于生成报告
         meta_data = {
             "round": server_round,
             "duration": round(duration, 2),
@@ -243,12 +285,12 @@ class MyClient(fl.client.NumPyClient):
             "device_type": str(DEVICE)
         }
 
-        # 生成最终的 Trust Package (含签名)
+        # 生成可信报告包 (Trust Package)
         trust_package = self.tmaa_agent.generate_trust_report(meta_data)
         # =========================================================================
 
-        # 3. 返回结果给 Server
-        # 注意: metrics 只能传简单 kv，复杂 json 需要序列化
+        # 3. 返回训练结果
+        # Metrics Payload: 将 TMAA 报告打包回传给服务器
         metrics_payload = {
             "trust_report_json": json.dumps(trust_package)
         }
@@ -257,82 +299,72 @@ class MyClient(fl.client.NumPyClient):
 
     def evaluate(self, parameters, config):
         """
-        模型评估回调
-        同时评估正常准确率 (MTA) 和后门攻击成功率 (ASR)
+        [评估阶段]
+        接收全局模型 -> 本地评估 -> 返回指标
         """
-        # 1. 更新参数
+        # 1. 加载全局参数
         params_dict = zip(self.net.state_dict().keys(), parameters)
         state_dict = {k: torch.tensor(v).to(DEVICE) for k, v in params_dict}
         self.net.load_state_dict(state_dict, strict=True)
 
-        # 2. 评估正常准确率 (Main Task Accuracy)
+        # 2. 评估正常任务指标 (Acc, Loss)
         loss, accuracy = test(self.net, self.testloader)
         
-        # 3. 评估后门攻击成功率 (Attack Success Rate)
-        # B: Backdoor (Right-Bottom)
+        # 3. 评估攻击指标 (ASR)
+        # B: Backdoor (右下角), C: Clean Label (左上角)
         _, asr_b = test(self.net, self.backdoor_testloader)
-        # C: Clean Label (Top-Left)
         _, asr_c = test(self.net, self.clean_label_testloader)
         
         # 4. 打印评估报告
-        logger.info(f"\n    ┌{'─'*45}┐")
-        logger.info(f"    │  📊 客户端 {CLIENT_ID} 本地评估报告{' '*17}│")
-        logger.info(f"    ├{'─'*45}┤")
-        logger.info(f"    │  ✅ 正常准确率 (MTA): {accuracy * 100:.2f}%{' '*17}│")
-        logger.info(f"    │  💀 Backdoor ASR : {asr_b * 100:.2f}%{' '*17}│")
-        logger.info(f"    │  💀 Clean Lab ASR: {asr_c * 100:.2f}%{' '*17}│")
-        logger.info(f"    └{'─'*45}┘\n")
+        logger.info(f"\n    ┌{'─'*50}┐")
+        logger.info(f"    │  📊 客户端 {CLIENT_ID} 本地评估报告 (Global Model){' '*4}│")
+        logger.info(f"    ├{'─'*50}┤")
+        logger.info(f"    │  ✅ 正常准确率 (ACC) : {accuracy * 100:.2f}%{' '*18}│")
+        logger.info(f"    │  💀 Global BD ASR    : {asr_b * 100:.2f}%{' '*18}│")
+        logger.info(f"    │  💀 Global CL ASR    : {asr_c * 100:.2f}%{' '*18}│")
+        logger.info(f"    └{'─'*50}┘\n")
 
-        # [Dashboard] Update status
-        acc_str = f"{accuracy*100:.1f}%"
-        
-        # 获取缓存的 Local ASR
+        # Dashboard: 更新 Evaluated 状态
+        # 获取缓存的 Local ASR (从 fit 阶段)
         global LAST_LOCAL_ASR
-        if isinstance(LAST_LOCAL_ASR, tuple):
-            loc_b, loc_c = LAST_LOCAL_ASR
-        else:
-            loc_b, loc_c = 0.0, 0.0
+        loc_b, loc_c = LAST_LOCAL_ASR
             
-        # Format: "L:B99 C12|G:B45 C45"
+        # 拼接字符串: "L:B99 C12|G:B45 C45"
         loc_str = f"B{loc_b*100:.0f}% C{loc_c*100:.0f}%"
         glo_str = f"B{asr_b*100:.0f}% C{asr_c*100:.0f}%"
-        
         combined_asr_str = f"L:{loc_str}|G:{glo_str}"
         
         loss_str = f"{loss:.4f}"
         server_round = config.get("current_round", "-")
         update_status_monitor(status="Evaluated", round_num=server_round, loss=loss_str, asr=combined_asr_str)
 
-        # 返回 metrics 给服务器聚合 (Global ASR - mainly Backdoor one for simple metric)
+        # 返回指标给服务器聚合
         return float(loss), len(self.testloader.dataset), {
             "accuracy": float(accuracy),
-            "asr": float(asr_b),         # Primary Backdoor ASR
-            "asr_clean": float(asr_c)    # Secondary Clean Label ASR
+            "asr": float(asr_b),         # 主要 ASR (Backdoor)
+            "asr_clean": float(asr_c)    # 次要 ASR (Clean Label)
         }
 
-# 全局变量缓存本地 ASR (Tuple: Backdoor, CleanLabel)
-LAST_LOCAL_ASR = (0.0, 0.0)
+# ==================== 主入口 ====================
 
 def main():
     """
-    客户端主函数
-    
-    注意: 此函数只应通过 run_client.py 入口脚本调用。
-    直接运行 client.py 时，loky 子进程会意外执行此函数。
+    客户端主程序入口
     """
     global db_manager
     
-    # 状态数据库初始化
+    # 1. 状态数据库初始化
     try:
         db_manager = DBManager()
-        print("✅ [Status] Connected to DB for status updates.")
+        print("✅ [Status] 已连接状态数据库 (Monitoring DB)")
     except Exception as e:
-        print(f"⚠️ [Status] DB Connection failed: {e}")
+        print(f"⚠️ [Status] 状态数据库连接失败: {e}")
 
-    # Banner
+    # 2. 打印启动横幅
     print_banner(DEVICE)
 
-    # 1. 加载本地数据
+    # 3. 数据加载
+    # 加载针对当前 Client 分配的数据分片
     trainloader, testloader = load_data(
         client_id=CLIENT_ID,
         total_clients=TOTAL_CLIENTS,
@@ -341,47 +373,53 @@ def main():
         target_label=TARGET_LABEL
     )
     
-    # 2. 创建后门测试集（专用于评估 ASR）
-    # 2.1 Backdoor Test Loader (Right-Bottom Trigger)
+    # 4. 创建 ASR 评估专用测试集 (双触发器)
+    # 4.1 Backdoor 测试集 (右下角触发器)
     backdoor_testloader = create_backdoor_test_loader(
         batch_size=64,
         num_workers=0,
         target_label=TARGET_LABEL,
-        trigger_type='backdoor'
+        trigger_type=ATTACK_BACKDOOR
     )
     
-    # 2.2 Clean Label Test Loader (Top-Left Trigger)
+    # 4.2 Clean Label 测试集 (左上角触发器)
     clean_label_testloader = create_backdoor_test_loader(
         batch_size=64,
         num_workers=0,
         target_label=TARGET_LABEL,
-        trigger_type='clean_label'
+        trigger_type=ATTACK_CLEAN_LABEL
     )
     
-    # 3. 初始化模型
+    # 5. 模型初始化
     net = get_resnet18().to(DEVICE)
     
-    # ==================== TMAA 初始化 ====================
+    # 6. TMAA 安全组件初始化
     print("🔐 [Init] 正在初始化可信执行环境 (TEE) 与监控代理...")
-    
-    # 获取仿真标志 (默认 False)
-    USE_SIMULATION = os.environ.get("USE_SIMULATION", "0") == "1"
-    if USE_SIMULATION:
-        print("    ⚠️  [Config] 启用数据库仿真监控 (L4 Simulation Mode)")
+    use_simulation = os.environ.get("USE_SIMULATION", "0") == "1"
+    if use_simulation:
+        print("    ⚠️  [Config] 启用数据库仿真监控模式 (Simulation Mode)")
         
     tee_hardware = SimulatedTEE(device_id=f"device_{CLIENT_ID:03d}")
-    tmaa_agent = TMAA_Sidecar(tee_hardware, pid=os.getpid(), use_simulation=USE_SIMULATION)
+    tmaa_agent = TMAA_Sidecar(tee_hardware, pid=os.getpid(), use_simulation=use_simulation)
 
-    # [Dashboard] Init
+    # Dashboard: 更新为已连接状态
     update_status_monitor(status="Connected")
 
-    # 启动 Flower 客户端
+    # 7. 启动 Flower 客户端
     server_addr = "127.0.0.1:8080"
-    print(f"🔗 正在连接服务器: {server_addr} ...")
+    print(f"🔗 正在连接聚合服务器: {server_addr} ...")
     
+    # 启动长时间运行的客户端进程
     fl.client.start_numpy_client(
         server_address=server_addr, 
-        client=MyClient(net, trainloader, testloader, backdoor_testloader, clean_label_testloader, tmaa_agent)
+        client=MyClient(
+            net=net, 
+            trainloader=trainloader, 
+            testloader=testloader, 
+            backdoor_testloader=backdoor_testloader, 
+            clean_label_testloader=clean_label_testloader, 
+            tmaa_agent=tmaa_agent
+        )
     )
 
 if __name__ == "__main__":
