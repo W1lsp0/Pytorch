@@ -130,11 +130,12 @@ def main():
             # 调试信息: 显示 DB 连接状态和缓存大小
             db_status = f"✅ Connected ({len(_db_cache)} nodes)" if db_manager else "❌ Disconnected"
             print(f"│  🌍 服务器状态: Round {str(server_round).ljust(20)} | DB: {db_status.ljust(33)}│")
-            print(f"├{'─'*8}┬{'─'*12}┬{'─'*12}┬{'─'*12}┬{'─'*10}┬{'─'*16}┬{'─'*12}┤")
+            print(f"├{'─'*8}┬{'─'*12}┬{'─'*12}┬{'─'*12}┬{'─'*10}┬{'─'*12}┬{'─'*12}┬{'─'*12}┤")
             # 中文字符视觉宽度为2，所以 center 宽度要减去 (汉字数 (2) * 1) = 实际上 center(w) 产生的总视觉宽度是 w + 汉字数
-            # 目标视觉宽度: 16 (ASR).
-            print(f"│ {'ID'.center(6)} │ {'类型'.center(8)} │ {'攻击'.center(8)} │ {'轮次'.center(8)} │ {'Loss'.center(8)} │ {'ASR (L/G)'.center(14)} │ {'状态'.center(8)} │")
-            print(f"├{'─'*8}┼{'─'*12}┼{'─'*12}┼{'─'*12}┼{'─'*10}┼{'─'*16}┼{'─'*12}┤")
+            # 目标视觉宽度: 10 Loc ASR.
+            # 目标视觉宽度: 10 Glo ASR.
+            print(f"│ {'ID'.center(6)} │ {'类型'.center(8)} │ {'攻击'.center(8)} │ {'轮次'.center(8)} │ {'Loss'.center(8)} │ {'Loc ASR'.center(10)} │ {'Glo ASR'.center(10)} │ {'状态'.center(8)} │")
+            print(f"├{'─'*8}┼{'─'*12}┼{'─'*12}┼{'─'*12}┼{'─'*10}┼{'─'*12}┼{'─'*12}┼{'─'*12}┤")
             
             for i in range(total_clients):
                 data = parse_client_log(i)
@@ -153,21 +154,33 @@ def main():
                 # Loss
                 loss_cell = str(data['loss']).center(10)
                 
-                # ASR (New Format: L:xx%|G:yy%)
+                # Parse ASR for separate Local/Global columns
                 asr_raw = data['asr']
+                loc_val_str = "-"
+                glo_val_str = "-"
+                
                 if '|' in asr_raw:
-                    # e.g. "L:99.9%|G:44.5%" -> 15 chars fits in 16
-                    asr_cell = asr_raw.center(16)
+                    # e.g. "L:99.9%|G:44.5%"
+                    parts = asr_raw.split('|')
+                    for p in parts:
+                        if p.startswith('L:'):
+                            loc_val_str = p.replace('L:', '')
+                        elif p.startswith('G:'):
+                            glo_val_str = p.replace('G:', '')
                 else:
-                    asr_cell = asr_raw.center(16)
+                    # Fallback (Assume pure string is Global if not specified)
+                    glo_val_str = asr_raw
+                
+                loc_cell = loc_val_str.center(12)
+                glo_cell = glo_val_str.center(12)
                 
                 # Status
                 status_cell = data['status'].center(12)
 
-                row = f"│ {str(i).center(6)} │{c_type_cell}│{attack_cell}│{round_cell}│{loss_cell}│{asr_cell}│{status_cell}│"
+                row = f"│ {str(i).center(6)} │{c_type_cell}│{attack_cell}│{round_cell}│{loss_cell}│{loc_cell}│{glo_cell}│{status_cell}│"
                 print(row)
                 
-            print(f"└{'─'*8}┴{'─'*12}┴{'─'*12}┴{'─'*12}┴{'─'*10}┴{'─'*16}┴{'─'*12}┘")
+            print(f"└{'─'*8}┴{'─'*12}┴{'─'*12}┴{'─'*12}┴{'─'*10}┴{'─'*12}┴{'─'*12}┴{'─'*12}┘")
             
             # ==================== 统计聚合 (New Feature) ====================
             # 统计各类攻击的平均 ASR 和 Loss
