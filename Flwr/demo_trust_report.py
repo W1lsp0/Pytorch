@@ -79,13 +79,21 @@ def main():
         layer_updates.append(diff)
         
     duration = 1.05
+    
+    # [New Feature] 训练过程曲线
+    train_history = {
+        "loss": [2.5, 2.1, 1.8, 1.5, 1.3],       # 模拟 Loss 下降
+        "grad_norm": [0.8, 0.7, 0.6, 0.5, 0.4]   # 模拟梯度收敛
+    }
+    
     meta_data = {
         "round": 1,
         "duration": duration,
-        "epochs": 1,
+        "epochs": 5,
         "sample_count": 100,
         "device_type": "cpu",
         "layer_updates": [round(x, 4) for x in layer_updates],
+        "training_curve": train_history, # 详细曲线
         "attack_mode": "none"  # Honest client
     }
     

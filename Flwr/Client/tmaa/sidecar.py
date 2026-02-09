@@ -114,6 +114,18 @@ class TMAA_Sidecar:
         if is_physically_impossible:
             throughput_status = "SUSPECTED_FAKE_TRAINING (Too Fast)"
         
+        # [New Feature] 训练曲线审计 (Training Curve Audit)
+        # 检查 Loss 是否收敛 (简单趋势分析)
+        training_curve = training_meta.get("training_curve", {})
+        loss_history = training_curve.get("loss", [])
+        
+        loss_trend = "STABLE"
+        if len(loss_history) > 1:
+            if loss_history[-1] > loss_history[0] * 1.5:
+                loss_trend = "DIVERGING (Loss Increasing)"
+            elif loss_history[-1] < loss_history[0]:
+                loss_trend = "CONVERGING"
+        
         # 构造报告载荷
         report_payload = {
             "header": {
@@ -130,10 +142,11 @@ class TMAA_Sidecar:
                 "behavior_fingerprint": {
                     "cpu_volatility": round(cpu_volatility, 4),
                     "throughput_check": throughput_status,
+                    "loss_trend": loss_trend,
                     "description": "High volatility > 5 indicates valid training"
                 },
                 "data_health_audit": self.data_metrics,  # 零知识审计结果
-                "client_reported_meta": training_meta    # 客户端自报数据
+                "client_reported_meta": training_meta    # 包含详细曲线数据
             }
         }
 

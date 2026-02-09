@@ -284,6 +284,12 @@ class DataInspector:
         if stacked_images is not None:
             sample_labels_tensor = torch.tensor(all_labels[:len(stacked_images)])
             
+            # [New Feature] 基本特征统计 (Feature Summary)
+            # 计算图像的平均亮度(Mean)和对比度(Std)
+            # 这是一个非常基础但有效的指纹，全黑/全白/高斯噪声图片的统计特征会显著异常
+            pixel_mean = stacked_images.mean().item()
+            pixel_std = stacked_images.std().item()
+            
             # 统计所有样本中出现的类别
             unique_classes = sorted(list(set(all_labels[:len(stacked_images)])))
             
@@ -297,6 +303,19 @@ class DataInspector:
                 if score > max_backdoor_score:
                     max_backdoor_score = score
                     suspected_class = cls_id
+        else:
+            pixel_mean, pixel_std = 0.0, 0.0
+
+        # [New Feature] 标签分布直方图 (Label Distribution)
+        # 统计各类样本数量，用于 Server 分析 Non-IID 程度
+        # 为了隐私，对 counts 添加噪声，保留分布轮廓
+        label_counts = Counter(all_labels)
+        distribution = {}
+        for k in range(10): # CIFAR-10 0-9
+            cnt = label_counts.get(k, 0)
+            # Add noise to count (Integer DP)
+            noisy_cnt = max(0, int(add_dp_noise(float(cnt), epsilon=5.0)))
+            distribution[str(k)] = noisy_cnt
         
         # 5. [New Feature] 差分隐私加噪 (Differential Privacy)
         # 对所有标量指标添加拉普拉斯噪声，保护具体样本隐私
@@ -307,7 +326,12 @@ class DataInspector:
             "uniqueness_ratio": round(add_dp_noise(uniqueness_score, epsilon), 4),
             "initial_loss": round(add_dp_noise(init_loss, epsilon), 4),
             "backdoor_score": round(add_dp_noise(max_backdoor_score, epsilon), 4),
-            "suspected_backdoor_class": suspected_class
+            "suspected_backdoor_class": suspected_class,
+            "feature_summary": {
+                "pixel_mean": round(add_dp_noise(pixel_mean, epsilon), 4),
+                "pixel_std": round(add_dp_noise(pixel_std, epsilon), 4)
+            },
+            "label_distribution": distribution
         }
         
         self._print_report(report)

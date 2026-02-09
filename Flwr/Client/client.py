@@ -133,9 +133,10 @@ def print_banner(device: torch.device):
     print("╚" + "═"*58 + "╝\n")
 
 
-def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int):
+def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int) -> Dict[str, List[float]]:
     """
     本地模型训练函数
+    Returns: history (Dict containing 'loss' and 'grad_norm' lists per epoch)
     """
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
@@ -143,21 +144,49 @@ def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int)
     
     logger.info(f"    🏋️  开始本地训练 (Epochs: {epochs})...")
     
+    epoch_loss_history = []
+    epoch_grad_norm_history = []
+    
     for epoch in range(epochs):
         running_loss = 0.0
+        running_grad_norm = 0.0
+        batch_count = 0
+        
         for i, (images, labels) in enumerate(trainloader):
             images, labels = images.to(DEVICE), labels.to(DEVICE)
             optimizer.zero_grad()
             outputs = net(images)
             loss = criterion(outputs, labels)
             loss.backward()
+            
+            # [New Feature] 计算梯度范数 (Monitor Gradient Norm)
+            # 反映训练的"力度"和收敛趋势
+            total_norm = 0.0
+            for p in net.parameters():
+                if p.grad is not None:
+                    param_norm = p.grad.data.norm(2)
+                    total_norm += param_norm.item() ** 2
+            total_norm = total_norm ** 0.5
+            running_grad_norm += total_norm
+            
             optimizer.step()
             running_loss += loss.item()
+            batch_count += 1
         
         # 模拟计算耗时，便于观察 Dashboard 状态变化
         time.sleep(0.1)
-        avg_loss = running_loss / len(trainloader)
-        logger.info(f"       Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f}")
+        avg_loss = running_loss / batch_count if batch_count > 0 else 0.0
+        avg_grad = running_grad_norm / batch_count if batch_count > 0 else 0.0
+        
+        epoch_loss_history.append(round(avg_loss, 4))
+        epoch_grad_norm_history.append(round(avg_grad, 4))
+        
+        logger.info(f"       Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f} | GradNorm: {avg_grad:.4f}")
+
+    return {
+        "loss": epoch_loss_history,
+        "grad_norm": epoch_grad_norm_history
+    }
 
 
 def test(net: nn.Module, testloader: torch.utils.data.DataLoader) -> Tuple[float, float]:
@@ -246,7 +275,8 @@ class MyClient(fl.client.NumPyClient):
         w_global = [p.clone().detach() for p in self.net.parameters()]
         
         start_time = time.time()
-        train(self.net, self.trainloader, epochs=1)
+        # [Capture History] 捕获训练过程数据
+        train_history = train(self.net, self.trainloader, epochs=1) 
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 
@@ -300,7 +330,8 @@ class MyClient(fl.client.NumPyClient):
             "epochs": 1,
             "sample_count": len(self.trainloader.dataset),
             "device_type": str(DEVICE),
-            "layer_updates": [round(x, 6) for x in layer_updates]  # 记录每一层的更新幅度
+            "layer_updates": [round(x, 6) for x in layer_updates],  # 记录每一层的更新幅度
+            "training_curve": train_history  # 记录 Loss 和 GradNorm 变化曲线
         }
 
         # 生成可信报告包 (Trust Package)

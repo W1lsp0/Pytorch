@@ -118,11 +118,15 @@ class PolicyMatcher:
         if integrity.get("file_tampered", False):
              return False, "❌ System integrity check failed (File Tampered)"
              
-        # 2. Check Behavior (Throughput / Fake Training)
+        # 2. Check Behavior (Throughput / Fake Training / Divergence)
         fingerprint = metrics.get("behavior_fingerprint", {})
         throughput_status = fingerprint.get("throughput_check", "NORMAL")
         if "SUSPECTED" in throughput_status:
              return False, f"❌ Behavior check failed ({throughput_status})"
+        
+        loss_trend = fingerprint.get("loss_trend", "STABLE")
+        if "DIVERGING" in loss_trend:
+             return False, f"❌ Training Divergence Detected ({loss_trend})"
 
         # 3. Check Data Quality (Inspector) -> Optional
         # e.g. Reject if Entropy is too low (Data Poisoning / Lazy)
