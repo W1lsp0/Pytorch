@@ -102,7 +102,9 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
 
     def log_audit(self, message: str):
         print(message, flush=True)
-        with open("tmaa_server_audit.log", "a", encoding="utf-8") as f:
+        # 确保 log 目录存在 (虽然 run_simulation.sh 已创建，但 Server 可能独立运行)
+        os.makedirs("log", exist_ok=True)
+        with open("log/tmaa_server_audit.log", "a", encoding="utf-8") as f:
             f.write(message + "\n")
 
     def aggregate_fit(

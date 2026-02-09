@@ -37,7 +37,7 @@ def get_last_line(filepath):
 
 def parse_server_log():
     """从 server.log 解析当前轮次"""
-    log_path = "server.log"
+    log_path = "log/server.log"
     if not os.path.exists(log_path):
         return "Init"
     
@@ -114,8 +114,9 @@ def main():
             # 1. 刷新数据库缓存 (一次查询获取所有)
             _db_cache = get_all_status_from_db()
             
-            # Debug: Write DB Cache to file
-            with open("dashboard_debug.log", "w", encoding="utf-8") as f:
+            # Debug: Write DB Cache to file (in log dir)
+            os.makedirs("log", exist_ok=True)
+            with open("log/dashboard_debug.log", "w", encoding="utf-8") as f:
                 f.write(f"Timestamp: {time.ctime()}\n")
                 f.write(f"DB Cache Keys: {list(_db_cache.keys())}\n")
                 if _db_cache:
