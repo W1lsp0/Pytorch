@@ -268,10 +268,11 @@ class DataInspector:
         if stacked_images is not None:
             sample_labels_tensor = torch.tensor(all_labels[:len(stacked_images)])
             
-            # 统计样本最多的 Top 3 类别
-            top_classes = [c for c, _ in Counter(all_labels).most_common(3)]
+            # 统计所有样本中出现的类别
+            unique_classes = sorted(list(set(all_labels[:len(stacked_images)])))
             
-            for cls_id in top_classes:
+            # 遍历所有类别进行后门聚类分析 (Comprehensive Audit)
+            for cls_id in unique_classes:
                 score = calc_backdoor_indicator(
                     net, stacked_images.to(self.device), 
                     sample_labels_tensor.to(self.device), 

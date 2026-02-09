@@ -175,6 +175,47 @@ def main():
                 print(row)
                 
             print(f"└{'─'*8}┴{'─'*12}┴{'─'*12}┴{'─'*12}┴{'─'*10}┴{'─'*10}┴{'─'*12}┘")
+            
+            # ==================== 统计聚合 (New Feature) ====================
+            # 统计各类攻击的平均 ASR 和 Loss
+            stats = {} # key: attack_type, value: {loss_sum, asr_sum, count}
+            
+            for i in range(total_clients):
+                data = parse_client_log(i)
+                attack_type = data['attack']
+                if attack_type == '-': continue
+                
+                # Parse Loss
+                try:
+                    loss_val = float(data['loss'])
+                except:
+                    loss_val = 0.0
+                    
+                # Parse ASR (remove %)
+                try:
+                    asr_val = float(data['asr'].replace('%', ''))
+                except:
+                    asr_val = 0.0
+                    
+                if attack_type not in stats:
+                    stats[attack_type] = {'loss': 0.0, 'asr': 0.0, 'count': 0}
+                
+                stats[attack_type]['loss'] += loss_val
+                stats[attack_type]['asr'] += asr_val
+                stats[attack_type]['count'] += 1
+            
+            print("\n📊 攻击效果统计 (Average):")
+            print(f"┌{'─'*40}┐")
+            print(f"│ {'Attack Type'.ljust(15)} │ {'Avg Loss'.center(8)} │ {'Avg ASR'.center(9)} │")
+            print(f"├{'─'*17}┼{'─'*10}┼{'─'*11}┤")
+            
+            for atype, s in stats.items():
+                if s['count'] > 0:
+                    avg_loss = s['loss'] / s['count']
+                    avg_asr = s['asr'] / s['count']
+                    print(f"│ {atype.ljust(15)} │ {f'{avg_loss:.4f}'.center(8)} │ {f'{avg_asr:.1f}%'.center(9)} │")
+            print(f"└{'─'*40}┘")
+            # ================================================================
             print("\n每 2 秒刷新一次...")
             print("提示: 建议将此窗口与日志窗口并排显示。")
             
