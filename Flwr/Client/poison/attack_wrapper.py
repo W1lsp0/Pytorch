@@ -110,9 +110,9 @@ class PoisonedDataset(Dataset):
 
         # 如果启用攻击，执行投毒操作
         if attack_type is not None and poison_rate > 0:
-            self._apply_poison()
+            self._apply_poison(verbose)
 
-    def _apply_poison(self) -> None:
+    def _apply_poison(self, verbose: bool = True) -> None:
         """
         执行投毒操作
         
@@ -131,7 +131,8 @@ class PoisonedDataset(Dataset):
         self.poisoned_local_indices = set(poison_local_indices)
 
         # 输出投毒攻击启动信息
-        self._print_attack_banner(total_samples, num_poison)
+        if verbose:
+            self._print_attack_banner(total_samples, num_poison)
 
     def _print_attack_banner(self, total_samples: int, num_poison: int) -> None:
         """打印投毒攻击启动横幅"""
@@ -282,7 +283,8 @@ def create_backdoor_test_loader(
         indices=all_indices,
         attack_type='backdoor',
         poison_rate=1.0,          # 100% 都添加触发器
-        target_label=target_label
+        target_label=target_label,
+        verbose=False             # 仅用于创建测试集，不打印攻击 Banner
     )
 
     # 创建 DataLoader

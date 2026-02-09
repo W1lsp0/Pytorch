@@ -198,6 +198,23 @@ class MyClient(fl.client.NumPyClient):
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 
+        # ====================== [New Feature] Local Poison Evaluation ======================
+        logger.info(f"📊 正在评估本地模型攻击效果...")
+        local_loss, local_acc = test(self.net, self.testloader)
+        _, local_asr = test(self.net, self.backdoor_testloader)
+        
+        # 更新全局缓存
+        global LAST_LOCAL_ASR
+        LAST_LOCAL_ASR = local_asr
+
+        # 更新 Dashboard: 显示 Local ASR (Global 暂时未知)
+        loss_str = f"{local_loss:.4f}"
+        combined_asr_str = f"L:{local_asr*100:.1f}%|G:?"
+        
+        update_status_monitor(status="Trained", round_num=server_round, loss=loss_str, asr=combined_asr_str)
+        logger.info(f"   -> Local ASR: {local_asr*100:.1f}% | Local Loss: {loss_str}")
+        # ===================================================================================
+
         # ====================== TMAA 介入 [Phase 2: Post-Train] ======================
         logger.info(f"🛡️  [Step 3] TMAA 停止监控并生成可信报告...")
         self.tmaa_agent.stop_monitoring()
@@ -250,16 +267,37 @@ class MyClient(fl.client.NumPyClient):
 
         # [Dashboard] Update status
         acc_str = f"{accuracy*100:.1f}%"
-        asr_str = f"{asr*100:.1f}%"
+        # 记录 Global ASR，并尝试组合 Local ASR 显示
+        global_asr_str = f"{asr*100:.1f}%"
+        
+        # 尝试从 fit 阶段获取 Local ASR (如果这一轮刚训练完)
+        # 注意: evaluate 可能在 fit 之前或之后运行， depending on Flower strategy
+        # 简单起见，我们在 fit 里更新 Local ASR，在这里更新 Global ASR，并尝试保留 Local 部分
+        # 但由于 status 是覆盖写的，这里我们只更新 Global ASR 可能会覆盖掉 Local ASR
+        # 改进策略: 从 db_manager 读取上一轮状态? 太慢。
+        # 简化策略: 在 Local ASR 更新时带上 (L), 在 Global ASR 更新时带上 (G)
+        # 最终策略: ASR 字段格式 "L:99% | G:44%"
+        
+        # 为了避免覆盖 fit 写入的 Local ASR，我们只更新 Global 部分？
+        # 不行，evaluate 此时并没有 Local ASR 的上下文 (除非全局变量)
+        # 让我们使用全局变量 cache
+        global LAST_LOCAL_ASR
+        local_asr_val = LAST_LOCAL_ASR if LAST_LOCAL_ASR is not None else 0.0
+        
+        combined_asr_str = f"L:{local_asr_val*100:.1f}%|G:{asr*100:.1f}%"
+        
         loss_str = f"{loss:.4f}"
         server_round = config.get("current_round", "-")
-        update_status_monitor(status="Evaluated", round_num=server_round, loss=loss_str, asr=asr_str)
+        update_status_monitor(status="Evaluated", round_num=server_round, loss=loss_str, asr=combined_asr_str)
 
         # 返回 metrics 给服务器聚合
         return float(loss), len(self.testloader.dataset), {
             "accuracy": float(accuracy),
             "asr": float(asr)
         }
+
+# 全局变量缓存本地 ASR，用于 Evaluate 阶段组合显示
+LAST_LOCAL_ASR = 0.0
 
 def main():
     """
