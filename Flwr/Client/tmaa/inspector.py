@@ -39,6 +39,22 @@ if sys.platform.startswith('win'):
 
 # ==================== 核心检测算法 ====================
 
+def add_dp_noise(value: float, epsilon: float = 10.0) -> float:
+    """
+    添加拉普拉斯噪声以满足差分隐私 (Differential Privacy)
+    
+    Args:
+        value: 原始敏感数值
+        epsilon: 隐私预算 (Privacy Budget), 越大噪声越小, 可用性越高
+        
+    Returns:
+        float: 加噪后的通过值
+    """
+    # 假设敏感度(Sensitivity)为 1.0 (因为这些指标通常归一化到 0-1)
+    # Noise ~ Laplace(0, Sensitivity/epsilon)
+    noise = np.random.laplace(0, 1.0 / epsilon)
+    return float(value + noise)
+
 def calc_entropy_score(labels: List[int]) -> float:
     """
     1. 信息熵 (Shannon Entropy) —— 检测 Non-IID 程度
@@ -282,11 +298,15 @@ class DataInspector:
                     max_backdoor_score = score
                     suspected_class = cls_id
         
+        # 5. [New Feature] 差分隐私加噪 (Differential Privacy)
+        # 对所有标量指标添加拉普拉斯噪声，保护具体样本隐私
+        epsilon = 20.0 # 隐私预算 (较高以保持可用性)
+        
         report = {
-            "non_iid_entropy": round(entropy_score, 4),
-            "uniqueness_ratio": round(uniqueness_score, 4),
-            "initial_loss": round(init_loss, 4),
-            "backdoor_score": round(max_backdoor_score, 4),
+            "non_iid_entropy": round(add_dp_noise(entropy_score, epsilon), 4),
+            "uniqueness_ratio": round(add_dp_noise(uniqueness_score, epsilon), 4),
+            "initial_loss": round(add_dp_noise(init_loss, epsilon), 4),
+            "backdoor_score": round(add_dp_noise(max_backdoor_score, epsilon), 4),
             "suspected_backdoor_class": suspected_class
         }
         

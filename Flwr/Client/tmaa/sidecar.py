@@ -102,6 +102,18 @@ class TMAA_Sidecar:
         # 计算资源波动率
         cpu_volatility = self.monitor.calculate_volatility()
         
+        # [New Feature] 物理吞吐量熔断 (Physical Throughput Hard-Limit)
+        # 检测训练时间是否低于物理极限 (防止"秒传"假训练)
+        # ResNet-18 训练 1 epoch (50,000 samples) 即使在 A100 上也至少需要 2-3秒
+        # 如果小于 0.5s，说明根本没跑完 data loader
+        duration = training_meta.get("duration", 0.0)
+        threshold_sec = 0.5 
+        is_physically_impossible = duration < threshold_sec
+        
+        throughput_status = "NORMAL"
+        if is_physically_impossible:
+            throughput_status = "SUSPECTED_FAKE_TRAINING (Too Fast)"
+        
         # 构造报告载荷
         report_payload = {
             "header": {
@@ -117,6 +129,7 @@ class TMAA_Sidecar:
                 },
                 "behavior_fingerprint": {
                     "cpu_volatility": round(cpu_volatility, 4),
+                    "throughput_check": throughput_status,
                     "description": "High volatility > 5 indicates valid training"
                 },
                 "data_health_audit": self.data_metrics,  # 零知识审计结果

@@ -242,10 +242,27 @@ class MyClient(fl.client.NumPyClient):
         # =========================================================================
 
         # 2. 执行本地训练
+        # 保存初始权重 (W_global) 用于后续计算更新量 (Boosting) & 层级更新幅度 (Layer-wise Updates)
+        w_global = [p.clone().detach() for p in self.net.parameters()]
+        
         start_time = time.time()
         train(self.net, self.trainloader, epochs=1)
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
+
+        # ====================== [New Feature] Layer-wise Gradient Consistency (层级更新一致性) ======================
+        # 检测 "Freezing Attack" (冻结攻击): 恶意节点可能冻结大部分层，只训练最后一层
+        # 计算每一层参数的 L2 范数变化量: ||W_new - W_old||
+        layer_updates = []
+        new_params = list(self.net.parameters())
+        with torch.no_grad():
+            for old_p, new_p in zip(w_global, new_params):
+                diff = torch.norm(new_p - old_p, p=2).item()
+                layer_updates.append(diff)
+        
+        # 将层级更新幅度加入元数据，供 TMAA 审计
+        # logger.info(f"    📏 Layer Updates: {[round(x, 4) for x in layer_updates[:5]]}...")
+        # ========================================================================================================
 
         # ====================== [New Feature] 本地模型攻击效果评估 ======================
         logger.info(f"📊 正在评估本地模型 (Post-Training Evaluation)...")
@@ -282,7 +299,8 @@ class MyClient(fl.client.NumPyClient):
             "duration": round(duration, 2),
             "epochs": 1,
             "sample_count": len(self.trainloader.dataset),
-            "device_type": str(DEVICE)
+            "device_type": str(DEVICE),
+            "layer_updates": [round(x, 6) for x in layer_updates]  # 记录每一层的更新幅度
         }
 
         # 生成可信报告包 (Trust Package)

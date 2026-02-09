@@ -100,6 +100,45 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
     
 
 
+# ==================== TMAA 策略引擎 (Policy Engine) ====================
+class PolicyMatcher:
+    """
+    TMAA 安全策略匹配器
+    理论对应: 阶段一 (准入) - 严格策略执行
+    """
+    def check_compliance(self, report: Dict[str, Any]) -> Tuple[bool, str]:
+        """
+        验证 Trust Report 是否符合安全基线
+        Returns: (is_compliant, reason)
+        """
+        metrics = report.get("metrics", {})
+        
+        # 1. Check Integrity (系统完整性)
+        integrity = metrics.get("system_integrity", {})
+        if integrity.get("file_tampered", False):
+             return False, "❌ System integrity check failed (File Tampered)"
+             
+        # 2. Check Behavior (Throughput / Fake Training)
+        fingerprint = metrics.get("behavior_fingerprint", {})
+        throughput_status = fingerprint.get("throughput_check", "NORMAL")
+        if "SUSPECTED" in throughput_status:
+             return False, f"❌ Behavior check failed ({throughput_status})"
+
+        # 3. Check Data Quality (Inspector) -> Optional
+        # e.g. Reject if Entropy is too low (Data Poisoning / Lazy)
+        # data_audit = metrics.get("data_health_audit", {})
+        
+        return True, "✅ Compliant"
+
+# ==================== TMAA 安全聚合策略 ====================
+class TMAA_FedAvg(fl.server.strategy.FedAvg):
+    """
+    TMAA 增强版 FedAvg 策略
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.policy_engine = PolicyMatcher()
+
     def log_audit(self, message: str):
         print(message, flush=True)
         # 确保 log 目录存在 (虽然 run_simulation.sh 已创建，但 Server 可能独立运行)
@@ -133,8 +172,19 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     meta = report["metrics"].get("client_reported_meta", {})
                     attack_mode = meta.get("attack_mode", "none")
                     
-                    self.log_audit(f"    📄 [Client {client.cid}] 收到可信报告 | TEE: {tee_id:12} | Attack: {attack_mode}")
+                    # Policy Check (策略检查)
+                    is_compliant, reason = self.policy_engine.check_compliance(report)
                     
+                    status_icon = "✅" if is_compliant else "⚠️"
+                    self.log_audit(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}")
+
+                    # [Strict Enforcement Switch]
+                    # 目前仅记录日志，不实际拒绝 (Simulation Mode)
+                    # if not is_compliant:
+                    #     self.log_audit(f"       ⛔ 拒绝聚合: 违反安全策略")
+                    #     rejected_count += 1
+                    #     continue
+
                     # 提取指纹 (演示用)
                     fingerprint = report["metrics"]["behavior_fingerprint"]
                     # print(f"       Fingerprint: {fingerprint}")
@@ -147,7 +197,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                 self.log_audit(f"    ⚠️ [Client {client.cid}] 未附带可信报告")
                 valid_results.append((client, fit_res))
 
-        self.log_audit(f"🛡️  [TMAA Server] 审计结束. 放行所有客户端 ({len(results)}) 进行聚合.")
+        self.log_audit(f"🛡️  [TMAA Server] 审计结束. 放行所有客户端 ({len(results)}), 拒绝 ({rejected_count}).")
         
         return super().aggregate_fit(server_round, results, failures)
 
