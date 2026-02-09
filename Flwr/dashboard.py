@@ -104,7 +104,7 @@ def clear_screen():
 
 def main():
     global _db_cache
-    total_clients = 10
+    total_clients = 20
     
     print("🚀 启动监控面板 (按 Ctrl+C 退出)...")
     time.sleep(1)

@@ -91,35 +91,96 @@ def load_data(
             size=10000, image_size=(3, 32, 32), num_classes=10, transform=transform_test
         )
 
-    # ======================== 3. 数据划分策略 (IID) ========================
-    # 策略: 将 50,000 张图片均匀打乱后，分配给 total_clients 个客户端
-    # 每个客户端获得 num_samples // total_clients 张图片
+    # ======================== 3. 数据划分策略 (Hybrid Non-IID) ========================
+    # 策略: 混合异构分布 (Hybrid Heterogeneity)
+    # Total Clients: 20
+    # Group A (0-9, IID):    前 50% 数据 (25,000张) -> 均匀分配
+    # Group B (10-14, Mod):  中 25% 数据 (12,500张) -> Dirichlet (alpha=1.0)
+    # Group C (15-19, Ext):  后 25% 数据 (12,500张) -> Dirichlet (alpha=0.1)
     
     num_train = len(trainset)
-    samples_per_client = num_train // total_clients
-    
-    # 使用固定种子保证可复现性，但每个客户端获得不同的切片
-    # 这里我们使用简单的切片逻辑:
-    # Client 0: [0, N]
-    # Client 1: [N, 2N]
-    # ...
-    # 为了保证随机性，我们先生成一个固定的随机索引序列
+    # 获取全部标签 (用于 Dirichlet 分布计算)
+    if isinstance(trainset, torchvision.datasets.FakeData):
+         all_labels = np.array([y for _, y in trainset])
+    else:
+         all_labels = np.array(trainset.targets)
+
+    # 1. 全局打乱索引 (保证 IID 组的数据不仅仅是某一类的)
     g_cpu = torch.Generator()
-    g_cpu.manual_seed(2024) # 固定种子，保证所有客户端看到相同的打乱顺序
-    rand_perm = torch.randperm(num_train, generator=g_cpu).tolist()
+    g_cpu.manual_seed(2024) 
+    rand_perm = torch.randperm(num_train, generator=g_cpu).numpy()
     
-    start_idx = client_id * samples_per_client
-    end_idx = start_idx + samples_per_client
+    # 2. 划分数据池
+    pool_A_indices = rand_perm[:25000]      # 25000 for 10 clients
+    pool_B_indices = rand_perm[25000:37500] # 12500 for 5 clients
+    pool_C_indices = rand_perm[37500:]      # 12500 for 5 clients
     
-    # 处理最后一个客户端可能分不到整除后的剩余数据? 
-    # 这里简单丢弃末尾余数，或者让最后一个拿完
-    if client_id == total_clients - 1:
-        end_idx = num_train
+    client_indices = []
+
+    # Helper: Dirichlet Partition
+    def partition_dirichlet(indices, labels, num_clients, alpha, seed):
+        np.random.seed(seed)
+        min_size = 0
+        N = len(indices)
         
-    client_indices = rand_perm[start_idx:end_idx]
+        # 循环直到找到合法的分割（每个客户端至少有 min_size 样本）
+        while min_size < 10:
+            idx_batch = [[] for _ in range(num_clients)]
+            # 对每个类别分别进行 Dirichlet 分割
+            for k in range(10): # CIFAR-10 has 10 classes
+                # 获取该类别在当前数据池中的所有索引
+                idx_k = indices[labels[indices] == k]
+                np.random.shuffle(idx_k)
+                
+                # 生成比例
+                proportions = np.random.dirichlet(np.repeat(alpha, num_clients))
+                # 归一化比例，防止精度误差
+                proportions = np.array([p * (len(idx_j) < N / num_clients) for p, idx_j in zip(proportions, idx_batch)])
+                proportions = proportions / proportions.sum()
+                proportions = (np.cumsum(proportions) * len(idx_k)).astype(int)[:-1]
+                
+                # 分割该类别的索引
+                idx_batch = [idx_j + idx.tolist() for idx_j, idx in zip(idx_batch, np.split(idx_k, proportions))]
+                min_size = min([len(idx_j) for idx_j in idx_batch])
+
+        return idx_batch
+
+    # 3. 分配给当前 Client
+    if 0 <= client_id <= 9:
+        # Group A (IID): Uniform Split
+        # 简单均分 pool_A
+        N_A = len(pool_A_indices)
+        size = N_A // 10
+        start = client_id * size
+        end = start + size
+        client_indices = pool_A_indices[start:end].tolist()
+        group_name = "Group A (IID)"
+        
+    elif 10 <= client_id <= 14:
+        # Group B (Moderate Non-IID): Dirichlet alpha=1.0
+        # 需要确定性地生成所有 clients 的 partition，然后取自己的
+        # 使用特定种子保证所有 Client 进程计算结果一致
+        partitions_B = partition_dirichlet(pool_B_indices, all_labels, 5, alpha=1.0, seed=202410)
+        client_indices = partitions_B[client_id - 10]
+        group_name = "Group B (Moderate alpha=1.0)"
+        
+    elif 15 <= client_id <= 19:
+        # Group C (Extreme Non-IID): Dirichlet alpha=0.1
+        partitions_C = partition_dirichlet(pool_C_indices, all_labels, 5, alpha=0.1, seed=202415)
+        client_indices = partitions_C[client_id - 15]
+        group_name = "Group C (Extreme alpha=0.1)"
+        
+    else:
+        raise ValueError(f"Client ID {client_id} out of range (0-19)")
     
-    print(f"│  ✂️  数据划分: Client {client_id} 分配索引 [{start_idx} -> {end_idx}]      │")
+    print(f"│  ✂️  数据划分: {group_name}                                        │")
     print(f"│     样本数量: {len(client_indices)} 张图片                                     │")
+    
+    # 统计类别分布 (可选)
+    subset_labels = all_labels[client_indices]
+    unique, counts = np.unique(subset_labels, return_counts=True)
+    dist = dict(zip(unique, counts))
+    # print(f"│     类别分布: {dist}                                             │")
 
     # ======================== 4. 应用投毒 (如果配置了攻击) ========================
     final_trainset = None

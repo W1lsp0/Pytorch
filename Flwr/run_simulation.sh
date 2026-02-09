@@ -17,7 +17,7 @@ set -e
 
 # ================= 配置 =================
 SERVER_ADDRESS="0.0.0.0:8080"
-TOTAL_CLIENTS=10
+TOTAL_CLIENTS=20
 USE_SIMULATION=1  # 启用基于数据库的 L4 模拟监控
 
 # 确保在正确目录
@@ -39,7 +39,7 @@ rm -f server.log tmaa_server_audit.log client_*.log dashboard_debug.log
 
 echo "🚀 正在启动仿真..."
 echo "   - 服务器: 1"
-echo "   - 客户端: 10 (4个恶意, 6个诚实)"
+echo "   - 客户端: 20 (Group A: 10, Group B: 5, Group C: 5)"
 echo "   - 模式: 真实执行 + 模拟 L4 监控"
 echo "   - 数据库管理器: 已启用 (状态跟踪)"
 echo "   - 日志目录: ./log/"
@@ -47,50 +47,70 @@ echo "   - 日志目录: ./log/"
 # 1. 启动服务器 (GPU 0)
 echo "-------------------------------------------"
 echo "🔵 正在启动服务器 (GPU 0)..."
+# 服务器占用显存极少，与 C0-C3 共享 GPU 0
 CUDA_VISIBLE_DEVICES=0 python server/server.py > log/server.log 2>&1 &
 SERVER_PID=$!
 echo "   服务器 PID: $SERVER_PID"
 echo "   正在等待服务器初始化..."
 sleep 5
 
-# 2. 启动恶意客户端 (4个节点)
-echo "-------------------------------------------"
-echo "🔴 正在启动恶意客户端..."
+# ================= 启动所有客户端 (负载均衡: 4 Clients/GPU) =================
+# GPU 0: Clients 0-3   (Malicious)
+# GPU 1: Clients 4-7   (Group A)
+# GPU 2: Clients 8-11  (Group A/B)
+# GPU 3: Clients 12-15 (Group B/C)
+# GPU 4: Clients 16-19 (Group C)
 
-# Client 0: 标签翻转 (GPU 0)
-echo "   [C0] 恶意: 标签翻转 (GPU 0)"
+echo "-------------------------------------------"
+echo "🔴 正在启动恶意客户端 (C0-C3) -> GPU 0..."
+
+# Client 0: 标签翻转
+echo "   [C0] 恶意 (Label Flip) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=0 ATTACK_TYPE=label_flip POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
 python Client/client.py > log/client_0.log 2>&1 &
 
-# Client 1: 后门攻击 (GPU 0)
-echo "   [C1] 恶意: 后门攻击 (GPU 0)"
+# Client 1: 后门攻击
+echo "   [C1] 恶意 (Backdoor) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=1 ATTACK_TYPE=backdoor POISON_RATE=0.2 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
 python Client/client.py > log/client_1.log 2>&1 &
 
-# Client 2: 干净标签攻击 (GPU 1)
-echo "   [C2] 恶意: 干净标签攻击 (GPU 1)"
-CUDA_VISIBLE_DEVICES=1 CLIENT_ID=2 ATTACK_TYPE=clean_label POISON_RATE=0.5 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
+# Client 2: 干净标签
+echo "   [C2] 恶意 (Clean Label) -> GPU 0"
+CUDA_VISIBLE_DEVICES=0 CLIENT_ID=2 ATTACK_TYPE=clean_label POISON_RATE=0.5 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
 python Client/client.py > log/client_2.log 2>&1 &
 
-# Client 3: 语义攻击 (GPU 1)
-echo "   [C3] 恶意: 语义攻击 (GPU 1)"
-CUDA_VISIBLE_DEVICES=1 CLIENT_ID=3 ATTACK_TYPE=semantic POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
+# Client 3: 语义攻击
+echo "   [C3] 恶意 (Semantic) -> GPU 0"
+CUDA_VISIBLE_DEVICES=0 CLIENT_ID=3 ATTACK_TYPE=semantic POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
 python Client/client.py > log/client_3.log 2>&1 &
 
 sleep 2
 
-# 3. 启动诚实客户端 (6个节点, 分布在 GPU 2, 3, 4)
-echo "-------------------------------------------"
-echo "🟢 正在启动诚实客户端 (C4 - C9)..."
+# 启动诚实客户端 C4 - C19
+# Group A (IID): 4-9
+# Group B (Mod): 10-14
+# Group C (Ext): 15-19
 
-for i in {4..9}
+for i in {4..19}
 do
-   # 计算 GPU ID: (i-4) // 2 + 2
-   # 4,5 -> GPU 2; 6,7 -> GPU 3; 8,9 -> GPU 4
-   GPU_ID=$(( (i - 4) / 2 + 2 ))
-   echo "   [C$i] 诚实节点 (GPU $GPU_ID)"
+   # 计算所属组别名称 (仅用于日志显示)
+   GROUP_NAME="Unknown"
+   if [ $i -le 9 ]; then GROUP_NAME="Group A (IID)";
+   elif [ $i -le 14 ]; then GROUP_NAME="Group B (Mod)";
+   else GROUP_NAME="Group C (Ext)"; fi
+
+   # 计算 GPU ID: floor(i / 4)
+   # 4-7->1, 8-11->2, 12-15->3, 16-19->4
+   GPU_ID=$(( i / 4 ))
+   
+   echo "   [C$i] Assigner: $GROUP_NAME -> GPU $GPU_ID"
    CUDA_VISIBLE_DEVICES=$GPU_ID CLIENT_ID=$i ATTACK_TYPE=none TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
    python Client/client.py > log/client_$i.log 2>&1 &
+   
+   # 每启动 4 个暂停一下，避免冲击
+   if [ $(( (i+1) % 4 )) -eq 0 ]; then
+       sleep 1
+   fi
 done
 
 echo "-------------------------------------------"
