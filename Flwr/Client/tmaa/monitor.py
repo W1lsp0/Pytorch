@@ -39,7 +39,10 @@ class SystemMonitor:
         self.use_simulation = use_simulation
         
         # Simulation State
-        self.sim_offset = 0
+        # self.sim_offset = 0 # Deprecated
+        self.current_phase = "Idle"
+        self.phase_step = 0
+        
         self.db_manager = None
         if self.use_simulation:
             from poison.db_manager import DBManager
@@ -59,6 +62,15 @@ class SystemMonitor:
 
         # 定义网络白名单 (允许的 IP)
         self.allowed_ips = ["127.0.0.1", "0.0.0.0", "localhost"]
+
+    def set_phase(self, phase: str):
+        """
+        [Event-Driven] 接收外部信号，切换监控阶段
+        """
+        if phase != self.current_phase:
+            self.current_phase = phase
+            self.phase_step = 0 # Reset counter for new phase
+            # print(f"🔄 [Monitor] Switched to phase: {phase}")
 
     def check_file_integrity(self, file_paths: List[str]) -> Dict[str, str]:
         """
@@ -80,22 +92,23 @@ class SystemMonitor:
         L2: 采样 CPU/内存 (构建资源指纹)
         """
         if self.use_simulation and self.db_manager:
-            # === Mode A: Simulation (Read from DB) ===
+            # === Mode A: Simulation (Event-Driven Read) ===
             try:
-                # Fetch 1 record at current offset
-                # 假设每秒调用一次，这里简单地读下一条
-                logs = self.db_manager.fetch_telemetry(self.device_id, limit=1, offset=self.sim_offset)
+                # Based on Current Phase
+                logs = self.db_manager.fetch_telemetry_by_phase(self.device_id, self.current_phase, self.phase_step)
+                
                 if logs:
-                    record = logs[0]
+                    record = logs # It returns a dict directly
                     cpu = record['cpu_usage']
                     mem = record['memory_usage_mb']
                     self.metrics_history["cpu"].append(cpu)
                     self.metrics_history["memory"].append(mem)
                     self.metrics_history["timestamps"].append(time.time())
-                    self.sim_offset += 1
+                    
+                    self.phase_step += 1
                 else:
-                    # 数据读完了，循环读取或保持最后状态
-                    self.sim_offset = 0 
+                    # Should not happen if fallback logic is correct, but just in case
+                    self.phase_step = 0 
             except Exception as e:
                 print(f"⚠️ [Monitor] Simulation read error: {e}")
                 

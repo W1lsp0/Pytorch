@@ -133,7 +133,8 @@ def print_banner(device: torch.device):
     print("╚" + "═"*58 + "╝\n")
 
 
-def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int) -> Dict[str, List[float]]:
+
+def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int, tmaa_agent: Any = None) -> Dict[str, List[float]]:
     """
     本地模型训练函数
     Returns: history (Dict containing 'loss' and 'grad_norm' lists per epoch)
@@ -152,11 +153,22 @@ def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int)
         running_grad_norm = 0.0
         batch_count = 0
         
+        # [Phase Signal] Data Loading (Start of Epoch)
+        if tmaa_agent: tmaa_agent.set_phase("Loading")
+
         for i, (images, labels) in enumerate(trainloader):
+            # [Phase Signal] Forward Pass
+            # 数据已经加载完成，现在开始计算
+            if tmaa_agent: tmaa_agent.set_phase("Forward")
+
             images, labels = images.to(DEVICE), labels.to(DEVICE)
             optimizer.zero_grad()
             outputs = net(images)
             loss = criterion(outputs, labels)
+            
+            # [Phase Signal] Backward Pass
+            if tmaa_agent: tmaa_agent.set_phase("Backward")
+
             loss.backward()
             
             # [New Feature] 计算梯度范数 (Monitor Gradient Norm)
@@ -172,7 +184,13 @@ def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int)
             optimizer.step()
             running_loss += loss.item()
             batch_count += 1
+            
+            # [Phase Signal] Batch End -> Loading next batch
+            if tmaa_agent: tmaa_agent.set_phase("Loading")
         
+        # [Phase Signal] Epoch End -> Idle
+        if tmaa_agent: tmaa_agent.set_phase("Idle")
+
         # 模拟计算耗时，便于观察 Dashboard 状态变化
         time.sleep(0.1)
         avg_loss = running_loss / batch_count if batch_count > 0 else 0.0
@@ -276,7 +294,7 @@ class MyClient(fl.client.NumPyClient):
         
         start_time = time.time()
         # [Capture History] 捕获训练过程数据
-        train_history = train(self.net, self.trainloader, epochs=1) 
+        train_history = train(self.net, self.trainloader, epochs=1, tmaa_agent=self.tmaa_agent) 
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 

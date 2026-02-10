@@ -132,19 +132,30 @@ def main():
             profile["attack_type"] = random.choice(attack_pool)
         else:
             profile["attack_type"] = "none"
+
+        # 恶意节点行为模式
+        pattern = "normal"
+        if is_malicious:
+            pattern = random.choice(["lazy", "miner"])
+
+        # 4. 创建模拟器实例 (Updated)
+        sim = DeviceSimulator(dev_id, profile_type=h_type, is_malicious=is_malicious, pattern=pattern)
         
         # 5. 注册设备 (写入 Static Profile)
         db.register_device(profile)
         
-        # 6. 生成时序数据 (Dynamic Telemetry)
-        start_ts = time.time()
+        # 6. 生成离散数据池 (Discrete Phase Data Pools)
+        # 每个 Phase 生成 200 个 Step 的数据供 Loop 使用
+        phases = ["Idle", "Data_Loading", "Forward", "Backward"]
+        logs = []
         
-        # 恶意节点行为模式
-        pattern = "sawtooth"
-        if is_malicious:
-            pattern = random.choice(["lazy", "miner"])
+        for phase in phases:
+            # Lazy 节点也会生成这些 Phase 标签，但内容全是 Idle 特征 (由 Simulator 内部处理)
+            # Miner 节点也会生成这些 Phase 标签，但内容全是 满载 特征
+            phase_logs = sim.generate_phase_data(phase, count=200, start_step=0)
+            logs.extend(phase_logs)
             
-        logs = sim.generate_trace(start_ts, args.duration, pattern=pattern)
+        # 7. 批量写入日志
         
         # 7. 批量写入日志
         db.insert_telemetry_batch(logs)

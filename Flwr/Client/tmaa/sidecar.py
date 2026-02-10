@@ -47,6 +47,12 @@ class TMAA_Sidecar:
         self._thread = threading.Thread(target=self.run, daemon=True)
         self._thread.start()
 
+    def set_phase(self, phase: str):
+        """
+        [Event-Driven] 转发 Phase 信号给 Monitor
+        """
+        self.monitor.set_phase(phase)
+
     def stop_monitoring(self):
         """停止监控"""
         self.running = False

@@ -95,11 +95,15 @@ class DBManager:
             # 4. 创建 telemetry_logs 表 (运行时遥测)
             # 优化方案: 使用 Partition 分区表，按设备ID哈希分 10 个区
             # 注意: Partition Key 必须包含在主键中
+            # 4. 创建 telemetry_logs 表 (运行时遥测)
+            # 优化方案: 使用 Partition 分区表，按设备ID哈希分 10 个区
+            # 注意: Partition Key 必须包含在主键中
+            # [Refactor] Timestamp -> Step (Int)
             table_logs = """
             CREATE TABLE IF NOT EXISTS telemetry_logs (
                 id INT AUTO_INCREMENT,
                 device_id VARCHAR(50) NOT NULL,
-                timestamp DOUBLE NOT NULL COMMENT 'UNIX时间戳',
+                step INT NOT NULL COMMENT '逻辑步数',
                 phase VARCHAR(20) COMMENT '当前阶段 (Idle, Forward, etc)',
                 cpu_usage FLOAT COMMENT 'CPU使用率(%)',
                 memory_usage_mb FLOAT COMMENT '内存使用量(MB)',
@@ -108,8 +112,7 @@ class DBManager:
                 fan_speed_rpm INT COMMENT '风扇转速(RPM)',
                 latency_ms FLOAT COMMENT '网络延迟(ms)',
                 PRIMARY KEY (id, device_id),
-                KEY idx_phase (phase),
-                INDEX idx_dev_time (device_id, timestamp)
+                KEY idx_phase_step (device_id, phase, step)
             ) ENGINE=InnoDB COMMENT='设备运行时遥测日志表'
             PARTITION BY KEY(device_id)
             PARTITIONS 10;
@@ -262,8 +265,8 @@ class DBManager:
 
         sql = """
         INSERT INTO telemetry_logs 
-        (device_id, timestamp, phase, cpu_usage, memory_usage_mb, gpu_util, temperature_c, fan_speed_rpm, latency_ms)
-        VALUES (%(device_id)s, %(timestamp)s, %(phase)s, %(cpu_usage)s, %(memory_usage_mb)s, %(gpu_util)s, %(temperature_c)s, %(fan_speed_rpm)s, %(latency_ms)s)
+        (device_id, step, phase, cpu_usage, memory_usage_mb, gpu_util, temperature_c, fan_speed_rpm, latency_ms)
+        VALUES (%(device_id)s, %(step)s, %(phase)s, %(cpu_usage)s, %(memory_usage_mb)s, %(gpu_util)s, %(temperature_c)s, %(fan_speed_rpm)s, %(latency_ms)s)
         """
         try:
             cursor.executemany(sql, logs)
@@ -280,7 +283,7 @@ class DBManager:
         """
         清空所有仿真数据 (重置环境)
         
-        危险操作: 会截断 (TRUNCATE) 所有表数据!
+        危危险操作: 会截断 (TRUNCATE) 所有表数据!
         """
         cnx = self.get_connection()
         cursor = cnx.cursor()
@@ -298,32 +301,39 @@ class DBManager:
             cursor.close()
             cnx.close()
 
-    def fetch_telemetry(self, device_id: str, limit: int = 10, offset: int = 0) -> List[Dict]:
+    def fetch_telemetry_by_phase(self, device_id: str, phase: str, step: int) -> Optional[Dict]:
         """
-        查询指定设备的遥测日志
-
-        Args:
-            device_id: 设备ID
-            limit: 返回条数
-            offset: 分页偏移
-
-        Returns:
-            list[dict]: 包含 telemetry 数据的字典列表
+        根据 Phase 和 Step 精确获取一条遥测数据
         """
         cnx = self.get_connection()
         cursor = cnx.cursor(dictionary=True)
         try:
+            # 使用 Modulo logic (循环读取)
+            # 假设每个Phase只生成了 MAX_STEPS (比如 200) 条数据
+            # 我们可以先 count 一下总数 (优化: 缓存 count)
+            # 为了简单，直接取 step % 200 (假设生成时固定为 200)
+            # 或者由调用者保证 step 合法。这里为了健壮性，使用 limit 1
+            
+            # 更好的做法: 查找 step, 如果找不到，查找 step % max_steps
             sql = """
             SELECT * FROM telemetry_logs 
-            WHERE device_id = %s 
-            ORDER BY timestamp ASC 
-            LIMIT %s OFFSET %s
+            WHERE device_id = %s AND phase = %s AND step = %s
+            LIMIT 1
             """
-            cursor.execute(sql, (device_id, limit, offset))
-            return cursor.fetchall()
+            cursor.execute(sql, (device_id, phase, step))
+            row = cursor.fetchone()
+            if row:
+                return row
+            else:
+                # Fallback: step loop (假设 pool size = 200)
+                # 这种 fallback 比较 naive，但对于 demo 足够
+                loop_step = step % 200 
+                cursor.execute(sql, (device_id, phase, loop_step))
+                return cursor.fetchone()
+                
         except mysql.connector.Error as err:
             print(f"Error fetching data: {err}")
-            return []
+            return None
         finally:
             cursor.close()
             cnx.close()

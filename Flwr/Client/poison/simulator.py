@@ -34,7 +34,7 @@ class DeviceSimulator:
     生成符合物理规律的"带剧情"时序数据。
     """
     
-    def __init__(self, device_id: str, profile_type: str = "NVIDIA_RTX3090", is_malicious: bool = False):
+    def __init__(self, device_id: str, profile_type: str = "NVIDIA_RTX3090", is_malicious: bool = False, pattern: str = "normal"):
         """
         初始化模拟器
 
@@ -42,10 +42,12 @@ class DeviceSimulator:
             device_id: 设备唯一ID
             profile_type: 硬件配置预设名称 (如 "NVIDIA_RTX4090")
             is_malicious: 是否为恶意节点
+            pattern: 行为模式 ('normal', 'lazy', 'miner')
         """
         self.device_id = device_id
         self.profile_type = profile_type
         self.is_malicious = is_malicious
+        self.pattern = pattern
         
         # 1. 加载设备配置
         # 如果传入的类型不在定义中，默认 fallback 到 RTX3090
@@ -91,99 +93,68 @@ class DeviceSimulator:
         }
         return specs_db.get(p_type, None)
 
-    def generate_trace(self, start_time: float, duration_sec: int, pattern: str = "sawtooth") -> List[Dict]:
+    def generate_phase_data(self, phase: str, count: int, start_step: int = 0) -> List[Dict]:
         """
-        生成一段连续的时序遥测数据
+        生成特定阶段的离散遥测数据池 (Data Pool)
         
         Args:
-            start_time: 起始时间戳
-            duration_sec: 持续时长(秒)
-            pattern: 行为模式 ('sawtooth', 'lazy', 'miner')
+            phase: 阶段名称 (Idle, Loading, Forward, Backward)
+            count: 生成数量
+            start_step: 起始步数 (用于数据库排序)
             
         Returns:
-            List[Dict]: 遥测数据记录列表
+            List[Dict]: 遥测数据列表
         """
         trace = []
-        time_step = 1.0 # 采样间隔 1秒
         
-        # 训练过程模拟: Loading -> Forward -> Backward -> Idle
-        # 周期长度 (秒) = 基准 / TFLOPs (算力越弱，周期越长)
-        # 假设基准周期 5秒 (RTX3090)
-        cycle_len = max(2.0, 5.0 * (35.6 / self.specs["tflops"])) 
-        
-        for t in range(int(duration_sec)):
-            now = start_time + t
-            
-            if self.is_malicious and pattern == "lazy":
-                # [恶意模式] 懒惰节点: 伪装在线但不干活
-                phase = "Idle"
-                cpu = random.uniform(0, 5)
-                gpu = random.uniform(0, 2)
-                power_load = 0.05
-                
-            elif self.is_malicious and pattern == "miner":
-                # [恶意模式] 挖矿劫持: 一直满载计算哈希
-                phase = "Mining"
-                cpu = random.uniform(90, 100)
-                gpu = random.uniform(95, 100)
-                power_load = 1.0
-                
+        # 定义阶段特征 (CPU, GPU, Power)
+        # 恶意模式下的特殊行为 (Lazy, Miner) 会覆盖这些
+        if self.is_malicious and self.pattern == "lazy":
+             base_cpu, base_gpu, power = (5, 0, 0.1)
+        elif self.is_malicious and self.pattern == "miner":
+             base_cpu, base_gpu, power = (95, 100, 1.0)
+        else:
+            # 正常训练特征
+            if phase == "Idle":
+                base_cpu, base_gpu, power = (10, 0, 0.1)
+            elif phase == "Loading":  # IO 密集
+                base_cpu, base_gpu, power = (70, 10, 0.3)
+            elif phase == "Forward":  # 计算密集 (中)
+                base_cpu, base_gpu, power = (40, 80, 0.7)
+            elif phase == "Backward": # 计算密集 (高)
+                base_cpu, base_gpu, power = (50, 95, 1.0)
             else:
-                # [正常模式] 周期性训练 (Sawtooth Wave)
-                cycle_pos = (t % cycle_len) / cycle_len
-                
-                if cycle_pos < 0.2:
-                    phase = "Data_Loading"     # 数据加载: 高CPU, 低GPU, 中能耗
-                    cpu = random.uniform(60, 80)
-                    gpu = random.uniform(10, 30)
-                    power_load = 0.4
-                elif cycle_pos < 0.6:
-                    phase = "Forward"          # 前向传播: 中CPU, 高GPU
-                    cpu = random.uniform(30, 50)
-                    gpu = random.uniform(70, 90)
-                    power_load = 0.8
-                elif cycle_pos < 0.9:
-                    phase = "Backward"         # 反向传播: 计算密集型, 满载
-                    cpu = random.uniform(40, 60)
-                    gpu = random.uniform(90, 100)
-                    power_load = 1.0
-                else:
-                    phase = "Idle"             # Batch 间隙
-                    cpu = random.uniform(5, 15)
-                    gpu = random.uniform(0, 5)
-                    power_load = 0.1
+                base_cpu, base_gpu, power = (10, 0, 0.1)
+
+        for i in range(count):
+            step = start_step + i
             
-            # --- 物理一致性模拟 (Physics Simulation) ---
+            # 1. 波动模拟
+            cpu = base_cpu + random.uniform(-5, 5)
+            gpu = base_gpu + random.uniform(-5, 5)
             
-            # 1. 温度模型
-            # 目标温度 = 环境温度(35) + 负载增温(50 * load) -> 满载85度
-            target_temp = 35.0 + (50.0 * power_load)
+            # 裁剪范围
+            cpu = max(0, min(100, cpu))
+            gpu = max(0, min(100, gpu))
             
-            # 使用差分方程模拟热惯性 (牛顿冷却定律变体)
-            # T_new = T_old + (Target - T_old) * Coeff
+            # 2. 物理一致性 (温度)
+            # 目标温度 = 环境(35) + 负载增温(50 * power)
+            target_temp = 35.0 + (50.0 * power)
             delta = (target_temp - self.current_temp) * 0.1 * self.specs["thermal_coeff"]
-            self.current_temp += delta
-            # 添加随机热噪声
-            self.current_temp += random.gauss(0, 0.5)
+            self.current_temp += delta + random.gauss(0, 0.2)
             
-            # 2. 风扇转速模型
-            # 简单的线性反馈控制: (Temp - 40) * 60
-            # 限制在 800 ~ 3000 RPM
+            # 3. 风扇
             fan_speed = int(min(3000, max(800, (self.current_temp - 40) * 60)))
             
-            # 3. 网络延迟模拟
-            # 基础延迟 + 抖动
-            latency = self.base_latency + random.gauss(0, 5)
-            # 模拟偶尔的网络拥塞 (长尾分布)
-            if random.random() < 0.05: # 5% 概率发生拥塞
-                latency += random.uniform(200, 1000)
-            
+            # 4. 延迟 (简单模拟)
+            latency = self.base_latency + random.gauss(0, 2)
+
             record = {
                 "device_id": self.device_id,
-                "timestamp": now,
-                "phase": phase,
+                "step": step,           # [New] 逻辑步数
+                "phase": phase,         # [New] 阶段标签
                 "cpu_usage": round(cpu, 2),
-                "memory_usage_mb": self.specs["mem_gb"] * 1024 * (0.2 + 0.5 * power_load),
+                "memory_usage_mb": self.specs["mem_gb"] * 1024 * (0.2 + 0.3 * power),
                 "gpu_util": round(gpu, 2),
                 "temperature_c": round(self.current_temp, 1),
                 "fan_speed_rpm": fan_speed,
