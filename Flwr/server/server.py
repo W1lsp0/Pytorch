@@ -192,6 +192,37 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     # 提取指纹 (演示用)
                     fingerprint = report["metrics"]["behavior_fingerprint"]
                     # print(f"       Fingerprint: {fingerprint}")
+                    
+                    # [New Feature] 记录数据统计特征 (Data Fingerprint Logging)
+                    data_audit = report["metrics"].get("data_health_audit", {})
+                    label_dist = data_audit.get("label_distribution", "N/A")
+                    feat_sum = data_audit.get("feature_summary", "N/A")
+                    
+                    # 简化日志输出
+                    if isinstance(label_dist, dict):
+                        # 只显示非零类别，节省日志空间
+                        dist_str = {k: v for k, v in label_dist.items() if v > 0}
+                    else:
+                        dist_str = "N/A"
+                        
+                    self.log_audit(f"       📊 Data Fingerprint: Dist={dist_str} | Feat={feat_sum}")
+                    
+                    # [New Feature] 客户端 0 独立审计日志 (Isolated Logging for Client 0)
+                    if str(client.cid) == "0":
+                        audit_entry = {
+                            "round": server_round,
+                            "timestamp": datetime.now().isoformat(),
+                            "report": report
+                        }
+                        
+                        client0_log_path = "log/client_0_history.json"
+                        
+                        # 为了保持 JSON 格式合法，我们需要读取-更新-写入，或者使用 JSON Lines
+                        # 这里使用简单的追加+分隔符方式，或者追加 list (效率低但可读)
+                        # 采用追加 JSON Lines 格式 (.jsonl)，每行一个 JSON 对象
+                        with open("log/client_0_audit.jsonl", "a", encoding="utf-8") as f0:
+                            f0.write(json.dumps(audit_entry, ensure_ascii=False) + "\n")
+                            
                     valid_results.append((client, fit_res))
                     
                 except Exception as e:
