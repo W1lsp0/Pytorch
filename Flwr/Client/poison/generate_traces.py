@@ -146,7 +146,7 @@ def main():
         
         # 6. 生成离散数据池 (Discrete Phase Data Pools)
         # 每个 Phase 生成 200 个 Step 的数据供 Loop 使用
-        phases = ["Idle", "Data_Loading", "Forward", "Backward"]
+        phases = ["Idle", "Loading", "Forward", "Backward"]
         logs = []
         
         for phase in phases:
