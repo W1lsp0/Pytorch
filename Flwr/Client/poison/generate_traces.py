@@ -52,9 +52,9 @@ def main():
     args = parser.parse_args()
     
     # 1. 初始化数据库
-    print("\n" + "="*60)
-    print("💾 正在初始化数据库连接...")
-    print("="*60)
+    print("\n" + "="*60 + "\n" +
+          "💾 正在初始化数据库连接...\n" +
+          "="*60)
     
     try:
         db = DBManager()
@@ -94,13 +94,15 @@ def main():
     probs = list(device_pool.values())
     
     total_records = args.devices * args.duration
-    print(f"\n🚀 开始大规模仿真任务:")
-    print(f"   👥 模拟设备数: {args.devices}")
-    print(f"   ⏱️  单机时长:   {args.duration} 秒")
-    print(f"   📊 预计总记录: {total_records} 条")
-    print(f"   🌍 设备分布:   异构混合 (DataCenter -> IoT)")
-    print(f"   😈 恶意比例:   {args.malicious_rate * 100:.1f}%")
-    print("-" * 60)
+    print("\n".join([
+        f"\n🚀 开始大规模仿真任务:",
+        f"   👥 模拟设备数: {args.devices}",
+        f"   ⏱️  单机时长:   {args.duration} 秒",
+        f"   📊 预计总记录: {total_records} 条",
+        f"   🌍 设备分布:   异构混合 (DataCenter -> IoT)",
+        f"   😈 恶意比例:   {args.malicious_rate * 100:.1f}%",
+        "-" * 60
+    ]))
     
     start_time_all = time.time()
     
@@ -172,12 +174,15 @@ def main():
 
     total_time = time.time() - start_time_all
     
-    print("-" * 60)
-    print("\n✨ 仿真任务完成!")
-    print(f"⏱️  总耗时:       {total_time:.2f} 秒")
-    print(f"📊 生成总记录:   {total_records}")
-    print("🔍 验证提示:     请检查 MySQL 表 'telemetry_logs'")
-    print("=" * 60)
+    print("\n".join([
+        "-" * 60,
+        "",
+        "✨ 仿真任务完成!",
+        f"⏱️  总耗时:       {total_time:.2f} 秒",
+        f"📊 生成总记录:   {total_records}",
+        "🔍 验证提示:     请检查 MySQL 表 'telemetry_logs'",
+        "=" * 60
+    ]))
 
 if __name__ == "__main__":
     main()

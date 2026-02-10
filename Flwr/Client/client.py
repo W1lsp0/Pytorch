@@ -119,18 +119,23 @@ def update_status_monitor(status="Waiting", round_num="-", loss="-", asr="-"):
 
 
 def print_banner(device: torch.device):
-    """打印客户端启动横幅"""
-    print("\n" + "╔" + "═"*58 + "╗")
-    print(f"║  🚀 联邦学习客户端启动 (ID: {CLIENT_ID}){' '*23}║")
-    print("╠" + "═"*58 + "╣")
-    print(f"║  💻 计算设备:  {str(device).ljust(41)} ║")
-    print(f"║  🛡️  TMAA 监控:  已启用 (Enabled){' '*27} ║")
+    """打印客户端启动横幅 (原子输出，防止多线程交错)"""
+    lines = [
+        "",
+        "╔" + "═"*58 + "╗",
+        f"║  🚀 联邦学习客户端启动 (ID: {CLIENT_ID}){' '*23}║",
+        "╠" + "═"*58 + "╣",
+        f"║  💻 计算设备:  {str(device).ljust(41)} ║",
+        f"║  🛡️  TMAA 监控:  已启用 (Enabled){' '*27} ║",
+    ]
     if ATTACK_TYPE:
-        print(f"║  😈 攻击模式:  {ATTACK_TYPE.upper().ljust(41)} ║")
-        print(f"║  🎯 目标标签:  {str(TARGET_LABEL).ljust(41)} ║")
+        lines.append(f"║  😈 攻击模式:  {ATTACK_TYPE.upper().ljust(41)} ║")
+        lines.append(f"║  🎯 目标标签:  {str(TARGET_LABEL).ljust(41)} ║")
     else:
-        print(f"║  ✅ 运行模式:  正常训练 (Honest){' '*24} ║")
-    print("╚" + "═"*58 + "╝\n")
+        lines.append(f"║  ✅ 运行模式:  正常训练 (Honest){' '*24} ║")
+    lines.append("╚" + "═"*58 + "╝")
+    lines.append("")
+    print("\n".join(lines))
 
 
 
@@ -384,13 +389,17 @@ class MyClient(fl.client.NumPyClient):
         _, asr_c = test(self.net, self.clean_label_testloader)
         
         # 4. 打印评估报告
-        logger.info(f"\n    ┌{'─'*50}┐")
-        logger.info(f"    │  📊 客户端 {CLIENT_ID} 本地评估报告 (Global Model){' '*4}│")
-        logger.info(f"    ├{'─'*50}┤")
-        logger.info(f"    │  ✅ 正常准确率 (ACC) : {accuracy * 100:.2f}%{' '*18}│")
-        logger.info(f"    │  💀 Global BD ASR    : {asr_b * 100:.2f}%{' '*18}│")
-        logger.info(f"    │  💀 Global CL ASR    : {asr_c * 100:.2f}%{' '*18}│")
-        logger.info(f"    └{'─'*50}┘\n")
+        # 原子输出评估报告 (防止多线程交错)
+        eval_report = "\n".join([
+            f"\n    ┌{'─'*50}┐",
+            f"    │  📊 客户端 {CLIENT_ID} 本地评估报告 (Global Model){' '*4}│",
+            f"    ├{'─'*50}┤",
+            f"    │  ✅ 正常准确率 (ACC) : {accuracy * 100:.2f}%{' '*18}│",
+            f"    │  💀 Global BD ASR    : {asr_b * 100:.2f}%{' '*18}│",
+            f"    │  💀 Global CL ASR    : {asr_c * 100:.2f}%{' '*18}│",
+            f"    └{'─'*50}┘\n"
+        ])
+        logger.info(eval_report)
 
         # Dashboard: 更新 Evaluated 状态
         # 获取缓存的 Local ASR (从 fit 阶段)

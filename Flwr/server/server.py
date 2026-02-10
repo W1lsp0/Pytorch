@@ -71,12 +71,17 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
     aggregated_asr = sum(weighted_asrs) / total_examples
 
     # 美化输出：显示全局指标
-    print("\n" + "╔" + "═"*58 + "╗")
-    print("║  📊 全局模型评估结果 (Global Metrics)".ljust(60) + "║")
-    print("╠" + "═"*58 + "╣")
-    print(f"║  🌟 平均准确率 (Accuracy):   {aggregated_accuracy * 100:.2f}%{' '*24}║")
-    print(f"║  💀 平均攻击率 (ASR):        {aggregated_asr * 100:.2f}%{' '*24}║")
-    print("╚" + "═"*58 + "╝\n")
+    # 原子输出 (防止多线程交错)
+    print("\n".join([
+        "",
+        "╔" + "═"*58 + "╗",
+        "║  📊 全局模型评估结果 (Global Metrics)".ljust(60) + "║",
+        "╠" + "═"*58 + "╣",
+        f"║  🌟 平均准确率 (Accuracy):   {aggregated_accuracy * 100:.2f}%{' '*24}║",
+        f"║  💀 平均攻击率 (ASR):        {aggregated_asr * 100:.2f}%{' '*24}║",
+        "╚" + "═"*58 + "╝",
+        ""
+    ]))
 
     return {
         "accuracy": aggregated_accuracy,
@@ -253,14 +258,19 @@ strategy = TMAA_FedAvg(
 
 # ==================== 启动服务器 ====================
 def main():
-    print("\n" + "╔" + "═"*60 + "╗")
-    print(f"║  🚀 联邦学习服务器启动中... {' '*33}║")
-    print("╠" + "═"*60 + "╣")
-    print(f"║  📦 模型架构: ResNet-18{' '*38}║")
-    print(f"║  📊 数据集:   CIFAR-10{' '*38}║")
-    print(f"║  🔗 监听地址: 0.0.0.0:8080{' '*35}║")
-    print(f"║  🔄 训练轮次: 20 Rounds{' '*38}║")
-    print("╚" + "═"*60 + "╝\n")
+    # 原子输出 (防止多线程交错)
+    print("\n".join([
+        "",
+        "╔" + "═"*60 + "╗",
+        f"║  🚀 联邦学习服务器启动中... {' '*33}║",
+        "╠" + "═"*60 + "╣",
+        f"║  📦 模型架构: ResNet-18{' '*38}║",
+        f"║  📊 数据集:   CIFAR-10{' '*38}║",
+        f"║  🔗 监听地址: 0.0.0.0:8080{' '*35}║",
+        f"║  🔄 训练轮次: 20 Rounds{' '*38}║",
+        "╚" + "═"*60 + "╝",
+        ""
+    ]))
 
     # 启动 Flower 服务器 (阻塞运行)
     fl.server.start_server(

@@ -47,9 +47,9 @@ def load_data(
         Tuple[DataLoader, DataLoader]: (训练集加载器, 测试集加载器)
     """
 
-    print("\n┌" + "─" * 58 + "┐")
-    print("│  📦 正在加载 CIFAR-10 数据集...                            │")
-    print("└" + "─" * 58 + "┘")
+    print("\n┌" + "─" * 58 + "┐\n" +
+          "│  📦 正在加载 CIFAR-10 数据集...                            │\n" +
+          "└" + "─" * 58 + "┘")
 
     # ======================== 1. 数据预处理 ========================
     # 训练集增强: 随机裁剪 + 水平翻转 + 标准化
@@ -173,8 +173,8 @@ def load_data(
     else:
         raise ValueError(f"Client ID {client_id} out of range (0-19)")
     
-    print(f"│  ✂️  数据划分: {group_name}                                        │")
-    print(f"│     样本数量: {len(client_indices)} 张图片                                     │")
+    print(f"│  ✂️  数据划分: {group_name}                                        │\n" +
+          f"│     样本数量: {len(client_indices)} 张图片                                     │")
     
     # 统计类别分布 (可选)
     subset_labels = all_labels[client_indices]

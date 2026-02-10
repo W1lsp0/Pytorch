@@ -112,28 +112,17 @@ class PoisonedDataset(Dataset):
             self._print_attack_info(total_samples, num_poison)
 
     def _print_attack_info(self, total_samples: int, num_poison: int) -> None:
-        """打印详细的攻击配置信息"""
-        print("\n" + "╔" + "═" * 60 + "╗")
-        print("║" + " " * 22 + "⚠️  警告: 投毒攻击已启动" + " " * 18 + "║")
-        print("╠" + "═" * 60 + "╣")
-        
+        """打印详细的攻击配置信息 (原子输出，防止多线程交错)"""
         # 格式化输出
         idx_info = f"{num_poison}/{total_samples}"
         rate_info = f"{self.poison_rate * 100:.1f}%"
-        
-        print(f"║  🔴 攻击类型 : {self.attack_type.ljust(43)} ║")
-        print(f"║  🎯 目标标签 : {str(self.target_label).ljust(43)} ║")
-        print(f"║  📊 投毒比例 : {rate_info.ljust(43)} ║")
-        print(f"║  🔢 样本数量 : {idx_info.ljust(43)} ║")
-
-        print("╠" + "─" * 60 + "╣")
         
         # 策略描述
         strategy_desc = "未知策略"
         if self.attack_type == ATTACK_LABEL_FLIP:
             strategy_desc = "随机翻转标签 (无规则)"
         elif self.attack_type == ATTACK_DIRECTED_FLIP:
-            strategy_desc = f"定向翻转 (Label -> {self.target_label})" # 修正为 Generic Directed
+            strategy_desc = f"定向翻转 (Label -> {self.target_label})"
         elif self.attack_type == ATTACK_BACKDOOR:
             strategy_desc = f"后门 (右下角触发器) -> 强制改标为 {self.target_label}"
         elif self.attack_type == ATTACK_CLEAN_LABEL:
@@ -142,9 +131,21 @@ class PoisonedDataset(Dataset):
             strategy_desc = f"评估专用 (左上角触发器) -> 强制改标为 {self.target_label}"
         elif self.attack_type == ATTACK_SEMANTIC:
             strategy_desc = "语义扰动 (添加高斯噪声)"
-            
-        print(f"║  📝 策略描述 : {strategy_desc.ljust(42)} ║")
-        print("╚" + "═" * 60 + "╝\n")
+
+        print("\n".join([
+            "",
+            "╔" + "═" * 60 + "╗",
+            "║" + " " * 22 + "⚠️  警告: 投毒攻击已启动" + " " * 18 + "║",
+            "╠" + "═" * 60 + "╣",
+            f"║  🔴 攻击类型 : {self.attack_type.ljust(43)} ║",
+            f"║  🎯 目标标签 : {str(self.target_label).ljust(43)} ║",
+            f"║  📊 投毒比例 : {rate_info.ljust(43)} ║",
+            f"║  🔢 样本数量 : {idx_info.ljust(43)} ║",
+            "╠" + "─" * 60 + "╣",
+            f"║  📝 策略描述 : {strategy_desc.ljust(42)} ║",
+            "╚" + "═" * 60 + "╝",
+            ""
+        ]))
 
     def __len__(self) -> int:
         return len(self.indices)

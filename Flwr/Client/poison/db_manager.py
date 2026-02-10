@@ -61,8 +61,11 @@ class DBManager:
         如果数据库不存在则创建；如果表不存在则创建。
         自动处理分区表的创建逻辑。
         """
-        print(f"┌{'─'*58}┐")
-        print(f"│  🔌 正在连接 MySQL: {self.config['host']}:{self.config['port']}...{' '*19}│")
+        # 收集所有初始化信息，最后一次性输出
+        _init_lines = [
+            f"┌{'─'*58}┐",
+            f"│  🔌 正在连接 MySQL: {self.config['host']}:{self.config['port']}...{' '*19}│",
+        ]
         
         try:
             # 1. 连接 MySQL Server (不指定 DB)
@@ -73,7 +76,7 @@ class DBManager:
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.db_name}")
             cnx.database = self.db_name
             
-            print(f"│  ✅ 数据库 '{self.db_name}' 准备就绪{' '*26}│")
+            _init_lines.append(f"│  ✅ 数据库 '{self.db_name}' 准备就绪{' '*26}│")
 
             # 3. 创建 device_profiles 表 (静态画像)
             # 存储设备的硬性指标
@@ -138,8 +141,9 @@ class DBManager:
             cnx.commit()
             cursor.close()
             cnx.close()
-            print(f"│  ✅ 表结构初始化完成 (支持分区优化 + 内存状态表){' '*8}│")
-            print(f"└{'─'*58}┘\n")
+            _init_lines.append(f"│  ✅ 表结构初始化完成 (支持分区优化 + 内存状态表){' '*8}│")
+            _init_lines.append(f"└{'─'*58}┘")
+            print("\n".join(_init_lines))
 
         except mysql.connector.Error as err:
             print(f"❌ [DBManager] Failed to init DB: {err}")
