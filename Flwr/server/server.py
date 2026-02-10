@@ -208,7 +208,8 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     self.log_audit(f"       📊 Data Fingerprint: Dist={dist_str} | Feat={feat_sum}")
                     
                     # [New Feature] 客户端 0 独立审计日志 (Isolated Logging for Client 0)
-                    if str(client.cid) == "0":
+                    # 识别 Client 0 (Client ID=0 -> worker_0000)
+                    if "worker_0000" in tee_id or str(client.cid) == "0":
                         audit_entry = {
                             "round": server_round,
                             "timestamp": datetime.now().isoformat(),
