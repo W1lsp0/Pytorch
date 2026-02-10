@@ -168,7 +168,7 @@ def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int,
             
             # [Phase Signal] Backward Pass
             if tmaa_agent: tmaa_agent.set_phase("Backward")
-
+            
             loss.backward()
             
             # [New Feature] 计算梯度范数 (Monitor Gradient Norm)
@@ -294,6 +294,7 @@ class MyClient(fl.client.NumPyClient):
         
         start_time = time.time()
         # [Capture History] 捕获训练过程数据
+        # [Updated] Pass tmaa_agent for Phase Signals
         train_history = train(self.net, self.trainloader, epochs=1, tmaa_agent=self.tmaa_agent) 
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
@@ -466,7 +467,7 @@ def main():
     if use_simulation:
         print("    ⚠️  [Config] 启用数据库仿真监控模式 (Simulation Mode)")
         
-    tee_hardware = SimulatedTEE(device_id=f"device_{CLIENT_ID:03d}")
+    tee_hardware = SimulatedTEE(device_id=f"worker_{CLIENT_ID:04d}")
     tmaa_agent = TMAA_Sidecar(tee_hardware, pid=os.getpid(), use_simulation=use_simulation)
 
     # Dashboard: 更新为已连接状态
