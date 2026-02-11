@@ -15,7 +15,7 @@
         - MyClient: 继承自 flwr.client.NumPyClient，实现 fit/evaluate 接口。
 
 作者: Flwr 联邦学习项目组
-日期: 2024
+Refactored: 2026-02-11
 ==============================================================================
 """
 
@@ -46,7 +46,6 @@ if sys.platform.startswith('win'):
 
 import flwr as fl
 import torch
-import torch.optim as optim
 import torch.nn as nn
 import time
 import json
@@ -62,6 +61,10 @@ from poison.db_manager import DBManager
 # TMAA 安全模块导入
 from tmaa.tee_sim import SimulatedTEE
 from tmaa.sidecar import TMAA_Sidecar
+
+# Refactored Modules
+from engine import train, test
+from status import StatusReporter
 
 # ==================== 日志配置 ====================
 logging.basicConfig(
@@ -89,35 +92,6 @@ if 'ATTACK_TYPE' in os.environ:
 POISON_RATE = float(os.environ.get("POISON_RATE", 0.0))
 TARGET_LABEL = int(os.environ.get("TARGET_LABEL", 0))
 
-# 状态同步数据库 (全局单例)
-db_manager: Optional[DBManager] = None
-
-# ASR 缓存 (Global Cache)
-# 格式: (Local Backdoor ASR, Local Clean Label ASR)
-LAST_LOCAL_ASR: Tuple[float, float] = (0.0, 0.0)
-
-
-# ==================== 辅助函数 ====================
-
-def update_status_monitor(status="Waiting", round_num="-", loss="-", asr="-"):
-    """
-    更新客户端状态到数据库 (供 Dashboard 实时读取)
-    """
-    if db_manager:
-        try:
-            data = {
-                "type": "BAD" if ATTACK_TYPE else "GOOD",
-                "attack": ATTACK_TYPE.upper() if ATTACK_TYPE else "HONEST",
-                "round": round_num,
-                "loss": loss,
-                "asr": asr,
-                "status": status
-            }
-            db_manager.update_client_status(CLIENT_ID, data)
-        except Exception as e:
-            pass # 避免因数据库网络抖动导致训练中断
-
-
 def print_banner(device: torch.device):
     """打印客户端启动横幅 (原子输出，防止多线程交错)"""
     lines = [
@@ -138,103 +112,6 @@ def print_banner(device: torch.device):
     print("\n".join(lines))
 
 
-
-def train(net: nn.Module, trainloader: torch.utils.data.DataLoader, epochs: int, tmaa_agent: Any = None) -> Dict[str, List[float]]:
-    """
-    本地模型训练函数
-    Returns: history (Dict containing 'loss' and 'grad_norm' lists per epoch)
-    """
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
-    net.train()
-    
-    logger.info(f"    🏋️  开始本地训练 (Epochs: {epochs})...")
-    
-    epoch_loss_history = []
-    epoch_grad_norm_history = []
-    
-    for epoch in range(epochs):
-        running_loss = 0.0
-        running_grad_norm = 0.0
-        batch_count = 0
-        
-        # [Phase Signal] Data Loading (Start of Epoch)
-        if tmaa_agent: tmaa_agent.set_phase("Loading")
-
-        for i, (images, labels) in enumerate(trainloader):
-            # [Phase Signal] Forward Pass
-            # 数据已经加载完成，现在开始计算
-            if tmaa_agent: tmaa_agent.set_phase("Forward")
-
-            images, labels = images.to(DEVICE), labels.to(DEVICE)
-            optimizer.zero_grad()
-            outputs = net(images)
-            loss = criterion(outputs, labels)
-            
-            # [Phase Signal] Backward Pass
-            if tmaa_agent: tmaa_agent.set_phase("Backward")
-            
-            loss.backward()
-            
-            # [New Feature] 计算梯度范数 (Monitor Gradient Norm)
-            # 反映训练的"力度"和收敛趋势
-            total_norm = 0.0
-            for p in net.parameters():
-                if p.grad is not None:
-                    param_norm = p.grad.data.norm(2)
-                    total_norm += param_norm.item() ** 2
-            total_norm = total_norm ** 0.5
-            running_grad_norm += total_norm
-            
-            optimizer.step()
-            running_loss += loss.item()
-            batch_count += 1
-            
-            # [Phase Signal] Batch End -> Loading next batch
-            if tmaa_agent: tmaa_agent.set_phase("Loading")
-        
-        # [Phase Signal] Epoch End -> Idle
-        if tmaa_agent: tmaa_agent.set_phase("Idle")
-
-        # 模拟计算耗时，便于观察 Dashboard 状态变化
-        time.sleep(0.1)
-        avg_loss = running_loss / batch_count if batch_count > 0 else 0.0
-        avg_grad = running_grad_norm / batch_count if batch_count > 0 else 0.0
-        
-        epoch_loss_history.append(round(avg_loss, 4))
-        epoch_grad_norm_history.append(round(avg_grad, 4))
-        
-        logger.info(f"       Epoch {epoch+1}/{epochs} | Loss: {avg_loss:.4f} | GradNorm: {avg_grad:.4f}")
-
-    return {
-        "loss": epoch_loss_history,
-        "grad_norm": epoch_grad_norm_history
-    }
-
-
-def test(net: nn.Module, testloader: torch.utils.data.DataLoader) -> Tuple[float, float]:
-    """
-    本地模型评估函数
-    Returns: (avg_loss, accuracy)
-    """
-    criterion = nn.CrossEntropyLoss()
-    correct, total, loss = 0, 0, 0.0
-    
-    net.eval()
-    with torch.no_grad():
-        for images, labels in testloader:
-            images, labels = images.to(DEVICE), labels.to(DEVICE)
-            outputs = net(images)
-            loss += criterion(outputs, labels).item()
-            _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-            
-    avg_loss = loss / len(testloader.dataset) if len(testloader.dataset) else 0.0
-    accuracy = correct / total if total else 0.0
-    return avg_loss, accuracy
-
-
 # ==================== Flower Client 定义 ====================
 
 class MyClient(fl.client.NumPyClient):
@@ -249,7 +126,8 @@ class MyClient(fl.client.NumPyClient):
         testloader: torch.utils.data.DataLoader, 
         backdoor_testloader: torch.utils.data.DataLoader, 
         clean_label_testloader: torch.utils.data.DataLoader, 
-        tmaa_agent: Any
+        tmaa_agent: Any,
+        status_reporter: StatusReporter
     ):
         self.net = net
         self.trainloader = trainloader
@@ -260,6 +138,10 @@ class MyClient(fl.client.NumPyClient):
         self.clean_label_testloader = clean_label_testloader # 左上角触发器
         
         self.tmaa_agent = tmaa_agent
+        self.status = status_reporter
+        
+        # Local ASR Cache (Backdoor, CleanLabel)
+        self.last_local_asr = (0.0, 0.0)
 
     def get_parameters(self, config):
         """获取本地模型参数"""
@@ -282,7 +164,7 @@ class MyClient(fl.client.NumPyClient):
         logger.info("━"*60)
 
         # Dashboard: 更新状态为 Training
-        update_status_monitor(status="Training", round_num=server_round)
+        self.status.update(status="Training", round_num=server_round)
 
         # ====================== TMAA 介入 [Phase 1: Pre-Train] ======================
         logger.info(f"🛡️  [TMAA Step 1] 启动 Sidecar 监控...")
@@ -300,7 +182,7 @@ class MyClient(fl.client.NumPyClient):
         start_time = time.time()
         # [Capture History] 捕获训练过程数据
         # [Updated] Pass tmaa_agent for Phase Signals
-        train_history = train(self.net, self.trainloader, epochs=1, tmaa_agent=self.tmaa_agent) 
+        train_history = train(self.net, self.trainloader, epochs=1, device=DEVICE, tmaa_agent=self.tmaa_agent) 
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 
@@ -320,15 +202,14 @@ class MyClient(fl.client.NumPyClient):
 
         # ====================== [New Feature] 本地模型攻击效果评估 ======================
         logger.info(f"📊 正在评估本地模型 (Post-Training Evaluation)...")
-        local_loss, local_acc = test(self.net, self.testloader)
+        local_loss, local_acc = test(self.net, self.testloader, DEVICE)
         
         # 评估两种攻击触发器的响应情况
-        _, local_asr_b = test(self.net, self.backdoor_testloader)     # Backdoor (右下角)
-        _, local_asr_c = test(self.net, self.clean_label_testloader)  # Clean Label (左上角)
+        _, local_asr_b = test(self.net, self.backdoor_testloader, DEVICE)     # Backdoor (右下角)
+        _, local_asr_c = test(self.net, self.clean_label_testloader, DEVICE)  # Clean Label (左上角)
         
         # 更新全局缓存 (用于 evaluate 阶段汇报)
-        global LAST_LOCAL_ASR
-        LAST_LOCAL_ASR = (local_asr_b, local_asr_c)
+        self.last_local_asr = (local_asr_b, local_asr_c)
 
         # Dashboard: 汇报 Training 完成状态 + 本地 ASR
         loss_str = f"{local_loss:.4f}"
@@ -337,7 +218,7 @@ class MyClient(fl.client.NumPyClient):
         local_asr_str = f"B{local_asr_b*100:.0f}% C{local_asr_c*100:.0f}%"
         combined_asr_str = f"L:{local_asr_str}|G:?"
         
-        update_status_monitor(status="Trained", round_num=server_round, loss=loss_str, asr=combined_asr_str)
+        self.status.update(status="Trained", round_num=server_round, loss=loss_str, asr=combined_asr_str)
         
         logger.info(f"   -> 本地 ASR (Backdoor):    {local_asr_b*100:.1f}%")
         logger.info(f"   -> 本地 ASR (CleanLabel):  {local_asr_c*100:.1f}%")
@@ -381,12 +262,12 @@ class MyClient(fl.client.NumPyClient):
         self.net.load_state_dict(state_dict, strict=True)
 
         # 2. 评估正常任务指标 (Acc, Loss)
-        loss, accuracy = test(self.net, self.testloader)
+        loss, accuracy = test(self.net, self.testloader, DEVICE)
         
         # 3. 评估攻击指标 (ASR)
         # B: Backdoor (右下角), C: Clean Label (左上角)
-        _, asr_b = test(self.net, self.backdoor_testloader)
-        _, asr_c = test(self.net, self.clean_label_testloader)
+        _, asr_b = test(self.net, self.backdoor_testloader, DEVICE)
+        _, asr_c = test(self.net, self.clean_label_testloader, DEVICE)
         
         # 4. 打印评估报告
         # 原子输出评估报告 (防止多线程交错)
@@ -403,8 +284,7 @@ class MyClient(fl.client.NumPyClient):
 
         # Dashboard: 更新 Evaluated 状态
         # 获取缓存的 Local ASR (从 fit 阶段)
-        global LAST_LOCAL_ASR
-        loc_b, loc_c = LAST_LOCAL_ASR
+        loc_b, loc_c = self.last_local_asr
             
         # 拼接字符串: "L:B99 C12|G:B45 C45"
         loc_str = f"B{loc_b*100:.0f}% C{loc_c*100:.0f}%"
@@ -413,7 +293,7 @@ class MyClient(fl.client.NumPyClient):
         
         loss_str = f"{loss:.4f}"
         server_round = config.get("current_round", "-")
-        update_status_monitor(status="Evaluated", round_num=server_round, loss=loss_str, asr=combined_asr_str)
+        self.status.update(status="Evaluated", round_num=server_round, loss=loss_str, asr=combined_asr_str)
 
         # 返回指标给服务器聚合
         return float(loss), len(self.testloader.dataset), {
@@ -428,14 +308,16 @@ def main():
     """
     客户端主程序入口
     """
-    global db_manager
     
     # 1. 状态数据库初始化
+    db_manager = None
     try:
         db_manager = DBManager()
         print("✅ [Status] 已连接状态数据库 (Monitoring DB)")
     except Exception as e:
         print(f"⚠️ [Status] 状态数据库连接失败: {e}")
+        
+    status_reporter = StatusReporter(db_manager, CLIENT_ID, ATTACK_TYPE)
 
     # 2. 打印启动横幅
     print_banner(DEVICE)
@@ -480,7 +362,7 @@ def main():
     tmaa_agent = TMAA_Sidecar(tee_hardware, pid=os.getpid(), use_simulation=use_simulation)
 
     # Dashboard: 更新为已连接状态
-    update_status_monitor(status="Connected")
+    status_reporter.update(status="Connected")
 
     # 7. 启动 Flower 客户端
     server_addr = "127.0.0.1:8080"
@@ -495,7 +377,8 @@ def main():
             testloader=testloader, 
             backdoor_testloader=backdoor_testloader, 
             clean_label_testloader=clean_label_testloader, 
-            tmaa_agent=tmaa_agent
+            tmaa_agent=tmaa_agent,
+            status_reporter=status_reporter
         )
     )
 

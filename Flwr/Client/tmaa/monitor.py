@@ -55,6 +55,10 @@ class SystemMonitor:
         self.metrics_history = {
             "cpu": [],
             "memory": [],
+            "gpu": [],
+            "temperature": [],
+            "fan_speed": [],
+            "latency": [],
             "timestamps": []
         }
         self.integrity_status = True
@@ -94,20 +98,20 @@ class SystemMonitor:
         if self.use_simulation and self.db_manager:
             # === Mode A: Simulation (Event-Driven Read) ===
             try:
-                # Based on Current Phase
-                logs = self.db_manager.fetch_telemetry_by_phase(self.device_id, self.current_phase, self.phase_step)
+                # 根据当前 Phase 和 Step 从数据库读取完整遥测数据
+                record = self.db_manager.fetch_telemetry_by_phase(self.device_id, self.current_phase, self.phase_step)
                 
-                if logs:
-                    record = logs # It returns a dict directly
-                    cpu = record['cpu_usage']
-                    mem = record['memory_usage_mb']
-                    self.metrics_history["cpu"].append(cpu)
-                    self.metrics_history["memory"].append(mem)
+                if record:
+                    self.metrics_history["cpu"].append(record.get('cpu_usage', 0))
+                    self.metrics_history["memory"].append(record.get('memory_usage_mb', 0))
+                    self.metrics_history["gpu"].append(record.get('gpu_util', 0))
+                    self.metrics_history["temperature"].append(record.get('temperature_c', 0))
+                    self.metrics_history["fan_speed"].append(record.get('fan_speed_rpm', 0))
+                    self.metrics_history["latency"].append(record.get('latency_ms', 0))
                     self.metrics_history["timestamps"].append(time.time())
                     
                     self.phase_step += 1
                 else:
-                    # Should not happen if fallback logic is correct, but just in case
                     self.phase_step = 0 
             except Exception as e:
                 print(f"⚠️ [Monitor] Simulation read error: {e}")
@@ -116,7 +120,6 @@ class SystemMonitor:
             # === Mode B: Real Monitoring (psutil) ===
             try:
                 proc = psutil.Process(self.pid)
-                # interval=None 表示非阻塞，返回上次调用以来的平均值
                 cpu = proc.cpu_percent(interval=None)
                 mem = proc.memory_info().rss / 1024 / 1024  # Convert to MB
     
@@ -125,7 +128,6 @@ class SystemMonitor:
                 self.metrics_history["timestamps"].append(time.time())
             except psutil.NoSuchProcess:
                 self.integrity_status = False
-                # print("⚠️  [Monitor] 目标进程已消失")
 
     def check_network(self):
         """
@@ -151,16 +153,48 @@ class SystemMonitor:
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
 
-    def calculate_volatility(self) -> float:
-        """
-        计算 CPU 波动率 (区分真实训练与死循环)
-        
-        - 真实训练: 波动较大 (Sawtooth like)
-        - 死循环/空转: 波动极小
-        """
-        if len(self.metrics_history["cpu"]) < 2:
+    def _calc_variance(self, key: str) -> float:
+        """计算指定指标的方差"""
+        data = self.metrics_history.get(key, [])
+        if len(data) < 2:
             return 0.0
         try:
-            return statistics.variance(self.metrics_history["cpu"])
+            return statistics.variance(data)
         except:
             return 0.0
+
+    def calculate_volatility(self) -> float:
+        """计算 CPU 波动率 (向后兼容)"""
+        return self._calc_variance("cpu")
+
+    def get_all_volatility(self) -> dict:
+        """
+        计算所有指标的波动率，用于构建完整的行为指纹
+        
+        Returns:
+            dict: 包含 cpu, memory, gpu, temperature 等维度的波动率
+        """
+        return {
+            "cpu_volatility": round(self._calc_variance("cpu"), 4),
+            "memory_volatility": round(self._calc_variance("memory"), 4),
+            "gpu_volatility": round(self._calc_variance("gpu"), 4),
+            "temperature_volatility": round(self._calc_variance("temperature"), 4),
+        }
+
+    def get_resource_summary(self) -> dict:
+        """
+        获取所有指标的均值摘要，用于 Trust Report
+        """
+        def _avg(key):
+            data = self.metrics_history.get(key, [])
+            return round(sum(data) / len(data), 2) if data else 0.0
+
+        return {
+            "avg_cpu": _avg("cpu"),
+            "avg_memory_mb": _avg("memory"),
+            "avg_gpu": _avg("gpu"),
+            "avg_temperature_c": _avg("temperature"),
+            "avg_fan_speed_rpm": round(_avg("fan_speed")),
+            "avg_latency_ms": _avg("latency"),
+            "sample_count": len(self.metrics_history["cpu"])
+        }

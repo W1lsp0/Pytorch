@@ -105,8 +105,9 @@ class TMAA_Sidecar:
         
         最后由从 TEE 获取的私钥签名。
         """
-        # 计算资源波动率
-        cpu_volatility = self.monitor.calculate_volatility()
+        # 计算全维度资源波动率
+        all_volatility = self.monitor.get_all_volatility()
+        resource_summary = self.monitor.get_resource_summary()
         
         # [New Feature] 物理吞吐量熔断 (Physical Throughput Hard-Limit)
         # 检测训练时间是否低于物理极限 (防止"秒传"假训练)
@@ -138,7 +139,7 @@ class TMAA_Sidecar:
                 "device_id": self.tee.device_id,
                 "timestamp": datetime.now().isoformat(),
                 "pid": self.pid,
-                "schema_version": "1.0"
+                "schema_version": "2.0"
             },
             "metrics": {
                 "system_integrity": {
@@ -146,11 +147,12 @@ class TMAA_Sidecar:
                     "network_anomalies": self.monitor.network_violations
                 },
                 "behavior_fingerprint": {
-                    "cpu_volatility": round(cpu_volatility, 4),
+                    **all_volatility,
                     "throughput_check": throughput_status,
                     "loss_trend": loss_trend,
-                    "description": "High volatility > 5 indicates valid training"
+                    "description": "Volatility > 5 indicates valid training; GPU volatility verifies GPU workload"
                 },
+                "resource_summary": resource_summary,
                 "data_health_audit": self.data_metrics,  # 零知识审计结果
                 "client_reported_meta": training_meta    # 包含详细曲线数据
             }
