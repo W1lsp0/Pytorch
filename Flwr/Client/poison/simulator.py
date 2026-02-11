@@ -93,7 +93,7 @@ class DeviceSimulator:
         }
         return specs_db.get(p_type, None)
 
-    def generate_phase_data(self, phase: str, count: int, start_step: int = 0) -> List[Dict]:
+    def generate_phase_data(self, phase: str, count: int, start_step: int = 0, complexity: str = "high") -> List[Dict]:
         """
         生成特定阶段的离散遥测数据池 (Data Pool)
         
@@ -101,6 +101,7 @@ class DeviceSimulator:
             phase: 阶段名称 (Idle, Loading, Forward, Backward)
             count: 生成数量
             start_step: 起始步数 (用于数据库排序)
+            complexity: 数据复杂度 ('high'=[IID/Compute-Bound], 'low'=[Non-IID/IO-Bound])
             
         Returns:
             List[Dict]: 遥测数据列表
@@ -126,12 +127,20 @@ class DeviceSimulator:
             else:
                 base_cpu, base_gpu, power = (10, 0, 0.1)
 
+        # [Virtual-Reality Alignment] 虚实对齐逻辑
+        # Low Complexity (Non-IID) -> IO Bound -> Higher Jitter
+        # High Complexity (IID) -> Compute Bound -> Lower Jitter
+        if complexity == "low":
+            jitter_factor = 3.0  # 剧烈抖动 (IO等待)
+        else:
+            jitter_factor = 1.0  # 平滑计算
+
         for i in range(count):
             step = start_step + i
             
-            # 1. 波动模拟
-            cpu = base_cpu + random.uniform(-5, 5)
-            gpu = base_gpu + random.uniform(-5, 5)
+            # 1. 波动模拟 (引入 Jitter Factor)
+            cpu = base_cpu + random.uniform(-5 * jitter_factor, 5 * jitter_factor)
+            gpu = base_gpu + random.uniform(-5 * jitter_factor, 5 * jitter_factor)
             
             # 裁剪范围
             cpu = max(0, min(100, cpu))

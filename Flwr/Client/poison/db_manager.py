@@ -312,13 +312,7 @@ class DBManager:
         cnx = self.get_connection()
         cursor = cnx.cursor(dictionary=True)
         try:
-            # 使用 Modulo logic (循环读取)
-            # 假设每个Phase只生成了 MAX_STEPS (比如 200) 条数据
-            # 我们可以先 count 一下总数 (优化: 缓存 count)
-            # 为了简单，直接取 step % 200 (假设生成时固定为 200)
-            # 或者由调用者保证 step 合法。这里为了健壮性，使用 limit 1
-            
-            # 更好的做法: 查找 step, 如果找不到，查找 step % max_steps
+            # 1. First attempt: Direct fetch
             sql = """
             SELECT * FROM telemetry_logs 
             WHERE device_id = %s AND phase = %s AND step = %s
@@ -328,12 +322,25 @@ class DBManager:
             row = cursor.fetchone()
             if row:
                 return row
-            else:
-                # Fallback: step loop (假设 pool size = 200)
-                # 这种 fallback 比较 naive，但对于 demo 足够
-                loop_step = step % 200 
+            
+            # 2. Fallback: Dynamic Cyclic Fetching
+            # Query the pool size (MAX step) for this phase
+            # Optimization: This could be cached in memory to avoid extra DB query
+            count_sql = "SELECT MAX(step) as max_step FROM telemetry_logs WHERE device_id = %s AND phase = %s"
+            cursor.execute(count_sql, (device_id, phase))
+            res = cursor.fetchone()
+            
+            if res and res['max_step'] is not None:
+                max_step = res['max_step']
+                # Calculate cyclic step: step % (max_step + 1)
+                # Ensure we handle the case where max_step=0 (single record)
+                pool_size = max_step + 1
+                loop_step = step % pool_size
+                
                 cursor.execute(sql, (device_id, phase, loop_step))
                 return cursor.fetchone()
+            else:
+                return None # No data pool found for this phase
                 
         except mysql.connector.Error as err:
             print(f"Error fetching data: {err}")

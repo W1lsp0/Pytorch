@@ -135,16 +135,27 @@ def main():
         else:
             profile["attack_type"] = "none"
 
+        # 4. 创建模拟器实例 (Updated)
         # 恶意节点行为模式
         pattern = "normal"
         if is_malicious:
             pattern = random.choice(["lazy", "miner"])
 
-        # 4. 创建模拟器实例 (Updated)
         sim = DeviceSimulator(dev_id, profile_type=h_type, is_malicious=is_malicious, pattern=pattern)
         
         # 5. 注册设备 (写入 Static Profile)
         db.register_device(profile)
+
+        # [Virtual-Reality Alignment] 根据设备 ID 分组分配数据复杂度
+        # Group A (0-9):   IID (High Complexity) -> Compute Bound
+        # Group B (10-14): Moderate Non-IID (Medium)
+        # Group C (15-19): Extreme Non-IID (Low Complexity) -> IO Bound
+        
+        complexity = "high"
+        if 10 <= i <= 14:
+            complexity = "medium"
+        elif 15 <= i <= 19:
+            complexity = "low"
         
         # 6. 生成离散数据池 (Discrete Phase Data Pools)
         # 每个 Phase 生成 200 个 Step 的数据供 Loop 使用
@@ -154,21 +165,21 @@ def main():
         for phase in phases:
             # Lazy 节点也会生成这些 Phase 标签，但内容全是 Idle 特征 (由 Simulator 内部处理)
             # Miner 节点也会生成这些 Phase 标签，但内容全是 满载 特征
-            phase_logs = sim.generate_phase_data(phase, count=200, start_step=0)
+            # [Updated] Pass complexity to simulator
+            phase_logs = sim.generate_phase_data(phase, count=200, start_step=0, complexity=complexity)
             logs.extend(phase_logs)
             
-        # 7. 批量写入日志
-        
         # 7. 批量写入日志
         db.insert_telemetry_batch(logs)
         
         # 进度输出美化
         status = "😈 MALICIOUS" if is_malicious else "✅ HONEST"
-        p_icon = "📈" if pattern == "sawtooth" else ("💤" if pattern == "lazy" else "⛏️ ")
+        p_icon = "📈" if pattern == "normal" else ("💤" if pattern == "lazy" else "⛏️ ")
+        comp_str = f"COMP:{complexity.upper()}"
         
         # 只打印部分日志，避免刷屏
         if i < 10 or i % 10 == 0 or i == args.devices - 1:
-            print(f"[{i+1:03d}/{args.devices}] {dev_id.ljust(12)} | {h_type.ljust(18)} | {status} | 模式: {pattern.ljust(8)} {p_icon}")
+            print(f"[{i+1:03d}/{args.devices}] {dev_id.ljust(12)} | {h_type.ljust(18)} | {status} | 模式: {pattern.ljust(8)} {p_icon} | {comp_str}")
         elif i == 10:
             print("... (中间省略) ...")
 
