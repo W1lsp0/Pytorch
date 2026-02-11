@@ -21,9 +21,23 @@ class AuditLogger:
         """
         写入主审计日志并打印到控制台
         """
+        # 使用原子打印防止多线程日志交错
         print(message, flush=True)
         with open(self.main_log_path, "a", encoding="utf-8") as f:
             f.write(message + "\n")
+
+    def log_batch(self, messages: list):
+        """
+        [Atomic] 批量写入并打印日志 (防止多线程交错)
+        """
+        if not messages:
+            return
+            
+        full_msg = "\n".join(messages)
+        print(full_msg, flush=True)
+        
+        with open(self.main_log_path, "a", encoding="utf-8") as f:
+            f.write(full_msg + "\n")
 
     def log_client_event(self, client_cid: str, tee_id: str, server_round: int, report: dict):
         """

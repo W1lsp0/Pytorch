@@ -78,6 +78,8 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         
         for client, fit_res in results:
             metrics = fit_res.metrics
+            client_logs = []  # [Atomic] Buffer logs for this client
+
             if "trust_report_json" in metrics:
                 try:
                     payload = json.loads(metrics["trust_report_json"])
@@ -90,14 +92,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     is_compliant, reason = self.policy_engine.check_compliance(report)
                     
                     status_icon = "✅" if is_compliant else "⚠️"
-                    self.audit_logger.log(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}")
-
-                    # [Strict Enforcement Switch]
-                    # 目前仅记录日志，不实际拒绝 (Simulation Mode)
-                    # if not is_compliant:
-                    #     self.audit_logger.log(f"       ⛔ 拒绝聚合: 违反安全策略")
-                    #     rejected_count += 1
-                    #     continue
+                    client_logs.append(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}")
 
                     # [New Feature] 记录数据统计特征 (Data Fingerprint Logging)
                     data_audit = report["metrics"].get("data_health_audit", {})
@@ -111,12 +106,12 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     else:
                         dist_str = "N/A"
                         
-                    self.audit_logger.log(f"       📊 Data Fingerprint: Dist={dist_str} | Feat={feat_sum}")
+                    client_logs.append(f"       📊 Data Fingerprint: Dist={dist_str} | Feat={feat_sum}")
                     
                     # 记录资源摘要 (v2.0 新增)
                     resource_sum = report["metrics"].get("resource_summary", {})
                     if resource_sum:
-                        self.audit_logger.log(
+                        client_logs.append(
                             f"       🖥️  Resources: CPU={resource_sum.get('avg_cpu', '?')}% "
                             f"GPU={resource_sum.get('avg_gpu', '?')}% "
                             f"Mem={resource_sum.get('avg_memory_mb', '?')}MB "
@@ -130,11 +125,14 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     valid_results.append((client, fit_res))
                     
                 except Exception as e:
-                    self.audit_logger.log(f"    ⚠️ [Client {client.cid}] 报告解析警告: {e}")
+                    client_logs.append(f"    ⚠️ [Client {client.cid}] 报告解析警告: {e}")
                     valid_results.append((client, fit_res))
             else:
-                self.audit_logger.log(f"    ⚠️ [Client {client.cid}] 未附带可信报告")
+                client_logs.append(f"    ⚠️ [Client {client.cid}] 未附带可信报告")
                 valid_results.append((client, fit_res))
+            
+            # [Atomic] Flush buffered logs for this client
+            self.audit_logger.log_batch(client_logs)
 
         self.audit_logger.log(f"🛡️  [TMAA Server] 审计结束. 放行所有客户端 ({len(results)}), 拒绝 ({rejected_count}).")
         
