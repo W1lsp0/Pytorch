@@ -20,15 +20,6 @@ SERVER_ADDRESS="0.0.0.0:8080"
 TOTAL_CLIENTS=20
 USE_SIMULATION=1  # 启用基于数据库的 L4 模拟监控
 
-# [Auto-Detect] Check for specific remote python, else fallback to 'python'
-if [ -x "/data1/anaconda3/envs/W1lsp0/bin/python" ]; then
-    PYTHON_BIN="/data1/anaconda3/envs/W1lsp0/bin/python"
-    echo "🐍 使用指定 Python: $PYTHON_BIN"
-else
-    PYTHON_BIN="python"
-    echo "🐍 使用系统默认 Python (未找到指定环境)"
-fi
-
 # 确保在正确目录
 cd "$(dirname "$0")"
 
@@ -54,13 +45,12 @@ echo "   - 客户端: 20 (Group A: 10, Group B: 5, Group C: 5)"
 echo "   - 模式: 真实执行 + 模拟 L4 监控"
 echo "   - 数据库管理器: 已启用 (状态跟踪)"
 echo "   - 日志目录: ./log/"
-echo "   - Python: $PYTHON_BIN"
 
 # 1. 启动服务器 (GPU 0)
 echo "-------------------------------------------"
 echo "🔵 正在启动服务器 (GPU 0)..."
 # 服务器占用显存极少，与 C0-C3 共享 GPU 0
-CUDA_VISIBLE_DEVICES=0 $PYTHON_BIN server/server.py > log/server.log 2>&1 &
+CUDA_VISIBLE_DEVICES=0 python server/server.py > log/server.log 2>&1 &
 SERVER_PID=$!
 echo "   服务器 PID: $SERVER_PID"
 echo "   正在等待服务器初始化..."
@@ -79,22 +69,22 @@ echo "🔴 正在启动恶意客户端 (C0-C3) -> GPU 0..."
 # Client 0: 标签翻转
 echo "   [C0] 恶意 (Label Flip) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=0 ATTACK_TYPE=label_flip POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-$PYTHON_BIN Client/client.py > log/client_0.log 2>&1 &
+python Client/client.py > log/client_0.log 2>&1 &
 
 # Client 1: 后门攻击
 echo "   [C1] 恶意 (Backdoor) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=1 ATTACK_TYPE=backdoor POISON_RATE=0.2 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-$PYTHON_BIN Client/client.py > log/client_1.log 2>&1 &
+python Client/client.py > log/client_1.log 2>&1 &
 
 # Client 2: 干净标签
 echo "   [C2] 恶意 (Clean Label) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=2 ATTACK_TYPE=clean_label POISON_RATE=0.5 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-$PYTHON_BIN Client/client.py > log/client_2.log 2>&1 &
+python Client/client.py > log/client_2.log 2>&1 &
 
 # Client 3: 语义攻击
 echo "   [C3] 恶意 (Semantic) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=3 ATTACK_TYPE=semantic POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-$PYTHON_BIN Client/client.py > log/client_3.log 2>&1 &
+python Client/client.py > log/client_3.log 2>&1 &
 
 sleep 2
 
@@ -117,7 +107,7 @@ do
    
    echo "   [C$i] Assigner: $GROUP_NAME -> GPU $GPU_ID"
    CUDA_VISIBLE_DEVICES=$GPU_ID CLIENT_ID=$i ATTACK_TYPE=none TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-   $PYTHON_BIN Client/client.py > log/client_$i.log 2>&1 &
+   python Client/client.py > log/client_$i.log 2>&1 &
    
    # 每启动 4 个暂停一下，避免冲击
    if [ $(( (i+1) % 4 )) -eq 0 ]; then
@@ -135,7 +125,7 @@ echo "-------------------------------------------"
 echo "📺 查看实时仪表板:"
 echo "   1. 打开一个新的终端窗口"
 echo "   2. 进入此目录"
-echo "   3. 运行: $PYTHON_BIN dashboard.py"
+echo "   3. 运行: python dashboard.py"
 echo "-------------------------------------------"
 echo ""
 echo "按 Ctrl+C 停止所有进程。"
