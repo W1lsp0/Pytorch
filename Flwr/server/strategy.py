@@ -40,11 +40,14 @@ class PolicyMatcher:
         
         gpu_vol = fingerprint.get("gpu_volatility", 0.0)
         cpu_vol = fingerprint.get("cpu_volatility", 0.0)
-        device_type = settings.get("device_type", "cpu").lower()
-        
         # [L4] Gaussian Noise / Fake Training Check
         # Rule: Real training causes volatility > 0.
-        if "cuda" in device_type:
+        # Dynamic check: If GPU volatility is significant, enforce GPU threshold.
+        # Otherwise fallback to CPU check.
+        
+        has_gpu_activity = gpu_vol > 0.001
+        
+        if has_gpu_activity:
              # GPU Training must show volatility. 
              # Threshold 0.01 allows for some idle time but filters pure noise/idling.
              if gpu_vol < 0.01:

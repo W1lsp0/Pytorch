@@ -52,7 +52,7 @@ class AuditLogger:
                 "report": report
             }
             
-            client0_log_path = os.path.join(self.log_dir, "client_0_audit.jsonl")
+            client0_log_path = os.path.join(self.log_dir, "client_0_audit.json")
             
             # 使用 JSON Lines 格式追加
             with open(client0_log_path, "a", encoding="utf-8") as f0:
