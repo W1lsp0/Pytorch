@@ -71,6 +71,7 @@ Monitor the logs (`log/client_*.log`) and dashboard to verify:
   - **Initial Loss Consistency**: Flags clients with `|loss - median| > 3 * MAD`.
   - **Layer-wise Norm Filtering**: Monitors `Classifier / Extractor` update ratio.
   - **Cosine Similarity (Sign Flip)**: Comparing client update direction with the average. Flags if `Cos(ΔW_i, ΔW_avg) < -0.5`.
+  - **Volatility Check (Gaussian Noise)**: Enforce `gpu_vol > 0.01` (if CUDA) or `cpu_vol > 0.05` to reject fake training.
 
 ## Phase 11: Deployment & Handoff
 

@@ -35,13 +35,26 @@ class PolicyMatcher:
         if "DIVERGING" in loss_trend:
              return False, f"❌ Training Divergence Detected ({loss_trend})"
 
-        # 3. Check GPU Volatility (GPU 行为异常检测)
-        # 如果 GPU 波动率为 0 但声称使用了 CUDA，可能是假训练
-        gpu_vol = fingerprint.get("gpu_volatility", -1)
-        client_meta = metrics.get("client_reported_meta", {})
-        device_type = client_meta.get("device_type", "cpu")
-        if "cuda" in device_type and gpu_vol == 0.0:
-            return False, "⚠️ GPU volatility is zero despite CUDA training (Possible Fake)"
+        # 3. Check Volatility (Training Fingerprint)
+        # Verify that computation actually happened (Gaussian Noise / Random Weight Attack Detection)
+        
+        gpu_vol = fingerprint.get("gpu_volatility", 0.0)
+        cpu_vol = fingerprint.get("cpu_volatility", 0.0)
+        device_type = settings.get("device_type", "cpu").lower()
+        
+        # [L4] Gaussian Noise / Fake Training Check
+        # Rule: Real training causes volatility > 0.
+        if "cuda" in device_type:
+             # GPU Training must show volatility. 
+             # Threshold 0.01 allows for some idle time but filters pure noise/idling.
+             if gpu_vol < 0.01:
+                 return False, f"❌ Fake Training Detected (GPU Volatility {gpu_vol:.3f} too low)"
+        else:
+             # CPU Training must show volatility.
+             if cpu_vol < 0.05: # CPU usually fluctuates more
+                 return False, f"❌ Fake Training Detected (CPU Volatility {cpu_vol:.3f} too low)"
+                 
+        # 4. Check Data Health (Basic L3)
 
         # 4. Check Data Quality (Inspector) -> Optional
         # e.g. Reject if Entropy is too low (Data Poisoning / Lazy)
