@@ -73,11 +73,18 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         
         self.audit_logger.log(f"\n🛡️  [TMAA Server] Round {server_round} | 接收客户端数据 (Passive Mode)...")
         
-        # [Step 1] Pre-scan: Collect all trust reports to calculate Global Stats (L4 Cross-Client Analysis)
+        # [Step 1] Pre-scan: Collect all trust reports & Model Updates for Cross-Client Analysis
         client_reports = {} # cid -> report
         initial_losses = []
         
+        # L4 Sign Flipping: Collect flattened updates
+        all_updates = [] # List[np.ndarray]
+        client_update_map = {} # cid -> np.ndarray
+        
+        import numpy as np
+        
         for client, fit_res in results:
+            # 1. Collect Report
             if "trust_report_json" in fit_res.metrics:
                 try:
                     payload = json.loads(fit_res.metrics["trust_report_json"])
@@ -85,9 +92,6 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     client_reports[client.cid] = report
                     
                     # Collect Initial Loss for L4 Analysis
-                    # Path: metrics -> client_reported_meta -> training_curve (list of dicts) -> [0]['loss']
-                    # Or check 'data_health_audit' -> 'initial_loss' (from inspector)
-                    # Let's prefer 'data_health_audit' as it's signed from Inspector
                     data_audit = report["metrics"].get("data_health_audit", {})
                     init_loss = data_audit.get("initial_loss", None)
                     if init_loss is not None:
@@ -95,15 +99,32 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                         
                 except:
                     pass
-        
+            
+            # 2. Collect Model Parameters (Flattened)
+            # fit_res.parameters is Parameters(tensors=[bytes]), we need to deserialize
+            try:
+                # Deserialize to List[np.ndarray]
+                weights = fl.common.parameters_to_ndarrays(fit_res.parameters)
+                # Flatten all layers into a single vector
+                flat_update = np.concatenate([w.flatten() for w in weights])
+                all_updates.append(flat_update)
+                client_update_map[client.cid] = flat_update
+            except Exception as e:
+                self.audit_logger.log(f"    ⚠️ [Client {client.cid}] Params deserialize failed: {e}")
+
         # Calculate Global Stats for L4 Policy
-        import numpy as np
         median_loss = np.median(initial_losses) if initial_losses else 0.0
         mad_loss = np.median(np.abs(np.array(initial_losses) - median_loss)) if initial_losses else 0.0
-        # Avoid division by zero
         mad_loss = max(mad_loss, 1e-6)
         
-        self.audit_logger.log(f"    📊 [L4 Analysis] Global Initial Loss: Median={median_loss:.4f}, MAD={mad_loss:.4f}")
+        # Calculate Average Update Vector (pseudo-gradient direction)
+        avg_update_vector = None
+        if all_updates:
+            # Mean of all updates (Reference Direction)
+            avg_update_vector = np.mean(all_updates, axis=0)
+            avg_norm = np.linalg.norm(avg_update_vector) + 1e-9
+        
+        self.audit_logger.log(f"    📊 [L4 Analysis] Global InitLoss: Med={median_loss:.4f}, MAD={mad_loss:.4f}")
 
         valid_results = []
         rejected_count = 0
@@ -119,37 +140,43 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     tee_id = report['header']['device_id']
                     
                     # Policy Check (策略检查)
-                    # Now passing global stats to check_compliance if needed, or check externally
                     is_compliant, reason = self.policy_engine.check_compliance(report)
                     
-                    # [L4 Check] Initial Loss Consistency (Is this client an outlier?)
+                    l4_status = ""
+                    
+                    # [L4 Check 1] Initial Loss Consistency
                     data_audit = report["metrics"].get("data_health_audit", {})
                     my_init_loss = data_audit.get("initial_loss", 0.0)
                     loss_deviation = abs(my_init_loss - median_loss) / mad_loss
                     
-                    l4_status = ""
-                    if loss_deviation > 3.0: # > 3 MADs
+                    if loss_deviation > 3.0: 
                         l4_status += f" ⚠️ InitLoss Outlier (+{loss_deviation:.1f}σ)"
-                        # is_compliant = False # Optional: Enforce strict
                     
-                    # [L4 Check] Layer-wise Norm Filtering
-                    # Check for "Head-Heavy" updates (Classifier >> Extractor)
+                    # [L4 Check 2] Layer-wise Norm Filtering
                     client_meta = report["metrics"].get("client_reported_meta", {})
                     layer_updates = client_meta.get("layer_updates", [])
                     if layer_updates and len(layer_updates) > 2:
-                        # Simple heuristic: Last layer vs Mean of first few layers
                         extractor_norm = np.mean(layer_updates[:-2]) + 1e-9
                         classifier_norm = layer_updates[-1]
                         impact_ratio = classifier_norm / extractor_norm
+                        if impact_ratio > 10.0:
+                             l4_status += f" ⚠️ Head-Heavy (Ratio {impact_ratio:.1f})"
+
+                    # [L4 Check 3] Cosine Similarity (Sign Flipping)
+                    if client.cid in client_update_map and avg_update_vector is not None:
+                        my_update = client_update_map[client.cid]
+                        # Cosine Sim = (A . B) / (|A| * |B|)
+                        my_norm = np.linalg.norm(my_update) + 1e-9
+                        dot_prod = np.dot(my_update, avg_update_vector)
+                        cosine_sim = dot_prod / (my_norm * avg_norm)
                         
-                        if impact_ratio > 10.0: # Heuristic threshold
-                             l4_status += f" ⚠️ Head-Heavy Update (Ratio {impact_ratio:.1f})"
+                        if cosine_sim < -0.5:
+                            l4_status += f" ⚠️ Sign Flip Warn (Cos={cosine_sim:.2f})"
                     
                     status_icon = "✅" if is_compliant else "⚠️"
                     client_logs.append(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}{l4_status}")
 
                     # [New Feature] 记录数据统计特征 (Data Fingerprint Logging)
-                    # Extract Cluster Quality (L3)
                     cluster_q = data_audit.get("cluster_quality", "N/A")
                     if isinstance(cluster_q, dict):
                          q_str = f"Sep={cluster_q.get('separability_ratio', '?')}"
