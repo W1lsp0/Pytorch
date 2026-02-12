@@ -73,40 +73,90 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         
         self.audit_logger.log(f"\n🛡️  [TMAA Server] Round {server_round} | 接收客户端数据 (Passive Mode)...")
         
+        # [Step 1] Pre-scan: Collect all trust reports to calculate Global Stats (L4 Cross-Client Analysis)
+        client_reports = {} # cid -> report
+        initial_losses = []
+        
+        for client, fit_res in results:
+            if "trust_report_json" in fit_res.metrics:
+                try:
+                    payload = json.loads(fit_res.metrics["trust_report_json"])
+                    report = payload.get("trust_report", payload)
+                    client_reports[client.cid] = report
+                    
+                    # Collect Initial Loss for L4 Analysis
+                    # Path: metrics -> client_reported_meta -> training_curve (list of dicts) -> [0]['loss']
+                    # Or check 'data_health_audit' -> 'initial_loss' (from inspector)
+                    # Let's prefer 'data_health_audit' as it's signed from Inspector
+                    data_audit = report["metrics"].get("data_health_audit", {})
+                    init_loss = data_audit.get("initial_loss", None)
+                    if init_loss is not None:
+                        initial_losses.append(init_loss)
+                        
+                except:
+                    pass
+        
+        # Calculate Global Stats for L4 Policy
+        import numpy as np
+        median_loss = np.median(initial_losses) if initial_losses else 0.0
+        mad_loss = np.median(np.abs(np.array(initial_losses) - median_loss)) if initial_losses else 0.0
+        # Avoid division by zero
+        mad_loss = max(mad_loss, 1e-6)
+        
+        self.audit_logger.log(f"    📊 [L4 Analysis] Global Initial Loss: Median={median_loss:.4f}, MAD={mad_loss:.4f}")
+
         valid_results = []
         rejected_count = 0
         
+        # [Step 2] Main Loop: Validate and Log
         for client, fit_res in results:
             metrics = fit_res.metrics
             client_logs = []  # [Atomic] Buffer logs for this client
 
-            if "trust_report_json" in metrics:
+            if client.cid in client_reports:
                 try:
-                    payload = json.loads(metrics["trust_report_json"])
-                    # The report is wrapped in a structure with signature
-                    report = payload.get("trust_report", payload) 
-                    
+                    report = client_reports[client.cid]
                     tee_id = report['header']['device_id']
                     
                     # Policy Check (策略检查)
+                    # Now passing global stats to check_compliance if needed, or check externally
                     is_compliant, reason = self.policy_engine.check_compliance(report)
                     
+                    # [L4 Check] Initial Loss Consistency (Is this client an outlier?)
+                    data_audit = report["metrics"].get("data_health_audit", {})
+                    my_init_loss = data_audit.get("initial_loss", 0.0)
+                    loss_deviation = abs(my_init_loss - median_loss) / mad_loss
+                    
+                    l4_status = ""
+                    if loss_deviation > 3.0: # > 3 MADs
+                        l4_status += f" ⚠️ InitLoss Outlier (+{loss_deviation:.1f}σ)"
+                        # is_compliant = False # Optional: Enforce strict
+                    
+                    # [L4 Check] Layer-wise Norm Filtering
+                    # Check for "Head-Heavy" updates (Classifier >> Extractor)
+                    client_meta = report["metrics"].get("client_reported_meta", {})
+                    layer_updates = client_meta.get("layer_updates", [])
+                    if layer_updates and len(layer_updates) > 2:
+                        # Simple heuristic: Last layer vs Mean of first few layers
+                        extractor_norm = np.mean(layer_updates[:-2]) + 1e-9
+                        classifier_norm = layer_updates[-1]
+                        impact_ratio = classifier_norm / extractor_norm
+                        
+                        if impact_ratio > 10.0: # Heuristic threshold
+                             l4_status += f" ⚠️ Head-Heavy Update (Ratio {impact_ratio:.1f})"
+                    
                     status_icon = "✅" if is_compliant else "⚠️"
-                    client_logs.append(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}")
+                    client_logs.append(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}{l4_status}")
 
                     # [New Feature] 记录数据统计特征 (Data Fingerprint Logging)
-                    data_audit = report["metrics"].get("data_health_audit", {})
-                    label_dist = data_audit.get("label_distribution", "N/A")
-                    feat_sum = data_audit.get("feature_summary", "N/A")
-                    
-                    # 简化日志输出
-                    if isinstance(label_dist, dict):
-                        # 只显示非零类别，节省日志空间
-                        dist_str = {k: v for k, v in label_dist.items() if v > 0}
+                    # Extract Cluster Quality (L3)
+                    cluster_q = data_audit.get("cluster_quality", "N/A")
+                    if isinstance(cluster_q, dict):
+                         q_str = f"Sep={cluster_q.get('separability_ratio', '?')}"
                     else:
-                        dist_str = "N/A"
-                        
-                    client_logs.append(f"       📊 Data Fingerprint: Dist={dist_str} | Feat={feat_sum}")
+                         q_str = "N/A"
+
+                    client_logs.append(f"       📊 Data Audit: Cluster={q_str} | InitLoss={my_init_loss:.3f}")
                     
                     # 记录资源摘要 (v2.0 新增)
                     resource_sum = report["metrics"].get("resource_summary", {})
@@ -115,11 +165,10 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                             f"       🖥️  Resources: CPU={resource_sum.get('avg_cpu', '?')}% "
                             f"GPU={resource_sum.get('avg_gpu', '?')}% "
                             f"Mem={resource_sum.get('avg_memory_mb', '?')}MB "
-                            f"Temp={resource_sum.get('avg_temperature_c', '?')}°C "
                             f"({resource_sum.get('sample_count', '?')} samples)"
                         )
                     
-                    # [New Feature] 客户端 0 独立审计日志 (Isolated Logging for Client 0)
+                    # Client 0 Independent Audit
                     self.audit_logger.log_client_event(client.cid, tee_id, server_round, report)
                             
                     valid_results.append((client, fit_res))

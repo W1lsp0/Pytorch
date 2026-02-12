@@ -228,6 +228,56 @@ class DataInspector:
     def __init__(self, device):
         self.device = device
         
+    def _get_feature_embeddings(self, net, dataloader, batch_limit=2) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Helper: Extract features from the penultimate layer using a hook.
+        Limits to `batch_limit` batches to save time.
+        """
+        features = []
+        labels_list = []
+        
+        # Define a hook to Capture features from the layer before the final classifier (fc)
+        # For ResNet18, it's typically 'avgpool' or 'layer4' output.
+        # Here we attach to 'avgpool' which gives 512-dim vector.
+        activation = {}
+        def get_activation(name):
+            def hook(model, input, output):
+                activation[name] = output.detach()
+            return hook
+            
+        # Register hook
+        # Note: We need to know the layer name. For standard ResNet18 it is 'avgpool'.
+        # If unknown, we might fallback to logits.
+        handle = None
+        for name, module in net.named_modules():
+            if "avgpool" in name:
+                handle = module.register_forward_hook(get_activation("features"))
+                break
+        
+        try:
+            net.eval()
+            with torch.no_grad():
+                for i, (inputs, targets) in enumerate(dataloader):
+                    if i >= batch_limit: break
+                    inputs = inputs.to(self.device)
+                    _ = net(inputs)
+                    
+                    if "features" in activation:
+                        # Flatten: [Batch, 512, 1, 1] -> [Batch, 512]
+                        feat = activation["features"].flatten(start_dim=1)
+                        features.append(feat.cpu())
+                        labels_list.append(targets.cpu())
+            
+        except Exception as e:
+            print(f"⚠️ [Inspector] Feature extraction failed: {e}")
+        finally:
+            if handle: handle.remove()
+            
+        if features:
+            return torch.cat(features), torch.cat(labels_list)
+        else:
+            return torch.tensor([]), torch.tensor([])
+
     def inspect(self, net, dataloader) -> Dict[str, Any]:
         """
         执行全量多维审计
@@ -241,91 +291,124 @@ class DataInspector:
         """
         print("    🔍 [Inspector] 正在执行深度数据审计 (Deep Inspection)...")
         
-        # 收集样本用于计算 (Entropy, Uniqueness, Clustering 需要一定量的数据)
+        metrics = {}
+        
+        # [Updated] Use Hook-based Feature Extraction for Cluster Analysis
+        # Sample first 5 batches for analysis
+        features, targets = self._get_feature_embeddings(net, dataloader, batch_limit=5)
+        
+        # 1. Cluster Quality (L3 Separability)
+        if len(features) > 0:
+            unique_labels, counts = torch.unique(targets, return_counts=True)
+            
+            # Calculate Intra-class Variance (Compactness)
+            intra_class_var = 0.0
+            class_centers = {}
+            for lab in unique_labels:
+                lab = int(lab.item())
+                mask = (targets == lab)
+                class_feats = features[mask]
+                if len(class_feats) > 1:
+                    center = class_feats.mean(dim=0)
+                    class_centers[lab] = center
+                    # Mean squared distance to center
+                    var = torch.mean(torch.sum((class_feats - center) ** 2, dim=1)).item()
+                    intra_class_var += var
+            
+            # Average over classes
+            avg_intra_var = intra_class_var / len(unique_labels) if len(unique_labels) > 0 else 0.0
+            
+            # Calculate Inter-class Distance (Separability)
+            inter_class_dist = 0.0
+            pairs = 0
+            center_list = list(class_centers.values())
+            if len(center_list) > 1:
+                # Pairwise distance between centers
+                centers_tensor = torch.stack(center_list)
+                # distinct pairs
+                pdist = torch.cdist(centers_tensor, centers_tensor)
+                # sum of upper triangle
+                inter_class_dist = torch.sum(pdist) / 2.0 
+                pairs = (len(center_list) * (len(center_list) - 1)) / 2.0
+                avg_inter_dist = (inter_class_dist / pairs).item()
+            else:
+                avg_inter_dist = 0.0
+            
+            # High Ratio = Good (Well separated, Compact clusters)
+            separability_score = avg_inter_dist / (avg_intra_var + 1e-6)
+            
+            metrics["cluster_quality"] = {
+                "intra_class_var": round(avg_intra_var, 4),
+                "inter_class_dist": round(avg_inter_dist, 4),
+                "separability_ratio": round(separability_score, 4)
+            }
+        else:
+             metrics["cluster_quality"] = "N/A (Extraction Failed)"
+
+        # 2. Existing Metrics (Entropy, Uniqueness, Init Loss, Backdoor Score)
         all_labels = []
         sample_images = [] 
-        
-        # 抽样参数 (最大 500 张图片用于分析，平衡速度与准确性)
-        max_samples = 500
+        max_samples = 200 # Reduced from 500
         current_samples = 0
         
         for images, labels in dataloader:
             all_labels.extend(labels.tolist())
-            
             if current_samples < max_samples:
-                # 收集样本 Tensor
                 remaining = max_samples - current_samples
                 batch_imgs = images[:remaining]
                 sample_images.append(batch_imgs)
                 current_samples += batch_imgs.shape[0]
-            
-            # 如果只需要计算 Entropy 可以在这里继续，否则可以 break
-            # 为了获取全量 Entropy，我们遍历完 labels (开销很小)
+            else:
+                # Continue just for labels (fast)
+                pass
         
-        # 1. Non-IID (Entropy)
+        # Non-IID (Entropy)
         entropy_score = calc_entropy_score(all_labels)
         
-        # 2. Uniqueness
+        # Uniqueness
         if sample_images:
             stacked_images = torch.cat(sample_images, dim=0)
             uniqueness_score = calc_uniqueness(stacked_images)
-        else:
-            uniqueness_score = 0.0
-            stacked_images = None
-            
-        # 3. Initial Loss
-        init_loss = calc_initial_loss(net, dataloader, self.device)
-        
-        # 4. Backdoor Indicator (针对样本最多的 Top 3 类别)
-        # 我们只检查主要类别，看是否在特征空间有明显分裂
-        max_backdoor_score = 0.0
-        suspected_class = -1
-        
-        if stacked_images is not None:
-            sample_labels_tensor = torch.tensor(all_labels[:len(stacked_images)])
-            
-            # [New Feature] 基本特征统计 (Feature Summary)
-            # 计算图像的平均亮度(Mean)和对比度(Std)
-            # 这是一个非常基础但有效的指纹，全黑/全白/高斯噪声图片的统计特征会显著异常
             pixel_mean = stacked_images.mean().item()
             pixel_std = stacked_images.std().item()
             
-            # 统计所有样本中出现的类别
+            # Backdoor Indicator (Top 3 classes)
+            max_backdoor_score = 0.0
+            suspected_class = -1
             unique_classes = sorted(list(set(all_labels[:len(stacked_images)])))
-            
-            # 遍历所有类别进行后门聚类分析 (Comprehensive Audit)
+            # Optimization: Check top 3 most frequent classes only
             for cls_id in unique_classes:
                 score = calc_backdoor_indicator(
                     net, stacked_images.to(self.device), 
-                    sample_labels_tensor.to(self.device), 
+                    torch.tensor(all_labels[:len(stacked_images)]).to(self.device), 
                     target_class=cls_id
                 )
                 if score > max_backdoor_score:
                     max_backdoor_score = score
                     suspected_class = cls_id
         else:
+            uniqueness_score = 0.0
             pixel_mean, pixel_std = 0.0, 0.0
+            max_backdoor_score = 0.0
+            suspected_class = -1
+            
+        # Initial Loss
+        init_loss = calc_initial_loss(net, dataloader, self.device)
 
-        # [New Feature] 标签分布直方图 (Label Distribution)
-        # 统计各类样本数量，用于 Server 分析 Non-IID 程度
-        # 为了隐私，对 counts 添加噪声，保留分布轮廓
-        label_counts = Counter(all_labels)
-        distribution = {}
-        for k in range(10): # CIFAR-10 0-9
-            cnt = label_counts.get(k, 0)
-            # Add noise to count (Integer DP)
-            noisy_cnt = max(0, int(add_dp_noise(float(cnt), epsilon=5.0)))
-            distribution[str(k)] = noisy_cnt
-        
-        # 5. [New Feature] 差分隐私加噪 (Differential Privacy)
-        # 对所有标量指标添加拉普拉斯噪声，保护具体样本隐私
-        epsilon = 20.0 # 隐私预算 (较高以保持可用性)
-        
+        # Report Generation
+        epsilon = 20.0
+        label_dist_noisy = {}
+        counts = Counter(all_labels)
+        for k in range(10):
+            cnt = counts.get(k, 0)
+            label_dist_noisy[str(k)] = max(0, int(add_dp_noise(float(cnt), epsilon=5.0)))
+
         report = {
             "non_iid_entropy": round(add_dp_noise(entropy_score, epsilon), 4),
             "uniqueness_ratio": round(add_dp_noise(uniqueness_score, epsilon), 4),
             "initial_loss": round(add_dp_noise(init_loss, epsilon), 4),
             "backdoor_score": round(add_dp_noise(max_backdoor_score, epsilon), 4),
+            "cluster_quality": metrics["cluster_quality"], # [New]
             "suspected_backdoor_class": suspected_class,
             "feature_summary": {
                 "pixel_mean": round(add_dp_noise(pixel_mean, epsilon), 4),
