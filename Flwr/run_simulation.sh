@@ -34,6 +34,7 @@ mkdir -p log
 
 # 清理旧日志 (清空 log 目录)
 rm -f log/*.log
+rm -f log/*.jsonl
 # 同时清理可能残留的根目录日志 (兼容旧习惯)
 rm -f server.log tmaa_server_audit.log client_*.log dashboard_debug.log
 

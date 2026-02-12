@@ -137,9 +137,11 @@ def main():
 
         # 4. 创建模拟器实例 (Updated)
         # 恶意节点行为模式
+        # [Updated] 用户确认: 前4个恶意客户端都进行了完整训练 (Stealthy Attack)
+        # 因此硬件表现应为 "normal" (与诚实节点一致)，而不是 "lazy" 或 "miner"
         pattern = "normal"
-        if is_malicious:
-            pattern = random.choice(["lazy", "miner"])
+        # if is_malicious:
+        #     pattern = random.choice(["lazy", "miner"])
 
         sim = DeviceSimulator(dev_id, profile_type=h_type, is_malicious=is_malicious, pattern=pattern)
         
