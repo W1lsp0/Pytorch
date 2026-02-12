@@ -64,6 +64,8 @@
 - [x] **Server-Side (L4)**: Implement Layer-wise Norm Filtering in `strategy.py`.
 - [x] **Server-Side (L4)**: Implement Cosine Similarity Check (Sign Flipping) in `strategy.py`.
 - [x] **Server-Side (L4)**: Implement Gaussian Noise/Fake Training Detection (Volatility Check) in `strategy.py`.
+- [x] **Server-Side (L4)**: Implement Zero Gradient Detection (Lazy Client) in `strategy.py`.
+- [x] **Server-Side (L4)**: Implement Scaling Attack Defense (Norm Consistency & Clipping) in `strategy.py`.
 
 ## Phase 11: Deployment [x]
 - [x] **Remote Setup**: Initialized git repo on `frps.w1lsp0.top`.

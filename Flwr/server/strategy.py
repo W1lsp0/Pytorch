@@ -130,14 +130,21 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         mad_loss = np.median(np.abs(np.array(initial_losses) - median_loss)) if initial_losses else 0.0
         mad_loss = max(mad_loss, 1e-6)
         
+        # [L4] Scaling Attack: Calculate Median Norm
+        all_norms = [np.linalg.norm(u) for u in all_updates]
+        median_norm = np.median(all_norms) if all_norms else 1.0
+        norm_threshold = median_norm * 2.0
+        if median_norm < 1e-4: norm_threshold = 1.0 # Avoid clipping if everyone starts near 0 discrepancy
+        
         # Calculate Average Update Vector (pseudo-gradient direction)
         avg_update_vector = None
+        global_grad_norm = 0.0
         if all_updates:
             # Mean of all updates (Reference Direction)
             avg_update_vector = np.mean(all_updates, axis=0)
-            avg_norm = np.linalg.norm(avg_update_vector) + 1e-9
+            global_grad_norm = np.linalg.norm(avg_update_vector) + 1e-9
         
-        self.audit_logger.log(f"    📊 [L4 Analysis] Global InitLoss: Med={median_loss:.4f}, MAD={mad_loss:.4f}")
+        self.audit_logger.log(f"    📊 [L4 Analysis] Global InitLoss: Med={median_loss:.4f} | Global Norm: Med={median_norm:.2f} (Clip > {norm_threshold:.2f})")
 
         valid_results = []
         rejected_count = 0
@@ -176,15 +183,43 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                              l4_status += f" ⚠️ Head-Heavy (Ratio {impact_ratio:.1f})"
 
                     # [L4 Check 3] Cosine Similarity (Sign Flipping)
-                    if client.cid in client_update_map and avg_update_vector is not None:
-                        my_update = client_update_map[client.cid]
+                    my_update = client_update_map.get(client.cid)
+                    my_norm = 0.0
+                    
+                    if my_update is not None and avg_update_vector is not None:
                         # Cosine Sim = (A . B) / (|A| * |B|)
                         my_norm = np.linalg.norm(my_update) + 1e-9
                         dot_prod = np.dot(my_update, avg_update_vector)
-                        cosine_sim = dot_prod / (my_norm * avg_norm)
+                        cosine_sim = dot_prod / (my_norm * global_grad_norm)
                         
                         if cosine_sim < -0.5:
                             l4_status += f" ⚠️ Sign Flip Warn (Cos={cosine_sim:.2f})"
+
+                        # [L4 Check 4] Zero Gradient (Lazy Client)
+                        if my_norm < 1e-4:
+                             l4_status += f" ❌ Zero Grad (Lazy)"
+                        
+                        # [L4 Check 5] Scaling Attack (Norm Consistency & Clipping)
+                        # Part A: Consistency (Did they lie?)
+                        if layer_updates:
+                             # Reported Norm = sqrt(sum(layer_update^2))
+                             reported_norm = np.sqrt(np.sum(np.array(layer_updates)**2))
+                             # Allow some floating point error (e.g. 5%)
+                             if abs(my_norm - reported_norm) > (my_norm * 0.1) + 1e-3:
+                                  l4_status += f" ⚠️ Norm Mismatch (Act={my_norm:.2f}|Rep={reported_norm:.2f})"
+                        
+                        # Part B: Norm Clipping (Global Median Threshold)
+                        if my_norm > norm_threshold:
+                            l4_status += f" 🛡️  Clipped (Norm {my_norm:.1f}->{norm_threshold:.1f})"
+                            # Perform Clipping
+                            scale_factor = norm_threshold / my_norm
+                            try:
+                                # Deserialize, Scale, Reserialize
+                                ndarrays = fl.common.parameters_to_ndarrays(fit_res.parameters)
+                                scaled_ndarrays = [layer * scale_factor for layer in ndarrays]
+                                fit_res.parameters = fl.common.ndarrays_to_parameters(scaled_ndarrays)
+                            except Exception as e:
+                                l4_status += f" (Clip Failed: {e})"
                     
                     status_icon = "✅" if is_compliant else "⚠️"
                     client_logs.append(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}{l4_status}")

@@ -72,6 +72,10 @@ Monitor the logs (`log/client_*.log`) and dashboard to verify:
   - **Layer-wise Norm Filtering**: Monitors `Classifier / Extractor` update ratio.
   - **Cosine Similarity (Sign Flip)**: Comparing client update direction with the average. Flags if `Cos(ΔW_i, ΔW_avg) < -0.5`.
   - **Volatility Check (Gaussian Noise)**: Enforce `gpu_vol > 0.01` (if CUDA) or `cpu_vol > 0.05` to reject fake training.
+  - **Zero Gradient**: Reject if update norm is effectively 0 (Lazy Client).
+  - **Scaling Attack Defense**: 
+    - **Consistency**: Compare `Reported Norm` (from Sidecar) vs `Actual Norm` (Payload).
+    - **Clipping**: If `Actual Norm > 2 * Median Norm`, clip weights to threshold.
 
 ## Phase 11: Deployment & Handoff
 
