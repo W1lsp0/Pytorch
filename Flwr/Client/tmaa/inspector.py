@@ -414,7 +414,7 @@ class DataInspector:
                 "pixel_mean": round(add_dp_noise(pixel_mean, epsilon), 4),
                 "pixel_std": round(add_dp_noise(pixel_std, epsilon), 4)
             },
-            "label_distribution": distribution
+            "label_distribution": label_dist_noisy
         }
         
         self._print_report(report)
