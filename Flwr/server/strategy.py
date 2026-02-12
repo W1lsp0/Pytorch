@@ -166,8 +166,11 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     
                     # [L4 Check 1] Initial Loss Consistency
                     data_audit = report["metrics"].get("data_health_audit", {})
-                    my_init_loss = data_audit.get("initial_loss", 0.0)
-                    loss_deviation = abs(my_init_loss - median_loss) / mad_loss
+                    # Fix: Handle NoneType if initial_loss is null in JSON
+                    my_init_loss = data_audit.get("initial_loss")
+                    if my_init_loss is None: my_init_loss = 0.0
+                    
+                    loss_deviation = abs(my_init_loss - median_loss) / (mad_loss + 1e-9)
                     
                     if loss_deviation > 3.0: 
                         l4_status += f" ⚠️ InitLoss Outlier (+{loss_deviation:.1f}σ)"
@@ -175,6 +178,10 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     # [L4 Check 2] Layer-wise Norm Filtering
                     client_meta = report["metrics"].get("client_reported_meta", {})
                     layer_updates = client_meta.get("layer_updates", [])
+                    # Fix: Filter out None values in list
+                    if layer_updates:
+                        layer_updates = [x for x in layer_updates if x is not None]
+
                     if layer_updates and len(layer_updates) > 2:
                         extractor_norm = np.mean(layer_updates[:-2]) + 1e-9
                         classifier_norm = layer_updates[-1]
@@ -225,7 +232,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                     client_logs.append(f"    📄 [Client {client.cid}] TEE: {tee_id[:8]}.. | {status_icon} Policy: {reason}{l4_status}")
 
                     # [New Feature] 记录数据统计特征 (Data Fingerprint Logging)
-                    cluster_q = data_audit.get("cluster_quality", "N/A")
+                    cluster_q = data_audit.get("cluster_quality")
                     if isinstance(cluster_q, dict):
                          q_str = f"Sep={cluster_q.get('separability_ratio', '?')}"
                     else:
