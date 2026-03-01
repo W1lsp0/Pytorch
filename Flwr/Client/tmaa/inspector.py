@@ -395,12 +395,14 @@ class DataInspector:
         # Initial Loss
         init_loss = calc_initial_loss(net, dataloader, self.device)
 
-        # Report Generation
-        epsilon = 20.0
+        # Report Generation - [Added] Differential Privacy
+        # To satisfy Privacy-Preserving Data Audit, add Laplacian noise to scalar outputs
+        epsilon = 20.0 # Privacy budget
         label_dist_noisy = {}
         counts = Counter(all_labels)
-        for k in range(10):
+        for k in range(10): # basic CIFAR10 assumption
             cnt = counts.get(k, 0)
+            # Clip at 0 for counts
             label_dist_noisy[str(k)] = max(0, int(add_dp_noise(float(cnt), epsilon=5.0)))
 
         report = {

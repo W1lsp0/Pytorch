@@ -50,7 +50,7 @@ echo "   - 日志目录: ./log/"
 echo "-------------------------------------------"
 echo "🔵 正在启动服务器 (GPU 0)..."
 # 服务器占用显存极少，与 C0-C3 共享 GPU 0
-CUDA_VISIBLE_DEVICES=0 python server/server.py > log/server.log 2>&1 &
+CUDA_VISIBLE_DEVICES=0 /root/miniconda3/envs/pytorch/bin/python server/server.py > log/server.log 2>&1 &
 SERVER_PID=$!
 echo "   服务器 PID: $SERVER_PID"
 echo "   正在等待服务器初始化..."
@@ -69,22 +69,22 @@ echo "🔴 正在启动恶意客户端 (C0-C3) -> GPU 0..."
 # Client 0: 标签翻转
 echo "   [C0] 恶意 (Label Flip) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=0 ATTACK_TYPE=label_flip POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > log/client_0.log 2>&1 &
+/root/miniconda3/envs/pytorch/bin/python Client/client.py > log/client_0.log 2>&1 &
 
 # Client 1: 后门攻击
 echo "   [C1] 恶意 (Backdoor) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=1 ATTACK_TYPE=backdoor POISON_RATE=0.2 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > log/client_1.log 2>&1 &
+/root/miniconda3/envs/pytorch/bin/python Client/client.py > log/client_1.log 2>&1 &
 
 # Client 2: 干净标签
 echo "   [C2] 恶意 (Clean Label) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=2 ATTACK_TYPE=clean_label POISON_RATE=0.5 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > log/client_2.log 2>&1 &
+/root/miniconda3/envs/pytorch/bin/python Client/client.py > log/client_2.log 2>&1 &
 
 # Client 3: 语义攻击
 echo "   [C3] 恶意 (Semantic) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=3 ATTACK_TYPE=semantic POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-python Client/client.py > log/client_3.log 2>&1 &
+/root/miniconda3/envs/pytorch/bin/python Client/client.py > log/client_3.log 2>&1 &
 
 sleep 2
 
@@ -107,7 +107,7 @@ do
    
    echo "   [C$i] Assigner: $GROUP_NAME -> GPU $GPU_ID"
    CUDA_VISIBLE_DEVICES=$GPU_ID CLIENT_ID=$i ATTACK_TYPE=none TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-   python Client/client.py > log/client_$i.log 2>&1 &
+   /root/miniconda3/envs/pytorch/bin/python Client/client.py > log/client_$i.log 2>&1 &
    
    # 每启动 4 个暂停一下，避免冲击
    if [ $(( (i+1) % 4 )) -eq 0 ]; then

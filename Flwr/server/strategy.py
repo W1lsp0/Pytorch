@@ -1,7 +1,6 @@
 import json
 import math
 import numpy as np
-from collections import deque
 from typing import List, Tuple, Dict, Optional
 
 import flwr as fl
@@ -13,31 +12,21 @@ from audit import AuditLogger
 # === 导入从 strategy.py 单独拆分出去的子模块 ===
 from trust_manager import TrustScoreManager
 from contribution import ContributionValidator
-from sensitivity import calculate_layer_sensitivity, calculate_inclusion_threshold
+from sensitivity import calculate_layer_sensitivities
 
-# 为导入 Client 模块添加路径 (如果需要)
+# 为导入 Client 模块添加路径
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'Client'))
 try:
     from model import get_resnet18
 except ImportError:
-    # 回退方案
-    def get_resnet18(num_classes=10):
-        import torchvision.models as models
-        import torch.nn as nn
-        net = models.resnet18(weights=None)
-        net.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)
-        net.maxpool = nn.Identity()
-        net.fc = nn.Linear(net.fc.in_features, num_classes)
-        return net
-
+    pass
 
 class TMAA_FedAvg(fl.server.strategy.FedAvg):
     """
     TMAA 增强版 FedAvg 策略：完全实现双流双层与动态门限
-    本聚合引擎与传统 FedAvg 的最大差异在于，放弃了“一刀切”聚合，而是采用
-    基于客户端历史声誉与节点设备健康审查的分层参数防投毒拦截算法。
+    引入了二次归一化、层级 L2-Norm Clipping、以及差分隐私数据的解析。
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -86,7 +75,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                 continue
 
             # 第一道防线：评估设备健康环境硬性门禁 
-            m_attest, trust_score = self.trust_manager.evaluate_m_attest_and_trust(cid, report)
+            m_attest, trust_score = self.trust_manager.evaluate_device_integrity(cid, report)
             if trust_score <= 0.0:
                 rejected_count += 1
                 client_logs.append(f"    ❌ [Client {cid}] 信任评估不通过，熔断拦截")
@@ -108,7 +97,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
                 "weights": weights,
                 "report": report,
                 "trust_score": trust_score,
-                "tee_id": report.get("device_info", {}).get("tee_id", "Unknown")
+                "tee_id": report.get("header", {}).get("device_id", "Unknown")
             }
             
             # 计算基线参考真理 (参照物) 时，基于当前该人的 TrustScore 进行声量加权！
@@ -119,7 +108,6 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             
             total_trust_score += trust_score
             
-        # 防止控制台日志重叠导致输出丢失
         self.audit_logger.log_batch(client_logs)
         client_logs.clear()
 
@@ -128,13 +116,12 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             return None, {}
 
         # ==========================================================
-        # 步骤 2: 内容审查与得分加权一致性 (Content Scrutiny)
+        # 步骤 2: 内容审查与实力分加权 (Content Scrutiny)
         # ==========================================================
-        # 产生高信誉玩家主导的主基准梯度，抵抗普通女巫攻击同化
+        # 产生高信誉玩家主导的主基准梯度
         g_ref = g_ref_weighted_sum / total_trust_score
         
-        # 【模拟 Root G】 理想情况下应该有一个服务器私密的清洗良好的微型数据集测算
-        # 如果没有独立数据集做测试，则使用刚刚汇聚出得加权共识作为真理衡量标准
+        # 理想情况下有一个 Root Dataset 算出的 g_root，此处仍以 g_ref 模拟
         g_root = g_ref
         
         all_s_contents = []
@@ -143,94 +130,91 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         for cid, data in client_data_map.items():
             g_k = data["flat_update"]
             
-            # 衡量方向：与大众基准方向的一致程度
-            norm_k = np.linalg.norm(g_k) + 1e-9
-            norm_ref = np.linalg.norm(g_ref) + 1e-9
-            cos_sim_ref = np.dot(g_k, g_ref) / (norm_k * norm_ref)
-            # 使用 sqrt(ReLU) 抑制负向并激励正向
-            s_consist = math.sqrt(max(0.0, cos_sim_ref))
-            
-            # 衡量贡献度：与代表模型演进正确客观方向的角度
-            cos_sim_root = np.dot(g_k, g_root) / (norm_k * np.linalg.norm(g_root) + 1e-9)
-            s_contrib = math.sqrt(max(0.0, cos_sim_root))
-            
-            if cos_sim_root > 0: round_positive_sims.append(cos_sim_root)
-            
-            # 双向几何平均数成为这一轮其提供的单纯“纯净的内容质量分” (不含资历情感)
-            s_content = math.sqrt(s_consist * s_contrib)
+            # 使用提取的 ContributionValidator 计算开根号映射后的实力分
+            s_content, cos_root = self.contribution_validator.evaluate_content_score(g_k, g_ref, g_root)
             data["s_content"] = s_content
+            
+            if cos_root > 0:
+                round_positive_sims.append(cos_root)
             all_s_contents.append(s_content)
 
         # ==========================================================
-        # 步骤 3: 历史演进模块 (History Evolution)
+        # 步骤 3: 双流演进 —— History 更新 与 RawScore 生成
         # ==========================================================
         mu_avg = np.mean(all_s_contents) if all_s_contents else 0.0
         sigma_scale = np.std(all_s_contents) + 1e-6
         
-        # 调用分离出的 trust_manager 获取最终包含历史偏见的超级权重：CompositeWeight
-        client_updates_for_manager = {cid: {"s_content": d["s_content"], "s_trust": d["trust_score"]} for cid, d in client_data_map.items()}
-        raw_scores = self.trust_manager.update_history_and_get_weight(client_updates_for_manager, mu_avg, sigma_scale)
+        # 3.1 Stream A: 更新节点长期历史 (只关注客观 ContentScore)
+        client_updates = {cid: d["s_content"] for cid, d in client_data_map.items()}
+        self.trust_manager.update_history(client_updates, mu_avg, sigma_scale)
         
-        # 将原始计算积分做 Softmax 或线性占比标准化缩放
-        total_raw = sum(raw_scores.values()) + 1e-9
-        composite_weights = {cid: rs / total_raw for cid, rs in raw_scores.items()}
+        # 3.2 Stream B: 综合计算绝对评分 RawScore (Trust, Content, History 连乘)
+        for cid, data in client_data_map.items():
+            data["raw_score"] = self.trust_manager.calculate_raw_score(
+                cid, data["trust_score"], data["s_content"]
+            )
 
         # ==========================================================
-        # 步骤 4: 分层差异化鲁棒聚合 (Layer-differentiated Aggregation)
+        # 步骤 4: 分层差异化鲁棒聚合与 L2-Norm裁剪
         # ==========================================================
-        # 取样本架构以计算敏感度地图
         sample_weights = next(iter(client_data_map.values()))["weights"]
-        layer_sensitivities = calculate_layer_sensitivity(sample_weights)
-        inclusion_thresholds = calculate_inclusion_threshold(layer_sensitivities)
+        
+        # 基于逐层结构计算基准层权重 g_ref_layers
+        g_ref_layers = []
+        for i in range(len(sample_weights)):
+            layer_sum = sum(data["weights"][i] * data["trust_score"] for data in client_data_map.values())
+            g_ref_layers.append(layer_sum / total_trust_score)
+
+        # 获取三维层级敏感度指纹与动态门槛
+        layer_sensitivities = calculate_layer_sensitivities(client_data_map, g_ref_layers)
         
         valid_results = []
-        aggregated_ndarrays = None
+        aggregated_ndarrays = [np.zeros_like(layer) for layer in sample_weights]
+        
+        # 遍历每层对幸存者进行局部聚合
+        for l_idx, layer_sens in enumerate(layer_sensitivities):
+            threshold_l = layer_sens["inclusion_threshold"]
+            clip_target = layer_sens["clip_target"]
+            
+            # 第一阶段过滤器：寻找能够越过这一层门槛的 VIP 玩家集合
+            survivors = []
+            for cid, data in client_data_map.items():
+                if data["raw_score"] >= threshold_l:
+                    survivors.append(cid)
+            
+            if not survivors:
+                continue
+                
+            # 第二次归一化：重算该层剩余幸存者的权重和，以防分母缺失导致的步长衰减
+            sum_raw_survivors = sum(client_data_map[cid]["raw_score"] for cid in survivors) + 1e-9
+            
+            for cid in survivors:
+                data = client_data_map[cid]
+                # 重新计算在这一层该人的分量
+                normalized_weight_l = data["raw_score"] / sum_raw_survivors
+                
+                layer_grad = data["weights"][l_idx]
+                norm_layer = np.linalg.norm(layer_grad)
+                
+                # 动态 L2-Norm 裁剪机制：若该层极其关键 (敏感分极高导致 clip target 很低)，重手一刀剪切！
+                scale = max(1.0, norm_layer / clip_target)
+                clipped_grad = layer_grad / scale
+                
+                aggregated_ndarrays[l_idx] += clipped_grad * normalized_weight_l
 
+        # 生成日志
         for cid, data in client_data_map.items():
-            cw = composite_weights[cid]
             fit_res = data["fit_res"]
-            original_weights = data["weights"]
-            tee_id = data["tee_id"]
-            
-            filtered_ndarrays = []
-            dropped = 0
-            
-            # 按层（Layer by Layer）对矩阵块进行拦截与吸收
-            for l_idx, layer in enumerate(original_weights):
-                threshold_l = inclusion_thresholds[l_idx]
-                if cw >= threshold_l:
-                    # 你的模型综合权力达到了该层参数的修改要求 -> 放行，按你的权力吸收
-                    filtered_ndarrays.append(layer * cw)
-                else:
-                    # 你的权力太低、或者本层过于深远重要 -> 无情丢弃该层所有贡献，置0阻塞该用户的该层传导
-                    dropped += 1
-                    filtered_ndarrays.append(np.zeros_like(layer))
-                    
-            # 加和进主全局累加器
-            if aggregated_ndarrays is None:
-                aggregated_ndarrays = list(filtered_ndarrays)
-            else:
-                aggregated_ndarrays = [a + b for a, b in zip(aggregated_ndarrays, filtered_ndarrays)]
-            
-            fit_res.parameters = ndarrays_to_parameters(filtered_ndarrays)
+            fit_res.parameters = ndarrays_to_parameters(data["weights"])
             valid_results.append((data["client_proxy"], fit_res))
             
-            # 日志汇报：能清晰在后端看到谁的哪些深层参数更新被扣除了
-            h_perf = self.trust_manager.history[cid]["ema_score"]
-            status_icon = "✅" if cw > 1e-4 else "❌"
-            
-            client_logs.append(f"    🌟 [积分] 纯净贡献={data['s_content']:.3f} | 历史口碑={h_perf:.3f} | 统合话语权={cw:.3f}")
-            if dropped > 0:
-                client_logs.append(f"    📄 [Client {cid}] TEE: {tee_id[:8]}.. | {status_icon} 低于核心门限，已拦截 {dropped}/{len(original_weights)} 层高敏参数")
-            else:
-                client_logs.append(f"    📄 [Client {cid}] TEE: {tee_id[:8]}.. | {status_icon} 优质节点，通过全层聚合信任验证")
+            h_perf = self.trust_manager.fetch_history(cid)
+            client_logs.append(f"    🌟 [积分] 纯净贡献={data['s_content']:.3f} | 历史口碑={h_perf:.3f} | 综合绝对权力={data['raw_score']:.3f}")
 
+        # 将已经手工合并的结果赋值
         self.audit_logger.log_batch(client_logs)
         self.contribution_validator.update_threshold_stats(round_positive_sims)
-        self.audit_logger.log(f"🛡️  [TMAA Server] 圆满完成差异化聚合策略. 选定人数 ({len(valid_results)}).")
+        self.audit_logger.log(f"🛡️  [TMAA Server] 圆满完成层级二次归一化与动态截断聚合. 选定人数 ({len(valid_results)}).")
 
-        # 将已完成聚合的矩阵块返回给系统执行下一轮全局广播
-        if aggregated_ndarrays is not None:
-            return ndarrays_to_parameters(aggregated_ndarrays), {}
-        else:
-            return super().aggregate_fit(server_round, valid_results, failures)
+        return ndarrays_to_parameters(aggregated_ndarrays), {}
+
