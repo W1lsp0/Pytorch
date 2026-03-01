@@ -164,26 +164,27 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         # ==================================================================
         # 生成高信誉玩家主导的参考梯度方向
         g_ref = g_ref_weighted_sum / total_trust_score
-
+        
         # 注: 理想情况下 g_root 应由服务端的 Root Dataset 独立计算
         # 此处以加权共识梯度作为替代
         g_root = g_ref
-
+        
         all_s_contents: List[float] = []
         round_positive_sims: List[float] = []
 
-        for cid, data in client_data_map.items():
-            g_k = data["flat_update"]
+        # 批量进行成对参数比较、贡献度计算与调和融合
+        batch_results = self.contribution_validator.evaluate_batch_content_scores(client_data_map, g_root)
 
-            # 计算开根号映射后的纯净内容实力分
-            s_content, cos_root = self.contribution_validator.evaluate_content_score(
-                g_k, g_ref, g_root
-            )
-            data["s_content"] = s_content
-
+        for cid, score_dict in batch_results.items():
+            # 存入每个客户端的数据图
+            client_data_map[cid]["s_content"] = score_dict["s_content"]
+            client_data_map[cid]["s_contrib"] = score_dict["s_contrib"]
+            client_data_map[cid]["s_consist"] = score_dict["s_consist"]
+            
+            cos_root = score_dict["cos_root"]
             if cos_root > 0:
                 round_positive_sims.append(cos_root)
-            all_s_contents.append(s_content)
+            all_s_contents.append(score_dict["s_content"])
 
         # ==================================================================
         # 阶段 3：双流正交演进
@@ -278,13 +279,15 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             h_perf = self.trust_manager.fetch_history(cid)
             client_logs.append(
                 f"    🌟 [Client {cid}] "
-                f"贡献={data['s_content']:.3f} | "
-                f"信誉={h_perf:.3f} | "
-                f"综合={data['raw_score']:.4f}"
+                f"S_contrib={data.get('s_contrib', 0.0):.3f} | S_consist={data.get('s_consist', 0.0):.3f} | "
+                f"S_content={data['s_content']:.3f} | "
+                f"Hist={h_perf:.3f} | "
+                f"Raw={data['raw_score']:.4f}"
             )
 
         self.audit_logger.log_batch(client_logs)
-        self.contribution_validator.update_threshold_stats(round_positive_sims)
+        # 暂不需要在这一步处理历史统计记录
+        # self.contribution_validator.update_threshold_stats(round_positive_sims)
         self.audit_logger.log(
             f"🛡️  [TMAA Server] 第 {server_round} 轮聚合完成 | "
             f"存活节点: {len(valid_results)} | 拦截: {rejected_count}"
