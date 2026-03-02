@@ -17,8 +17,11 @@
 ==============================================================================
 """
 
+import os
+import json
 import math
-from typing import Dict, Tuple
+import mysql.connector
+from typing import Dict, Tuple, List
 
 
 class TrustScoreManager:
@@ -42,7 +45,15 @@ class TrustScoreManager:
         self.beta = beta
         self.gamma = gamma
 
-        # ---- 历史信誉持久化存储 ----
+        # ---- 历史信誉持久化存储 (MySQL) ----
+        self.db_config = {
+            'host': "59.67.152.211",
+            'port': 3306,
+            'user': "root",
+            'password': "root123456",
+            'database': "tmaa_simulation",
+            'raise_on_warnings': False
+        }
         # 结构: { client_id: {"ema_score": float, "rounds": int} }
         self.history: Dict[str, dict] = {}
 
@@ -50,10 +61,118 @@ class TrustScoreManager:
         # 0.7 表示 70% 继承历史口碑，30% 吸收本轮竞争信号
         self.ema_decay = 0.7
 
+        # ---- 黑名单与淘汰超参数 ----
+        self.prune_threshold = 0.1  # τ: 死亡线，跌破此值永久封禁
+        self.blacklist = set()
+
         # ---- 指数衰减惩罚超参数 ----
         self.lambda_penalty = 5.0   # λ: 惩罚强度系数
         self.tau_tolerance = 0.1    # τ: 容忍基线（低于此值的异常不惩罚）
         self.rho_exponent = 2.0     # ρ: 断崖指数（≥2 时形成几何级惩罚）
+
+        # ---- 从本地恢复历史状态 ----
+        self._load_state()
+
+    def _get_connection(self):
+        """获取 MySQL 数据库连接"""
+        return mysql.connector.connect(**self.db_config)
+
+    def _init_db(self) -> None:
+        """初始化 MySQL 数据库表结构"""
+        try:
+            # 先连 Server，确保 Database 存在
+            init_cfg = self.db_config.copy()
+            del init_cfg['database']
+            cnx = mysql.connector.connect(**init_cfg)
+            cursor = cnx.cursor()
+            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.db_config['database']}")
+            cursor.close()
+            cnx.close()
+            
+            # 再连 Database 建表
+            cnx = self._get_connection()
+            cursor = cnx.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS server_history_pool (
+                    client_id VARCHAR(50) PRIMARY KEY,
+                    ema_score FLOAT NOT NULL,
+                    rounds INT NOT NULL
+                ) ENGINE=InnoDB COMMENT='服务端信誉池';
+            ''')
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS server_blacklist (
+                    client_id VARCHAR(50) PRIMARY KEY,
+                    reason VARCHAR(255)
+                ) ENGINE=InnoDB COMMENT='服务端封禁名单';
+            ''')
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+        except mysql.connector.Error as err:
+            print(f"⚠️ [TrustManager] 初始化 MySQL 表结构失败: {err}")
+
+    def _load_state(self) -> None:
+        """从 MySQL 数据库加载历史信誉池和黑名单"""
+        self._init_db()
+        try:
+            cnx = self._get_connection()
+            cursor = cnx.cursor(dictionary=True)
+            
+            # 加载 history
+            cursor.execute("SELECT client_id, ema_score, rounds FROM server_history_pool")
+            for row in cursor.fetchall():
+                self.history[row['client_id']] = {"ema_score": row['ema_score'], "rounds": row['rounds']}
+            
+            # 加载 blacklist
+            cursor.execute("SELECT client_id FROM server_blacklist")
+            for row in cursor.fetchall():
+                self.blacklist.add(row['client_id'])
+                
+            cursor.close()
+            cnx.close()
+        except Exception as e:
+            print(f"⚠️ [TrustManager] 读取 MySQL 失败: {e}，将使用内存空状态。")
+            self.history = {}
+            self.blacklist = set()
+
+    def _save_state(self) -> None:
+        """将当前历史信誉池和黑名单持久化到 MySQL 数据库中"""
+        try:
+            cnx = self._get_connection()
+            cursor = cnx.cursor()
+            
+            # 更新 history (使用 ON DUPLICATE KEY UPDATE)
+            history_data = [
+                (cid, data["ema_score"], data["rounds"]) 
+                for cid, data in self.history.items()
+            ]
+            if history_data:
+                cursor.executemany(
+                    """
+                    INSERT INTO server_history_pool (client_id, ema_score, rounds) 
+                    VALUES (%s, %s, %s)
+                    ON DUPLICATE KEY UPDATE
+                    ema_score=VALUES(ema_score), rounds=VALUES(rounds)
+                    """, 
+                    history_data
+                )
+            
+            # 更新 blacklist (仅插入防重复)
+            blacklist_data = [(cid, "pruned_by_low_score") for cid in self.blacklist]
+            if blacklist_data:
+                cursor.executemany(
+                    """
+                    INSERT IGNORE INTO server_blacklist (client_id, reason) 
+                    VALUES (%s, %s)
+                    """, 
+                    blacklist_data
+                )
+            
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+        except Exception as e:
+            print(f"⚠️ [TrustManager] 写入 MySQL 失败: {e}")
 
     # ==================================================================
     # 第一阶段：设备完整性评估（硬门禁 + 软感知）
@@ -121,9 +240,8 @@ class TrustScoreManager:
         """
         获取节点的历史信誉得分。
 
-        冷启动策略：
-            首次参与的新节点返回中立值 0.5（不奖不罚），
-            避免新节点因缺乏历史数据而被过度惩罚或偏袒。
+        如果节点在黑名单中，将提前在 Strategy 拦截。此处的 fetch 仅作调用防御。
+        对于首轮冷启动节点，返回中立偏下的 0.5（预热期保护）。
 
         参数:
             client_id: 客户端标识符
@@ -131,6 +249,9 @@ class TrustScoreManager:
         返回:
             HistPerf 信誉分 ∈ [0, 1]
         """
+        if client_id in self.blacklist:
+            return 0.0
+
         if client_id not in self.history:
             return 0.5
         return self.history[client_id]["ema_score"]
@@ -177,6 +298,13 @@ class TrustScoreManager:
             self.history[cid]["ema_score"] = hist_new
             self.history[cid]["rounds"] += 1
 
+            # 步骤 4: 动态熔断判定（Pruning）
+            if hist_new < self.prune_threshold:
+                self.blacklist.add(cid)
+
+        # 全局状态持久化落盘
+        self._save_state()
+
     # ==================================================================
     # 第三阶段：综合绝对评分生成（三维指数乘积）
     # ==================================================================
@@ -189,7 +317,7 @@ class TrustScoreManager:
             RawScore = (TrustScore)^α × (ContentScore)^β × (HistPerf)^γ
 
         设计要点：
-            - 使用已更新后的 HistPerf（本轮 update_history 之后的值）
+            - 使用上一轮的 HistPerf_k(t-1) 作为资历加成，不包含本轮新表现
             - α=3.0 使低信任节点的 RawScore 急剧趋零（安全门控）
             - γ=0.5 使历史分的影响被开方压缩（避免老资历独大）
 

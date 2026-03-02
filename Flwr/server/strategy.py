@@ -100,6 +100,12 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         for client, fit_res in results:
             cid = client.cid
 
+            # ---- 阶段 0：黑名单绝对屏障拦截 ----
+            if cid in self.trust_manager.blacklist:
+                rejected_count += 1
+                client_logs.append(f"    ⛔ [Client {cid}] 黑名单拦截: 该节点已被系统永久清退")
+                continue
+
             # ---- 解析安全报告 ----
             report = {}
             if "trust_report_json" in fit_res.metrics:
@@ -192,15 +198,15 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         mu_avg = float(np.mean(all_s_contents)) if all_s_contents else 0.0
         sigma_scale = float(np.std(all_s_contents)) + 1e-6
 
-        # ---- Stream A: 更新历史信誉（仅基于纯净 ContentScore） ----
-        content_scores = {cid: d["s_content"] for cid, d in client_data_map.items()}
-        self.trust_manager.update_history(content_scores, mu_avg, sigma_scale)
-
-        # ---- Stream B: 计算综合绝对评分 RawScore ----
+        # ---- Stream B: 计算综合绝对评分 RawScore (使用旧资历 t-1) ----
         for cid, data in client_data_map.items():
             data["raw_score"] = self.trust_manager.calculate_raw_score(
                 cid, data["trust_score"], data["s_content"]
             )
+
+        # ---- Stream A: 更新历史信誉（仅基于纯净 ContentScore，生成新历史 t） ----
+        content_scores = {cid: d["s_content"] for cid, d in client_data_map.items()}
+        self.trust_manager.update_history(content_scores, mu_avg, sigma_scale)
 
         # ==================================================================
         # 阶段 4：分层差异化鲁棒聚合
