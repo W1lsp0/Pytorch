@@ -47,11 +47,11 @@ class TrustScoreManager:
 
         # ---- 历史信誉持久化存储 (MySQL) ----
         self.db_config = {
-            'host': "59.67.152.211",
+            'host': "202.113.76.179",
             'port': 3306,
             'user': "root",
             'password': "root123456",
-            'database': "tmaa_simulation",
+            'database': "tmaa_server",
             'raise_on_warnings': False
         }
         # 结构: { client_id: {"ema_score": float, "rounds": int} }
