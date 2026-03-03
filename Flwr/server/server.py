@@ -94,9 +94,9 @@ def weighted_average(metrics: List[Tuple[int, Metrics]]) -> Metrics:
 strategy = TMAA_FedAvg(
     fraction_fit=1.0,                      # 每轮采样 100% 的可用客户端参与训练
     fraction_evaluate=1.0,                 # 每轮采样 100% 的可用客户端参与评估
-    min_fit_clients=10,                     # 每轮至少请求 10 个客户端
-    min_evaluate_clients=10,                # 每轮至少请求 10 个客户端
-    min_available_clients=10,               # 启动训练前等待至少 10 个客户端连接
+    min_fit_clients=20,                     # 每轮至少请求 20 个客户端
+    min_evaluate_clients=20,                # 每轮至少请求 20 个客户端
+    min_available_clients=20,               # 启动训练前等待至少 20 个客户端连接
     
     evaluate_metrics_aggregation_fn=weighted_average,  # 配置聚合函数
     on_fit_config_fn=get_on_fit_config_fn,            # 配置下发函数
@@ -104,7 +104,7 @@ strategy = TMAA_FedAvg(
 
 
 # ==================== 启动服务器 ====================
-def main():
+def main(server_address="0.0.0.0:8080"):
     # 原子输出 (防止多线程交错)
     print("\n".join([
         "",
@@ -113,18 +113,22 @@ def main():
         "╠" + "═"*60 + "╣",
         f"║  📦 模型架构: ResNet-18{' '*38}║",
         f"║  📊 数据集:   CIFAR-10{' '*38}║",
-        f"║  🔗 监听地址: 0.0.0.0:8080{' '*35}║",
-        f"║  🔄 训练轮次: 20 Rounds{' '*38}║",
+        f"║  🔗 监听地址: {server_address.ljust(18)}{' '*28}║",
+        f"║  🔄 训练轮次: 50 Rounds{' '*38}║",
         "╚" + "═"*60 + "╝",
         ""
     ]))
 
     # 启动 Flower 服务器 (阻塞运行)
     fl.server.start_server(
-        server_address="0.0.0.0:8080",
-        config=fl.server.ServerConfig(num_rounds=3),
+        server_address=server_address,
+        config=fl.server.ServerConfig(num_rounds=50),
         strategy=strategy
     )
 
 if __name__ == "__main__":
-    main()
+    import argparse
+    parser = argparse.ArgumentParser(description="Flower Server")
+    parser.add_argument("--server_address", type=str, default="0.0.0.0:8080", help="Server address.")
+    args = parser.parse_args()
+    main(args.server_address)

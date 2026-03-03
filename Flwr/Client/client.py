@@ -182,7 +182,7 @@ class MyClient(fl.client.NumPyClient):
         start_time = time.time()
         # [Capture History] 捕获训练过程数据
         # [Updated] Pass tmaa_agent for Phase Signals
-        train_history = train(self.net, self.trainloader, epochs=1, device=DEVICE, tmaa_agent=self.tmaa_agent) 
+        train_history = train(self.net, self.trainloader, epochs=3, device=DEVICE, tmaa_agent=self.tmaa_agent) 
         duration = time.time() - start_time
         logger.info(f"✅ 本地训练完成 (耗时: {duration:.2f}s)")
 
@@ -246,7 +246,8 @@ class MyClient(fl.client.NumPyClient):
         # 3. 返回训练结果
         # Metrics Payload: 将 TMAA 报告打包回传给服务器
         metrics_payload = {
-            "trust_report_json": json.dumps(trust_package)
+            "trust_report_json": json.dumps(trust_package),
+            "real_client_id": CLIENT_ID
         }
         
         return self.get_parameters(config={}), len(self.trainloader.dataset), metrics_payload

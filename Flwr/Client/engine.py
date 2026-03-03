@@ -20,7 +20,8 @@ def train(
     Returns: history (Dict containing 'loss' and 'grad_norm' lists per epoch)
     """
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
+    # 降低学习率至 0.001：在联邦 Non-IID 且有强力 TMAA 裁剪下，过大的 lr 会导致步长太大被不断惩罚，从而无法收敛
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     net.train()
     
     logger.info(f"    🏋️  开始本地训练 (Epochs: {epochs})...")

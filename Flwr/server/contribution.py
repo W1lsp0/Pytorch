@@ -77,10 +77,13 @@ class ContributionValidator:
             norm_k = float(np.linalg.norm(g_k)) + 1e-9
             norms[cid] = norm_k
             
-            # 计算与黄金梯度的夹角 (S_contrib)
+            # 计算与黄金梯度的夹角
+            # 采用仿射变换将 [-1, 1] 映射到 [0, 1]，防止极度 Non-IID (正交或微负) 直接被一刀切成 0
             cos_root = float(np.dot(g_k, g_root) / (norm_k * norm_root))
+            print(f"[DEBUG SIM] CID: {cid[:5]} | norm_k: {norm_k:.4f} | norm_root: {norm_root:.4f} | cos_root: {cos_root:.6f}", flush=True)
             cos_root_map[cid] = cos_root
-            s_contrib_map[cid] = math.sqrt(max(0.0, cos_root))
+            shifted_cos = (cos_root + 1.0) / 2.0
+            s_contrib_map[cid] = math.sqrt(max(0.0, shifted_cos))
             
         # 如果只有一个客户端，无法计算成对一致性，直接 fallback 为 S_contrib
         if n_clients == 1:
@@ -118,8 +121,9 @@ class ContributionValidator:
                 # Pairwise Cosine Similarity
                 sim_k_j = float(np.dot(g_k, g_j) / (norm_k * norm_j))
                 
-                # 仅认可正向对齐，且利用对方的 TrustScore 作为“投票权重”
-                weighted_sim_sum += trust_j * max(0.0, sim_k_j)
+                # 采用仿射变换保证非极端对立的 Non-IID 客户端仍有基础分数支撑
+                shifted_sim_k_j = (sim_k_j + 1.0) / 2.0
+                weighted_sim_sum += trust_j * shifted_sim_k_j
                 trust_sum_others += trust_j
                 
             # 计算加权共识并进行根号映射

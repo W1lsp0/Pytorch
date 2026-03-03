@@ -52,11 +52,12 @@ def get_resnet18(num_classes: int = 10) -> nn.Module:
     """
 
     # ======================== 步骤 1: 加载基础模型 ========================
-    # 创建标准 ResNet-18 结构 (无预训练权重)
-    net = models.resnet18(weights=None)
+    from torchvision.models import ResNet18_Weights
+    # 使用预训练权重加速收敛，特别是在联邦 Non-IID 且梯度被严厉裁剪的情况下
+    net = models.resnet18(weights=ResNet18_Weights.DEFAULT)
     
     print("┌" + "─" * 58 + "┐")
-    print("│  🏗️  正在构建 CIFAR-10 适配版 ResNet-18 模型...             │")
+    print("│  🏗️  正在构建 CIFAR-10 适配版 ResNet-18 模型 (Pretrained)...  │")
     print("└" + "─" * 58 + "┘")
 
     # ======================== 步骤 2: 适配首层卷积 ========================
