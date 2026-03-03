@@ -57,18 +57,15 @@ class TrustScoreManager:
         # 结构: { client_id: {"ema_score": float, "rounds": int} }
         self.history: Dict[str, dict] = {}
 
-        # ---- EMA 衰减系数 ----
-        # 0.7 表示 70% 继承历史口碑，30% 吸收本轮竞争信号
-        self.ema_decay = 0.7
-
-        # ---- 黑名单与淘汰超参数 ----
-        self.prune_threshold = 0.1  # τ: 死亡线，跌破此值永久封禁
-        self.blacklist = set()
-
-        # ---- 指数衰减惩罚超参数 ----
+        # ---- 超参数设定 ----
+        self.prune_threshold = 0.2  # τ: 死亡线，跌破此值永久封禁 (调整至 0.2，避免误杀极端 Non-IID 节点)
+        self.ema_decay = 0.8        # β: EMA 平滑系数，越小对新表现越敏感
         self.lambda_penalty = 5.0   # λ: 惩罚强度系数
         self.tau_tolerance = 0.1    # τ: 容忍基线（低于此值的异常不惩罚）
         self.rho_exponent = 2.0     # ρ: 断崖指数（≥2 时形成几何级惩罚）
+
+        # ---- 黑名单 ----
+        self.blacklist = set()
 
         # ---- 从本地恢复历史状态 ----
         self._load_state()

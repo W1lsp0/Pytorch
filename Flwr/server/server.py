@@ -114,7 +114,7 @@ def main(server_address="0.0.0.0:8080"):
         f"║  📦 模型架构: ResNet-18{' '*38}║",
         f"║  📊 数据集:   CIFAR-10{' '*38}║",
         f"║  🔗 监听地址: {server_address.ljust(18)}{' '*28}║",
-        f"║  🔄 训练轮次: 50 Rounds{' '*38}║",
+        f"║  🔄 训练轮次: 30 Rounds{' '*38}║",
         "╚" + "═"*60 + "╝",
         ""
     ]))
@@ -122,7 +122,7 @@ def main(server_address="0.0.0.0:8080"):
     # 启动 Flower 服务器 (阻塞运行)
     fl.server.start_server(
         server_address=server_address,
-        config=fl.server.ServerConfig(num_rounds=50),
+        config=fl.server.ServerConfig(num_rounds=30),
         strategy=strategy
     )
 

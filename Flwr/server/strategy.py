@@ -375,7 +375,11 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             short_cid = f"Client {real_id}"
             
             # 高亮显示被拒绝过的或者是被极为严重裁剪的 (考虑到预训练权重的范数放大，阈值放宽到 20.0 倍)
-            flag = "⚠️" if exc > 0 or avg_scale > 20.0 else "✅"
+            # 修复: 只有当一轮中大部分层被拒绝，或者平均 Scale 裁剪极其严重时才打警告
+            # 否则像 Client 10 这种正常 Non-IID 只是极少数特征层离群，不该被标记为 ⚠️
+            is_warn = (exc > inc * 2) or (avg_scale > 20.0) 
+            flag = "⚠️" if is_warn else "✅"
+            
             audit_panel.append(
                 f"    │  {flag} {short_cid:<11} | Inc: {inc:03d} | Exc: {exc:02d} | Scale: {avg_scale:6.2f}x{' '*6}│"
             )
