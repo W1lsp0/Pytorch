@@ -84,8 +84,11 @@ class TrustScoreManager:
         self.risk_soft_rounds = 5
         self.risk_soft_probe_floor = 0.35
         self.risk_soft_trigger_floor = 0.40
+        self.risk_soft_pixel_floor = 0.55
         self.risk_soft_grad_floor = 0.20
         self.risk_soft_peer_floor = 0.32
+        self.risk_soft_min_hits = 2
+        self.risk_soft_relief_margin = 0.04
         self.risk_hard_threshold = 0.90
         self.risk_hard_rounds = 4
         self.risk_hard_min_probe_streak = 2
@@ -1032,18 +1035,30 @@ class TrustScoreManager:
             else:
                 entry["c2_drift_combo_streak"] = max(0, entry["c2_drift_combo_streak"] - 1)
 
-            soft_evidence = (
-                probe_risk >= self.risk_soft_probe_floor
-                or trigger_risk >= self.risk_soft_trigger_floor
-                or grad_risk >= self.risk_soft_grad_floor
-                or sign_risk >= 0.12
-                or peer_effective >= self.risk_soft_peer_floor
-                or bool(entry.get("c2_seeded", False))
+            soft_hit_count = (
+                int(probe_risk >= self.risk_soft_probe_floor)
+                + int(trigger_risk >= self.risk_soft_trigger_floor)
+                + int(pixel_risk >= self.risk_soft_pixel_floor)
+                + int(grad_risk >= self.risk_soft_grad_floor)
+                + int(sign_risk >= 0.12)
+                + int(peer_effective >= self.risk_soft_peer_floor)
             )
-            if risk_new > self.risk_soft_threshold and soft_evidence:
+            soft_strong = (
+                bool(entry.get("c2_seeded", False))
+                or trigger_risk >= self.risk_soft_trigger_floor
+                or pixel_risk >= self.risk_soft_pixel_floor
+            )
+            soft_gate = soft_strong or soft_hit_count >= self.risk_soft_min_hits
+
+            if risk_new > self.risk_soft_threshold and soft_gate:
                 entry["risk_soft_streak"] += 1
             else:
-                entry["risk_soft_streak"] = max(0, entry["risk_soft_streak"] - 1)
+                decay_step = 2 if (
+                    risk_new < (self.risk_soft_threshold - self.risk_soft_relief_margin)
+                    and soft_hit_count == 0
+                    and not soft_strong
+                ) else 1
+                entry["risk_soft_streak"] = max(0, entry["risk_soft_streak"] - decay_step)
             entry["risk_isolated"] = entry["risk_soft_streak"] >= self.risk_soft_rounds
 
             hard_evidence = (
