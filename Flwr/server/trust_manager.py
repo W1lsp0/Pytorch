@@ -92,7 +92,8 @@ class TrustScoreManager:
         self.risk_soft_blacklist_cross_floor = 0.60
         self.risk_soft_blacklist_probe_rounds = 4
         self.risk_soft_blacklist_pixel_rounds = 3
-        self.risk_soft_blacklist_trigger_rounds = 3
+        # 低误杀加严：仅对触发器通道缩短连续告警轮数，其它通道保持不变
+        self.risk_soft_blacklist_trigger_rounds = 2
         self.risk_soft_blacklist_peer_rounds = 3
 
         # =========== 动态平衡参数 ===========

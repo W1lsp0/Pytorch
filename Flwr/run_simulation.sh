@@ -87,7 +87,8 @@ fi
 echo "-------------------------------------------"
 echo "🔵 正在启动服务器 (GPU 0)..."
 # 服务器占用显存极少，与 C0-C3 共享 GPU 0
-CUDA_VISIBLE_DEVICES=0 "$PYTHON_BIN" server/server.py --server_address=$SERVER_ADDRESS > log/server.log 2>&1 &
+ENABLE_KNOWN_TRIGGER_PROBE=1 HEAVY_PROBE_ROTATE_MOD=1 CUDA_VISIBLE_DEVICES=0 \
+"$PYTHON_BIN" server/server.py --server_address=$SERVER_ADDRESS > log/server.log 2>&1 &
 SERVER_PID=$!
 echo "   服务器 PID: $SERVER_PID"
 echo "   正在等待服务器初始化..."
