@@ -396,8 +396,8 @@ class DataInspector:
         init_loss = calc_initial_loss(net, dataloader, self.device)
 
         # Report Generation - [Added] Differential Privacy
-        # To satisfy Privacy-Preserving Data Audit, add Laplacian noise to scalar outputs
-        epsilon = 20.0 # Privacy budget
+        # Set epsilon very high to essentially disable Laplace noise for debugging and stability
+        epsilon = 1000.0 # Privacy budget
         label_dist_noisy = {}
         counts = Counter(all_labels)
         for k in range(10): # basic CIFAR10 assumption
@@ -431,6 +431,11 @@ class DataInspector:
         print(f"    │  • 唯一性 (Uniqueness): {report['uniqueness_ratio']:.4f} (1.0=Unique){' '*8}│")
         print(f"    │  • 初始损失 (Loss):     {report['initial_loss']:.4f}{' '*23}│")
         print(f"    │  • 后门聚类分数:        {report['backdoor_score']:.4f}{' '*23}│")
+        
+        cq = report.get('cluster_quality', {})
+        if isinstance(cq, dict) and 'separability_ratio' in cq:
+            print(f"    │  • 特征聚类别离度:      {cq['separability_ratio']:.4f}{' '*23}│")
+            
         if report['suspected_backdoor_class'] != -1:
             print(f"    │    ⚠️ 疑似后门类别:     Class {report['suspected_backdoor_class']}{' '*24}│")
         print(f"    └{'─'*52}┘")

@@ -66,6 +66,10 @@ def train(
             running_loss += loss.item()
             batch_count += 1
             
+            # 释放训练显存残影避免卡死
+            del outputs
+            del loss
+            
             # [Phase Signal] Batch End -> Loading next batch
             if tmaa_agent: tmaa_agent.set_phase("Loading")
         
@@ -109,6 +113,11 @@ def test(
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
+            
+            # 释放推理图显存残影
+            del outputs
+            
+    torch.cuda.empty_cache()
             
     avg_loss = loss / len(testloader.dataset) if len(testloader.dataset) else 0.0
     accuracy = correct / total if total else 0.0

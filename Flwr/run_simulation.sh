@@ -15,10 +15,15 @@
 
 set -e
 
+# 屏蔽 gRPC 中频繁出现的 fork() 线程警告
+export GRPC_ENABLE_FORK_SUPPORT=0
+export GRPC_POLL_STRATEGY=epoll1
+
 # ================= 配置 =================
 SERVER_ADDRESS="0.0.0.0:8080"
 TOTAL_CLIENTS=20
 USE_SIMULATION=1  # 启用基于数据库的 L4 模拟监控
+PYTHON_BIN="/data1/anaconda3/envs/W1lsp0/bin/python"
 
 # 确保在正确目录
 cd "$(dirname "$0")"
@@ -48,13 +53,41 @@ echo "   - 日志目录: ./log/"
 # 清理 MySQL 历史记录库
 echo "-------------------------------------------"
 echo "🚮 正在清空 tmaa_server 历史数据库..."
-mysql -h 202.113.76.179 -P 3306 -u root -proot123456 -e "DROP DATABASE IF EXISTS tmaa_server;" || echo "数据库清理失败，将尝试继续执行"
+if ! "$PYTHON_BIN" - <<'PY'
+import sys
+
+try:
+    import mysql.connector
+except Exception as exc:
+    print(f"无法导入 mysql.connector: {exc}")
+    sys.exit(1)
+
+try:
+    cnx = mysql.connector.connect(
+        host="202.113.76.179",
+        port=3306,
+        user="root",
+        password="root123456",
+    )
+    cursor = cnx.cursor()
+    cursor.execute("DROP DATABASE IF EXISTS tmaa_server;")
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    print("数据库清理成功")
+except Exception as exc:
+    print(f"数据库清理失败: {exc}")
+    sys.exit(1)
+PY
+then
+    echo "数据库清理失败，将尝试继续执行"
+fi
 
 # 1. 启动服务器 (GPU 0)
 echo "-------------------------------------------"
 echo "🔵 正在启动服务器 (GPU 0)..."
 # 服务器占用显存极少，与 C0-C3 共享 GPU 0
-CUDA_VISIBLE_DEVICES=0 /data1/anaconda3/envs/W1lsp0/bin/python server/server.py --server_address=$SERVER_ADDRESS > log/server.log 2>&1 &
+CUDA_VISIBLE_DEVICES=0 "$PYTHON_BIN" server/server.py --server_address=$SERVER_ADDRESS > log/server.log 2>&1 &
 SERVER_PID=$!
 echo "   服务器 PID: $SERVER_PID"
 echo "   正在等待服务器初始化..."
@@ -73,22 +106,22 @@ echo "🔴 正在启动恶意客户端 (C0-C3) -> GPU 0..."
 # Client 0: 标签翻转
 echo "   [C0] 恶意 (Label Flip) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=0 ATTACK_TYPE=label_flip POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-/data1/anaconda3/envs/W1lsp0/bin/python Client/client.py > log/client_0.log 2>&1 &
+"$PYTHON_BIN" Client/client.py > log/client_0.log 2>&1 &
 
 # Client 1: 后门攻击
 echo "   [C1] 恶意 (Backdoor) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=1 ATTACK_TYPE=backdoor POISON_RATE=0.2 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-/data1/anaconda3/envs/W1lsp0/bin/python Client/client.py > log/client_1.log 2>&1 &
+"$PYTHON_BIN" Client/client.py > log/client_1.log 2>&1 &
 
 # Client 2: 干净标签
 echo "   [C2] 恶意 (Clean Label) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=2 ATTACK_TYPE=clean_label POISON_RATE=0.5 TARGET_LABEL=0 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-/data1/anaconda3/envs/W1lsp0/bin/python Client/client.py > log/client_2.log 2>&1 &
+"$PYTHON_BIN" Client/client.py > log/client_2.log 2>&1 &
 
 # Client 3: 语义攻击
 echo "   [C3] 恶意 (Semantic) -> GPU 0"
 CUDA_VISIBLE_DEVICES=0 CLIENT_ID=3 ATTACK_TYPE=semantic POISON_RATE=0.5 TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-/data1/anaconda3/envs/W1lsp0/bin/python Client/client.py > log/client_3.log 2>&1 &
+"$PYTHON_BIN" Client/client.py > log/client_3.log 2>&1 &
 
 sleep 2
 
@@ -111,7 +144,7 @@ do
    
    echo "   [C$i] Assigner: $GROUP_NAME -> GPU $GPU_ID"
    CUDA_VISIBLE_DEVICES=$GPU_ID CLIENT_ID=$i ATTACK_TYPE=none TOTAL_CLIENTS=$TOTAL_CLIENTS USE_SIMULATION=$USE_SIMULATION \
-   /data1/anaconda3/envs/W1lsp0/bin/python Client/client.py > log/client_$i.log 2>&1 &
+   "$PYTHON_BIN" Client/client.py > log/client_$i.log 2>&1 &
    
    # 每启动 4 个暂停一下，避免冲击
    if [ $(( (i+1) % 4 )) -eq 0 ]; then
@@ -129,7 +162,7 @@ echo "-------------------------------------------"
 echo "📺 查看实时仪表板:"
 echo "   1. 打开一个新的终端窗口"
 echo "   2. 进入此目录"
-echo "   3. 运行: python dashboard.py"
+echo "   3. 运行: $PYTHON_BIN dashboard.py"
 echo "-------------------------------------------"
 echo ""
 echo "按 Ctrl+C 停止所有进程。"

@@ -28,7 +28,6 @@
 ==============================================================================
 """
 
-import math
 import numpy as np
 from typing import List, Tuple, Dict
 
@@ -42,6 +41,8 @@ class ContributionValidator:
         # 调和融合倾斜超参数：β = 2.0，意味着 S_contrib 的权重是 S_consist 的 4 倍
         self.beta_fusion = 2.0
         self.beta_sq = self.beta_fusion ** 2
+        # 平移映射后的非线性压制强度（>1 会压低低相似度节点的分数底座）
+        self.shift_power = 1.2
 
     def evaluate_batch_content_scores(self, client_data_map: Dict[str, dict], g_root: np.ndarray) -> Dict[str, dict]:
         """
@@ -78,12 +79,15 @@ class ContributionValidator:
             norms[cid] = norm_k
             
             # 计算与黄金梯度的夹角
-            # 采用仿射变换将 [-1, 1] 映射到 [0, 1]，防止极度 Non-IID (正交或微负) 直接被一刀切成 0
+            # 在中后期，由于维度灾难和收敛，梯度会趋于正交 (cos_root ≈ 0.0)
             cos_root = float(np.dot(g_k, g_root) / (norm_k * norm_root))
             print(f"[DEBUG SIM] CID: {cid[:5]} | norm_k: {norm_k:.4f} | norm_root: {norm_root:.4f} | cos_root: {cos_root:.6f}", flush=True)
             cos_root_map[cid] = cos_root
-            shifted_cos = (cos_root + 1.0) / 2.0
-            s_contrib_map[cid] = math.sqrt(max(0.0, shifted_cos))
+            
+            # [Fix Dimensionality Curse Shift]
+            # 放弃激进的抛物线压根映射，改用更带容忍度的软线性映射：
+            # cos=1 -> 1.0, cos=0 -> 0.6 (容忍正交), cos=-1 -> 0.2
+            s_contrib_map[cid] = max(0.0, 0.6 + 0.4 * cos_root)
             
         # 如果只有一个客户端，无法计算成对一致性，直接 fallback 为 S_contrib
         if n_clients == 1:
@@ -96,6 +100,27 @@ class ContributionValidator:
                 "cos_root": cos_root_map[cid]
             }
             return result_map
+
+        # --- 临时植入的 PCA 降维探针 (Method 1) ---
+        try:
+            from sklearn.decomposition import PCA
+            
+            # 将所有 flat_update 堆叠为一个大矩阵 (N_clients, M_features)
+            X = np.stack([client_data_map[c]["flat_update"] for c in cids])
+            if n_clients >= 2:
+                # 提取前两个主成分
+                pca = PCA(n_components=2)
+                X_pca = pca.fit_transform(X)
+                
+                print(f"\n{'='*25} 🔍 PCA 特征主成分映射探测面板 {'='*25}", flush=True)
+                for i, cid in enumerate(cids):
+                    # 尝试读取真实的映射 ID 以方便人类观察
+                    real_id = client_data_map[cid].get("real_client_id", str(cid)[:5])
+                    print(f"    🌌 [Client {real_id:>2}]  |  PCA-1: {X_pca[i, 0]:10.4f}  |  PCA-2: {X_pca[i, 1]:10.4f}", flush=True)
+                print(f"{'='*76}\n", flush=True)
+        except Exception as e:
+            print(f"⚠️ PCA 降维探测执行失败: {e}", flush=True)
+        # ----------------------------------------
 
         # ------------------------------------------------------------------
         # Step 1: 构建参数级成对相似度矩阵并计算 Trust-Weighted Consistency
@@ -121,18 +146,18 @@ class ContributionValidator:
                 # Pairwise Cosine Similarity
                 sim_k_j = float(np.dot(g_k, g_j) / (norm_k * norm_j))
                 
-                # 采用仿射变换保证非极端对立的 Non-IID 客户端仍有基础分数支撑
-                shifted_sim_k_j = (sim_k_j + 1.0) / 2.0
+                # 同理使用软补偿防止正交引发分崩离析 (0.6 底座)
+                shifted_sim_k_j = max(0.0, 0.6 + 0.4 * sim_k_j)
                 weighted_sim_sum += trust_j * shifted_sim_k_j
                 trust_sum_others += trust_j
                 
-            # 计算加权共识并进行根号映射
+            # 计算加权共识
             if trust_sum_others > 0:
                 raw_consist = weighted_sim_sum / trust_sum_others
             else:
                 raw_consist = 0.0
                 
-            s_consist_map[cid_k] = math.sqrt(max(0.0, raw_consist))
+            s_consist_map[cid_k] = raw_consist
 
         # ------------------------------------------------------------------
         # Step 2: 效用主导的非对称调和融合 (Asymmetric Harmonic Fusion)

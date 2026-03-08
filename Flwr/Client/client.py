@@ -197,7 +197,7 @@ class MyClient(fl.client.NumPyClient):
                 layer_updates.append(diff)
         
         # 将层级更新幅度加入元数据，供 TMAA 审计
-        # logger.info(f"    📏 Layer Updates: {[round(x, 4) for x in layer_updates[:5]]}...")
+        logger.info(f"    📏 Layer Updates: {[round(x, 4) for x in layer_updates[-5:]]}...")
         # ========================================================================================================
 
         # ====================== [New Feature] 本地模型攻击效果评估 ======================

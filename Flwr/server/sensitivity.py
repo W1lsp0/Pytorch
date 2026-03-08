@@ -64,8 +64,8 @@ def calculate_layer_sensitivities(client_data_map: dict,
     weight_privacy = 0.3    # 隐私维度融合权重 α
     weight_utility = 0.4    # 效用维度融合权重 β
     weight_security = 0.3   # 安全维度融合权重 γ
-    mu_base = 0.3           # 准入门槛基线（最低质量保障）
-    lambda_coef = 0.5       # 敏感度对门槛的放大系数
+    mu_base = 0.05          # 准入门槛基线（最低质量保障，降低以适应晚期衰减）
+    lambda_coef = 0.15      # 敏感度对门槛的放大系数（平滑以避免层级误杀）
     c_base = 2.0            # 裁剪基线常数
 
     for l_idx in range(total_layers):

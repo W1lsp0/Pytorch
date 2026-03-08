@@ -27,6 +27,105 @@ import sys
 # 导入模块化组件
 from strategy import TMAA_FedAvg
 
+# ==================== 训练配置 ====================
+NUM_ROUNDS = 30
+EVAL_BATCH_SIZE = 64
+
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Subset
+import torchvision
+import torchvision.transforms as transforms
+
+# ==================== (SCHEME D) 预加载服务器端纯净验证集 ====================
+print("📥 [Server] 正在从本地或者网络拉取 CIFAR-10 防御级纯净验证集...", flush=True)
+
+transform_test = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
+
+testset = torchvision.datasets.CIFAR10(
+    root='./data', train=False, download=True, transform=transform_test
+)
+
+# ==================== (SCHEME D) 预加载服务器端绝对平衡验证集 ====================
+# 这里不仅抽取 500 张，更是要保证 0-9 每一个类别精确抽取 50 张！
+proxy_indices = []
+class_counts = {i: 0 for i in range(10)}
+
+if hasattr(testset, 'targets'):
+    targets = testset.targets
+else:
+    # 针对部分老版本属性兼容
+    targets = [y for _, y in testset]
+
+for idx, label in enumerate(targets):
+    if class_counts[label] < 50:
+        proxy_indices.append(idx)
+        class_counts[label] += 1
+    # 当 10 个类目各凑齐 50 个时停止搜寻
+    if all(count == 50 for count in class_counts.values()):
+        break
+
+clean_proxy_testset = Subset(testset, proxy_indices)
+
+# 创建 DataLoader 以备后续进行前向推理
+proxy_testloader = DataLoader(
+    clean_proxy_testset, 
+    batch_size=EVAL_BATCH_SIZE, 
+    shuffle=False, 
+    num_workers=2, 
+    pin_memory=True
+)
+print(f"✅ [Server] 纯净验证集挂载完毕! 样本数量: {len(proxy_testloader.dataset)}", flush=True)
+
+# ==================== (SCHEME G) 预加载对抗探针验证集 (Noisy Probes) ====================
+print("📥 [Server] 正在构建 Scheme G 主动探针数据集 (Noisy Probes)...", flush=True)
+
+# 我们增加一个自定义的 Transform，用于在图片上叠加强烈的空间噪声，破坏自然流形
+class AddGaussianNoise(object):
+    def __init__(self, mean=0., std=1.5):
+        self.std = std
+        self.mean = mean
+        
+    def __call__(self, tensor):
+        return tensor + torch.randn(tensor.size()) * self.std + self.mean
+
+transform_noisy_probe = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    AddGaussianNoise(0., 2.0) # 施加极强的局部高斯噪声以触发异常神经元
+])
+
+# 重新加载相同 500 张图片的 Subset，但是带上受损的 transform
+noisy_testset = torchvision.datasets.CIFAR10(
+    root='./data', train=False, download=False, transform=transform_noisy_probe
+)
+noisy_proxy_testset = Subset(noisy_testset, proxy_indices)
+
+noisy_probe_loader = DataLoader(
+    noisy_proxy_testset, 
+    batch_size=EVAL_BATCH_SIZE, 
+    shuffle=False, 
+    num_workers=2, 
+    pin_memory=True
+)
+print(f"✅ [Server] 探针验证集(Noisy Probes)构建完毕! 激进噪声比: std=2.0", flush=True)
+
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'Client'))
+try:
+    from model import get_resnet18
+except ImportError:
+    pass
+
+# 借用 Client 端一模一样的 ResNet-18 结构以匹配 [64,3,3,3] 的 conv1_weight
+base_net = get_resnet18()
+base_net.fc = nn.Linear(base_net.fc.in_features, 10)  # CIFAR-10 是 10 分类
+# ==================================================================================
+
 # ==================== 解决 Windows 中文乱码问题 ====================
 if sys.platform.startswith('win'):
     try:
@@ -100,6 +199,13 @@ strategy = TMAA_FedAvg(
     
     evaluate_metrics_aggregation_fn=weighted_average,  # 配置聚合函数
     on_fit_config_fn=get_on_fit_config_fn,            # 配置下发函数
+    
+    # [Scheme D] 注入服务器验证代理所需的神器
+    proxy_net=base_net,
+    proxy_testloader=proxy_testloader,
+    
+    # [Scheme G] 注入探测用的受损探测集
+    noisy_probe_loader=noisy_probe_loader
 )
 
 
@@ -114,7 +220,7 @@ def main(server_address="0.0.0.0:8080"):
         f"║  📦 模型架构: ResNet-18{' '*38}║",
         f"║  📊 数据集:   CIFAR-10{' '*38}║",
         f"║  🔗 监听地址: {server_address.ljust(18)}{' '*28}║",
-        f"║  🔄 训练轮次: 30 Rounds{' '*38}║",
+        f"║  🔄 训练轮次: {NUM_ROUNDS} Rounds{' '*38}║",
         "╚" + "═"*60 + "╝",
         ""
     ]))
@@ -122,7 +228,7 @@ def main(server_address="0.0.0.0:8080"):
     # 启动 Flower 服务器 (阻塞运行)
     fl.server.start_server(
         server_address=server_address,
-        config=fl.server.ServerConfig(num_rounds=30),
+        config=fl.server.ServerConfig(num_rounds=NUM_ROUNDS),
         strategy=strategy
     )
 

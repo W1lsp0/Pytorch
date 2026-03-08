@@ -91,12 +91,13 @@ def load_data(
             size=10000, image_size=(3, 32, 32), num_classes=10, transform=transform_test
         )
 
-    # ======================== 3. 数据划分策略 (Hybrid Non-IID) ========================
-    # 策略: 混合异构分布 (Hybrid Heterogeneity)
+    # ======================== 3. 数据划分策略 (Hybrid Non-IID + Shared Pool) ========================
+    # 策略: 混合异构分布 + 公共基础池保底
     # Total Clients: 20
-    # Group A (0-9, IID):    前 50% 数据 (25,000张) -> 均匀分配
-    # Group B (10-14, Mod):  中 25% 数据 (12,500张) -> Dirichlet (alpha=1.0)
-    # Group C (15-19, Ext):  后 25% 数据 (12,500张) -> Dirichlet (alpha=0.1)
+    # Shared Pool (全体共享): 前 10% 数据 (5,000张) -> 每人都有，保证基础类别覆盖
+    # Group A (0-9, IID):    接下来的 22,500张 -> 均匀分配
+    # Group B (10-14, Mod):  接下来的 11,250张 -> Dirichlet (alpha=1.0)
+    # Group C (15-19, Ext):  最后的 11,250张 -> Dirichlet (alpha=0.1)
     
     num_train = len(trainset)
     # 获取全部标签 (用于 Dirichlet 分布计算)
@@ -111,9 +112,10 @@ def load_data(
     rand_perm = torch.randperm(num_train, generator=g_cpu).numpy()
     
     # 2. 划分数据池
-    pool_A_indices = rand_perm[:25000]      # 25000 for 10 clients
-    pool_B_indices = rand_perm[25000:37500] # 12500 for 5 clients
-    pool_C_indices = rand_perm[37500:]      # 12500 for 5 clients
+    pool_shared_indices = rand_perm[:5000]          # 5000 for all clients
+    pool_A_indices = rand_perm[5000:27500]          # 22500 for 10 clients
+    pool_B_indices = rand_perm[27500:38750]         # 11250 for 5 clients
+    pool_C_indices = rand_perm[38750:]              # 11250 for 5 clients
     
     client_indices = []
 
@@ -145,36 +147,37 @@ def load_data(
 
         return idx_batch
 
-    # 3. 分配给当前 Client
+    # 3. 分配给当前 Client 专属部分
+    exclusive_indices = []
     if 0 <= client_id <= 9:
         # Group A (IID): Uniform Split
-        # 简单均分 pool_A
         N_A = len(pool_A_indices)
         size = N_A // 10
         start = client_id * size
         end = start + size
-        client_indices = pool_A_indices[start:end].tolist()
+        exclusive_indices = pool_A_indices[start:end].tolist()
         group_name = "Group A (IID)"
         
     elif 10 <= client_id <= 14:
         # Group B (Moderate Non-IID): Dirichlet alpha=1.0
-        # 需要确定性地生成所有 clients 的 partition，然后取自己的
-        # 使用特定种子保证所有 Client 进程计算结果一致
         partitions_B = partition_dirichlet(pool_B_indices, all_labels, 5, alpha=1.0, seed=202410)
-        client_indices = partitions_B[client_id - 10]
+        exclusive_indices = partitions_B[client_id - 10]
         group_name = "Group B (Moderate alpha=1.0)"
         
     elif 15 <= client_id <= 19:
         # Group C (Extreme Non-IID): Dirichlet alpha=0.1
         partitions_C = partition_dirichlet(pool_C_indices, all_labels, 5, alpha=0.1, seed=202415)
-        client_indices = partitions_C[client_id - 15]
+        exclusive_indices = partitions_C[client_id - 15]
         group_name = "Group C (Extreme alpha=0.1)"
         
     else:
         raise ValueError(f"Client ID {client_id} out of range (0-19)")
     
+    # 将公共基础池合并到该客户端的数据中
+    client_indices = pool_shared_indices.tolist() + exclusive_indices
+
     print(f"│  ✂️  数据划分: {group_name}                                        │\n" +
-          f"│     样本数量: {len(client_indices)} 张图片                                     │")
+          f"│     样本数量: {len(client_indices)} 张 (含公共池 5000 张)                    │")
     
     # 统计类别分布 (可选)
     subset_labels = all_labels[client_indices]
