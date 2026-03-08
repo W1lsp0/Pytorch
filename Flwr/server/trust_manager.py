@@ -80,10 +80,17 @@ class TrustScoreManager:
         self.risk_ema_decay = 0.85
         self.risk_report_weight = 0.30
         self.risk_grad_weight = 0.70
-        self.risk_soft_threshold = 0.60
-        self.risk_soft_rounds = 4
+        self.risk_soft_threshold = 0.64
+        self.risk_soft_rounds = 5
+        self.risk_soft_probe_floor = 0.35
+        self.risk_soft_trigger_floor = 0.40
+        self.risk_soft_grad_floor = 0.20
+        self.risk_soft_peer_floor = 0.32
         self.risk_hard_threshold = 0.90
         self.risk_hard_rounds = 4
+        self.risk_hard_min_probe_streak = 2
+        self.risk_hard_min_trigger_streak = 1
+        self.risk_hard_peer_confirm_floor = 0.70
         self.risk_raw_attenuation_power = 1.0
         # 仅当多通道强异常同时出现时，才允许 instant_risk 直接拉满到 1.0
         self.risk_instant_confirm_threshold = 0.90
@@ -95,6 +102,28 @@ class TrustScoreManager:
         # 低误杀加严：仅对触发器通道缩短连续告警轮数，其它通道保持不变
         self.risk_soft_blacklist_trigger_rounds = 2
         self.risk_soft_blacklist_peer_rounds = 3
+        # [Dual-Channel] C1: 触发器亲和快封通道（针对明确 trigger 异常）
+        self.c1_fast_track_trigger_floor = 0.62
+        self.c1_fast_track_probe_floor = 0.45
+        self.c1_fast_track_risk_floor = 0.62
+        self.c1_fast_track_rounds = 2
+        # [Dual-Channel] C2: 漂移组合封禁通道（针对 trigger 不显著但长期漂移异常）
+        self.c2_combo_probe_floor = 0.42
+        self.c2_combo_peer_floor = 0.24
+        self.c2_combo_grad_floor = 0.35
+        self.c2_combo_trigger_ceiling = 0.35
+        self.c2_combo_pixel_ceiling = 0.65
+        self.c2_combo_risk_floor = 0.55
+        self.c2_combo_rounds = 5
+        # C2 种子：仅允许“早期触发器异常”或“极端 probe+peer+grad 组合”进入 C2 通道
+        self.c2_seed_trigger_floor = 0.52
+        self.c2_seed_probe_floor = 0.98
+        self.c2_seed_peer_floor = 0.28
+        self.c2_seed_grad_floor = 0.20
+        self.c2_seed_round_window = 8
+        # peer 风险联动闸门：无其他证据时抑制 peer 单通道拉满，减少大面积误判
+        self.peer_gate_margin = 0.12
+        self.peer_solo_suppress_threshold = 0.25
 
         # =========== 动态平衡参数 ===========
 
@@ -141,6 +170,12 @@ class TrustScoreManager:
                 "peer_alert_streak": 0,
                 "peer_risk_ema": 0.0,
                 "last_peer_risk": 0.0,
+                "c1_trigger_combo_streak": 0,
+                "c2_drift_combo_streak": 0,
+                "c2_probe_streak": 0,
+                "c2_peer_streak": 0,
+                "c2_grad_streak": 0,
+                "c2_seeded": False,
                 "any_soft_streak": 0,
             }
         else:
@@ -159,6 +194,12 @@ class TrustScoreManager:
             entry.setdefault("peer_alert_streak", 0)
             entry.setdefault("peer_risk_ema", 0.0)
             entry.setdefault("last_peer_risk", 0.0)
+            entry.setdefault("c1_trigger_combo_streak", 0)
+            entry.setdefault("c2_drift_combo_streak", 0)
+            entry.setdefault("c2_probe_streak", 0)
+            entry.setdefault("c2_peer_streak", 0)
+            entry.setdefault("c2_grad_streak", 0)
+            entry.setdefault("c2_seeded", False)
             entry.setdefault("any_soft_streak", 0)
         return self.history[client_id]
 
@@ -448,6 +489,9 @@ class TrustScoreManager:
                 "peer_risk_ema": 1.0,
                 "peer_alert_streak": self.risk_soft_blacklist_peer_rounds,
                 "last_peer_risk": 1.0,
+                "c1_trigger_combo_streak": self.c1_fast_track_rounds,
+                "c2_drift_combo_streak": self.c2_combo_rounds,
+                "c2_seeded": True,
             }
         entry = self._ensure_history_entry(client_id)
         return {
@@ -458,6 +502,9 @@ class TrustScoreManager:
             "peer_risk_ema": float(entry.get("peer_risk_ema", 0.0)),
             "peer_alert_streak": int(entry.get("peer_alert_streak", 0)),
             "last_peer_risk": float(entry.get("last_peer_risk", 0.0)),
+            "c1_trigger_combo_streak": int(entry.get("c1_trigger_combo_streak", 0)),
+            "c2_drift_combo_streak": int(entry.get("c2_drift_combo_streak", 0)),
+            "c2_seeded": bool(entry.get("c2_seeded", False)),
         }
 
     def _compute_tail_risk(
@@ -840,6 +887,21 @@ class TrustScoreManager:
             peer_risk_ema = 0.70 * peer_risk_prev + 0.30 * peer_risk_raw
             entry["last_peer_risk"] = peer_risk_raw
             entry["peer_risk_ema"] = peer_risk_ema
+            # peer 仅作“怀疑加权”，不允许在缺乏其他证据时单通道拉满
+            primary_non_peer = max(
+                report_risk,
+                grad_risk,
+                probe_risk,
+                temporal_risk,
+                spectral_risk,
+                pixel_risk,
+                trigger_risk,
+                sign_risk,
+            )
+            peer_effective = min(peer_risk_ema, primary_non_peer + self.peer_gate_margin)
+            if primary_non_peer < self.peer_solo_suppress_threshold:
+                peer_effective *= 0.60
+            peer_effective = self._clip01(peer_effective)
             
             p_msg = f"    🔎 [Client {cid}] H_base={client_entropy:.4f} {shield_status} | "
             p_msg += f"Probe_H={probe_entropy:.4f}(Risk={probe_risk:.2f}) | "
@@ -847,7 +909,7 @@ class TrustScoreManager:
             p_msg += f"S_top1={top1_ratio:.4f}(Risk={spectral_risk:.2f}) | "
             p_msg += f"Pix(mu={pixel_mean_val:.4f},std={pixel_std_val:.4f},Risk={pixel_risk:.2f}) | "
             p_msg += f"Trig(BR={trigger_br_val:.3f},TL={trigger_tl_val:.3f},Risk={trigger_risk:.2f}) | "
-            p_msg += f"Sign={sign_risk:.2f} | Peer={peer_risk_ema:.2f}"
+            p_msg += f"Sign={sign_risk:.2f} | Peer={peer_risk_ema:.2f}->{peer_effective:.2f}"
             print(p_msg)
                 
             # Using Max to ensure independent anomalous signals trigger risk
@@ -860,20 +922,28 @@ class TrustScoreManager:
                 pixel_risk,
                 trigger_risk,
                 sign_risk,
-                peer_risk_ema,
+                peer_effective,
             )
             instant_risk = self._clip01(max(channel_risks))
             strong_signal_count = sum(
                 1 for rv in channel_risks if rv >= self.risk_instant_confirm_threshold
             )
             cross_channel_peak = max(
-                report_risk, grad_risk, temporal_risk, spectral_risk, trigger_risk, sign_risk, peer_risk_ema
+                report_risk, grad_risk, temporal_risk, spectral_risk, trigger_risk, sign_risk, peer_effective
             )
 
             # [EMA 贯穿打击] 
             # 如果捕捉到了极其确凿的 1.0 满格死刑（如 信心断层 探出的微型后门），
             # 必须立刻打破 EMA 的动量缓冲，否则在它被缓慢隔离前，后门毒素就会污染全局模型！
-            if instant_risk >= 0.99 and strong_signal_count >= self.risk_instant_confirm_channels:
+            instant_kill_switch = (
+                instant_risk >= 0.99
+                and strong_signal_count >= self.risk_instant_confirm_channels
+                and (
+                    trigger_risk >= self.c2_seed_trigger_floor
+                    or probe_risk >= self.c2_seed_probe_floor
+                )
+            )
+            if instant_kill_switch:
                 risk_new = 1.0
             else:
                 risk_new = self.risk_ema_decay * risk_prev + (1.0 - self.risk_ema_decay) * instant_risk
@@ -896,21 +966,125 @@ class TrustScoreManager:
             else:
                 entry["peer_alert_streak"] = 0
 
-            if risk_new > self.risk_soft_threshold:
+            # [Dual-Channel C2 Seed] 仅早期出现过明确异常种子的节点，才允许走 C2 漂移封禁
+            if not entry.get("c2_seeded", False):
+                early_round = int(entry.get("rounds", 0)) <= self.c2_seed_round_window
+                seed_by_trigger = trigger_risk >= self.c2_seed_trigger_floor
+                seed_by_extreme_drift = (
+                    probe_risk >= self.c2_seed_probe_floor
+                    and peer_effective >= self.c2_seed_peer_floor
+                    and grad_risk >= self.c2_seed_grad_floor
+                )
+                if early_round and (seed_by_trigger or seed_by_extreme_drift):
+                    entry["c2_seeded"] = True
+                    print(
+                        f"    🧬 [Client {cid}] C2 Seed Armed | trig={trigger_risk:.2f} "
+                        f"| probe={probe_risk:.2f} | peer={peer_effective:.2f} | grad={grad_risk:.2f}"
+                    )
+
+            # [Dual-Channel C1] 触发器快封：高熵 + 持续触发器异常 + probe/risk 联动
+            c1_hit = (
+                client_entropy > 0.95
+                and trigger_risk >= self.c1_fast_track_trigger_floor
+                and (
+                    probe_risk >= self.c1_fast_track_probe_floor
+                    or entry["probe_alert_streak"] >= 2
+                )
+                and risk_new >= self.c1_fast_track_risk_floor
+            )
+            if c1_hit:
+                entry["c1_trigger_combo_streak"] += 1
+            else:
+                entry["c1_trigger_combo_streak"] = 0
+
+            # [Dual-Channel C2] 漂移组合：高熵节点在 probe/peer/grad 通道出现持续耦合漂移
+            c2_enabled = bool(entry.get("c2_seeded", False))
+            peer_signal = max(peer_effective, peer_risk_raw)
+            c2_probe_hit = c2_enabled and client_entropy > 0.95 and probe_risk >= self.c2_combo_probe_floor
+            c2_peer_hit = c2_enabled and client_entropy > 0.95 and peer_signal >= self.c2_combo_peer_floor
+            c2_grad_hit = c2_enabled and client_entropy > 0.95 and (
+                grad_risk >= self.c2_combo_grad_floor or sign_risk >= 0.15
+            )
+
+            if c2_probe_hit:
+                entry["c2_probe_streak"] += 1
+            else:
+                entry["c2_probe_streak"] = max(0, entry["c2_probe_streak"] - 1)
+
+            if c2_peer_hit:
+                entry["c2_peer_streak"] += 1
+            else:
+                entry["c2_peer_streak"] = max(0, entry["c2_peer_streak"] - 1)
+
+            if c2_grad_hit:
+                entry["c2_grad_streak"] += 1
+            else:
+                entry["c2_grad_streak"] = max(0, entry["c2_grad_streak"] - 1)
+
+            c2_hit_count = int(c2_probe_hit) + int(c2_peer_hit) + int(c2_grad_hit)
+            if (
+                c2_hit_count >= 2
+                and trigger_risk <= self.c2_combo_trigger_ceiling
+                and pixel_risk <= self.c2_combo_pixel_ceiling
+                and risk_new >= (self.c2_combo_risk_floor - 0.06)
+            ):
+                entry["c2_drift_combo_streak"] += 1
+            else:
+                entry["c2_drift_combo_streak"] = max(0, entry["c2_drift_combo_streak"] - 1)
+
+            soft_evidence = (
+                probe_risk >= self.risk_soft_probe_floor
+                or trigger_risk >= self.risk_soft_trigger_floor
+                or grad_risk >= self.risk_soft_grad_floor
+                or sign_risk >= 0.12
+                or peer_effective >= self.risk_soft_peer_floor
+                or bool(entry.get("c2_seeded", False))
+            )
+            if risk_new > self.risk_soft_threshold and soft_evidence:
                 entry["risk_soft_streak"] += 1
             else:
-                entry["risk_soft_streak"] = 0
+                entry["risk_soft_streak"] = max(0, entry["risk_soft_streak"] - 1)
             entry["risk_isolated"] = entry["risk_soft_streak"] >= self.risk_soft_rounds
 
-            if risk_new > self.risk_hard_threshold:
+            hard_evidence = (
+                entry["probe_alert_streak"] >= self.risk_hard_min_probe_streak
+                or entry["trigger_alert_streak"] >= self.risk_hard_min_trigger_streak
+                or (
+                    peer_effective >= self.risk_hard_peer_confirm_floor
+                    and (grad_risk >= 0.25 or sign_risk >= 0.15)
+                )
+            )
+            if risk_new > self.risk_hard_threshold and hard_evidence:
                 entry["risk_hard_streak"] += 1
             else:
-                entry["risk_hard_streak"] = 0
+                entry["risk_hard_streak"] = max(0, entry["risk_hard_streak"] - 1)
 
             if entry["risk_hard_streak"] >= self.risk_hard_rounds:
                 self._mark_blacklist(
                     cid,
                     f"risk_ema_above_{self.risk_hard_threshold:.2f}_for_{self.risk_hard_rounds}_rounds",
+                )
+            elif (
+                cid not in self.blacklist
+                and entry["c1_trigger_combo_streak"] >= self.c1_fast_track_rounds
+            ):
+                self._mark_blacklist(
+                    cid,
+                    f"c1_trigger_combo_for_{self.c1_fast_track_rounds}_rounds",
+                )
+            elif (
+                cid not in self.blacklist
+                and entry["c2_drift_combo_streak"] >= self.c2_combo_rounds
+                and entry["c2_probe_streak"] >= max(3, self.c2_combo_rounds - 2)
+                and (
+                    entry["c2_peer_streak"] >= max(2, self.c2_combo_rounds - 3)
+                    or entry["c2_grad_streak"] >= max(2, self.c2_combo_rounds - 3)
+                )
+                and risk_new >= self.c2_combo_risk_floor
+            ):
+                self._mark_blacklist(
+                    cid,
+                    f"c2_drift_combo_for_{self.c2_combo_rounds}_rounds",
                 )
             elif (
                 cid not in self.blacklist

@@ -685,6 +685,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
         # 当基线样本不足时，再回退到全体 EXPOSED heavy-probed 节点
         # ==================================================================
         exposed_probe_values = []
+        exposed_probe_records = []  # (probe_loss, risk_ema_prev, cid)
         clean_baseline_values = []
         baseline_risk_cap = max(0.40, self.heavy_probe_min_risk - 0.05)
         for cid, d in client_data_map.items():
@@ -698,10 +699,34 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             exposed_probe_values.append(probe_val)
 
             risk_prev = self.trust_manager._safe_float(d.get("risk_ema_prev", 0.0))
+            exposed_probe_records.append((probe_val, risk_prev, cid))
             if risk_prev <= baseline_risk_cap:
                 clean_baseline_values.append(probe_val)
 
-        baseline_values = clean_baseline_values if len(clean_baseline_values) >= 4 else exposed_probe_values
+        baseline_values = []
+        source_tag = "InsufficientSamples"
+        mad_k = 1.2
+
+        if len(clean_baseline_values) >= 4:
+            baseline_values = clean_baseline_values
+            source_tag = "CleanBaseline"
+            mad_k = 1.2
+        elif len(exposed_probe_records) >= 4:
+            # 无低风险纯净样本时，改用“低风险分位”回退，避免可疑样本抬高门限。
+            # 这比直接使用 Exposed 全体更稳，且对 C2 类持续漂移更敏感。
+            low_quantile = 0.35
+            take_n = max(4, int(round(len(exposed_probe_records) * low_quantile)))
+            low_risk_subset = sorted(exposed_probe_records, key=lambda x: x[1])[:take_n]
+            baseline_values = [x[0] for x in low_risk_subset]
+            source_tag = f"LowRiskQuantile({take_n}/{len(exposed_probe_records)})"
+            mad_k = 1.0
+        elif len(exposed_probe_values) >= 3:
+            # 极端小样本兜底：仅使用下半区，避免全量回退放大污染。
+            sorted_vals = sorted(exposed_probe_values)
+            half_n = max(3, len(sorted_vals) // 2)
+            baseline_values = sorted_vals[:half_n]
+            source_tag = "LowerHalfFallback"
+            mad_k = 1.0
 
         if len(baseline_values) >= 3:
             import statistics
@@ -710,14 +735,17 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             # MAD = Median(|x_i - median|)
             mad_val = statistics.median([abs(v - median_val) for v in sorted_vals])
             # 动态门限 = 中位数 + k * MAD
-            dynamic_threshold = median_val + 1.2 * max(mad_val, 0.05)  # 保底 0.05 防止 MAD=0
+            dynamic_threshold = median_val + mad_k * max(mad_val, 0.04)
+            # 再加一层上限保护，避免 Exposed 样本整体漂移把阈值抬得过高。
+            if exposed_probe_values:
+                p75_cap = float(np.percentile(exposed_probe_values, 75)) + 0.12
+                dynamic_threshold = min(dynamic_threshold, p75_cap)
             self.trust_manager._probe_outlier_threshold = dynamic_threshold
             self.trust_manager._probe_round_median = median_val
             self.trust_manager._probe_round_mad = mad_val
-            source_tag = "CleanBaseline" if baseline_values is clean_baseline_values else "ExposedFallback"
             self.audit_logger.log(
                 f"    📊 [Scheme J] 动态离群门限: Median={median_val:.4f} | MAD={mad_val:.4f} | "
-                f"Threshold={dynamic_threshold:.4f} | Source={source_tag} "
+                f"Threshold={dynamic_threshold:.4f} | Source={source_tag} | k={mad_k:.2f} "
                 f"(Clean={len(clean_baseline_values)}, Exposed={len(exposed_probe_values)})"
             )
         else:
