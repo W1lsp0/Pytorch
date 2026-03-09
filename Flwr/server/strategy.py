@@ -823,25 +823,48 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
 
         # ==================================================================
         # 阶段 4：分层差异化鲁棒聚合
+        # 规则：软隔离/风险隔离节点本轮不参与参数聚合（但保留状态跟踪，后续可恢复）
         # ==================================================================
-        sample_weights = next(iter(client_data_map.values()))["weights"]
+        isolated_for_aggregation = {
+            cid for cid in client_data_map
+            if self.trust_manager.is_risk_isolated(cid) or self.trust_manager.is_soft_isolated(cid)
+        }
+        active_agg_client_map = {
+            cid: data for cid, data in client_data_map.items() if cid not in isolated_for_aggregation
+        }
+
+        if isolated_for_aggregation:
+            isolated_real_ids = sorted(
+                [str(client_data_map[cid].get("real_client_id", str(cid)[:5])) for cid in isolated_for_aggregation],
+                key=lambda x: int(x) if x.isdigit() else x
+            )
+            self.audit_logger.log(
+                f"    🚧 聚合隔离: 本轮排除 {len(isolated_for_aggregation)} 个软隔离节点，不参与参数聚合 "
+                f"(Client IDs: {','.join(isolated_real_ids)})"
+            )
+
+        if not active_agg_client_map:
+            self.audit_logger.log("    ❌ 参数聚合中止: 本轮全部节点处于软隔离/风险隔离。")
+            return None, {}
+
+        sample_weights = next(iter(active_agg_client_map.values()))["weights"]
         num_layers = len(sample_weights)
 
         # ---- 计算逐层参考梯度（信任加权） ----
         g_ref_layers = []
         layer_trust_sum = (
-            sum(data["trust_score"] for data in client_data_map.values()) + 1e-9
+            sum(data["trust_score"] for data in active_agg_client_map.values()) + 1e-9
         )
         for i in range(num_layers):
             layer_sum = sum(
                 data["weights"][i] * data["trust_score"]
-                for data in client_data_map.values()
+                for data in active_agg_client_map.values()
             )
             g_ref_layers.append(layer_sum / layer_trust_sum)
 
         # ---- 获取三维层级敏感度指纹 ----
         layer_sensitivities = calculate_layer_sensitivities(
-            client_data_map, g_ref_layers
+            active_agg_client_map, g_ref_layers
         )
 
         # 初始化全局聚合累加器（全零，强制浮点型以避免累加时类型转换失败）
@@ -859,7 +882,7 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             # 步骤 1: 筛选幸存者集合 Φ^l
             # 只有绝对分 RawScore ≥ 该层门槛的节点才有资格参与聚合
             survivors = [
-                cid for cid, data in client_data_map.items()
+                cid for cid, data in active_agg_client_map.items()
                 if data["raw_score"] >= threshold_l
             ]
 
@@ -875,12 +898,12 @@ class TMAA_FedAvg(fl.server.strategy.FedAvg):
             # 步骤 2: 二次归一化（解决分母缺失问题）
             # 被淘汰节点的权重不会凭空消失，幸存者自动填补，权重总和恢复为 1
             sum_raw_survivors = sum(
-                client_data_map[cid]["raw_score"] for cid in survivors
+                active_agg_client_map[cid]["raw_score"] for cid in survivors
             ) + 1e-9
 
             # 步骤 3: 对每个幸存者执行动态裁剪并加权累加
             for cid in survivors:
-                data = client_data_map[cid]
+                data = active_agg_client_map[cid]
 
                 # 局部归一化权重
                 normalized_weight = data["raw_score"] / sum_raw_survivors

@@ -94,12 +94,15 @@ class TrustScoreManager:
         self.risk_hard_min_probe_streak = 2
         self.risk_hard_min_trigger_streak = 1
         self.risk_hard_peer_confirm_floor = 0.70
+        # 降误杀：硬封禁要求“已播种 C2 或触发器告警”其一成立
+        self.risk_hard_require_seed_or_trigger = True
         self.risk_raw_attenuation_power = 1.0
         # 仅当多通道强异常同时出现时，才允许 instant_risk 直接拉满到 1.0
         self.risk_instant_confirm_threshold = 0.90
         self.risk_instant_confirm_channels = 2
         # 软隔离升级黑名单前，要求存在跨通道证据 + 持续探针异常
         self.risk_soft_blacklist_cross_floor = 0.60
+        self.risk_soft_blacklist_strong_cross_floor = 0.70
         self.risk_soft_blacklist_probe_rounds = 4
         self.risk_soft_blacklist_pixel_rounds = 3
         # 低误杀加严：仅对触发器通道缩短连续告警轮数，其它通道保持不变
@@ -118,6 +121,15 @@ class TrustScoreManager:
         self.c2_combo_pixel_ceiling = 0.65
         self.c2_combo_risk_floor = 0.55
         self.c2_combo_rounds = 5
+        # C2 抗抖动记忆通道：避免“差一点就断档”导致恶意节点突然洗白
+        self.c2_memory_strong_gain = 2
+        self.c2_memory_weak_gain = 1
+        self.c2_memory_decay_step = 1
+        self.c2_memory_cap = 20
+        self.c2_memory_quarantine_score = 8
+        self.c2_memory_quarantine_rounds = 2
+        self.c2_memory_risk_floor = 0.50
+        self.c2_memory_release_score = 3
         # C2 种子：仅允许“早期触发器异常”或“极端 probe+peer+grad 组合”进入 C2 通道
         self.c2_seed_trigger_floor = 0.52
         self.c2_seed_probe_floor = 0.98
@@ -131,8 +143,8 @@ class TrustScoreManager:
         # =========== 动态平衡参数 ===========
 
         self.soft_blacklist_rounds = 4
-        # 中等加严：Risk 软隔离持续后更快升级为黑名单
-        self.risk_soft_blacklist_rounds = 6
+        # 降误杀：延长 Risk 软隔离升级黑名单窗口
+        self.risk_soft_blacklist_rounds = 8
 
         # ---- 黑名单 ----
         self.blacklist = set()
@@ -178,6 +190,8 @@ class TrustScoreManager:
                 "c2_probe_streak": 0,
                 "c2_peer_streak": 0,
                 "c2_grad_streak": 0,
+                "c2_memory_score": 0,
+                "c2_quarantine_streak": 0,
                 "c2_seeded": False,
                 "any_soft_streak": 0,
             }
@@ -202,6 +216,8 @@ class TrustScoreManager:
             entry.setdefault("c2_probe_streak", 0)
             entry.setdefault("c2_peer_streak", 0)
             entry.setdefault("c2_grad_streak", 0)
+            entry.setdefault("c2_memory_score", 0)
+            entry.setdefault("c2_quarantine_streak", 0)
             entry.setdefault("c2_seeded", False)
             entry.setdefault("any_soft_streak", 0)
         return self.history[client_id]
@@ -494,6 +510,8 @@ class TrustScoreManager:
                 "last_peer_risk": 1.0,
                 "c1_trigger_combo_streak": self.c1_fast_track_rounds,
                 "c2_drift_combo_streak": self.c2_combo_rounds,
+                "c2_memory_score": self.c2_memory_quarantine_score,
+                "c2_quarantine_streak": self.c2_memory_quarantine_rounds,
                 "c2_seeded": True,
             }
         entry = self._ensure_history_entry(client_id)
@@ -507,6 +525,8 @@ class TrustScoreManager:
             "last_peer_risk": float(entry.get("last_peer_risk", 0.0)),
             "c1_trigger_combo_streak": int(entry.get("c1_trigger_combo_streak", 0)),
             "c2_drift_combo_streak": int(entry.get("c2_drift_combo_streak", 0)),
+            "c2_memory_score": int(entry.get("c2_memory_score", 0)),
+            "c2_quarantine_streak": int(entry.get("c2_quarantine_streak", 0)),
             "c2_seeded": bool(entry.get("c2_seeded", False)),
         }
 
@@ -1035,6 +1055,47 @@ class TrustScoreManager:
             else:
                 entry["c2_drift_combo_streak"] = max(0, entry["c2_drift_combo_streak"] - 1)
 
+            # [C2 Memory Lane] 累积证据而非死板连续命中，提升跨轮稳定检出
+            c2_memory_score_prev = int(entry.get("c2_memory_score", 0))
+            c2_mild_signal = c2_enabled and client_entropy > 0.95 and (
+                probe_risk >= max(0.28, self.c2_combo_probe_floor - 0.10)
+                or peer_signal >= max(0.18, self.c2_combo_peer_floor - 0.06)
+                or grad_risk >= max(0.22, self.c2_combo_grad_floor - 0.13)
+                or sign_risk >= 0.12
+            )
+            if c2_enabled and c2_hit_count >= 2 and risk_new >= (self.c2_combo_risk_floor - 0.08):
+                c2_memory_score = c2_memory_score_prev + self.c2_memory_strong_gain
+            elif c2_mild_signal and risk_new >= (self.c2_memory_risk_floor - 0.05):
+                c2_memory_score = c2_memory_score_prev + self.c2_memory_weak_gain
+            else:
+                c2_memory_score = c2_memory_score_prev - self.c2_memory_decay_step
+            c2_memory_score = max(0, min(self.c2_memory_cap, c2_memory_score))
+            entry["c2_memory_score"] = c2_memory_score
+
+            c2_quarantine_hit = (
+                c2_enabled
+                and c2_memory_score >= self.c2_memory_quarantine_score
+                and risk_new >= self.c2_memory_risk_floor
+                and trigger_risk <= self.c2_combo_trigger_ceiling
+                and pixel_risk <= (self.c2_combo_pixel_ceiling + 0.10)
+            )
+            if c2_quarantine_hit:
+                entry["c2_quarantine_streak"] += 1
+            else:
+                q_decay = 2 if (
+                    c2_memory_score <= self.c2_memory_release_score
+                    and risk_new < (self.c2_memory_risk_floor - 0.08)
+                ) else 1
+                entry["c2_quarantine_streak"] = max(0, entry["c2_quarantine_streak"] - q_decay)
+
+            c2_quarantine_active = entry["c2_quarantine_streak"] >= self.c2_memory_quarantine_rounds
+            if c2_enabled and (c2_memory_score >= self.c2_memory_quarantine_score - 1 or c2_quarantine_active):
+                print(
+                    f"    🧬 [Client {cid}] C2 Memory | score={c2_memory_score:02d} | "
+                    f"QStreak={entry['c2_quarantine_streak']} | hit={c2_hit_count} | "
+                    f"risk={risk_new:.3f} | trig={trigger_risk:.2f} | pix={pixel_risk:.2f}"
+                )
+
             soft_hit_count = (
                 int(probe_risk >= self.risk_soft_probe_floor)
                 + int(trigger_risk >= self.risk_soft_trigger_floor)
@@ -1059,7 +1120,10 @@ class TrustScoreManager:
                     and not soft_strong
                 ) else 1
                 entry["risk_soft_streak"] = max(0, entry["risk_soft_streak"] - decay_step)
-            entry["risk_isolated"] = entry["risk_soft_streak"] >= self.risk_soft_rounds
+            entry["risk_isolated"] = (
+                entry["risk_soft_streak"] >= self.risk_soft_rounds
+                or c2_quarantine_active
+            )
 
             hard_evidence = (
                 entry["probe_alert_streak"] >= self.risk_hard_min_probe_streak
@@ -1069,7 +1133,12 @@ class TrustScoreManager:
                     and (grad_risk >= 0.25 or sign_risk >= 0.15)
                 )
             )
-            if risk_new > self.risk_hard_threshold and hard_evidence:
+            hard_gate = (
+                (not self.risk_hard_require_seed_or_trigger)
+                or bool(entry.get("c2_seeded", False))
+                or entry["trigger_alert_streak"] >= self.risk_hard_min_trigger_streak
+            )
+            if risk_new > self.risk_hard_threshold and hard_evidence and hard_gate:
                 entry["risk_hard_streak"] += 1
             else:
                 entry["risk_hard_streak"] = max(0, entry["risk_hard_streak"] - 1)
@@ -1104,31 +1173,34 @@ class TrustScoreManager:
             elif (
                 cid not in self.blacklist
                 and entry["risk_soft_streak"] >= self.risk_soft_blacklist_rounds
-                and (
-                    entry["risk_hard_streak"] >= 2
-                    or (
-                        entry["probe_alert_streak"] >= self.risk_soft_blacklist_probe_rounds
-                        and cross_channel_peak >= self.risk_soft_blacklist_cross_floor
-                    )
-                    or (
-                        entry["pixel_alert_streak"] >= self.risk_soft_blacklist_pixel_rounds
-                        and cross_channel_peak >= self.risk_soft_blacklist_cross_floor
-                    )
-                    or (
-                        entry["trigger_alert_streak"] >= self.risk_soft_blacklist_trigger_rounds
-                        and cross_channel_peak >= self.risk_soft_blacklist_cross_floor
-                    )
-                    or (
-                        entry["peer_alert_streak"] >= self.risk_soft_blacklist_peer_rounds
-                        and cross_channel_peak >= self.risk_soft_blacklist_cross_floor
-                    )
-                )
+                and risk_new >= self.risk_soft_threshold
             ):
-                # 长期软隔离不再无限旁观，升级为保守硬封禁
-                self._mark_blacklist(
-                    cid,
-                    f"risk_soft_isolation_for_{self.risk_soft_blacklist_rounds}_rounds",
+                # 仅当存在“强跨通道证据”才允许从软隔离升级黑名单，避免误杀正常难样本节点
+                seeded = bool(entry.get("c2_seeded", False))
+                has_strong_visual = (
+                    entry["trigger_alert_streak"] >= self.risk_soft_blacklist_trigger_rounds
+                    or entry["pixel_alert_streak"] >= self.risk_soft_blacklist_pixel_rounds
                 )
+                has_seeded_drift = (
+                    seeded
+                    and (
+                        entry["probe_alert_streak"] >= self.risk_soft_blacklist_probe_rounds
+                        or entry["peer_alert_streak"] >= self.risk_soft_blacklist_peer_rounds
+                        or entry["c2_drift_combo_streak"] >= max(3, self.c2_combo_rounds - 1)
+                    )
+                )
+                strong_cross = cross_channel_peak >= self.risk_soft_blacklist_strong_cross_floor
+                promote_soft_blacklist = (
+                    entry["risk_hard_streak"] >= 2
+                    or (has_strong_visual and strong_cross)
+                    or (has_seeded_drift and cross_channel_peak >= self.risk_soft_blacklist_cross_floor)
+                )
+                if promote_soft_blacklist:
+                    # 长期软隔离不再无限旁观，升级为保守硬封禁
+                    self._mark_blacklist(
+                        cid,
+                        f"risk_soft_isolation_for_{self.risk_soft_blacklist_rounds}_rounds",
+                    )
 
             # [Scheme C - 宽恕正常偏科生，脱钩打分与拦截]
             # 完全去除 Hist/RiskEMA 的软防线导致系统永久封禁的捆绑！
