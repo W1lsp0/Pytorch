@@ -108,7 +108,7 @@ while maintaining practical convergence under heterogeneous edge settings.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{system_arch.png}
+    \includegraphics[width=0.95\textwidth]{system_arch.pdf}
     \caption{联邦计算网络交互：基于 TEE 锚点加密的端边云协同物理架构图}
     \label{fig:system_arch}
 \end{figure}
@@ -123,7 +123,7 @@ while maintaining practical convergence under heterogeneous edge settings.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{threat_model.png}
+    \includegraphics[width=0.85\textwidth]{threat_model.pdf}
     \caption{边缘广域网络下的安全渗透与多维复合型投毒威胁模型示意图}
     \label{fig:threat_model}
 \end{figure}
@@ -163,76 +163,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 \begin{figure}[htbp]
     \centering
-    \resizebox{\textwidth}{!}{
-    \begin{tikzpicture}[
-        font=\sffamily,
-        node distance=2.5cm and 2cm,
-        % Styles
-        phase_bg/.style={draw=gray!30, fill=#1, rounded corners=8pt, inner sep=18pt, dashed, thick},
-        block/.style={draw=black!70, fill=white, rounded corners=4pt, text width=3.8cm, align=center, minimum height=1.3cm, thick, drop shadow={opacity=0.15}},
-        highlight_block/.style={block, fill=yellow!10, draw=orange, thick},
-        arrow/.style={-{Stealth[scale=1.2]}, thick, draw=black!80},
-        feedback/.style={-{Stealth[scale=1.2]}, line width=1.5pt, dashed, draw=blue!70!black}
-    ]
-
-    % Stage 1 Nodes (Left)
-    \node[block] (tee) {TEE 硬件锚定与证明\\($M_{attest,k}$)};
-    \node[block, below=1cm of tee] (anomaly) {资源探针异常分数\\($A_k$)};
-    \node[highlight_block, right=1.2cm of anomaly, yshift=1.1cm] (trustscore) {终端基底准入门槛分\\$TrustScore_k$};
-    \draw[arrow] (tee) -| (trustscore);
-    \draw[arrow] (anomaly) -| (trustscore);
-
-    % Stage 2 Nodes
-    \node[block, right=2cm of trustscore, yshift=1.1cm] (groot) {优先纯净指导锚点\\($g_{root}$)};
-    \node[block, below=1cm of groot] (content) {双维模型质量映射\\(Contrib \& Consist)};
-    \node[highlight_block, right=1.2cm of content, yshift=1.1cm] (contentscore) {当轮有效模型内容分\\$ContentScore_k$};
-    \draw[arrow] (groot) -| (contentscore);
-    \draw[arrow] (content) -| (contentscore);
-
-    % Stage 3 Nodes
-    \node[block, right=2cm of contentscore, yshift=1.1cm] (hist) {历史效用软流演进\\($HistPerf$)};
-    \node[block, below=1cm of hist] (risk) {瞬发致命风险探针流\\($RiskEMA$)};
-    \node[highlight_block, right=1.2cm of risk, yshift=1.1cm] (rawscore) {加权表决信誉权值\\$RawScore_k$};
-    \draw[arrow] (hist) -| (rawscore);
-    \draw[arrow] (risk) -| (rawscore);
-
-    % Stage 4 Nodes (Return flow below)
-    \node[block, below=3.5cm of rawscore, xshift=-2cm] (gate) {层级防御防卫敏感度\\$S_{total}^{(l)}$};
-    \node[block, left=1.5cm of gate] (clip) {L2 面包圈自适应压缩\\(收缩边界 $C^{(l)}$)};
-    \node[highlight_block, left=1.5cm of clip] (survivor) {严格门限隔离幸存名单\\$\Phi^{(l)} (\ge \theta^{(l)})$};
-    \draw[arrow] (rawscore) |- (gate);
-    \draw[arrow] (gate) -- node[above, font=\scriptsize] {拔高门槛} (clip);
-    \draw[arrow] (clip) -- node[above, font=\scriptsize] {筛选入局} (survivor);
-
-    % Stage 5 Nodes
-    \node[highlight_block, left=2.5cm of survivor] (agg) {安全同源分层拼接聚合\\$\Delta W_{global}^{(l)}$};
-    \node[block, fill=blue!5, left=1.8cm of agg, minimum height=2cm] (global) {新一轮全局模型定稿\\$W_{global}^{new}$};
-    \draw[arrow] (survivor) -- (agg);
-    \draw[arrow] (agg) -- (global);
-
-    % Closed Loop Feedback
-    \draw[feedback] (global.north) |- ([yshift=2.0cm]tee.north) -| node[above, near start, font=\bfseries] {将全局泛知识与荣誉信誉池向边缘终端反哺 (闭环演替开始)} (tee.north);
-
-    % Grouping Backgrounds
-    \begin{scope}[on background layer]
-        \node[phase_bg=cyan!4, fit=(tee) (anomaly) (trustscore)] (bg1) {};
-        \node[font=\bfseries\large, text=cyan!80!black, fill=white, inner sep=2pt] at (bg1.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 1: 硬件特权准入};
-
-        \node[phase_bg=orange!4, fit=(groot) (content) (contentscore)] (bg2) {};
-        \node[font=\bfseries\large, text=orange!80!black, fill=white, inner sep=2pt] at (bg2.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 2: 原点内容校准};
-
-        \node[phase_bg=blue!4, fit=(hist) (risk) (rawscore)] (bg3) {};
-        \node[font=\bfseries\large, text=blue!80!black, fill=white, inner sep=2pt] at (bg3.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 3: 多轨流状态剥离};
-
-        \node[phase_bg=red!4, fit=(gate) (clip) (survivor)] (bg4) {};
-        \node[font=\bfseries\large, text=red!80!black, fill=white, inner sep=2pt] at (bg4.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 4: 层级动态门限拦截};
-
-        \node[phase_bg=green!4, fit=(agg) (global)] (bg5) {};
-        \node[font=\bfseries\large, text=green!80!black, fill=white, inner sep=2pt] at (bg5.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 5: 因果演替组装};
-    \end{scope}
-    
-    \end{tikzpicture}
-    }
+    \includegraphics[width=\textwidth]{fig3_arch.pdf}
     \caption{信任流驱动的可信联邦学习五阶段防御闭环架构总览}
     \label{fig:framework}
 \end{figure}
@@ -333,52 +264,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.9\textwidth}{!}{
-    \begin{tikzpicture}[
-        font=\sffamily,
-        >=Stealth,
-        node distance=3cm and 3.5cm,
-        % State definitions
-        state_base/.style={circle, draw, very thick, minimum size=3.2cm, align=center, drop shadow={opacity=0.15}},
-        normal/.style={state_base, fill=green!10, draw=green!60!black},
-        suspect/.style={state_base, fill=orange!10, draw=orange!80!black, dashed},
-        quar/.style={state_base, fill=red!10, draw=red!70!black},
-        black/.style={state_base, fill=gray!20, draw=black!90, double, double distance=2pt},
-        % Edge definitions
-        edge_norm/.style={->, thick, draw=blue!60!black},
-        edge_warn/.style={->, thick, draw=orange!80!black},
-        edge_danger/.style={->, thick, draw=red!80!black},
-        edge_fatal/.style={->, ultra thick, draw=black!80, dashed},
-        lbl/.style={fill=white, inner sep=4pt, font=\small, rounded corners=2pt, align=center}
-    ]
-
-    % Nodes
-    \node[normal] (N) {\textbf{NORMAL}\\常规聚合节点\\全权状态};
-    \node[suspect, above right=2.5cm and 4.8cm of N] (S) {\textbf{SUSPECT}\\嫌疑监控态\\行为审查};
-    \node[quar, below right=2.5cm and 4.8cm of N] (Q) {\textbf{QUARANTINE}\\物理隔离态\\权值剥夺};
-    \node[black, right=4.2cm of Q] (B) {\textbf{BLACKLIST}\\绝对黑名单\\不可逆封禁};
-
-    % Edges with specific bending to avoid straight line crossings
-    \path
-        % N to S and S to N (上半区走廊，与下半区彻底绝缘)
-        (N) edge[edge_warn, bend left=15] node[lbl, sloped, above] {瞬时风险评估超限 ($RiskEMA \uparrow$)} (S)
-        (S) edge[edge_norm, bend left=15] node[lbl, sloped, below] {长效观测风险回退 (状态特赦)} (N)
-        
-        % N to Q and Q to N (下半区走廊)
-        (N) edge[edge_danger, bend right=15] node[lbl, sloped, below] {历史效用断崖滑坡 ($HistPerf \downarrow$)} (Q)
-        (Q) edge[edge_norm, bend right=15] node[lbl, sloped, above] {限制域测试重归合规 (解除隔离)} (N)
-        
-        % S to Q
-        (S) edge[edge_danger, bend left=15] node[lbl, fill=white, inner sep=4pt] {持续异常触发隔离红线} (Q)
-        
-        % Q to B
-        (Q) edge[edge_fatal] node[lbl, above] {命中拒绝服务硬阈值, 物理阻断} (B)
-        
-        % B loop
-        (B) edge[->, ultra thick, draw=black!80, loop right, looseness=5] node[lbl, right] {吊销 TEE 证书\\永久终止握手} (B);
-        
-    \end{tikzpicture}
-    }
+    \includegraphics[width=0.9\textwidth]{fig4_state.pdf}
     \caption{客户端积弊历史与瞬发风险叠加下的四态监管转移自动机逻辑图}
     \label{fig:node_state_machine}
 \end{figure}
@@ -486,64 +372,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 \begin{figure}[H]
     \centering
-    \resizebox{0.95\textwidth}{!}{
-    \begin{tikzpicture}[
-        font=\sffamily,
-        >=Stealth,
-        % Styles
-        phase_bg/.style={draw=gray!30, fill=#1, rounded corners=8pt, inner sep=15pt, dashed, thick},
-        block/.style={draw=black!70, fill=white, rounded corners=4pt, text width=3.2cm, align=center, minimum height=1.3cm, thick, drop shadow={opacity=0.15}},
-        small_block/.style={block, minimum height=0.8cm, text width=2.5cm, fill=white!95!gray},
-        highlight_block/.style={block, fill=red!5, draw=red!60, thick},
-        final_block/.style={block, fill=green!10, draw=green!60!black, thick, text width=3.5cm},
-        arrow/.style={-{Stealth[scale=1.2]}, thick, draw=black!80},
-        lbl/.style={fill=white, inner sep=2pt, font=\small, rounded corners=2pt}
-    ]
-
-    % Core Data Nodes (Bottom Row)
-    \node[block] (survivors) {硬界资质筛查\\($RawScore \ge \theta$)};
-    \node[block, left=2.5cm of survivors, fill=blue!5, draw=blue!80] (data_in) {单层计算梯度流\\$\{\Delta W_{k}^{(l)}\}_{k \in \mathcal{A}}$};
-    \node[block, right=3.5cm of survivors] (clipped) {动态振幅修剪圈\\$\widehat{\Delta W}_{k}^{(l)}$};
-    \node[final_block, right=3.8cm of clipped] (agg) {分层权重聚合总成\\$\Delta W_{global}^{(l)}$};
-    
-    \draw[arrow] (data_in) -- (survivors);
-    \draw[arrow] (survivors) -- node[lbl, above] {出线晋级名单 $\Phi^{(l)}$} (clipped);
-    \draw[arrow] (clipped) -- node[lbl, above, align=center] {重分配 $\tilde{w}_k^{(l)}$\\二次合装} (agg);
-
-    % Control Nodes (Intermediate)
-    \node[highlight_block, above=2.8cm of survivors] (theta) {生成控制底线\\$\theta^{(l)}$};
-    \node[highlight_block, above=2.8cm of clipped] (clip) {约束裁剪半径\\$C^{(l)}$};
-
-    \draw[arrow, dashed, draw=red!80, line width=1.5pt] (theta) -- node[lbl, right] {上提基准限度 $\uparrow$} (survivors);
-    \draw[arrow, dashed, draw=red!80, line width=1.5pt] (clip) -- node[lbl, right] {向心收紧边界 $\downarrow$} (clipped);
-
-    % Control Nodes (Top S_total)
-    \path (theta) -- node[pos=0.5] (mid_tc) {} (clip);
-    \node[block, fill=purple!5, draw=purple!80, above=2.5cm of mid_tc] (stotal) {防卫诉求主控中枢\\$S_{total}^{(l)}$};
-    
-    \draw[arrow] (stotal) -| (theta);
-    \draw[arrow] (stotal) -| (clip);
-
-    % Sensors
-    \node[small_block, left=3.5cm of stotal, yshift=1.2cm] (sp) {层级隐私维度 $S_{privacy}$};
-    \node[small_block, left=3.5cm of stotal, yshift=0cm] (su) {更新效能维度 $S_{utility}$};
-    \node[small_block, left=3.5cm of stotal, yshift=-1.2cm] (ss) {后门安全维度 $S_{security}$};
-
-    \draw[arrow] (sp.east) -- (stotal.west);
-    \draw[arrow] (su.east) -- (stotal.west);
-    \draw[arrow] (ss.east) -- (stotal.west);
-    
-    % Grouping Backgrounds
-    \begin{scope}[on background layer]
-        \node[phase_bg=purple!4, fit=(sp) (ss) (stotal) (theta) (clip)] (bgControl) {};
-        \node[font=\bfseries\large, text=purple!80!black, fill=white, inner sep=2pt] at (bgControl.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {自适应层级防线控制反馈中枢 (Control Core)};
-        
-        \node[phase_bg=orange!4, fit=(data_in) (survivors) (clipped) (agg)] (bgData) {};
-        \node[font=\bfseries\large, text=orange!80!black, fill=white, inner sep=2pt] at (bgData.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {深度网格参数剥离与等比降频剪裁流 (Data Pipeline)};
-    \end{scope}
-
-    \end{tikzpicture}
-    }
+    \includegraphics[width=0.95\textwidth]{fig5_layer.pdf}
     \caption{风险门控驱动的分层自适应审查与动态裁剪机制示意图}
     \label{fig:layer_gating}
 \end{figure}
