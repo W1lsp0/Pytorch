@@ -6,6 +6,8 @@
 \usepackage{threeparttable}
 \usepackage{graphicx}
 \usepackage{geometry}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, shapes.geometric, calc, fit, backgrounds, decorations.pathmorphing}
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage{algorithm}
@@ -64,18 +66,18 @@ while maintaining practical convergence under heterogeneous edge settings.
     \section{引言}
 联邦学习（Federated Learning, FL）作为一种新兴的分布式机器学习范式，通过“数据不出本地，仅交换模型参数”的机制，为边缘计算（Edge Computing）场景下的数据孤岛问题和隐私保护需求提供了理想的解决方案\cite{kairouz2021flsurvey}。在工业物联网、医疗诊断、自动驾驶等边缘应用中，海量智能设备产生的丰富感知数据可在不暴露原始数据的前提下，协同训练高性能的全局模型。
 
-然而，当联邦学习从理想化的数据中心走向真实的边缘计算环境时，系统面临着由环境不确定性、数据异构性与行为欺诈性叠加带来的严峻鲁棒性挑战。首先，边缘节点的算力、网络带宽与感知场景高度碎片化，导致本地数据呈现极端的非独立同分布（Non-IID）特性。这种强烈的长尾知识与数据异构性，使得全局模型极易向拥有大量本地数据或特定分布特征的诚实群体发生参数偏移。其次，开放式无边界的边缘网络缺乏集中的物理与安全管控，参与训练的节点身份和运行环境极易被伪造或篡改。攻击者可轻易控制大量边缘设备，不仅可能发起女巫攻击（Sybil Attack）窃取隐私或伪造更新，更可能试图操纵本地数据或梯度以发起诸如标签翻转（Label Flip）、静态与隐蔽动态后门（Backdoor）、干净标签投毒（Clean Label）以及高频语义投毒（Semantic）等纵深复合型模型投毒攻击\cite{gu2017badnets,wang2019neuralcleanse}。在这种极端的边缘场景下，“因 Non-IID 产生的诚实模型漂移”与“经过精心设计的隐蔽性投毒微调”在参数空间中相互掩盖，极大地增加了有效防御的难度。
+然而，当联邦学习从理想化的数据中心走向真实的边缘计算拓扑时，系统不可避免地陷入由于\textbf{极端环境不确定性、数据非独立同分布（Non-IID）与高阶行为欺诈}相互交织而成的“内忧外患”困境。在“内忧”层面，自然分布的边缘设备不仅算力受限，其独立感知的碎片化场景导致本地样本呈现极度倾斜的长尾特性；这种剧烈的异构偏差天然会引发诚实节点产生全局模型漂移。在“外患”层面，开放且无强制物理准入的边缘网络缺乏绝对信赖的安全护城河，脆弱的端侧运行环境极易遭到敌手利用或劫持。恶意参与者不仅能横向伪造海量女巫节点（Sybil Attack）挤占算力，更可针对性地实施纵深复合型的模型投毒与隐蔽后门攻击（如标签翻转、生成对抗级干净标签污染、深层神经元语义后门，甚至直接向框架底层注入被篡改的参数阵列）\cite{gu2017badnets,wang2019neuralcleanse}。在上述恶劣交叠的边缘实战场景中，\textbf{“高方差的诚实长尾数据特征漂移”极易成为“高阶隐蔽后门精妙微调”绝佳的天然伪装掩体}，致使传统依赖表面参数统计距离的数学防线全面陷入“防不住潜伏投毒”自身又极易“错杀大量合法异构节点”的系统逻辑死结。
 
-现有的联邦学习主动防御机制未能完美破解上述困境。绝大多数研究聚焦于模型聚合阶段的“拜占庭容错（Byzantine-Robust）”设计。例如，Krum、Trimmed Mean 以及 RFA 等经典算法通过距离测算或几何中位数的统计过滤机制以剔除异常梯度\cite{blanchard2017krum,yin2018byzantine,pillutla2022robust}。然而，这类纯基于数学参数统计的点状防御由于缺乏物理层信任根，在高度异构的边缘环境中极易失效，难以从数学空间上区分合法却长尾的偏置节点与精心伪装的投毒节点。另一方面，FLTrust、FoolsGold 等基于先验纯净锚点或历史相似度的防御方案探索了跨轮的时间维度验证\cite{cao2021fltrust,fung2020foolsgold}。虽然它们引入了长周期的信任管理，但其防御评估维度依然单一。当面对攻击者采用“前期潜伏攒信誉、后期小批量持续投毒”的高级伪装策略时，粗放的信誉管理极易出现判定滞后；更为致命的是，将低频偏离直接等同于欺诈的硬性奖惩机制，往往会导致高价值的长尾异构节点遭遇“永久性误杀”，彻底丧失联邦学习覆盖多元长尾知识的初衷。
+现有的联邦学习主动防御机制未能完美破解上述困境。绝大多数研究聚焦于模型聚合阶段的“拜占庭容错（Byzantine-Robust）”设计，如 Krum、Trimmed Mean 以及 RFA 等经典算法试图通过距离测算或几何中位数的统计机制剔除异常梯度\cite{blanchard2017krum,yin2018byzantine,pillutla2022robust}。然而，这类防线由于缺乏底层物理维度的信任根，在高度异构的边缘环境中极易失效。另一方面，FLTrust 等方案探索了跨轮的时间维度信任管理\cite{cao2021fltrust,fung2020foolsgold}，但在面对投毒者采用“前期潜伏攒虚假信誉、后期小批量持续投毒”的高级水坑策略时，粗放的单线积分管理往往出现重大的判定滞后；更为致命的是，其将任何偏离强行等同于失信的惩罚机制，最终剥夺了长尾节点的生存空间，彻底背离了联邦学习涵盖多元宽广知识体系的初衷。
 
-针对上述挑战，单点防御机制已难以应对。本文立足于边缘系统工程视角，摒弃了传统防线“单次评估、事后算账”的局限性，提出一种基于“信任流（Trust Flow）”驱动的可信联邦学习主动防御框架。该框架的核心创新在于构建了旨在适应长周期的\textbf{“软硬件双结合、全生命周期贯穿”}的动静态信任机制。在硬件隔离层，引入可信执行环境（TEE）进行硬门禁验证，从根源筛除虚假运行环境及未授权节点；在软件层，系统打破聚合期的单一审查，整合了内容审查与长期信誉演化，并通过“历史信誉流与多维风险探测流”的正交解耦设计，建立起环环相扣、多状态并行演算的全链路防御体系（即“信任流”）。
+为彻底冲破上述困境，单点或纯软件层面的防御机理已力不从心。本文立足于边缘系统工程的全局视角，摒弃了传统防线“单一聚合期评估、事后机械过滤”的被动局限，提出一种基于“信任流（Trust Flow）”驱动的可信联邦学习主动防御框架。该框架的本质创新在于将原本散落的验证模块，通过\textbf{“软硬件双结合的信任锚”}与\textbf{“贯穿模型训练全生命周期的时序动态防御机制”}深度绞合。在底层物理隔离域，系统跨界引入可信执行环境（TEE）构筑硬件级门禁，从源头阻击外部身份伪造与内鬼进程篡改；在应用算法层，打破了常规审视盲区，创新性设计了“历史价值流与多维瞬发风险流”的正交状态转移自动机，从而在确保模型广域知识收敛的同时，实现对各类高维潜伏威胁的全链路绞杀。
 
 本文的主要贡献总结如下：
 \begin{enumerate}
-    \item \textbf{提出软硬件双结合的全生命周期可信联邦架构}。有别于仅在聚合阶段被动过滤的单点防御，本框架将防线前置并贯穿始终。利用 TEE 硬件信任根执行物理节点准入与环境监控，随后串接服务端的纯净内容审查分值，覆盖了硬件入场、软件审查、信誉演化与分层干预四大生命阶段。
-    \item \textbf{设计历史信誉与多维降调风险正交演化的追踪体系}。为了适应长期的系统更迭并彻底解决长期机制易误杀正常节点的核心痛点，本文将客户端信任更新逻辑重构为解耦的双流：基于纯净内容相似度积累的“历史效用流”用于把控验证池的话语权，而由多维探针瞬间捕获的指数波动“风险流”专注行使对攻击者的一票过滤隔离，有效规避了针对高危潜伏者的判定迟防及正常节点的误杀。
-    \item \textbf{建立基于纯净基准的分层差异化聚合机制}。在抵御高级后门时，框架引入了基于服务器少量隔离数据提炼的核心参考原点，并结合深浅神经网络对投毒敏感度分化不同，实施风险门控下的逐层准入、受信任幸存者的动向重调校与细粒度参数 L2 裁剪，系统性阻断深层神经元恶意触发器。
-    \item \textbf{完成多形态极限安全环境下的实证与端到端平台部署}。本文基于真实 TEE 的验证与设计理念，在包含 20 客户端集群的边缘架构内进行了深度仿真部署（$n=5$ 重复实验）。面对 6 种混编攻击及强异构长尾数据分布环境，本体系极其稳健地将具有硬件后门及全层级投毒行为的敌手节点 100\% 剔除，在维持针对合法分布零永久误杀（FPR $<$ 0.01\%）的基础下，取得 90.85\% 的主任务均值精度与 10.21\% 的绝对抑制级后门攻击成功率（ASR）。这一系统实现为解决泛化性边缘智算提供了全域维度的强参考框架。
+    \item \textbf{构建软硬件双结合的信任锚与全生命周期防御机制}。有别于仅在聚合瞬间被动过滤的单点防线，本设计将防御纵深全面前置并贯穿模型演化始终。在硬件端，依托 TEE 芯上飞地构筑不可篡改的物理节点准入与运行时环境指纹；在软件端，自然承接硬件初始基准，实现了跨硬件入场、纯净内容审查、时序信誉演算与分层动态控制的长效闭环管理。
+    \item \textbf{提出适应长期边缘环境的双流正交信誉演化体系}。针对以往累积信誉机制在长周期运作中“常引发长尾合法节点被永久误杀、而高级潜伏者难被揪出”的痛点核心，本文首创将身份评估逻辑降维解耦为两极独立互斥的运行轨道：以纯净贡献度积淀的“历史效用流”用于温和保障异构合规群组的话语权特赦；而汇聚多层神经网络深层敏感探针的激进型“瞬发风险流”则专司执行极速的高危熔断拦截，在根本机理上化解了防漏杀与抗误伤不可兼得的矛盾。
+    \item \textbf{建立基于纯净基准的分层差异化聚合机制}。在抵御高级后门时，框架引入了基于服务器少量隔离数据提炼的核心参考原点，并结合深浅神经网络对投毒敏感度分化不同，实施风险门控下的逐层准入、受信任幸存者的动向重调校与细粒度参数动态 L2 裁剪，系统性阻断深层神经元恶意触发器透传。
+    \item \textbf{完成多形态极限安全环境下的实证与端到端平台部署}。本文基于真实 TEE 的验证机制设计，在包含 20 客户端集群的跨算力边缘架构内进行了深度仿真部署（$n=5$ 独立重复实验）。面对 6 种高危混编攻击及强目录长尾数据环境，体系稳健地将具有系统合谋投毒行为的敌手节点 100\% 剔除；在维持合法长尾节点绝对零永久误杀（FPR $<$ 0.01\%）的基础下，逼近了 90.85\% 的主任务均值精度，并将后门攻击成功率（ASR）绝对压制至 10.21\% 的摧毁级别。该系统实践为解决边缘环境智算规模化落地提供了具备实操意义的安全指引。
 \end{enumerate}
 
 
@@ -106,8 +108,68 @@ while maintaining practical convergence under heterogeneous edge settings.
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.95\textwidth]{system_arch.pdf}
-    \fbox{\rule{0pt}{2.5in} \rule{0.9\textwidth}{0pt}} % 此处为您后续重绘带 TEE 锁的物理架构图预留站位
+    \resizebox{0.95\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=1.5cm and 2cm,
+        font=\sffamily,
+        % Styles
+        box/.style={draw, rounded corners, align=center, fill=white, thick},
+        server_box/.style={box, fill=blue!10, minimum width=8cm, minimum height=1.8cm},
+        edge_box/.style={box, fill=cyan!10, minimum width=3.5cm, minimum height=1.5cm},
+        client_box/.style={box, fill=gray!5, minimum width=3cm, minimum height=2.5cm, dashed},
+        tee_box/.style={box, fill=green!15, minimum width=2.4cm, minimum height=1.2cm},
+        data_box/.style={box, fill=orange!10, minimum width=2.4cm, minimum height=0.8cm},
+        arrow/.style={-{Stealth[scale=1.2]}, thick, draw=black!80},
+        lock_arrow/.style={-{Stealth[scale=1.2]}, thick, draw=green!60!black, dashed}
+    ]
+
+    % Server Layer
+    \node[server_box] (server) {};
+    \node[font=\bfseries] at ([yshift=-0.4cm]server.north) {参数汇总审查验证中心 (Cloud Server $\mathcal{S}$)};
+    \node[box, fill=white, minimum width=3cm, minimum height=0.8cm] (agg) at ([shift={(-2,-0.3)}]server) {多流分层聚合器};
+    \node[box, fill=white, minimum width=3cm, minimum height=0.8cm] (trust) at ([shift={(2,-0.3)}]server) {动态信任评审中心};
+
+    % Edge Layer
+    \node[edge_box, below left=1.2cm and -1.5cm of server] (edge1) {边缘汇聚点 1\\(Edge Gateway)};
+    \node[edge_box, below right=1.2cm and -1.5cm of server] (edge2) {边缘汇聚点 2\\(Edge Gateway)};
+
+    % Client Layer for Edge 1
+    \node[client_box, below left=1.5cm and -0.8cm of edge1] (client1) {};
+    \node[font=\bfseries, text depth=0.2ex] at ([yshift=-0.4cm]client1.north) {设备容器 $c_1$};
+    \node[data_box, below=0.6cm of client1.north] (data1) {原始异构数据 $\mathcal{D}_1$};
+    \node[tee_box, below=0.2cm of data1] (tee1) {TEE [芯上飞地]\\硬件加密签名};
+
+    \node[client_box, below right=1.5cm and -0.8cm of edge1] (client2) {};
+    \node[font=\bfseries, text depth=0.2ex] at ([yshift=-0.4cm]client2.north) {设备容器 $c_2$};
+    \node[data_box, below=0.6cm of client2.north] (data2) {原始异构数据 $\mathcal{D}_2$};
+    \node[tee_box, below=0.2cm of data2] (tee2) {TEE [芯上飞地]\\硬件加密签名};
+
+    % Client Layer for Edge 2 (simplified)
+    \node[client_box, below=1.5cm of edge2] (clientK) {};
+    \node[font=\bfseries, text depth=0.2ex] at ([yshift=-0.4cm]clientK.north) {泛在末端设备 $c_K$\\...};
+    \node[data_box, below=0.6cm of clientK.north] (dataK) {非独立同分布数据};
+    \node[tee_box, below=0.2cm of dataK] (teeK) {可信运行时基座};
+
+    % Connections
+    \draw[arrow] (tee1.north) -- (data1.south);
+    \draw[arrow] (tee2.north) -- (data2.south);
+    \draw[arrow] ([xshift=-0.5cm]client1.north) -- node[left, font=\scriptsize] {本地 $\Delta W_1$} ([xshift=-1.5cm]edge1.south);
+    \draw[lock_arrow] ([xshift=0.5cm]client1.north) -- node[right, font=\scriptsize, text=green!60!black] {加密证明} ([xshift=-0.5cm]edge1.south);
+
+    \draw[arrow] ([xshift=-0.5cm]client2.north) -- node[left, font=\scriptsize] {本地 $\Delta W_2$} ([xshift=0.5cm]edge1.south);
+    \draw[lock_arrow] ([xshift=0.5cm]client2.north) -- node[right, font=\scriptsize, text=green!60!black] {加密证明} ([xshift=1.5cm]edge1.south);
+
+    \draw[arrow] (clientK.north) -- node[left, font=\scriptsize] {上传参数} (edge2.south);
+
+    \draw[arrow] ([xshift=-1cm]edge1.north) -- node[left, font=\small] {梯度与证明汇总报告} ([xshift=-3cm]server.south);
+    \draw[arrow] ([xshift=1cm]edge1.north) -- ([xshift=-1cm]server.south);
+
+    \draw[arrow] (edge2.north) -- node[right, font=\small] {梯次上报\quad} ([xshift=2cm]server.south);
+
+    \draw[arrow, dashed] (server.west) .. controls +(-2,2) and +(-3,1) .. node[above left, font=\small] {下发全局基准模型 $W_{global}^{(t-1)}$} (client1.west);
+    \draw[arrow, dashed] (server.east) .. controls +(2,2) and +(3,1) .. node[above right, font=\small] {信誉分发与跨硬件验证} (clientK.east);
+    \end{tikzpicture}
+    }
     \caption{联邦计算网络交互：基于 TEE 锚点加密的端边云协同物理架构图}
     \label{fig:system_arch}
 \end{figure}
@@ -122,8 +184,64 @@ while maintaining practical convergence under heterogeneous edge settings.
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.85\textwidth]{threat_model.pdf}
-    \fbox{\rule{0pt}{2.5in} \rule{0.8\textwidth}{0pt}} % 此处为您后续重绘复合型投毒威胁模型树预留站位
+    \resizebox{0.85\textwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=1.5cm and 2cm,
+        font=\sffamily,
+        % Styles
+        box/.style={draw, rounded corners, align=center, fill=white, thick},
+        cloud/.style={box, fill=blue!10, minimum width=8cm, minimum height=2.2cm},
+        shield/.style={draw=red!80, fill=red!5, thick, rounded corners, minimum width=10cm, minimum height=1.6cm, align=center},
+        normal_client/.style={box, fill=green!10, minimum width=2.8cm, minimum height=1.2cm},
+        malicious_client/.style={box, fill=red!15, minimum width=2.8cm, minimum height=1.2cm, dashed, draw=red},
+        arrow/.style={-{Stealth[scale=1.2]}, thick},
+        attack_arrow/.style={-{Stealth[scale=1.2]}, thick, draw=red, decorate, decoration={snake, amplitude=0.4mm, segment length=3mm}},
+        block_cross/.style={cross out, draw=red, ultra thick, minimum size=15pt}
+    ]
+
+    % Server
+    \node[cloud] (global) {};
+    \node[font=\bfseries, text depth=0.2ex] at ([yshift=-0.4cm]global.north) {云端聚合中央枢纽 (Honest-but-curious)};
+    \node[box, fill=white, minimum width=3cm, minimum height=0.6cm] (c1) at ([shift={(-2,-0.4)}]global) {内容纯净度审查};
+    \node[box, fill=white, minimum width=3cm, minimum height=0.6cm] (c2) at ([shift={(2,-0.4)}]global) {信誉时序剥离算法};
+
+    % Defense Barrier
+    \node[shield, below=1.2cm of global] (barrier) {};
+    \node[font=\bfseries, text=red!80!black] at ([yshift=0.4cm]barrier.south) {核心信任墙: TEE 硬件强制准入 \& 多维探针软拦截带};
+
+    \draw[arrow, line width=1.4pt, draw=blue!60!black] (barrier.north) -- node[right, font=\small] {唯一合法信誉幸存流} (global.south);
+
+    % Normal Clients (Left)
+    \node[normal_client, below left=2cm and 1cm of barrier] (normal1) {边缘合法长尾群体};
+    \node[normal_client, below=0.6cm of normal1] (normal2) {本地高方差/弱势设备};
+    \draw[arrow, draw=green!60!black] (normal1.north) -- node[left, font=\scriptsize] {合规参数上传} ([xshift=-2.5cm]barrier.south);
+    \draw[arrow, draw=green!60!black] (normal2.west) .. controls +(-1.5,0) and +(-3,-1) .. ([xshift=-4cm]barrier.south);
+
+    % Malicious Clients (Right)
+    \node[malicious_client, below right=1.5cm and 1cm of barrier] (sybil) {外部女巫节点伪造群};
+    \node[malicious_client, below=0.4cm of sybil] (cleanlabel) {干净标签强对抗污染 (C2)};
+    \node[malicious_client, below=0.4cm of cleanlabel] (signflip) {底层符号暴力反转与拉力激增};
+    \node[malicious_client, right=0.5cm of sybil] (freerider) {越狱搭便车者};
+
+    % Attack Flows
+    \draw[attack_arrow] (sybil.north) -- node[right, font=\scriptsize, text=red] {无证书/硬闯报文} ([xshift=2.5cm]barrier.south);
+    \draw[draw=red, ultra thick] ([xshift=2.2cm,yshift=-0.3cm]barrier.south) -- ([xshift=2.8cm,yshift=0.3cm]barrier.south);
+    \draw[draw=red, ultra thick] ([xshift=2.2cm,yshift=0.3cm]barrier.south) -- ([xshift=2.8cm,yshift=-0.3cm]barrier.south);
+
+    \draw[attack_arrow] (cleanlabel.north) .. controls +(-1,1) and +(1,-1) .. node[left, font=\scriptsize, text=red] {穿透性隐蔽后门透传} ([xshift=0.5cm]barrier.south);
+
+    \draw[attack_arrow] (freerider.north) .. controls +(0,1.5) and +(3,-1) .. node[right, font=\scriptsize, text=red] {异常负载协议} ([xshift=4cm]barrier.south);
+    \draw[draw=red, ultra thick] ([xshift=3.7cm,yshift=-0.3cm]barrier.south) -- ([xshift=4.3cm,yshift=0.3cm]barrier.south);
+    \draw[draw=red, ultra thick] ([xshift=3.7cm,yshift=0.3cm]barrier.south) -- ([xshift=4.3cm,yshift=-0.3cm]barrier.south);
+
+    \draw[attack_arrow] (signflip.west) .. controls +(-2,0) and +(1,-2) .. node[below right, font=\scriptsize, text=red] {模型直接投毒操控} ([xshift=-0.5cm]barrier.south);
+
+    % Central core
+    \node[box, fill=yellow!15, minimum width=2.5cm, minimum height=1.2cm, below=2cm of barrier, xshift=-0.8cm] (compromised) {已被系统级劫持控制的合法席位\\(Internal Poisoner/共谋串通)};
+    \draw[attack_arrow] (compromised.north) -- node[left, font=\scriptsize, text=red] {持续隐蔽投毒} ([xshift=-1cm]barrier.south);
+
+    \end{tikzpicture}
+    }
     \caption{边缘广域网络下的安全渗透与多维复合型投毒威胁模型示意图}
     \label{fig:threat_model}
 \end{figure}
@@ -276,13 +394,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{align}
 其中指数化超参数 $\alpha, \beta, \gamma, p$ 分别决定了上述四大维度对最终话语权（权值反馈）的控制强度（其最优控制变量矩阵同样见实验超参数设定）。
 
-为了更直观地阐述上述复杂的体系交汇验证逻辑，图~\ref{fig:dual_stream} 勾勒了该正交机制在鉴别边缘节点上传参数合法性时的全链路白盒决策树（White-box Decision Tree）。探针流首先跨过 TEE 物理门禁筛选，进而同时触发时域内的连击判定（Streak Combo）用以处置长尾潜在威胁。
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{fig_decision_tree.jpg}
-    \caption{基于多维通道与连贯击中规则的双流信任验证白盒决策树}
-    \label{fig:dual_stream}
-\end{figure}
+
 
 \begin{algorithm}[htbp]
 \caption{双流正交信任状态演化 (HistPerf \& RiskEMA)}
