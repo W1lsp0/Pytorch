@@ -90,11 +90,11 @@ while maintaining practical convergence under heterogeneous edge settings.
 在完全开放且无强制准入审核的联邦广域交互中，中心枢纽难以甄别本地数据收集源的合法性与梯度纯净度度量。这导致目前的恶意攻击手段在边缘侧演化出了两个致命的高危分支：一是破坏性极强的\textbf{无差别投毒攻击}（Untargeted Poisoning），例如符号强行反转（Sign-flipping）和幅度暴力拉扯（Gradient Scaling），其目的在于使全局权重突变失锁，直接达成大范围拒绝服务拒绝（DoS）；二是极为阴险的\textbf{隐蔽目标后门攻击}（Targeted Backdoor），攻击方（如标签翻转、干净噪声标签注入、深层语义后门投毒）通过在隐秘的小规模样本中潜藏像素级触发器（Trigger），平时对主导分类任务伪装成高精度贡献，但在遭遇具有特定印记（Pattern）的推断时便瞬间劫持判定网络走向预测深渊。
 
 \subsection{现有主动防御防线的机制与不可调和的局限性}
-为了缓解此类无妄之灾，先驱防御手段大多采取几何层面的粗暴过滤机制（如距离隔离的 Krum \cite{blanchard2017krum} 与逐维中值裁剪的 Trimmed Mean \cite{yin2018byzantine}）。而在最新的前沿研究中，基于时序观察的主动信任评估正成为主流：例如基于小批干净验证集的 FLTrust 余弦导向评估\cite{cao2021fltrust}、FoolsGold 的抗合谋相似性剔除\cite{fung2020foolsgold}，甚至是集成在边缘层级的自适应动态聚合器 RaSA\cite{wang2025rasa} 等方案。除此之外，针对由模型投毒衍生的隐蔽后门与共谋攻击，学界也相应提出了基于解耦对比训练的 FLPurifier \cite{flpurifier}、主打目标共谋防御的 RoseAgg \cite{roseagg} 以及利用双重陷门构建污染缓解机制的 ShieldFL \cite{shieldfl}。
+为了缓解此类无妄之灾，先驱防御手段大多采取几何层面的粗暴过滤机制（如距离隔离的 Krum \cite{blanchard2017krum} 与逐维中值裁剪的 Trimmed Mean \cite{yin2018byzantine}）。而在最新的前沿研究中，基于时序观察的主动信任评估正成为主流：例如基于小批干净验证集的 FLTrust 余弦导向评估\cite{cao2021fltrust}、FoolsGold 的抗合谋相似性剔除\cite{fung2020foolsgold}，甚至是集成在边缘层级的自适应动态聚合器 RaSA\cite{wang2025rasa} 等方案。同时，专注于恶意客户端广义检测 \cite{dou2025toward}、细粒度可信训练框架设计（如 TMT-FL）\cite{lu2025tmt}，以及多级自适应保护架构 \cite{wang2024federated} 的探索，也极大丰富了纯软件评估防线的维度。除此之外，针对由模型投毒衍生的隐蔽后门与共谋攻击，学界也相应提出了基于解耦对比训练的 FLPurifier \cite{flpurifier}、主打目标共谋防御的 RoseAgg \cite{roseagg} 以及利用双重陷门构建污染缓解机制的 ShieldFL \cite{shieldfl}。
 然而，上述全软件层面的防御大都面临一个逻辑死结：如果在 Non-IID 异构环境下提高排异警阈门控，则极为轻易将携带稀有正义特征的正当节点也扫地出门（导致 FPR 误杀率飙升）；此外，纯软件的探针根本无法拦截具有系统 Root 操作权限的黑客私自串改内存监控读数及本地执行框架底层的超限违规举措。
 
 \subsection{联邦环境下的可信硬件信任根 (TEE)}
-为了弥补纯算法对宿主机环境把空的物理真空，学术界开始借助诸如 Intel SGX、ARM TrustZone 等可信执行环境（Trusted Execution Environment, TEE）在联邦参与设备内部构建绝对安全的“芯上飞地”。TEE 隔离区利用加密内存区运行机要代码，即便是遭遇越狱获取了底层权限的恶意控制者，也无法篡改存放于内的密钥证明与校验签名（如 Liao 等证明的防篡改推理机制\cite{liao2024verifiable}与 RPPFL 硬件封装防线\cite{zhang2025rppfl}）。近期研究更加广泛地证实了 TEE 在联邦训练完整性保障 \cite{r1_tee_integrity}、对抗性攻击缓解 \cite{r5_tee_mitigating} 以及工业物联网数据分布式信任共享 \cite{r12_iot_tee} 中的兜底基石作用。
+为了弥补纯算法对宿主机环境把空的物理真空，学术界开始借助诸如 Intel SGX、ARM TrustZone 等可信执行环境（Trusted Execution Environment, TEE）在联邦参与设备内部构建绝对安全的“芯上飞地”。TEE 隔离区利用加密内存区运行机要代码，即便是遭遇越狱获取了底层权限的恶意控制者，也无法篡改存放于内的密钥证明与校验签名（如 Liao 等证明的防篡改推理机制\cite{liao2024verifiable}与 RPPFL 硬件封装防线\cite{zhang2025rppfl}）。近期研究更加广泛地证实了 TEE 在联邦训练完整性保障 \cite{r1_tee_integrity}、对抗性攻击缓解 \cite{r5_tee_mitigating} 以及工业物联网数据分布式信任共享 \cite{r12_iot_tee} 中的兜底基石作用，其在 SGX 环境下的分布式联邦扩展应用可行性 \cite{xu2021distributed} 与高效层级并发训练加速策略 \cite{yan2024efficient} 也得到了业界成功展示。
 本文体系吸收这一最纯粹的硬件隔离底座，由此创造出软硬件联动的不可撕裂的网闸防线——不仅由系统内核（云）核查参数，同时借硬件之手在边侧加装具备反向侦听与绝对可信证据上报的软锚锁（TMAA），锁死第一道也是最基础的安全协议门。
 
 
@@ -584,6 +584,9 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
     \bibitem{fedpe} FedPE: Adaptive Model Pruning-Expanding for Federated Learning on Mobile Devices[J]. 
 \bibitem{parallelsfl} ParallelSFL: A Novel Split Federated Learning Framework Tackling Heterogeneity Issues[J]. 
     \bibitem{wang2025rasa} Wang et al. RaSA: Robust and Adaptive Secure Aggregation for Edge-Assisted Hierarchical Federated Learning[J]. 2025.
+    \bibitem{dou2025toward} Dou et al. Toward Malicious Clients Detection in Federated Learning[J]. 2025.
+    \bibitem{lu2025tmt} Lu et al. TMT-FL: Enabling Trustworthy Model Training of Federated Learning With Malicious Participants[J]. 2025.
+    \bibitem{wang2024federated} Wang et al. A Federated Learning Scheme with Adaptive Hierarchical Protection and Multiple Aggregation[J]. 2024.
     \bibitem{flpurifier} FLPurifier: Backdoor Defense in Federated Learning via Decoupled Contrastive Training[J]. 
     \bibitem{roseagg} RoseAgg: Robust Defense Against Targeted Collusion Attacks in Federated Learning[J]. 
     \bibitem{shieldfl} ShieldFL: Mitigating Model Poisoning Attacks in Privacy-Preserving Federated Learning[J]. 
@@ -592,11 +595,8 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
     \bibitem{r1_tee_integrity} A training-integrity privacy-preserving federated learning scheme with trusted execution environment[J]. 
     \bibitem{r5_tee_mitigating} Mitigating Adversarial Attacks in Federated Learning with Trusted Execution Environments[J]. 
     \bibitem{r12_iot_tee} Secure sharing of industrial IoT data based on distributed trust management and trusted execution environment[J]. 
-    \bibitem{mcmahan2017fedavg} McMahan B, Moore E, Ramage D, et al. Communication-Efficient Learning of Deep Networks from Decentralized Data[J]. AISTATS, 2017.
-    \bibitem{lu2025tmt} Lu et al. TMT-FL: Enabling Trustworthy Model Training of Federated Learning With Malicious Participants[J]. 2025.
-    \bibitem{dou2025toward} Dou et al. Toward Malicious Clients Detection in Federated Learning[J]. 2025.
-    \bibitem{wang2024federated} Wang et al. A Federated Learning Scheme with Adaptive Hierarchical Protection and Multiple Aggregation[J]. 2024.
     \bibitem{xu2021distributed} Xu et al. Distributed Learning in Trusted Execution Environment A Case Study of Federated Learning in SGX[J]. 2021.
     \bibitem{yan2024efficient} Yan et al. An Efficient Greedy Hierarchical Federated Learning Training Method Based on Trusted Execution Envir[J]. 2024.
+    \bibitem{mcmahan2017fedavg} McMahan B, Moore E, Ramage D, et al. Communication-Efficient Learning of Deep Networks from Decentralized Data[J]. AISTATS, 2017.
     \end{thebibliography}
 \end{document}
