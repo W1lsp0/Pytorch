@@ -95,16 +95,25 @@ while maintaining practical convergence under heterogeneous edge settings.
 
 \subsection{联邦环境下的可信硬件信任根 (TEE)}
 为了弥补纯算法对宿主机环境把空的物理真空，学术界开始借助诸如 Intel SGX、ARM TrustZone 等可信执行环境（Trusted Execution Environment, TEE）在联邦参与设备内部构建具备高安全隔离等级的“芯上飞地”。TEE 隔离区利用加密内存区运行机要代码，即便是遭遇越狱获取了底层权限的恶意控制者，也难以篡改存放于内的密钥证明与校验签名（在不考虑高级侧信道攻击的标准安全假设前提下）（如 Liao 等证明的防篡改推理机制\cite{liao2024verifiable}与 RPPFL 硬件封装防线\cite{zhang2025rppfl}）。近期研究更加广泛地证实了 TEE 在联邦训练完整性保障 \cite{r1_tee_integrity}、对抗性攻击缓解 \cite{r5_tee_mitigating} 以及工业物联网数据分布式信任共享 \cite{r12_iot_tee} 中的兜底基石作用，其在 SGX 环境下的分布式联邦扩展应用可行性 \cite{xu2021distributed} 与高效层级并发训练加速策略 \cite{yan2024efficient} 也得到了业界成功展示。
-本文体系吸收这一最纯粹的硬件隔离底座，由此创造出软硬件联动的不可撕裂的网闸防线——不仅由系统内核（云）核查参数，同时借硬件之手在边侧加装具备反向侦听与绝对可信证据上报的软锚锁（TMAA），锁死第一道也是最基础的安全协议门。
+本文体系吸收这一最纯粹的硬件隔离底座，由此创造出软硬件联动的不可撕裂的网闸防线。与 RPPFL \cite{zhang2025rppfl} 仅利用 TEE 进行梯度静态加密机制，或是 TMT-FL \cite{lu2025tmt} 单维聚焦于后端异常评测的研究存在本质区别，本文首次将底层的硬件远程证明（Remote Attestation）与顶层的双流正交动态信誉演化进行了深度耦合：不仅由系统内核（云）核查参数，同时借硬件之手在边侧加装具备反向侦听与高度可信证据上报的软锚锁（TMAA），实现了跨硬件强制准入规则与软件动态风险熔断机制的毫秒级时序协同。
 
 
 \section{系统模型与问题定义}
 
 \subsection{端边云协同架构与系统流转建模}
 在本文设计的“信任流”防御逻辑网格中，系统运行在一个典型的大型端-边-云（Client-Edge-Cloud）异构不信任通信链路环境中（全局协同物理架构如图~\ref{fig:system_arch} 所示）。整个业务架构包含顶端的\textbf{参数汇总审查验证中心（Server, $\mathcal{S}$）}，以及下方 $K$ 个游离在网络浅滩、不定期上线且随时可能沦落为受控投毒者的\textbf{边缘节点容器组合} $\mathcal{C}=\{c_1, c_2, \dots, c_K\}$。
-系统首先通过部署硬接入凭证，在各边缘 $c_k$ 设备内核开辟出 TEE 加密信道，随后才运行其参与联合建模目标：最小化定义在所有物理边缘侧数据集 $\mathcal{D}_k$ 分布总和上的经验求导风险期望：$\min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)$。
-其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$。在第 $t$ 轮训练伊始，服务器广播基线模型副本 $W_{global}^{(t-1)}$，安全代理节点在其非独立同分布数据集（Non-IID）上进行前向反向步计算，得出局部收敛参数增益：$\Delta W_{k}^{(t)} = \arg\min_{\Delta W} \mathbb{E}[\ell(W_{global}^{(t-1)} + \Delta W; x, y)]$。
-最后，合法的增量与其由 TEE 签名背书的“硬件级防篡改报告信物（Attestation Quote）”，一并上传入风险过滤网卡，从而让中心服务器能够基于多流演化的信任评分系统实施鲁棒更新：$W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})$。
+系统首先通过部署硬接入凭证，在各边缘 $c_k$ 设备内核开辟出 TEE 加密信道，随后才运行其参与联合建模目标：最小化定义在所有物理边缘侧数据集 $\mathcal{D}_k$ 分布总和上的经验求导风险期望：
+\begin{equation}
+\min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)
+\end{equation}
+其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$。在第 $t$ 轮训练伊始，服务器广播基线模型副本 $W_{global}^{(t-1)}$，安全代理节点在其非独立同分布数据集（Non-IID）上进行前向反向步计算，得出局部收敛参数增益：
+\begin{equation}
+\Delta W_{k}^{(t)} = \arg\min_{\Delta W} \mathbb{E}[\ell(W_{global}^{(t-1)} + \Delta W; x, y)]
+\end{equation}
+最后，合法的增量与其由 TEE 签名背书的“硬件级防篡改报告信物（Attestation Quote）”，一并上传入风险过滤网卡，从而让中心服务器能够基于多流演化的信任评分系统实施鲁棒更新：
+\begin{equation}
+W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})
+\end{equation}
 
 \begin{figure}[H]
     \centering
@@ -176,7 +185,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \begin{equation}
     TrustScore_{k} = M_{attest,k} \cdot \exp\left(-\lambda \cdot\max(0, A_{k} - \tau)^{\rho}\right),
 \end{equation}
-其中参数 $\lambda$ 控制随异常程度增加而降分的陡峭度，$\tau$ 充当容忍正常波动的安全死区阈值，$\rho$ 则为指数衰减加速因子（本文各阶段核心超参数的最佳经验取值，将在第~\ref{sec:experiments} 节的超参数表中统一详述）。
+其中参数 $\lambda$ 控制随异常程度增加而降分的陡峭度，$\tau$ 充当容忍正常波动的安全死区阈值，$\rho$ 则为指数衰减加速因子（在本实验默认配置中经验取值为 $\lambda=5.0, \tau=0.1, \rho=2.0$，各阶段核心超参数的敏感性组合详见第~\ref{sec:experiments} 节的具体列表）。
 
 \subsection{阶段二：服务器优先的参考方向构建与同构协调审查}
 纯粹在客户端梯度间做两两余弦相似度测算极易因攻击者相互抱团（合谋攻击）而受骗。为此，本文设计了\textbf{优先纯净基准（Vanilla Reference Prioritization）}。
@@ -199,7 +208,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
     S_{consist,k} &= \frac{\sum_{j\neq k} TrustScore_{j} \cdot \max\left(0,\ \alpha_{1} + \alpha_{2} \cdot \cos(\Delta W_{k}, \Delta W_{j})\right)}{\sum_{j\neq k} TrustScore_{j} + \varepsilon}, \\
     ContentScore_{k} &= \frac{(1 + \beta_{fusion}^{2}) \cdot S_{consist,k} \cdot S_{contrib,k}}{\beta_{fusion}^{2}\cdot S_{consist,k} + S_{contrib,k} + \varepsilon}.
 \end{align}
-此处 $\alpha_{1}$ 与 $\alpha_{2}$（且 $\alpha_1 + \alpha_2 = 1.0$）用于平滑并标定余弦距离的敏感映射区间；$\beta_{fusion} > 1.0$ 为先验融合偏置，这表示系统有意令绝对贡献度（靠近纯净大方向）的权重高于群体协作一致性，以强力锚定正确的全局演化路径。
+此处 $\alpha_{1}$ 与 $\alpha_{2}$（且 $\alpha_1 + \alpha_2 = 1.0$）用于平滑并标定余弦距离的敏感映射区间；$\beta_{fusion} > 1.0$（实验默认经验收敛值设定为 $\beta_{fusion}=2.0$）为先验融合偏置，这表示系统有意令绝对贡献度（靠近纯净大方向）的权重高于群体协作一致性，以应对隐蔽合谋攻击并强力锚定正确的全局演化路径。
 
 \begin{algorithm}[htbp]
 \caption{基于 TEE 硬件锚点与纯净参考的准入与内容审查}
