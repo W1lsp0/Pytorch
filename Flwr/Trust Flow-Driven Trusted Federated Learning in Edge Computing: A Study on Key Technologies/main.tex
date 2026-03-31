@@ -443,7 +443,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\textwidth]{convergence_asr.pdf}
+    \includegraphics[width=0.85\textwidth]{convergence_asr_cropped.pdf}
     \caption{全局收敛准确率 (Accuracy) 与后门攻击成功率 (ASR) 演化曲线}
     \label{fig:convergence}
 \end{figure}
@@ -477,7 +477,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\textwidth]{fig_tsne_visualization.pdf}
-    \caption{联邦参与节点特征向量在双流防御前后的 t-SNE 降维对比。系统成功分离了紧密耦合的高危掩体，保障了合规长尾节点免遭误杀。}
+    \caption{联邦参与节点特征向量在双流防御前后的 t-SNE 降维对比}
     \label{fig:tsne_manifold}
 \end{figure}
 
@@ -523,7 +523,7 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{ablation_study.pdf}
-    \caption{多阶段防御机制消融剥离分析。左轴（蓝色块）展示模型主任务准确率，右轴（红色块）为攻击成功率。可见深层架构有效压制 ASR 至 10.21\% 的同时，成功维系了 92.40\% 的业务基盘。}
+    \caption{多阶段防御机制消融剥离分析}
     \label{fig:ablation}
 \end{figure}
 
@@ -535,7 +535,7 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{alpha_sensitivity.pdf}
-    \caption{环境数据异构度（Dirichlet $\alpha$）衰减下的各类安全聚合算法健壮性压测对比。粉色阴影区为本次实证所面临的地狱级极端长尾设定区。}
+    \caption{环境数据异构度（Dirichlet $\alpha$）衰减下的各类安全聚合算法健壮性压测对比}
     \label{fig:alpha_sensitivity}
 \end{figure}
 
