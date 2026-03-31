@@ -106,14 +106,15 @@ while maintaining practical convergence under heterogeneous edge settings.
 \begin{equation}
 \min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)
 \end{equation}
-其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$。在第 $t$ 轮训练伊始，服务器广播基线模型副本 $W_{global}^{(t-1)}$，安全代理节点在其非独立同分布数据集（Non-IID）上进行前向反向步计算，得出局部收敛参数增益：
+其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$。在第 $t$ 轮训练伊始，服务器广播基线模型副本 $W_{global}^{(t-1)}$，安全代理节点（以 $W_{k,0}^{(t)} \equiv W_{global}^{(t-1)}$ 为起点）在其非独立同分布数据集（Non-IID）上进行 $E$ 轮基于局部学习率 $\eta_l$ 的本地随机梯度下降（SGD）计算，最终得出的局部收敛参数增益可表示为累计张量偏移：
 \begin{equation}
-\Delta W_{k}^{(t)} = \arg\min_{\Delta W} \mathbb{E}[\ell(W_{global}^{(t-1)} + \Delta W; x, y)]
+\Delta W_{k}^{(t)} = W_{k, E}^{(t)} - W_{global}^{(t-1)}, \quad \text{其中 } W_{k, e}^{(t)} = W_{k, e-1}^{(t)} - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)]
 \end{equation}
 最后，合法的增量与其由 TEE 签名背书的“硬件级防篡改报告信物（Attestation Quote）”，一并上传入风险过滤网卡，从而让中心服务器能够基于多流演化的信任评分系统实施鲁棒更新：
 \begin{equation}
 W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})
 \end{equation}
+其中，$\Phi \subseteq \mathcal{C}$ 表示在本轮中共识存活下来的有效客户端组合；而 $\mathrm{Agg}(\cdot)$ 代表本文所设计的核心安全信任聚合算子，其基于长效历史得分与多维瞬发风险解耦的具体自适应融合方程机制，将在第 4 节体系化地展开。
 
 \begin{figure}[H]
     \centering
@@ -609,7 +610,7 @@ $r_{grad}$ 旨在衡量客户端上传梯度 $\Delta W_k^{(t)}$ 与全局纯净�
 \begin{equation}
     r_{grad, k}^{(t)} = \lambda_{d} \left(1 - \frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{||\Delta W_k^{(t)}|| \cdot ||g_{root}^{(t)}||}\right) + \lambda_{m} \max\left(0, \frac{||\Delta W_k^{(t)}||_2 - \mu^{(t)}}{\sigma^{(t)}}\right)
 \end{equation}
-其中，$\mu^{(t)}$ 与 $\sigma^{(t)}$ 分别为当前轮次全场入围节点局部梯度 L2 范数分布的标量均值与标准差。
+其中，常量 $\lambda_d$ 与 $\lambda_m$ 为控制方向偏离与幅度突变惩罚强度的平衡超参数（本文默认等权设定为 $0.5$）；而 $\mu^{(t)}$ 与 $\sigma^{(t)}$ 严格定义为当前第 $t$ 聚合轮次（单次全场，非跨轮截断滑动）内所有入围审查节点局部梯度 L2 范数分布的统计平均标量与标准偏差。
 
 \subsection{A.2 小样本先验验证交叉熵探针 ($r_{probe}$)}
 基于纯粹软件距离层面的探测往往无法防范针对非主线类别的精准毒化。$r_{probe}$ 利用中心服务器端物理隔离持有的极小规模纯净辅助集（Probe Dataset, $\mathcal{D}_{probe}$），通过比较融合该局部模型前后的前向推理损失激增量（Loss Surge），精准测定深水区的降维打击：
@@ -618,7 +619,7 @@ $r_{grad}$ 旨在衡量客户端上传梯度 $\Delta W_k^{(t)}$ 与全局纯净�
 \end{equation}
 
 \subsection{A.3 深层神经元隐蔽后门激活探针 ($r_{trigger}$)}
-针对高度隐蔽的生成对抗级污染（如 Clean-Label Attack），常规的统计与验证 Loss 可能失灵。本系统监控高层特征映射的激活散度。$r_{trigger}$ 提取特定客户端模型深层特征网络在推理验证基准时的分类前置神经元激活层输出 $A_k$，并计算其分布向量相比于安全基线 $\mathcal{H}(A_{base})$ 的香农散度或 KL 散度偏差：
+针对高度隐蔽的生成对抗级污染（如 Clean-Label Attack），常规的统计与验证 Loss 可能失灵。本系统监控高层特征映射的激活散度。$r_{trigger}$ 提取特定客户端模型经过深层特征网络前向推理验证集时的分类前置活化张量输出 $A_k$。此处记号 $\mathcal{H}(\cdot)$ 定义为将原生非界化神经元输出经由 Softmax 归一化（或构建为离散特征频率直方分布）映射生成的后验概率密度向量，以此严格满足极限定理对 KL 散度算子输入的数学约束：
 \begin{equation}
     r_{trigger, k}^{(t)} = \text{KL-Divergence}\left( \mathcal{H}(A_{base}) \| \mathcal{H}(A_k) \right)
 \end{equation}
