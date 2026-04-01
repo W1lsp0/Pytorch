@@ -1,6 +1,6 @@
 # 排除超过100MB的文件
 Flwr/data/cifar-10-python.tar.gz
-
+Flwr-half/data/cifar-10-python.tar.gz
 # 排除以点号开头的文件和目录
 .*
 
