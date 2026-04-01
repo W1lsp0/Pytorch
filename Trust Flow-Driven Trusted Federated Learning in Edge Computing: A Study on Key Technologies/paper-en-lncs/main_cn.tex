@@ -1,11 +1,12 @@
 % !TeX program = xelatex
-\documentclass[11pt, a4paper, UTF8, fontset=fandol]{ctexart}
+\documentclass[runningheads]{llncs}
+\usepackage[UTF8, fontset=fandol]{ctex}
 
 \usepackage{amsmath, amssymb}
 \usepackage{booktabs, multirow, array, longtable}
 \usepackage{threeparttable}
 \usepackage{graphicx}
-\usepackage{geometry}
+% \usepackage{geometry} % LNCS format manages its own geometry
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, shapes.geometric, calc, fit, backgrounds, decorations.pathmorphing, shadows}
 \usepackage{hyperref}
@@ -14,7 +15,7 @@
 \usepackage{algorithmic}
 \renewcommand{\algorithmicrequire}{\textbf{输入:}}
 \renewcommand{\algorithmicensure}{\textbf{输出:}}
-\geometry{left=2.3cm, right=2.3cm, top=2.5cm, bottom=2.5cm}
+% \geometry{left=2.3cm, right=2.3cm, top=2.5cm, bottom=2.5cm}
 \hypersetup{colorlinks=true, linkcolor=black, citecolor=black, urlcolor=blue}
 
 % 兼容部分 pdflatex 环境中 CJK 粗体字体缺失问题
@@ -22,39 +23,29 @@
 \renewcommand{\bfdefault}{m}
 \makeatother
 
-\ctexset{ section={format=\Large\rmfamily}, subsection={format=\large\rmfamily}, subsubsection={format=\normalsize\rmfamily} }
+% \ctexset{ section={format=\Large\rmfamily}, subsection={format=\large\rmfamily}, subsubsection={format=\normalsize\rmfamily} }
 
 \begin{document}
-    % 手工标题区：避免 \maketitle 默认粗体中文触发字体缺失
-    \begin{center}
-        {\Large Trust Flow-Driven Trusted Federated Learning in Edge Computing: A Study on Key Technologies\par}
-        \vspace{4pt}
-        {\Large 边缘计算中信任流驱动的可信联邦关键技术研究\par}
-        \vspace{10pt}
-        {周家凯\par}
-        \vspace{2pt}
-        {2026年3月\par}
-    \end{center}
 
-    \begin{abstract}
-        面向边缘计算场景，联邦学习在提升数据可用性的同时，也面临非独立同分布数据、模型投毒和运行环境不确定性叠加带来的鲁棒性挑战。本文提出一种信任流驱动的可信联邦学习框架，将客户端可信验证、参数内容审查、历史信誉演化、风险状态更新以及分层鲁棒聚合串联为统一的状态闭环。方法上，本文构建了硬门禁与指数衰减结合的信任评分机制，引入服务器优先的纯净参考方向用于贡献度验证，设计历史流与风险流正交更新策略，并在聚合阶段采用风险门控下的逐层准入、二次归一化与动态裁剪机制。基于Flower实现并在CIFAR-10上完成20客户端、6种高危混合攻击的实证。5轮独立实验（$n=5$）统计结果显示：在设定的对抗区间内可有效识别各类恶意客户端，且正常节点永久误杀率维持向零收敛（瞬时可疑率 $<$ 0.01\%）；系统取得了 $92.31\% (\pm 0.09\%)$ 的均值收敛准确率，并将后门攻击成功率（ASR）极值期望控制在 $10.21\% (\pm 0.05\%)$；单次 30 轮仿真基准耗时为 3878.53s。结果表明，信任流正交建模能够在异构边缘环境中提供稳健的恶意节点识别能力。
-    \end{abstract}
+\title{Trust Flow-Driven Trusted Federated Learning in Edge Computing: A Study on Key Technologies}
+\titlerunning{Trust Flow-Driven Trusted Federated Learning}
+\author{周家凯 (Jiakai Zhou)\inst{1}}
+\authorrunning{J. Zhou}
+\institute{Institution Name \\ \email{email@example.com}}
 
-    关键词：联邦学习；边缘计算；可信执行环境；风险状态建模；分层鲁棒聚合；后门防御
+\maketitle
 
-    \begin{center}
-        Abstract
-    \end{center}
-    Federated learning in edge environments faces compound risks from data
-    heterogeneity, model poisoning, and runtime trust uncertainty. This paper presents
-    a trust flow-driven trusted federated learning framework that unifies trusted
-    report verification, content auditing, historical reputation evolution, risk-state
-    updating, and layer-wise robust aggregation into a closed-loop pipeline. The
-    proposed method combines hard attestation gating with exponential trust
-    attenuation, introduces a server-prioritized clean reference for contribution
-    validation, and adopts orthogonal dual-stream updates (history stream and risk
-    stream). During aggregation, risk-gated layer-wise admission, survivor re-normalization,
-    and dynamic clipping are jointly applied. We implement the framework on Flower and evaluate it on CIFAR-10 with 20 clients
+\begin{abstract}
+Federated learning in edge environments faces compound risks from data
+heterogeneity, model poisoning, and runtime trust uncertainty. This paper presents
+a trust flow-driven trusted federated learning framework that unifies trusted
+report verification, content auditing, historical reputation evolution, risk-state
+updating, and layer-wise robust aggregation into a closed-loop pipeline. The
+proposed method combines hard attestation gating with exponential trust
+attenuation, introduces a server-prioritized clean reference for contribution
+validation, and adopts orthogonal dual-stream updates (history stream and risk
+stream). During aggregation, risk-gated layer-wise admission, survivor re-normalization,
+and dynamic clipping are jointly applied. We implement the framework on Flower and evaluate it on CIFAR-10 with 20 clients
 under six mixed attack types. Statistical results over 5 independent runs
 ($n=5$) show that malicious clients are effectively identified with
 negligible permanent impact on benign nodes. The framework achieves an average
@@ -62,6 +53,16 @@ accuracy of 92.31\% ($\pm$ 0.09\%) and maintains an average ASR of 10.21\% ($\pm
 representative benchmark runtime of 3878.53s. The results indicate that
 trust-flow orthogonal modeling provides robust malicious-client detection
 while maintaining practical convergence under heterogeneous edge settings.
+
+\keywords{Federated Learning \and Edge Computing \and Trusted Execution Environment \and Risk State Modeling \and Layer-wise Robust Aggregation \and Backdoor Defense}
+\end{abstract}
+
+\def\abstractname{\textbf{中文摘要}}
+\begin{abstract}
+面向边缘计算场景，联邦学习在提升数据可用性的同时，也面临非独立同分布数据、模型投毒和运行环境不确定性叠加带来的鲁棒性挑战。本文提出一种信任流驱动的可信联邦学习框架，将客户端可信验证、参数内容审查、历史信誉演化、风险状态更新以及分层鲁棒聚合串联为统一的状态闭环。方法上，本文构建了硬门禁与指数衰减结合的信任评分机制，引入服务器优先的纯净参考方向用于贡献度验证，设计历史流与风险流正交更新策略，并在聚合阶段采用风险门控下的逐层准入、二次归一化与动态裁剪机制。基于Flower实现并在CIFAR-10上完成20客户端、6种高危混合攻击的实证。5轮独立实验（$n=5$）统计结果显示：在设定的对抗区间内可有效识别各类恶意客户端，且正常节点永久误杀率维持向零收敛（瞬时可疑率 $<$ 0.01\%）；系统取得了 $92.31\% (\pm 0.09\%)$ 的均值收敛准确率，并将后门攻击成功率（ASR）极值期望控制在 $10.21\% (\pm 0.05\%)$；单次 30 轮仿真基准耗时为 3878.53s。结果表明，信任流正交建模能够在异构边缘环境中提供稳健的恶意节点识别能力。
+
+\keywords{联邦学习 \and 边缘计算 \and 可信执行环境 \and 风险状态建模 \and 分层鲁棒聚合 \and 后门防御}
+\end{abstract}
 
     \section{引言}
 联邦学习（Federated Learning, FL）作为一种新兴的分布式机器学习范式，通过“数据不出本地，仅交换模型参数”的机制，为边缘计算（Edge Computing）场景下的数据孤岛问题和隐私保护需求提供了理想的解决方案\cite{kairouz2021flsurvey}。在工业物联网、医疗诊断、自动驾驶等边缘应用中，海量智能设备产生的丰富感知数据可在不暴露原始数据的前提下，协同训练高性能的全局模型。
@@ -110,6 +111,7 @@ while maintaining practical convergence under heterogeneous edge settings.
 \begin{equation}
 \Delta W_{k}^{(t)} = W_{k, E}^{(t)} - W_{global}^{(t-1)}, \quad \text{其中 } W_{k, e}^{(t)} = W_{k, e-1}^{(t)} - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)]
 \end{equation}
+其中，期望 $\mathbb{E}[\cdot]$ 表示对本地数据集 $\mathcal{D}_k$ 的随机小批量（mini-batch）采样取期望（本研究仿真框架中 batch size 设定为 64）。
 最后，合法的增量与其由 TEE 签名背书的“硬件级防篡改报告信物（Attestation Quote）”，一并上传入风险过滤网卡，从而让中心服务器能够基于多流演化的信任评分系统实施鲁棒更新：
 \begin{equation}
 W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})
@@ -128,7 +130,7 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
 \begin{itemize}
     \item \textbf{硬件隔离安全边界假设（信任基石）}：系统根植于可受验证的安全边界限制之内：即在标准安全模型假定下（在不探究针对硅芯片的微架构时序探测、侧信道分析或物理强力暴力窃取（Physical Probing）的前提制约下\cite{zhang2025rppfl}），假定即使外部宿主操作系统（OS）遭遇内核越权渗透与控制，内部驻留的硬件特权高地（譬如由 TrustZone/SGX 构建的 TEE 安全验证辖内）依旧确保高计算复杂度安全等级的处理隔离。这就为体系提供了签发不可低成本抵赖防伪运行特征的基础基床。
     \item \textbf{半诚实偏好奇的云端聚合总库（Honest-but-curious）}：这保证了我们部署的信誉双流积分池与分层聚合乘数会被代码丝毫不差地遵循演算推进；防备的是其探看明文原属照片图集等违规窥探操作行为。
-    \item \textbf{无孔不入且伪装精妙的内部串通派系（Internal Attackers/Poisoners）}：有别于仅能嵅探公网报文却无法发送有效握手证书的外部被动攻击者，假定我们的假想敌已经成功潜伏进了拥有合法准入凭证的正当设备阵列之列（高危占比上限 $< 50\%$）。内部破坏者拥有更改当前节点本地标签体系、混入脏数据（生成带噪声的 Clean-label 污染原图）、甚至暴力拉扯底层 PyTorch SGD 更新返回的步频张量进行强行符号倒置与数量级放大（参数缩放与修改指令）的近乎无约束权利。
+    \item \textbf{无孔不入且伪装精妙的内部串通派系（Internal Attackers/Poisoners）}：有别于仅能嵅探公网报文却无法发送有效握手证书的外部被动攻击者，假定我们的假想敌已经成功潜伏进了拥有合法准入凭证的正当设备阵列之列（高危占比上限 $< 50\%$）。内部破坏者拥有更改当前节点本地标签体系、混入脏数据（生成带噪声的 Clean-label 污染原图）、甚至暴力拉扯底层 PyTorch SGD 更新返回的步频张量进行强行符号倒置与数量级放大（参数缩放与修改指令）的近乎无约束权利。需要说明的是，虽然理论分析假定的系统容灾界限为 50\% 高危恶意占比，但为了符合现实威胁模型下的大多数分布情况，本研究的框架性实验基础测评重点首先聚焦于高危强度典型的 30\% 从属环境；而随后逼近 50\% 界线深水区的抗打击延伸测试，则作为系统威胁假设边界的独立压力检验被单列汇报。
 \end{itemize}
 
 \begin{figure}[H]
@@ -588,6 +590,8 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
 
 分析该灵敏度演替曲线可知：在 $\alpha=100$ 或 $\alpha=1.0$ 这类平和或轻度倾斜的温室场景下，以 Krum 和 FLTrust 为代表的距离约束机制能从宽裕的特征中勉强找到同构集，并有着与本文系统接近的正常表现（Acc 均 > 90\%）。然而，一旦防御战线被迫进入极端长尾分布 ($\alpha \to 0.1$) 区域，基于排他性纯距排斥的传统解法出现了明显的泛化崩塌，大量携带重要垂直类别信息的合法客户端因被误诊而抛弃，准确率显著下降至 64.2\%。相比之下，本架构（蓝实线）由于引入了双维度信任隔离机制，即便面对最严苛的偏科分布，也能始终以巨大的安全裕量横盘维系在 92.0\% 的准线之上。这从本质层面自证了：该防线的极高精度是由系统底层解耦设计赋予的普适红利，而非刻意修饰特定数据环境而产生的脆弱过拟合现象。
 
+此外，针对决定上述框架信任流容错核心表现的关键超参数先验融合偏置 $\beta_{fusion}$，我们在同等对抗强度下横向比对了其离散映射区间。实证表明：当测试 $\beta_{fusion} \in [0.5, 1.0, 2.0, 3.0]$ 等数值时，系统呈现出显著的阶段性差异。数值偏低时会赋予长尾异构较高的留存概率，但同时也抬高了极端投毒 ASR 穿刺的风险；而在极限高值下系统逐渐退化为绝对的同质化独裁筛选。因此，系统最终采用的 $\beta_{fusion} = 2.0$ 并非随意抽样，而是经由高强度网格验证后确定的、在收敛速度（Acc）和恶意拦截（ASR 压制）之间取得最佳效用的全局经验最优参数。
+
 \subsection{系统计算与通信额外开销分析 (Overhead Analysis)}
 虽然本防御方案内部演化逻辑复杂，但在基于“边云协同”的微服务架构下计算与通信开销依旧可控。如表~\ref{tab:overhead} 所示，由于在\textbf{边缘客户端}仅仅是生成 TEE Quote 以及执行原生的本地训练，无需进行沉重的全同态加密计算，终端的额外延迟仅为 $12 \sim 15$ 毫秒，对性能极其受限的 IoT 设备极其友好。
 而在\textbf{通信频段}上，每一台设备上报参数时只需附带一份轻量级（约 $15$ KB）的 TrustReport JSON 证书文件，相比于动辄 $10$ MB 级别的权重矩阵传输，带宽增量 $<0.15\%$，近乎忽略不计（Negligible）。
@@ -638,7 +642,7 @@ $r_{grad}$ 旨在衡量客户端上传梯度 $\Delta W_k^{(t)}$ 与全局纯净�
 \end{equation}
 
 \subsection{A.3 深层神经元隐蔽后门激活探针 ($r_{trigger}$)}
-针对高度隐蔽的生成对抗级污染（如 Clean-Label Attack），常规的统计与验证 Loss 可能失灵。本系统监控高层特征映射的激活散度。$r_{trigger}$ 提取特定客户端模型经过深层特征网络前向推理验证集时的分类前置活化张量输出 $A_k$。此处记号 $\mathcal{H}(\cdot)$ 定义为将原生非界化神经元输出经由 Softmax 归一化（或构建为离散特征频率直方分布）映射生成的后验概率密度向量，以此严格满足极限定理对 KL 散度算子输入的数学约束：
+针对高度隐蔽的生成对抗级污染（如 Clean-Label Attack），常规的统计与验证 Loss 可能失灵。本系统监控高层特征映射的激活散度。$r_{trigger}$ 提取特定客户端模型经过深层特征网络前向推理验证集时的分类前置活化张量输出 $A_k$。此处记号 $\mathcal{H}(\cdot)$ 定义为将原生非界化神经元输出经由 Softmax 归一化映射为概率单形（Probability Simplex，即强制性转化为非负且总和为 1 的后验概率分布体系），以此从数学层面上严格满足规范理论对 KL 散度算子输入的约束前置条件：
 \begin{equation}
     r_{trigger, k}^{(t)} = \text{KL-Divergence}\left( \mathcal{H}(A_{base}) \| \mathcal{H}(A_k) \right)
 \end{equation}

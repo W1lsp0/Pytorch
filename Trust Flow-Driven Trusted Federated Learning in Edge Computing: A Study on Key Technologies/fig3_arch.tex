@@ -16,59 +16,59 @@
     ]
 
     % Stage 1 Nodes (Left)
-    \node[block] (tee) {TEE 硬件锚定与证明\\($M_{attest,k}$)};
-    \node[block, below=1cm of tee] (anomaly) {资源探针异常分数\\($A_k$)};
-    \node[highlight_block, right=1.2cm of anomaly, yshift=1.1cm] (trustscore) {终端基底准入门槛分\\$TrustScore_k$};
+    \node[block] (tee) {TEE Hardware Attest.\\($M_{attest,k}$)};
+    \node[block, below=1cm of tee] (anomaly) {Resource Probe Anomaly\\($A_k$)};
+    \node[highlight_block, right=1.2cm of anomaly, yshift=1.1cm] (trustscore) {Terminal Base Threshold\\$TrustScore_k$};
     \draw[arrow] (tee) -| (trustscore);
     \draw[arrow] (anomaly) -| (trustscore);
 
     % Stage 2 Nodes
-    \node[block, right=2cm of trustscore, yshift=1.1cm] (groot) {优先纯净指导锚点\\($g_{root}$)};
-    \node[block, below=1cm of groot] (content) {双维模型质量映射\\(Contrib \& Consist)};
-    \node[highlight_block, right=1.2cm of content, yshift=1.1cm] (contentscore) {当轮有效模型内容分\\$ContentScore_k$};
+    \node[block, right=2cm of trustscore, yshift=1.1cm] (groot) {Prioritized Clean Anchor\\($g_{root}$)};
+    \node[block, below=1cm of groot] (content) {Dual-Dim Model Quality\\(Contrib \& Consist)};
+    \node[highlight_block, right=1.2cm of content, yshift=1.1cm] (contentscore) {Valid Model Content Msg\\$ContentScore_k$};
     \draw[arrow] (groot) -| (contentscore);
     \draw[arrow] (content) -| (contentscore);
 
     % Stage 3 Nodes
-    \node[block, right=2cm of contentscore, yshift=1.1cm] (hist) {历史效用软流演进\\($HistPerf$)};
-    \node[block, below=1cm of hist] (risk) {瞬发致命风险探针流\\($RiskEMA$)};
-    \node[highlight_block, right=1.2cm of risk, yshift=1.1cm] (rawscore) {加权表决信誉权值\\$RawScore_k$};
+    \node[block, right=2cm of contentscore, yshift=1.1cm] (hist) {Historic Utility Evolution\\($HistPerf$)};
+    \node[block, below=1cm of hist] (risk) {Fatal Risk Probe Flow\\($RiskEMA$)};
+    \node[highlight_block, right=1.2cm of risk, yshift=1.1cm] (rawscore) {Weighted Reputation Proxy\\$RawScore_k$};
     \draw[arrow] (hist) -| (rawscore);
     \draw[arrow] (risk) -| (rawscore);
 
     % Stage 4 Nodes (Return flow below)
-    \node[block, below=3.5cm of rawscore, xshift=-2cm] (gate) {层级防御防卫敏感度\\$S_{total}^{(l)}$};
-    \node[block, left=1.5cm of gate] (clip) {L2 面包圈自适应压缩\\(收缩边界 $C^{(l)}$)};
-    \node[highlight_block, left=1.5cm of clip] (survivor) {严格门限隔离幸存名单\\$\Phi^{(l)} (\ge \theta^{(l)})$};
+    \node[block, below=3.5cm of rawscore, xshift=-2cm] (gate) {Layer Defense Sensitivity\\$S_{total}^{(l)}$};
+    \node[block, left=1.5cm of gate] (clip) {L2 Adaptive Clipping\\(Bounds $C^{(l)}$)};
+    \node[highlight_block, left=1.5cm of clip] (survivor) {Strict Threshold Survivor List\\$\Phi^{(l)} (\ge \theta^{(l)})$};
     \draw[arrow] (rawscore) |- (gate);
-    \draw[arrow] (gate) -- node[above, font=\scriptsize] {拔高门槛} (clip);
-    \draw[arrow] (clip) -- node[above, font=\scriptsize] {筛选入局} (survivor);
+    \draw[arrow] (gate) -- node[above, font=\scriptsize] {Raise Threshold} (clip);
+    \draw[arrow] (clip) -- node[above, font=\scriptsize] {Filter In} (survivor);
 
     % Stage 5 Nodes
-    \node[highlight_block, left=2.5cm of survivor] (agg) {安全同源分层拼接聚合\\$\Delta W_{global}^{(l)}$};
-    \node[block, fill=blue!5, left=1.8cm of agg, minimum height=2cm] (global) {新一轮全局模型定稿\\$W_{global}^{new}$};
+    \node[highlight_block, left=2.5cm of survivor] (agg) {Secure Layer Aggregation\\$\Delta W_{global}^{(l)}$};
+    \node[block, fill=blue!5, left=1.8cm of agg, minimum height=2cm] (global) {New Global Model Setup\\$W_{global}^{new}$};
     \draw[arrow] (survivor) -- (agg);
     \draw[arrow] (agg) -- (global);
 
     % Closed Loop Feedback
-    \draw[feedback] (global.north) |- ([yshift=2.0cm]tee.north) -| node[above, near start, font=\bfseries] {将全局泛知识与荣誉信誉池向边缘终端反哺 (闭环演替开始)} (tee.north);
+    \draw[feedback] (global.north) |- ([yshift=2.0cm]tee.north) -| node[above, near start, font=\bfseries] {Feed Global Knowledge and Reputation back to Edge Terminals (Closed-loop Starts)} (tee.north);
 
     % Grouping Backgrounds
     \begin{scope}[on background layer]
         \node[phase_bg=cyan!4, fit=(tee) (anomaly) (trustscore)] (bg1) {};
-        \node[font=\bfseries\large, text=cyan!80!black, fill=white, inner sep=2pt] at (bg1.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 1: 硬件特权准入};
+        \node[font=\bfseries\large, text=cyan!80!black, fill=white, inner sep=2pt] at (bg1.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {Stage 1: Hardware Access};
 
         \node[phase_bg=orange!4, fit=(groot) (content) (contentscore)] (bg2) {};
-        \node[font=\bfseries\large, text=orange!80!black, fill=white, inner sep=2pt] at (bg2.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 2: 原点内容校准};
+        \node[font=\bfseries\large, text=orange!80!black, fill=white, inner sep=2pt] at (bg2.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {Stage 2: Origin Content Calibration};
 
         \node[phase_bg=blue!4, fit=(hist) (risk) (rawscore)] (bg3) {};
-        \node[font=\bfseries\large, text=blue!80!black, fill=white, inner sep=2pt] at (bg3.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 3: 多轨流状态剥离};
+        \node[font=\bfseries\large, text=blue!80!black, fill=white, inner sep=2pt] at (bg3.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {Stage 3: Multi-track Flow Decoupling};
 
         \node[phase_bg=red!4, fit=(gate) (clip) (survivor)] (bg4) {};
-        \node[font=\bfseries\large, text=red!80!black, fill=white, inner sep=2pt] at (bg4.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 4: 层级动态门限拦截};
+        \node[font=\bfseries\large, text=red!80!black, fill=white, inner sep=2pt] at (bg4.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {Stage 4: Layer Dynamic Throttle};
 
         \node[phase_bg=green!4, fit=(agg) (global)] (bg5) {};
-        \node[font=\bfseries\large, text=green!80!black, fill=white, inner sep=2pt] at (bg5.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {阶段 5: 因果演替组装};
+        \node[font=\bfseries\large, text=green!80!black, fill=white, inner sep=2pt] at (bg5.north west) [anchor=south west, xshift=15pt, yshift=-8pt] {Stage 5: Causal Evolution Assembly};
     \end{scope}
     
     \end{tikzpicture}

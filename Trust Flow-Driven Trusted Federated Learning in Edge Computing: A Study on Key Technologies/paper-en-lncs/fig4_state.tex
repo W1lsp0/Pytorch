@@ -23,29 +23,29 @@
     ]
 
     % Nodes
-    \node[normal] (N) {\textbf{NORMAL}\\Regular Aggregation Node\\Full Privilege State};
-    \node[suspect, above right=2.5cm and 4.8cm of N] (S) {\textbf{SUSPECT}\\Suspicious Monitoring State\\Behavioral Review};
-    \node[quar, below right=2.5cm and 4.8cm of N] (Q) {\textbf{QUARANTINE}\\Physical Quarantine State\\Weight Deprivation};
-    \node[black, right=4.2cm of Q] (B) {\textbf{BLACKLIST}\\Absolute Blacklist\\Irreversible Ban};
+    \node[normal] (N) {\textbf{NORMAL}\\常规聚合节点\\全权状态};
+    \node[suspect, above right=2.5cm and 4.8cm of N] (S) {\textbf{SUSPECT}\\嫌疑监控态\\行为审查};
+    \node[quar, below right=2.5cm and 4.8cm of N] (Q) {\textbf{QUARANTINE}\\物理隔离态\\权值剥夺};
+    \node[black, right=4.2cm of Q] (B) {\textbf{BLACKLIST}\\绝对黑名单\\不可逆封禁};
 
     % Edges with specific bending to avoid straight line crossings
     \path
-        % N to S and S to N
-        (N) edge[edge_warn, bend left=15] node[lbl, sloped, above] {Instant Risk Eval Exceeds Limit ($RiskEMA \uparrow$)} (S)
-        (S) edge[edge_norm, bend left=15] node[lbl, sloped, below] {Long-term Observation Risk Recedes} (N)
+        % N to S and S to N (上半区走廊，与下半区彻底绝缘)
+        (N) edge[edge_warn, bend left=15] node[lbl, sloped, above] {瞬时风险评估超限 ($RiskEMA \uparrow$)} (S)
+        (S) edge[edge_norm, bend left=15] node[lbl, sloped, below] {长效观测风险回退 (状态特赦)} (N)
         
-        % N to Q and Q to N
-        (N) edge[edge_danger, bend right=15] node[lbl, sloped, below] {Historic Utility Drop ($HistPerf \downarrow$)} (Q)
-        (Q) edge[edge_norm, bend right=15] node[lbl, sloped, above] {Restricted Test Passes (Amnesty)} (N)
+        % N to Q and Q to N (下半区走廊)
+        (N) edge[edge_danger, bend right=15] node[lbl, sloped, below] {历史效用断崖滑坡 ($HistPerf \downarrow$)} (Q)
+        (Q) edge[edge_norm, bend right=15] node[lbl, sloped, above] {限制域测试重归合规 (解除隔离)} (N)
         
         % S to Q
-        (S) edge[edge_danger, bend left=15] node[lbl, fill=white, inner sep=4pt] {Persistent Anomaly Hits Quarantine Line} (Q)
+        (S) edge[edge_danger, bend left=15] node[lbl, fill=white, inner sep=4pt] {持续异常触发隔离红线} (Q)
         
         % Q to B
-        (Q) edge[edge_fatal] node[lbl, above] {Hits Hard DoS Threshold, Physical Block} (B)
+        (Q) edge[edge_fatal] node[lbl, above] {命中拒绝服务硬阈值, 物理阻断} (B)
         
         % B loop
-        (B) edge[->, ultra thick, draw=black!80, loop right, looseness=5] node[lbl, right] {Revoke TEE Certificate\\Permanent Handshake Terminated} (B);
+        (B) edge[->, ultra thick, draw=black!80, loop right, looseness=5] node[lbl, right] {吊销 TEE 证书\\永久终止握手} (B);
         
     \end{tikzpicture}
 \end{document}
