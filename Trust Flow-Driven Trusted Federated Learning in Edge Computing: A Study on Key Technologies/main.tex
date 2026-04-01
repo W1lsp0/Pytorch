@@ -75,7 +75,7 @@ while maintaining practical convergence under heterogeneous edge settings.
 本文的主要贡献总结如下：
 \begin{enumerate}
     \item \textbf{构建软硬件双结合的信任锚与全生命周期防御机制}。有别于仅在聚合瞬间被动过滤的单点防线，本设计将防御纵深全面前置并贯穿模型演化始终。在硬件端，依托 TEE 芯上飞地构筑难以篡改的物理节点准入与运行时环境指纹；在软件端，自然承接硬件初始基准，实现了跨硬件入场、纯净内容审查、时序信誉演算与分层动态控制的长效闭环管理。
-    \item \textbf{提出适应长期边缘环境的双流正交信誉演化体系}。针对以往累积信誉机制在长周期运作中“常引发长尾合法节点被永久误杀、而高级潜伏者难被揪出”的痛点核心，本文首创将身份评估逻辑降维解耦为两极独立互斥的运行轨道：以纯净贡献度积淀的“历史效用流（HistPerf）”用于温和保障异构合规群组的话语权特赦（\textit{在直觉层面，$HistPerf$ 犹如央行下发的个人信用评分：允许合规节点产生因数据偏科导致的暂时性更新落后，但鼓励其在长期长尾交互中赚回信誉特赦红利}）；而汇聚多层神经网络深层敏感探针的激进型“瞬发风险流（RiskEMA）”则专司执行极速的高危熔断拦截（\textit{相反，$RiskEMA$ 犹如登机口的一票否决安检仪：一旦触发特定投毒特征则不管其历史贡献多高，当轮触发即高压斩断}），系统在设计的实验与理论假设范围内（恶意占比$<50\%$、Non-IID $\alpha \geq 0.1$），有效缓解了防漏杀与抗误伤之间的权衡挑战。
+    \item \textbf{提出适应长期边缘环境的双流正交信誉演化体系}。针对以往累积信誉机制在长周期运作中“常引发长尾合法节点被永久误杀、而高级潜伏者难被揪出”的痛点核心，本文首创将身份评估逻辑降维解耦为两极独立互斥的运行轨道：以纯净贡献度积淀的“历史效用流（HistPerf）”用于温和保障异构合规群组的话语权特赦（\textit{在直觉层面，$HistPerf$ 犹如央行下发的个人信用评分：允许合规节点产生因数据偏科导致的暂时性更新落后，但鼓励其在长期长尾交互中赚回信誉特赦红利}）；而汇聚多层神经网络深层敏感探针的激进型“瞬发风险流（RiskEMA）”则专司执行极速的高危熔断拦截（\textit{相反，$RiskEMA$ 犹如登机口的零容忍安检仪：一旦触发特定投毒特征则不管其历史贡献多高，当轮触发即高压斩断}），系统在设计的实验与理论假设范围内（恶意占比$<50\%$、Non-IID $\alpha \geq 0.1$），有效缓解了防漏杀与抗误伤之间的权衡挑战。
     \item \textbf{建立基于纯净基准的分层差异化聚合机制}。在抵御高级后门时，框架引入了基于服务器少量隔离数据提炼的核心参考原点，并结合深浅神经网络对投毒敏感度分化不同，实施风险门控下的逐层准入、受信任幸存者的动向重调校与细粒度参数动态 L2 裁剪，系统性阻断深层神经元恶意触发器透传。
     \item \textbf{完成多形态安全环境下的实证与端到端平台部署}。本文利用包含 20 客户端集群的跨算力边缘架构进行了深度仿真测试（$n=5$ 独立重复实验）。面对 6 种混编攻击及长尾数据异构分布环境，体系在实验设定的对抗强度区间内（涵盖逼近 50\% 理论极限占比的极高危混编测试）取得了极高且稳定的恶意节点召回表现（TPR）；并借助向零收敛的系统永久误杀率（FPR $\approx$ 0\%）维系了全体协作信任，取得了 $92.31\% (\pm 0.09\%)$ 的主任务均值精度，及将后门攻击 ASR 期望有效牵制于 $10.21\% (\pm 0.05\%)$，由此验证了其作为高可靠联邦引擎架构在实际应用中的落地韧性。
 \end{enumerate}
@@ -394,19 +394,19 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \textbf{引理 1（长尾节点的方差收敛特性，Lemma 1）}
 假设合规的长尾客户端 $k$ 的单轮原始内容得分 $ContentScore_{k}^{(t)}$ 服从期望为 $\mu_{clean}$，因 Non-IID 产生的极大方差为 $\sigma_{clean}^2$ 的扰动分布。在传统的刚性单线截断阈值 $\tau_{hard}$ 下，当 $\tau_{hard} > \mu_{clean} - \sigma_{clean}$ 时该节点面临持续淘汰的高概率。但在本文的历史效用流平滑积分规则下，该节点的长程状态期望 $\mathbb{E}[HistPerf_k^{(\infty)}] = \mu_{clean}$，且长时程方差被极限压缩为：
 \begin{equation}
-    \operatorname{Var}(HistPerf_{k}^{(\infty)}) = \frac{1-\beta}{1+\beta} \sigma_{clean}^{2}
+    \operatorname{Var}(HistPerf_{k}^{(\infty)}) = \frac{1-\beta_h}{1+\beta_h} \sigma_{clean}^{2}
 \end{equation}
-由于 $0 < \beta < 1$，当宽容度 $\beta \to 1$ 时单期扰动极大地被时域消弭。只要客户端真实贡献期望 $\mu_{clean}$ 高于系统绝对生存底线，积分流即可作为低通滤波器，以概率 $P \to 1$ 保障其挺过瞬时分数的探底低谷，即理论上达成 $\lim_{t \to \infty} \text{FPR} = 0$。
+由于 $0 < \beta_h < 1$，当宽容度 $\beta_h \to 1$ 时单期扰动极大地被时域消弭。只要客户端真实贡献期望 $\mu_{clean}$ 高于系统绝对生存底线，积分流即可作为低通滤波器，以概率 $P \to 1$ 保障其挺过瞬时分数的探底低谷，即理论上达成 $\lim_{t \to \infty} \text{FPR} = 0$。
 
 \textbf{引理 2（高阶潜伏投毒的瞬时冲激响应，Lemma 2）}
-对于采用“前期高频伪装、极少频次隐秘爆发”的高层后门投毒节点 $m$，尽管其前期积攒满足够红利使得 $\mathbb{E}[HistPerf_m] \ge \mu_{clean}$，但其在第 $t$ 轮释放恶性微调参数时，其深浅层触发探针值远大于常态（即 $\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$）。在瞬发风险流的多维转移函数中，其具有不可微的非线性极大值（$\max$）算子约束：
+对于采用“前期高频伪装、极少频次隐秘爆发”的高层后门投毒节点 $m$，尽管其前期积攒满足够红利使得 $\mathbb{E}[HistPerf_m] \ge \mu_{clean}$，但其在第 $t$ 轮释放恶性微调参数时，其深浅层触发探针值远大于常态（即 $\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$）。为便于理论分析，我们考虑如下下界形式：由于 $Risk_k^{inst} = \max\{r_{grad}, r_{probe}, r_{trigger}, \dots\}$，且 EMA 更新关于 $Risk_k^{inst}$ 单调递增，此时 RiskEMA 轨迹满足如下理想化极大值算子下界：
 \begin{equation}
-    RiskEMA_m^{(t)} = \max \left( \gamma \cdot RiskEMA_m^{(t-1)},\ \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \right)
+    RiskEMA_m^{(t)} \ge \max \left( \beta_r \cdot RiskEMA_m^{(t-1)},\ \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \right)
 \end{equation}
-由于 $\mathcal{F}_{probe}$ 在检测到投毒特征时产生瞬时突变，这导致风险导数在触发瞬间呈现出逼近绝对阻断极值的冲激增量（Impulse Response），形成瞬间极化阻断。
+由于 $\mathcal{F}_{probe}$ 在检测到投毒特征时产生瞬时突变，这导致风险导数在触发瞬间呈现出逼近阻断阈值的冲激增量（Impulse Response），形成瞬时的绝对隔离。
 
 \textbf{定理 1（双流熔断正交解耦，Theorem 1）}
-\textit{在本文建立的双轨评估机制中，诚实长尾节点的局部非独立同分布方差在 $HistPerf$ 平面被低通极限平滑；而任何超限的恶性投毒梯度，由于在 $RiskEMA$ 函数族上的不可微极大值特性，必然产生跨越门控熔断阈值的单边突跃。系统对这两类具有截然相反特征分布的事件实施了绝对的正交解析隔离，从理论底层打破了单分数防线无法同时兼顾 $\text{FPR} \to 0$ 和 $\text{ASR} \to 0$ 的维数灾难。}
+\textit{在本文建立的双轨评估机制中，诚实长尾节点的局部非独立同分布方差在 $HistPerf$ 平面被低通极限平滑；而任何超限的恶性投毒梯度，由于瞬时探针 $Risk^{inst}$ 的极大值约束下界，必然产生跨越门控熔断阈值的单边突跃。系统对这两类具有截然相反特征分布的事件实施了绝对的正交解析隔离，从理论底层打破了单分数防线无法同时兼顾 $\text{FPR} \to 0$ 和 $\text{ASR} \to 0$ 的维数灾难。}
 
 \section{实验与分析}
 \label{sec:experiments}
@@ -617,7 +617,7 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
 
 通过将防御战线战略性前移，系统利用 TEE（可信执行环境）锚定了具备高度置信证明的边缘物理准入与运行时环境指纹；在逻辑层，我们彻底摒弃了传统单纯以空间距离过滤或单一聚合权重的盲区。通过构筑基于“历史增益效用（HistPerf）”与“多维瞬发风险（RiskEMA）”各自独立演替的正交信誉系统，配合基于层级敏感度的风险门控 L2 裁剪机制，本体系在算术与物理的双重钳制下阻断了深度触发器的投毒同化。
 
-真实高性能边缘联邦仿真集群系统上的高压力实证结果表明：无论是在涵盖泛型模型/数据投毒、干净标签等交叉污染的基础校验，还是在逼近系统抗打击理论极限值（即多达 50\% 异常比例延伸测评框架下的深水区博弈）里，本研究架构均强韧保障了对所有内嵌风险载体的纵深剥离剔除职能。在系列交叉评价下，它不仅稳固将主观的后门植入攻击成功比率（ASR）中枢期望锁定在 $10.21\% (\pm 0.05\%)$ 临界点内的极低风险水段，同时通过温和解脱的留存分控架构设计（FPR 极限向零收敛），有效抑制了核心合法分布资源的荒废抛弃危机，推动着分布式多域协作算网整体步入 $92.31\% (\pm 0.09\%)$ 综合广域识别率的高效稳定收敛信道之上。
+真实高性能边缘联邦仿真集群系统上的高压力实证结果表明：无论是在涵盖泛型模型/数据投毒、干净标签等交叉污染的基础校验，还是在逼近系统抗打击理论极限值（即多达 50\% 异常比例延伸测评框架下的深水区博弈）里，本研究架构在本评测的实验框架内，均强韧保障了对内嵌风险载体的纵深剥离剔除职能。在系列交叉评价下，它不仅稳固将主观的后门植入攻击成功比率（ASR）中枢期望锁定在 $10.21\% (\pm 0.05\%)$ 临界点内的极低风险水段，同时通过温和解脱的留存分控架构设计（FPR 极限向零收敛），有效抑制了核心合法分布资源的荒废抛弃危机，推动着分布式多域协作算网整体步入 $92.31\% (\pm 0.09\%)$ 综合广域识别率的高效稳定收敛信道之上。
 
 \textbf{横向对比局限性与呼吁}：在联邦学习安全前沿，近期涌现了诸如 RPPFL\cite{zhang2025rppfl}、TMT-FL\cite{lu2025tmt} 等借助 TEE 构筑多端防御的出色理论验证框架。然而，由于这些前沿研究当前均暂未提供可供公共审查与跨设备真实部署的完整开源代码实现，导致在本文所设定的“高度长尾偏斜联合 6 种混编协同投毒”的严苛实战网络下，脱离其原始工程超参数去强行进行黑盒重构底层框架极易引入实验侧评估偏差。因此，出于维护科学比较的严谨性与公平性，本研究在此阶段暂未将其硬性纳入同构量化基线跑分（Baseline）。为破除这一实验孤岛困境，我们将随着本文定稿一并开源底层的跨层攻防拓扑组件引擎，以期为未来的可信边缘计算领域孕育一套具备严苛对抗场景检验的标准化 TEE-FL 模块化基准验证平台。
 
@@ -670,7 +670,7 @@ $r_{grad}$ 旨在衡量客户端上传梯度 $\Delta W_k^{(t)}$ 与全局纯净�
     \bibitem{liao2024verifiable} Liao et al. Verifiable Deep Learning Inference on Heterogeneous Edge Devices With Trusted Execution Environment[J]. 2024.
     \bibitem{zhang2025rppfl} Zhang et al. RPPFL: Robust and Privacy-Preserving Federated Learning via Trusted Execution Environments[J]. 2025.
     \bibitem{r1_tee_integrity} A training-integrity privacy-preserving federated learning scheme with trusted execution environment[J]. 
-    \bibitem{r5_tee_mitigating} Mitigating Adversarial Attacks in Federated Learning with Trusted Execution Environments[J]. 
+    \bibitem{r5_tee_mitigating} Queyrut S, Schiavoni V, Felber P. Mitigating Adversarial Attacks in Federated Learning with Trusted Execution Environments[C]. ICDCS, 2023.
     \bibitem{r12_iot_tee} Secure sharing of industrial IoT data based on distributed trust management and trusted execution environment[J]. 
     \bibitem{xu2021distributed} Xu et al. Distributed Learning in Trusted Execution Environment A Case Study of Federated Learning in SGX[J]. 2021.
     \bibitem{yan2024efficient} Yan et al. An Efficient Greedy Hierarchical Federated Learning Training Method Based on Trusted Execution Environment[J]. 2024.

@@ -62,7 +62,7 @@ To significantly mitigate the above dilemmas under given edge network heterogene
 The main contributions of this paper are summarized as follows:
 \begin{enumerate}
     \item \textbf{Dual software-hardware trust anchor with full-lifecycle defense}. Unlike single-point defenses that only filter at aggregation time, this design extends the defense boundary across the entire model evolution cycle. On the hardware side, it leverages TEE on-chip enclaves for tamper-resistant node admission and runtime fingerprinting. On the software side, it inherits the hardware baseline to realize closed-loop management spanning admission, content auditing, reputation scoring, and layer-wise dynamic control.
-    \item \textbf{Proposing an orthogonal dual-stream reputation evolution system adapted to long-term edge environments}. Targeting the core pain point in traditional cumulative reputation mechanisms operating over long cycles---``frequently causing permanent miskills of valid long-tail nodes while advanced lurkers evade detection''---this paper pioneers decoupling the identity evaluation logic into two independent, mutually exclusive operating tracks: the ``historical performance flow'' ($HistPerf$), accumulated through clean contributions, is used to gently preserve the voice and grant pardons to heterogeneous compliant groups (\textit{intuitively, $HistPerf$ acts like a central bank's personal credit score: it allows compliant nodes to temporarily fall behind due to skewed data, but encourages them to earn back credit pardons through long-term long-tail interactions}); whereas the aggressive ``instant risk flow'' ($RiskEMA$), aggregating sensitive probes deep in multi-layer neural networks, is exclusively responsible for executing rapid high-risk fuse interceptions (\textit{conversely, $RiskEMA$ works like a one-vote veto security scanner at a boarding gate: once specific poisoning features are triggered, regardless of its high historical contribution, it is decisively blocked at that round}). The system, within designed empirical and theoretical operational bounds (malicious ratio $<50\%$, Non-IID $\alpha \geq 0.1$), effectively alleviates the trade-off challenge between missing hostile nodes and mistakenly injuring benign ones.
+    \item \textbf{Proposing an orthogonal dual-stream reputation evolution system adapted to long-term edge environments}. Targeting the core pain point in traditional cumulative reputation mechanisms operating over long cycles---``frequently causing permanent miskills of valid long-tail nodes while advanced lurkers evade detection''---this paper pioneers decoupling the identity evaluation logic into two independent, mutually exclusive operating tracks: the ``historical performance flow'' ($HistPerf$), accumulated through clean contributions, is used to gently preserve the voice and grant pardons to heterogeneous compliant groups (\textit{intuitively, $HistPerf$ acts like a central bank's personal credit score: it allows compliant nodes to temporarily fall behind due to skewed data, but encourages them to earn back credit pardons through long-term long-tail interactions}); whereas the aggressive ``instant risk flow'' ($RiskEMA$), aggregating sensitive probes deep in multi-layer neural networks, is exclusively responsible for executing rapid high-risk fuse interceptions (\textit{conversely, $RiskEMA$ works like a zero-tolerance security scanner at a boarding gate: once specific poisoning features are triggered, regardless of its high historical contribution, it is decisively blocked at that round}). The system, within designed empirical and theoretical operational bounds (malicious ratio $<50\%$, Non-IID $\alpha \geq 0.1$), effectively alleviates the trade-off challenge between missing hostile nodes and mistakenly injuring benign ones.
     \item \textbf{Clean baseline-based layer-wise heterogeneous aggregation}. In defending against advanced backdoors, the framework uses a reference gradient distilled from isolated server data. Combined with the differentiated sensitivity of deep and shallow layers to poisoning, it implements risk-gated layer-wise admission, momentum re-calibration, and fine-grained L2 clipping, systematically blocking malicious triggers from propagating across deep neurons.
     \item \textbf{Completing empirical validation and end-to-end platform deployment in multi-morphology security environments}. This paper conducts deep simulation testing utilizing a cross-computing-power edge architecture populated by a 20-client cluster (across 5 independent repeated runs). Facing 6 hybrid attacks and long-tail heterogeneous data distribution environments, the system achieves an exceptionally high and stable malicious node recall performance (TPR) within the configured adversarial intensity range (covering extreme-risk hybrid tests approaching the 50\% theoretical limit). It sustains overall collaborative trust with a permanent miskill rate approaching zero (FPR $\approx$ 0\%), secures a main-task average accuracy of 92.31\% ($\pm$ 0.09\%), and effectively pins the backdoor Attack Success Rate (ASR) expectation at 10.21\% ($\pm$ 0.05\%). These results validate its deployment resilience as a highly reliable federated engine architecture in practical applications.
 \end{enumerate}
@@ -108,7 +108,7 @@ where $\Phi \subseteq \mathcal{C}$ denotes the set of clients surviving trust-ba
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.95\textwidth]{system_arch.pdf}
-    \caption{Federated Computational Network Interaction: Client-Edge-Cloud collaborative physical architecture diagram encrypted upon TEE anchor points.}
+    \caption{Client-Edge-Cloud collaborative architecture with TEE-anchored trust verification.}
     \label{fig:system_arch}
 \end{figure}
 
@@ -259,10 +259,10 @@ By combining the orthogonal calculus of the aforementioned multi-dimensional ris
 \begin{itemize}
     \item \textbf{Normal Nodes (NORMAL)}: Fully participate in the current round's aggregation and distribution. When the probe acutely captures an anomaly (a rise in RiskEMA) or a decline in historical utility, the node will shift rightwards to the suspect status or transition into the soft isolation state, respectively.
     \item \textbf{Suspect Nodes (SUSPECT)}: Localized monitoring is intensified on the dimension that triggered the alarm. If the observed risk subsides, it is pardoned and restored to NORMAL; if it continuously triggers the redline threshold, it is handed over to the isolation procedure.
-    \item \textbf{Quarantine Observation (QUARANTINE)}: Deprived of the right to contribute physical parameters for the global aggregation of the current round, only permitted to contribute non-critical computations. If subsequent observations show compliance (condition lifted), it may return to NORMAL; conversely, if a poor track record triggers the banning rule, it plummets into the abyss.
+    \item \textbf{Quarantine Observation (QUARANTINE)}: The node is excluded from contributing parameters to the current global aggregation, retaining only non-critical computation rights. If subsequent observations confirm compliance, it may return to NORMAL; otherwise, persistent violations trigger permanent banning.
     \item \textbf{Blacklist Banning (BLACKLIST)}: A permanent, irreversible blacklist. Hitting the hard threshold completely severs the handshake at the TEE certificate layer, terminating all future collaborative qualifications.
 \end{itemize}
-This highly implicit state decoupling mechanism, which balances historical tolerance (allowing for pardons), enables the framework to boldly filter heterogeneous gradients while maintaining a false positive rate converging to zero.
+This state decoupling mechanism, which balances historical tolerance with immediate risk response, enables the framework to aggressively filter suspicious gradients while maintaining a false positive rate converging to zero.
 
 \begin{figure}[htbp]
     \centering
@@ -310,23 +310,23 @@ where the exponential hyperparameters $\alpha, \beta, \gamma$, and $p$ sequentia
 \end{algorithm}
 
 \subsection{Phase 4: Risk-gated Layer-wise Differentiated Robust Aggregation}
-The attacker's stealthy backdoors are frequently concealed inside specific neurons within deep layers. Directly orchestrating a unified multiply-accumulate weight merging across the entire gradient of the model leaves vulnerabilities wherein dormant backdoors can penetrate. Therefore, we propose a differentiated (Layer-wise) admission-gated aggregation strategy executed in accordance to the network layer depth $l$.
+The attacker's stealthy backdoors are frequently concealed inside specific neurons within deep layers. A naive full-model aggregation that uniformly merges all gradient components leaves vulnerabilities for dormant backdoors to penetrate. Therefore, we propose a differentiated (Layer-wise) admission-gated aggregation strategy executed according to the network layer depth $l$.
 
 First, filter the set of active clients $\mathcal{A}$ qualified to participate in the current round:
 \begin{equation} \label{eq:active_clients}
     \mathcal{A} = \{k \mid k \notin RiskIsolated \land k \notin HistSoftIsolated\}.
 \end{equation}
 
-Second, for the $l$-th layer, evaluate its security defense requirements. The shallow layers of a network typically preserve common privacy features such as the physical edge schemas of images, while the deep layers entail massive weight alterations (utility) and are susceptible to buried poison (security). The algorithm leverages a 3D modeling of the weight sensitivity of the layer $S_{total}^{(l)}$:
+Second, for the $l$-th layer, evaluate its security defense requirements. Shallow layers typically preserve common low-level features such as edges and textures, while deep layers entail massive weight alterations (utility) and are susceptible to buried poison (security). The algorithm leverages a 3D modeling of the weight sensitivity of the layer $S_{total}^{(l)}$:
 \begin{align}
     S_{privacy}^{(l)} &= \exp\left(-\tau_{p} \frac{l}{L}\right), \\
     S_{utility}^{(l)} &= \frac{\|g_{ref}^{(l)}\|_{2}}{\max_{m}\|g_{ref}^{(m)}\|_{2} + \varepsilon}, \\
     S_{security}^{(l)} &= 1 - \frac{\sum_{k\in\mathcal{A}}TrustScore_{k}\cdot\cos(\Delta W_{k}^{(l)}, g_{ref}^{(l)})}{\sum_{k\in\mathcal{A}}TrustScore_{k} + \varepsilon}, \\
     S_{total}^{(l)} &= w_p S_{privacy}^{(l)} + w_u S_{utility}^{(l)} + w_s S_{security}^{(l)}.
 \end{align}
-Here, $w_p, w_u, w_s$ denote the hierarchical requirement weighting factors satisfying the normalization condition. If the sum of the layer's security segregation sensitivities $S_{total}^{(l)}$ is extraordinarily high, it proves that this layer is a major disaster zone for backdoor injections. The system will immediately elevate the proportional admission threshold $\theta^{(l)} = \mu_{base} + \lambda_{s} \cdot S_{total}^{(l)}$ and tighten the L2 clipping space $C^{(l)} = C_{base} / (S_{total}^{(l)} + \varepsilon_{c})$.
+Here, $w_p, w_u, w_s$ denote the hierarchical requirement weighting factors satisfying the normalization condition. When $S_{total}^{(l)}$ is high, the layer is identified as a high-risk target for backdoor injection. The system accordingly elevates the admission threshold $\theta^{(l)} = \mu_{base} + \lambda_{s} \cdot S_{total}^{(l)}$ and tightens the L2 clipping bound $C^{(l)} = C_{base} / (S_{total}^{(l)} + \varepsilon_{c})$.
 
-Third, only those ``layer survivors'' $\Phi^{(l)}$ whose current round $RawScore_k$ breaches $\theta^{(l)}$ are allowed to submit updates for aggregation. After entering the survivor list, a normalized weight distribution $\tilde{w}_{k}^{(l)}$ is enacted and anomalously colossal malicious gradient amplitudes are forcibly clipped ($scale_k^{(l)}$):
+Third, only those ``layer survivors'' $\Phi^{(l)}$ whose current round $RawScore_k$ exceeds $\theta^{(l)}$ are allowed to submit updates for aggregation. After entering the survivor list, a normalized weight distribution $\tilde{w}_{k}^{(l)}$ is applied and excessively large gradient magnitudes are clipped ($scale_k^{(l)}$):
 \begin{align}
     \Phi^{(l)} &= \{k \in \mathcal{A} \mid RawScore_{k} \ge \theta^{(l)} \}, \quad \tilde{w}_{k}^{(l)} = \frac{RawScore_{k}}{\sum_{j\in\Phi^{(l)}}RawScore_{j} + \varepsilon}, \\
     scale_{k}^{(l)} &= \max\left(1, \frac{\|\Delta W_{k}^{(l)}\|_{2}}{C^{(l)}}\right), \quad
@@ -351,7 +351,7 @@ Fourth, the individual layers are respectively weighted and merged into a single
     \STATE Utility sensitivity $S_{utility}^{(l)} \leftarrow \|g_{ref}^{(l)}\|_2 / \max_m\|g_{ref}^{(m)}\|_2$
     \STATE Security sensitivity $S_{security}^{(l)} \leftarrow 1 - \frac{\sum_{k\in\mathcal{A}} TrustScore_k \cos(\Delta W_k^{(l)}, g_{ref}^{(l)})}{\sum_{k\in\mathcal{A}} TrustScore_k + \varepsilon}$
     \STATE Total defense requirement sensitivity $S_{total}^{(l)} \leftarrow w_p S_{privacy}^{(l)} + w_u S_{utility}^{(l)} + w_s S_{security}^{(l)}$
-    \STATE \textbf{Step 2: Dynamic Risk Gating and Adaptive L2 Donut Clipping}
+    \STATE \textbf{Step 2: Dynamic Risk Gating and Adaptive L2 Norm Clipping}
     \STATE Elevate the security admission score threshold for this layer $\theta^{(l)} \leftarrow \mu_{base} + \lambda_s \cdot S_{total}^{(l)}$
     \STATE Tighten the malicious amplitude clipping boundary for this layer $C^{(l)} \leftarrow C_{base} / (S_{total}^{(l)} + \varepsilon_c)$
     \STATE \textbf{Step 3: Survivor Node Selection and Secondary Re-calibration}
@@ -359,7 +359,7 @@ Fourth, the individual layers are respectively weighted and merged into a single
     \STATE Re-normalize the effective weights for the survivors $\tilde{w}_k^{(l)} \leftarrow RawScore_k / \sum_{j\in\Phi^{(l)}} RawScore_j$
     \STATE Execute L2 proportional downscaling $\widehat{\Delta W}_k^{(l)} \leftarrow \Delta W_k^{(l)} / \max(1, \|\Delta W_k^{(l)}\|_2 / C^{(l)})$
     \STATE \textbf{Step 4: Layer-wise Merging and Stitching}
-    \STATE Extract the highly secure, lesion-free gradient segments for this layer $\Delta W_{global}^{(l)} \leftarrow \sum_{k\in\Phi^{(l)}} \tilde{w}_k^{(l)} \cdot \widehat{\Delta W}_k^{(l)}$
+    \STATE Aggregate filtered gradients for this layer $\Delta W_{global}^{(l)} \leftarrow \sum_{k\in\Phi^{(l)}} \tilde{w}_k^{(l)} \cdot \widehat{\Delta W}_k^{(l)}$
     \STATE Splice and integrate into the global model update amount $\Delta W_{global} \leftarrow \Delta W_{global} \cup \Delta W_{global}^{(l)}$
 \ENDFOR
 \RETURN $\Delta W_{global}$
@@ -382,21 +382,21 @@ Traditional single-domain reputation mechanisms (such as the simple accumulation
 \begin{lemma}[Variance Convergence Properties of Long-tail Nodes]
 Assume that the raw content score $ContentScore_{k}^{(t)}$ of a compliant long-tail client $k$ in a single round follows a perturbation distribution with an expectation of $\mu_{clean}$ and an extremely large variance $\sigma_{clean}^2$ caused by Non-IID data. Under a traditional rigid single-line truncation threshold $\tau_{hard}$, when $\tau_{hard} > \mu_{clean} - \sigma_{clean}$, this node faces a high probability of continuous elimination. However, under the historical utility flow smoothing integration rule proposed in this paper, the long-term state expectation of this node is $\mathbb{E}[HistPerf_k^{(\infty)}] = \mu_{clean}$, and the long-term variance is compressed to the limit:
 \begin{equation}
-    \operatorname{Var}(HistPerf_{k}^{(\infty)}) = \frac{1-\beta}{1+\beta} \sigma_{clean}^{2}
+    \operatorname{Var}(HistPerf_{k}^{(\infty)}) = \frac{1-\beta_h}{1+\beta_h} \sigma_{clean}^{2}
 \end{equation}
-Since $0 < \beta < 1$, when the tolerance factor $\beta \to 1$, single-round perturbations are significantly dissipated in the time domain. As long as the client's true contribution expectation $\mu_{clean}$ is higher than the absolute minimum survival baseline of the system, the integration flow can act as a low-pass filter to guarantee, with probability $P \to 1$, that it survives through instantaneous low score troughs. Consequently, the theoretical False Positive Rate (FPR) approaches zero ($\lim_{t \to \infty} \text{FPR} = 0$).
+Since $0 < \beta_h < 1$, when the tolerance factor $\beta_h \to 1$, single-round perturbations are significantly dissipated in the time domain. As long as the client's true contribution expectation $\mu_{clean}$ is higher than the absolute minimum survival baseline of the system, the integration flow can act as a low-pass filter to guarantee, with probability $P \to 1$, that it survives through instantaneous low score troughs. Consequently, the theoretical False Positive Rate (FPR) approaches zero ($\lim_{t \to \infty} \text{FPR} = 0$).
 \end{lemma}
 
 \begin{lemma}[Transient Impulse Response against Advanced Latent Attacks]
-Consider a high-level backdoor poisoning node $m$ that adopts a strategy of "high-frequency camouflage in early stages, extremely rare stealth explosions". Although its accumulated dividends in early rounds satisfy $\mathbb{E}[HistPerf_m] \ge \mu_{clean}$, when it releases malicious fine-tuning parameters in round $t$, its deep and shallow triggering probe values are significantly higher than the norm (i.e., $\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$). In the multi-dimensional transition function of the instantaneous risk flow, it is constrained by an indifferentiable non-linear maximum ($\max$) operator:
+Consider a high-level backdoor poisoning node $m$ that adopts a strategy of ``high-frequency camouflage in early stages, extremely rare stealth explosions''. Although its accumulated dividends in early rounds satisfy $\mathbb{E}[HistPerf_m] \ge \mu_{clean}$, when it releases malicious fine-tuning parameters in round $t$, its deep and shallow triggering probe values are significantly higher than the norm (i.e., $\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$). For theoretical analysis, we consider the following lower-bound formulation: since $Risk_k^{inst} = \max\{r_{grad}, r_{probe}, r_{trigger}, \dots\}$, the RiskEMA trajectory is bounded below by the idealized maximum operator:
 \begin{equation}
-    RiskEMA_m^{(t)} = \max \left( \gamma \cdot RiskEMA_m^{(t-1)},\ \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \right)
+    RiskEMA_m^{(t)} \ge \max \left( \beta_r \cdot RiskEMA_m^{(t-1)},\ \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \right)
 \end{equation}
-Because $\mathcal{F}_{probe}$ generates an instantaneous mutation when it detects poisoning features, this causes the risk derivative to exhibit an impulse response approaching the absolute blocking extremum the moment it is triggered, resulting in an instantaneous polarized blockade.
+Because $\mathcal{F}_{probe}$ generates an instantaneous mutation when it detects poisoning features, this causes the risk derivative to exhibit an impulse response approaching the blocking threshold the moment it is triggered, resulting in an immediate categorical isolation.
 \end{lemma}
 
 \begin{theorem}[Orthogonal Decoupling of Dual-Stream Blockade]
-In the dual-track evaluation mechanism established in this paper, the local Non-IID variance of honest long-tail nodes is smoothed to the low-pass limit in the $HistPerf$ plane. In contrast, any out-of-bounds malicious poisoning gradient will inevitably produce a unilateral jump across the gating blockade threshold due to the indifferentiable maximum characteristic of the $RiskEMA$ function family. The system implements an absolute orthogonal analytical isolation for these two types of events with diametrically opposite feature distributions. This theoretically resolves the dimensionality curse of single-score defense lines, which intrinsically fail to balance $\text{FPR} \to 0$ and $\text{ASR} \to 0$ simultaneously.
+In the dual-track evaluation mechanism established in this paper, the local Non-IID variance of honest long-tail nodes is smoothed to the low-pass limit in the $HistPerf$ plane. In contrast, any out-of-bounds malicious poisoning gradient will inevitably produce a unilateral jump across the gating blockade threshold due to the lower-bound maximum constraint dictated by the instantaneous $Risk^{inst}$ probes. The system implements an absolute orthogonal analytical isolation for these two types of events with diametrically opposite feature distributions. This theoretically resolves the dimensionality curse of single-score defense lines, which intrinsically fail to balance $\text{FPR} \to 0$ and $\text{ASR} \to 0$ simultaneously.
 \end{theorem}
 
 \section{Experiments and Analysis}
@@ -417,11 +417,11 @@ The model utilizes a classic lightweight Convolutional Neural Network (CNN) arch
 \end{itemize}
 
 \subsubsection{Malicious Attack Instances and Proportions}
-To examine the all-around identification capability of our ``Trust Flow'' defense model, 6 chronically active malicious nodes were mixed into the 20-node network (a high-risk proportion of 30\%). We not only configured traditional data poisoning but also introduced more destructive direct model parameter manipulation attacks:
+To examine the comprehensive detection capability of our ``Trust Flow'' defense model, 6 persistently active malicious nodes were mixed into the 20-node network (a high-risk proportion of 30\%). We not only configured traditional data poisoning but also introduced more destructive direct model parameter manipulation attacks:
 \begin{itemize}
     \item \textbf{Client 0 - Label Flip Poisoning ($\gamma=0.5$)}: Forcibly maps a certain category in its local real dataset to another category, instilling erroneous boundaries into the network.
     \item \textbf{Client 1 - Stealthy Backdoor Injection ($\gamma=0.2$)}: Applies a specific pixel patch (Trigger) to the corners of 20\% of the training sample images and tags them with the target category 0 label, attempting to mislead the system during inference.
-    \item \textbf{Client 2 - Clean Label Backdoor ($\gamma=0.5$)}: This is the highest-level attack, utilizing Generative Adversarial noises to scramble the input pixels of target category 0 without modifying its label category 0, thereby confusing gradient feature extraction.
+    \item \textbf{Client 2 - Clean Label Backdoor ($\gamma=0.5$)}: This is the most sophisticated attack, utilizing adversarial perturbations to subtly alter the input pixels of target category 0 without modifying its label, thereby confusing gradient feature extraction.
     \item \textbf{Client 3 - Semantic Backdoor Poisoning ($\gamma=0.5$)}: Installs malicious patterns without artificial graphical triggers but directs the model to strongly associate images with specific background colors found in nature entirely with incorrect categories.
     \item \textbf{Client 4 - Sign-Flipping Attack (Model Poisoning)}: The attacker directly manipulates the step-size tensor returned by the underlying PyTorch SGD update, forcibly reversing the signs of gradients in some layers ($\Delta \widehat{W}_k = - \gamma \cdot \Delta W_k$), attempting to trigger severe global convergence deviations and denial of service.
     \item \textbf{Client 5 - Gradient Scaling (Model Poisoning)}: Operating on the basis of a stealthy backdoor, it forcibly magnifies the malicious increment amplitude 100 times ($\Delta \widehat{W}_k = 100 \times \Delta W_k$), attempting to directly overwrite global parameters through a massive weight proportion.
@@ -573,11 +573,11 @@ Standard FedAvg & 0 ms (Baseline) & 0 KB (Baseline) & $\sim 2.10$ s \\
 \end{table}
 
 \section{Conclusion and Future Outlook}
-This paper deeply analyzes the structural vulnerability dilemma faced by edge federated learning architectures under the dual attack of highly discrete Non-Independent and Identically Distributed (Non-IID) long-tail data biases and advanced composite poisoning from malicious nodes (backdoor implantation, parameter manipulation, etc.). To this end, we innovatively propose and deploy a trust flow-driven defense framework (Trust-Flow TFL) based on "software-hardware dual-layer coupling" and "state flow orthogonal decoupling."
+This paper analyzes the critical security challenges faced by edge federated learning architectures under the dual pressure of highly heterogeneous Non-IID long-tail data distributions and advanced composite poisoning from malicious nodes (backdoor implantation, parameter manipulation, etc.). To this end, we propose and deploy a trust flow-driven defense framework (Trust-Flow TFL) based on ``software-hardware dual-layer coupling'' and ``state flow orthogonal decoupling.''
 
 By strategically advancing the defense frontier, the system anchors highly confident physical edge admission and runtime environmental fingerprints using TEEs (Trusted Execution Environments). At the logical layer, we completely abandon the blind spots of traditional filtering purely based on spatial distance or singular aggregation weights. By constructing an orthogonal reputation system where the "Historical Performance Flow" ($HistPerf$) and "Multi-dimensional Instant Risk Flow" ($RiskEMA$) evolve independently, combined with a layer-sensitivity-based risk-gated L2 clipping mechanism, this framework blocks the assimilation of deep trigger poisoning under dual arithmetic and physical constraints.
 
-Extensive experiments on a real high-performance edge federated simulation cluster demonstrate that: across both standard benchmarks (covering model/data poisoning and clean-label contamination) and extreme stress tests (up to 50\% malicious ratio), our architecture reliably isolates and removes all embedded threat vectors. Specifically, the backdoor ASR is consistently suppressed to $10.21\% (\pm 0.05\%)$, while the FPR converges to zero through the gentle temporal reputation mechanism, preserving legitimate distributed resources. The overall recognition accuracy reaches $92.31\% (\pm 0.09\%)$ across all evaluation configurations.
+Extensive experiments on a real high-performance edge federated simulation cluster demonstrate that: across both standard benchmarks (covering model/data poisoning and clean-label contamination) and extreme stress tests (up to 50\% malicious ratio), our architecture reliably isolates and removes embedded threat vectors within our experimental scope. Specifically, the backdoor ASR is consistently suppressed to $10.21\% (\pm 0.05\%)$, while the FPR converges to zero through the gentle temporal reputation mechanism, preserving legitimate distributed resources. The overall recognition accuracy reaches $92.31\% (\pm 0.09\%)$ across all evaluation configurations.
 
 \textbf{Limitations of Horizontal Comparison}: Recent TEE-based federated defense frameworks such as RPPFL \cite{zhang2025rppfl} and TMT-FL \cite{lu2025tmt} represent promising advances. However, as these works do not currently provide open-source implementations, reproducing their systems under our rigorous adversarial setup (strong Non-IID combined with 6 types of hybrid poisoning) would risk introducing evaluation bias. To maintain scientific rigor, we refrain from including them in the quantitative baseline comparison. We plan to open-source our defense engine alongside this paper's publication, aiming to foster a standardized TEE-FL benchmark platform for adversarial scenario testing.
 
@@ -588,7 +588,7 @@ Extensive experiments on a real high-performance edge federated simulation clust
 To ensure the reproducibility and system transparency of the federated defense mechanism, this appendix details the specific algebraic evaluation logic of the core probes ($r_{grad}$, $r_{probe}$, $r_{trigger}$) in the multi-dimensional instant risk flow module presented in Section 4. During the defensive aggregation phase of round $t$, the computational logic is as follows:
 
 \subsection{Gradient Direction and Amplitude Physical Probe ($r_{grad}$)}
-$r_{grad}$ aims to measure the geometric penalization distance between the gradient $\Delta W_k^{(t)}$ uploaded by the client and the global pristine evolutionary baseline $g_{root}^{(t)}$, thus capturing large-scale sign inversions and magnitude poisoning attacks. Its metric fuses directional deviation (cosine penalty) and magnitude surges (L2 norm anomalous deviations):
+$r_{grad}$ measures the geometric distance between the client gradient $\Delta W_k^{(t)}$ and the global reference gradient $g_{root}^{(t)}$, thereby detecting large-scale sign inversions and magnitude poisoning attacks. Its metric fuses directional deviation (cosine penalty) and magnitude anomalies (L2 norm deviation):
 \begin{equation}
     r_{grad, k}^{(t)} = \lambda_{d} \left(1 - \frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{||\Delta W_k^{(t)}|| \cdot ||g_{root}^{(t)}||}\right) + \lambda_{m} \max\left(0, \frac{||\Delta W_k^{(t)}||_2 - \mu^{(t)}}{\sigma^{(t)}}\right)
 \end{equation}
@@ -618,22 +618,22 @@ These three orthogonal anomaly scalars are then fused into a normalized risk coe
 \bibitem{cao2021fltrust} Cao X., Fang M., Liu J., et al.: FLTrust: Byzantine-Robust Federated Learning via Trust Bootstrapping. In: NDSS (2021).
 \bibitem{fung2020foolsgold} Fung C., Yoon C. J. M., Beschastnikh I.: The Limitations of Federated Learning in Sybil Settings. In: RAID (2020).
 \bibitem{r9_clustered} Xu, Y., Tan, Y., Zhang, C., et al.: Towards Privacy-Enhanced and Robust Clustered Federated Learning. IEEE Transactions on Mobile Computing 24(8), 7171--7188 (2025).
-\bibitem{fedpe} Jiang, Y., et al.: FedPE: Adaptive Model Pruning-Expanding for Federated Learning on Mobile Devices. IEEE Transactions on Mobile Computing 23(11) (2024).
+\bibitem{fedpe} Jiang, Y., et al.: FedPE: Adaptive Model Pruning-Expanding for Federated Learning on Mobile Devices. IEEE Transactions on Mobile Computing 23(11), 10475--10493 (2024).
 \bibitem{parallelsfl} Liao, Y., Xu, Y., et al.: ParallelSFL: A Novel Split Federated Learning Framework Tackling Heterogeneity Issues. arXiv preprint arXiv:2410.01256 (2024).
-\bibitem{wang2025rasa} Wang et al.: RaSA: Robust and Adaptive Secure Aggregation for Edge-Assisted Hierarchical Federated Learning (2025).
-\bibitem{dou2025toward} Dou et al.: Toward Malicious Clients Detection in Federated Learning (2025).
-\bibitem{lu2025tmt} Lu et al.: TMT-FL: Enabling Trustworthy Model Training of Federated Learning With Malicious Participants (2025).
-\bibitem{wang2024federated} Wang et al.: A Federated Learning Scheme with Adaptive Hierarchical Protection and Multiple Aggregation (2024).
-\bibitem{flpurifier} Xu, Y., et al.: FLPurifier: Backdoor Defense in Federated Learning via Decoupled Contrastive Training. IEEE Transactions on Information Forensics and Security (2024).
-\bibitem{roseagg} Yang, H., Xi, W., et al.: RoseAgg: Robust Defense Against Targeted Collusion Attacks in Federated Learning. IEEE Transactions on Information Forensics and Security (2024).
-\bibitem{shieldfl} Ma, Z., Ma, J., et al.: ShieldFL: Mitigating Model Poisoning Attacks in Privacy-Preserving Federated Learning. IEEE Transactions on Information Forensics and Security (2022).
-\bibitem{liao2024verifiable} Liao et al.: Verifiable Deep Learning Inference on Heterogeneous Edge Devices With Trusted Execution Environment (2024).
-\bibitem{zhang2025rppfl} Zhang et al.: RPPFL: Robust and Privacy-Preserving Federated Learning via Trusted Execution Environments (2025).
+\bibitem{wang2025rasa} Wang, L., Huang, M., Zhang, Z., Li, M., Wang, J., Gai, K.: RaSA: Robust and Adaptive Secure Aggregation for Edge-Assisted Hierarchical Federated Learning. IEEE Transactions on Information Forensics and Security 20, 4280--4295 (2025).
+\bibitem{dou2025toward} Dou, Z., Wang, J., Sun, W., Liu, Z., Fang, M.: Toward Malicious Clients Detection in Federated Learning. In: ACM ASIA CCS (2025).
+\bibitem{lu2025tmt} Lu, Z., Wang, L., Zhang, Z., Huang, M., Wang, J.: TMT-FL: Enabling Trustworthy Model Training of Federated Learning With Malicious Participants. IEEE Transactions on Dependable and Secure Computing 22(3), 2968--2983 (2025).
+\bibitem{wang2024federated} Wang, Z., Yu, X., Tian, Z.: A Federated Learning Scheme with Adaptive Hierarchical Protection and Multiple Aggregation. In: IEEE TrustCom, pp. 2106--2114 (2024).
+\bibitem{flpurifier} Zhang, J., Zhu, C., Sun, X., Ge, C., Chen, B., Susilo, W., Yu, S.: FLPurifier: Backdoor Defense in Federated Learning via Decoupled Contrastive Training. IEEE Transactions on Information Forensics and Security 19, 4752--4766 (2024).
+\bibitem{roseagg} Yang, H., Xi, W., et al.: RoseAgg: Robust Defense Against Targeted Collusion Attacks in Federated Learning. IEEE Transactions on Information Forensics and Security 19, 2951--2966 (2024).
+\bibitem{shieldfl} Ma, Z., Ma, J., et al.: ShieldFL: Mitigating Model Poisoning Attacks in Privacy-Preserving Federated Learning. IEEE Transactions on Information Forensics and Security 17, 1639--1654 (2022).
+\bibitem{liao2024verifiable} Liao, L., Zheng, Y., Lu, H., Liu, X., Chen, S., Yu, Y.: Verifiable Deep Learning Inference on Heterogeneous Edge Devices With Trusted Execution Environment. IEEE Sensors Journal 24(17), 27701--27713 (2024).
+\bibitem{zhang2025rppfl} Zhang, X., Chen, Z., Chen, G., Feng, X., Shen, Q., Wu, Z.: RPPFL: Robust and Privacy-Preserving Federated Learning via Trusted Execution Environments. In: IEEE ICASSP (2025).
 \bibitem{r1_tee_integrity} Chen, Y., Luo, F., Li, T., Xiang, T., Liu, Z., Li, J.: A training-integrity privacy-preserving federated learning scheme with trusted execution environment. Information Sciences 522, 69--79 (2020).
-\bibitem{r5_tee_mitigating} Xu, R., et al.: Mitigating Adversarial Attacks in Federated Learning with Trusted Execution Environments. arXiv preprint (2022).
+\bibitem{r5_tee_mitigating} Queyrut, S., Schiavoni, V., Felber, P.: Mitigating Adversarial Attacks in Federated Learning with Trusted Execution Environments. In: IEEE ICDCS (2023).
 \bibitem{r12_iot_tee} Zheng, W., Cao, Y., Tan, H.: Secure sharing of industrial IoT data based on distributed trust management and trusted execution environments: a federated learning approach. Neural Computing and Applications 35(29), 21499--21509 (2023).
-\bibitem{xu2021distributed} Xu et al.: Distributed Learning in Trusted Execution Environment A Case Study of Federated Learning in SGX (2021).
-\bibitem{yan2024efficient} Yan et al.: An Efficient Greedy Hierarchical Federated Learning Training Method Based on Trusted Execution Environment (2024).
+\bibitem{xu2021distributed} Xu, T., Zhu, K., Andrzejak, A., Zhang, L.: Distributed Learning in Trusted Execution Environment: A Case Study of Federated Learning in SGX. In: IEEE IC-NIDC (2021).
+\bibitem{yan2024efficient} Yan, J., Li, Y., Yin, S., Kang, X., Wang, J., Zhang, H., Hu, B.: An Efficient Greedy Hierarchical Federated Learning Training Method Based on Trusted Execution Environments. Electronics 13(17), 3548 (2024).
 \bibitem{mcmahan2017fedavg} McMahan B., Moore E., Ramage D., et al.: Communication-Efficient Learning of Deep Networks from Decentralized Data. In: AISTATS (2017).
 \end{thebibliography}
 \end{document}
