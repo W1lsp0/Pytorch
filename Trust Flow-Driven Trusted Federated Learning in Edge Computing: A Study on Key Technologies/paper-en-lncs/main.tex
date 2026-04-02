@@ -89,6 +89,13 @@ The framework presented in this paper absorbs this purest underlying hardware is
 \subsection{Client-Edge-Cloud Synergy Architecture and System Flow Modeling}
 In the ``Trust Flow'' defensive logical grid designed in this paper, the system operates within a typical large-scale Client-Edge-Cloud un-trusted communication link environment (the global cooperative physical architecture is shown in Fig.~\ref{fig:system_arch}). The entire operational architecture comprises an overriding \textbf{Parameter Aggregation Audit and Verification Center (Server, $\mathcal{S}$)} at the top, and a constellation of $K$ loosely connected \textbf{Edge Node Container Ensembles} $\mathcal{C}=\{c_1, c_2, \dots, c_K\}$ wandering in the shallow network layers, which connect intermittently and are potentially susceptible to becoming controlled poisoners at any moment.
 
+\begin{figure}[htbp!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{system_arch.pdf}
+    \caption{Client-Edge-Cloud collaborative architecture with TEE-anchored trust verification.}
+    \label{fig:system_arch}
+\end{figure}
+
 The system initially establishes TEE encrypted channels within the kernel of each edge device $c_k$ by deploying hard access credentials, and subsequently executes its joint modeling objective: minimizing the expected empirical risk over the aggregate data distributions $\mathcal{D}_k$ across all physical edge entities:
 \begin{equation}
 \min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)
@@ -105,12 +112,6 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
 \end{equation}
 where $\Phi \subseteq \mathcal{C}$ denotes the set of clients surviving trust-based filtering in the current round, and $\mathrm{Agg}(\cdot)$ represents the secure aggregation operator detailed in Section~4.
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.95\textwidth]{system_arch.pdf}
-    \caption{Client-Edge-Cloud collaborative architecture with TEE-anchored trust verification.}
-    \label{fig:system_arch}
-\end{figure}
 
 \subsection{Threat Model}
 A sound security framework must clearly delineate the adversarial capabilities and trust assumptions. This section specifies three tiers of entities and the corresponding trust boundaries (the multi-dimensional attack surfaces are illustrated in Fig.~\ref{fig:threat_model}):
@@ -122,9 +123,9 @@ A sound security framework must clearly delineate the adversarial capabilities a
     \item \textbf{Internal Colluding Adversaries}: Unlike external passive eavesdroppers, we assume adversaries have compromised a fraction of legitimate devices (upper bound $< 50\%$). These malicious insiders can arbitrarily tamper with local labels, inject poisoned samples (including clean-label attacks), or directly manipulate gradient tensors (e.g., sign-flipping or magnitude scaling). Although the theoretical tolerance extends to 50\%, our primary benchmarks operate at the high-intensity 30\% setting; the 50\% extreme scenario serves as an independent stress test of system resilience.
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[htbp!]
     \centering
-    \includegraphics[width=0.85\textwidth]{threat_model.pdf}
+    \includegraphics[width=0.75\textwidth]{threat_model.pdf}
     \caption{Multi-dimensional composite poisoning threat model in edge federated networks.}
     \label{fig:threat_model}
 \end{figure}

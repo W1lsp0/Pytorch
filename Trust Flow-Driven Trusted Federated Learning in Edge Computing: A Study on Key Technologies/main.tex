@@ -102,6 +102,13 @@ while maintaining practical convergence under heterogeneous edge settings.
 
 \subsection{端边云协同架构与系统流转建模}
 在本文设计的“信任流”防御逻辑网格中，系统运行在一个典型的大型端-边-云（Client-Edge-Cloud）异构不信任通信链路环境中（全局协同物理架构如图~\ref{fig:system_arch} 所示）。整个业务架构包含顶端的\textbf{参数汇总审查验证中心（Server, $\mathcal{S}$）}，以及下方 $K$ 个游离在网络浅滩、不定期上线且随时可能沦落为受控投毒者的\textbf{边缘节点容器组合} $\mathcal{C}=\{c_1, c_2, \dots, c_K\}$。
+
+\begin{figure}[htbp!]
+    \centering
+    \includegraphics[width=0.85\textwidth]{system_arch.pdf}
+    \caption{联邦计算网络交互：基于 TEE 锚点加密的端边云协同物理架构图}
+    \label{fig:system_arch}
+\end{figure}
 系统首先通过部署硬接入凭证，在各边缘 $c_k$ 设备内核开辟出 TEE 加密信道，随后才运行其参与联合建模目标：最小化定义在所有物理边缘侧数据集 $\mathcal{D}_k$ 分布总和上的经验求导风险期望：
 \begin{equation}
 \min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)
@@ -117,12 +124,6 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
 \end{equation}
 其中，$\Phi \subseteq \mathcal{C}$ 表示在本轮中共识存活下来的有效客户端组合；而 $\mathrm{Agg}(\cdot)$ 代表本文所设计的核心安全信任聚合算子，其基于长效历史得分与多维瞬发风险解耦的具体自适应融合方程机制，将在第 4 节体系化地展开。
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{system_arch.pdf}
-    \caption{联邦计算网络交互：基于 TEE 锚点加密的端边云协同物理架构图}
-    \label{fig:system_arch}
-\end{figure}
 
 \subsection{复合型威胁假设与强信任底座边界 (Threat Model)}
 任何前置安全声明都必须界定攻防两端不对等的能力界限与假设底仓。为了充分榨取框架的潜能，本文刻画了三种分层的防范假定实体与系统基床信任红线（边缘网络下的多维攻击面如图~\ref{fig:threat_model} 所示）：
@@ -132,9 +133,9 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
     \item \textbf{无孔不入且伪装精妙的内部串通派系（Internal Attackers/Poisoners）}：有别于仅能嵅探公网报文却无法发送有效握手证书的外部被动攻击者，假定我们的假想敌已经成功潜伏进了拥有合法准入凭证的正当设备阵列之列（高危占比上限 $< 50\%$）。内部破坏者拥有更改当前节点本地标签体系、混入脏数据（生成带噪声的 Clean-label 污染原图）、甚至暴力拉扯底层 PyTorch SGD 更新返回的步频张量进行强行符号倒置与数量级放大（参数缩放与修改指令）的近乎无约束权利。需要说明的是，虽然理论分析假定的系统容灾界限为 50\% 高危恶意占比，但为了符合现实威胁模型下的大多数分布情况，本研究的框架性实验基础测评重点首先聚焦于高危强度典型的 30\% 从属环境；而随后逼近 50\% 界线深水区的抗打击延伸测试，则作为系统威胁假设边界的独立压力检验被单列汇报。
 \end{itemize}
 
-\begin{figure}[H]
+\begin{figure}[htbp!]
     \centering
-    \includegraphics[width=0.85\textwidth]{threat_model.pdf}
+    \includegraphics[width=0.75\textwidth]{threat_model.pdf}
     \caption{边缘广域网络下的安全渗透与多维复合型投毒威胁模型示意图}
     \label{fig:threat_model}
 \end{figure}
