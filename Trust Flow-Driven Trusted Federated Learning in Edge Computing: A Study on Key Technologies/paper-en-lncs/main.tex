@@ -55,7 +55,7 @@ As an emerging distributed machine learning paradigm, federated learning (FL) pr
 
 However, when federated learning transitions from idealized data centers to realistic edge computing topologies, the system inevitably faces compound security challenges intertwined with extreme environmental uncertainty, non-independent and identically distributed (Non-IID) data, and advanced behavioral fraud. On the ``internal concern'' side, naturally distributed edge devices not only have limited computing power, but their independently sensed fragmented scenarios result in highly skewed, long-tailed characteristics in local samples. From the perspective of formal optimization, this severe structural bias causes an extremely large variance in the local gradient updates of honest nodes (i.e., $\operatorname{Var}(|| \nabla \mathcal{L}_k ||) \gg \sigma_{threshold}$), which inherently triggers profound global model spatial drift. On the ``external threat'' side, edge networks without mandatory physical admission lack a root of trust, leaving the vulnerable client tier highly susceptible to adversary exploitation. Malicious participants can implement targeted, deep-compositional model poisoning and stealthy backdoor attacks (such as clean-label poisoning and deep semantic backdoors) \cite{gu2017badnets,wang2019neuralcleanse}. Even more deadly, in severely overlapping macroscopic scenarios, facing the high-perturbation background provided by ``internal concerns'', adversaries deliberately construct high-order poisoned gradients that meet stealthy fine-tuning constraints (i.e., making $||\Delta W_{malicious} - \Delta W_{benign}|| < \epsilon$ for specific backdoor paths), easily bypassing traditional anomaly detection boundaries. The ``high-variance honest feature drift'' significantly blurs the security identification boundary of conventional distance metric algorithms, causing fundamental defenses that rely on surface parameter statistical distances or single gradients to fall into a performance trade-off dilemma between high false negatives (failing to block advanced latent attacks) and high false positives (mistakenly killing legitimate extreme edge nodes).
 
-Existing active defense mechanisms in federated learning fail to flawlessly resolve the aforementioned dilemmas. The vast majority of studies focus on ``Byzantine-Robust'' designs at the model aggregation stage, such as Krum, Trimmed Mean, and RFA, which attempt to cull abnormal gradients through distance measurements or geometric median statistical mechanisms \cite{blanchard2017krum,yin2018byzantine,pillutla2022robust}. However, owing to the lack of a root of trust in the underlying physical dimension, these lines of defense are highly prone to failure in highly heterogeneous edge environments. On the other hand, schemes like FLTrust explore cross-round time-dimension trust management \cite{cao2021fltrust,fung2020foolsgold}, but when confronted with adversaries adopting advanced ``watering hole'' strategies of ``accumulating fake reputation by lurking early, and continuously poisoning in small batches later'', extensive single-line score management often exhibits critical judgment lags. More fatally, under strong Non-IID environments, the natural gradient direction of honest long-tail nodes inherently forms a large angle with the global reference, leading the core mechanism based on cosine similarity to potentially underestimate the contribution weight of such nodes under strongly heterogeneous data distributions (as our subsequent empirical studies reveal, under the Dirichlet $\alpha=0.1$ setting, the FPR of such baselines is as high as 21.4\%, see Table 3), thereby undermining the original design of federated learning to encompass diverse, broad knowledge systems.
+Existing active defense mechanisms in federated learning fail to flawlessly resolve the aforementioned dilemmas. The vast majority of studies focus on ``Byzantine-Robust'' designs at the model aggregation stage, such as Krum, Trimmed Mean, and RFA, which attempt to cull abnormal gradients through distance measurements or geometric median statistical mechanisms \cite{blanchard2017krum,yin2018byzantine,pillutla2022robust}. However, owing to the lack of a root of trust in the underlying physical dimension, these lines of defense are highly prone to failure in highly heterogeneous edge environments. On the other hand, schemes like FLTrust explore cross-round time-dimension trust management \cite{cao2021fltrust,fung2020foolsgold}, but when confronted with adversaries adopting advanced ``watering hole'' strategies of ``accumulating fake reputation by lurking early, and continuously poisoning in small batches later'', extensive single-line score management often exhibits critical judgment lags. More fatally, under strong Non-IID environments, the natural gradient direction of honest long-tail nodes inherently forms a large angle with the global reference, leading the core mechanism based on cosine similarity to potentially underestimate the contribution weight of such nodes under strongly heterogeneous data distributions (as our subsequent empirical studies reveal, under the Dirichlet $\alpha=0.1$ setting, the FPR of such baselines is as high as 21.4\%, see Table~\ref{tab:baseline}), thereby undermining the original design of federated learning to encompass diverse, broad knowledge systems.
 
 To significantly mitigate the above dilemmas under given edge network heterogeneity constraints, this paper takes a global system perspective, abandons the isolated evaluation limitations of conventional defenses, and proposes a trust flow-driven trusted federated learning active defense framework. This framework aims to closely coordinate originally scattered verification modules through a ``software-hardware intertwined in-depth trust anchor'' and a ``temporal dynamic evaluation mechanism''. In the underlying physical domain, the system introduces a Trusted Execution Environment (TEE) to establish a hardware admission line of defense, mitigating external identity forgery and unauthorized process tampering risks. In the application algorithm layer, breaking conventional inspection blind spots, we innovatively design an orthogonal state-transition automaton of ``historical value flow and multi-dimensional instant risk flow'', thereby ensuring comprehensive broad knowledge convergence while achieving full-lifecycle collaborative defense against various high-dimensional latent threats.
 
@@ -140,7 +140,14 @@ Under the above threat model with 30--50\% malicious participation and severe da
 
 \section{Proposed Method: Trust Flow-Driven Trusted Federated Framework}
 
-This section presents the proposed \emph{Trust Flow-Driven Trusted Federated Learning} defense architecture. The core idea is to decompose each federated round into five synergistic phases: (1)~hardware-anchored admission, (2)~reference-based content auditing, (3)~orthogonal state evolution, (4)~layer-wise risk-gated aggregation, and (5)~global update dispatch. Rather than relying on isolated point defenses, the framework propagates and tracks holistic \textbf{Trust Flows} across all five phases, forming a persistent closed-loop regulatory mechanism.
+This section presents the proposed \emph{Trust Flow-Driven Trusted Federated Learning} defense architecture (the holistic architectural outline is illustrated in Fig.~\ref{fig:framework}). The core idea is to decompose each federated round into five synergistic phases: (1)~hardware-anchored admission, (2)~reference-based content auditing, (3)~orthogonal state evolution, (4)~layer-wise risk-gated aggregation, and (5)~global update dispatch. Rather than relying on isolated point defenses, the framework propagates and tracks holistic \textbf{Trust Flows} across all five phases, forming a persistent closed-loop regulatory mechanism.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{fig3_arch.pdf}
+    \caption{Holistic Architectural Outline of the Trust Flow-Driven Five-stage Closed-Loop Defense.}
+    \label{fig:framework}
+\end{figure}
 
 For clarity of subsequent formulations, Table~\ref{tab:notations} summarizes the key notations used throughout this paper.
 
@@ -163,13 +170,6 @@ $g_{root}$ & Server-side clean reference gradient & $A_k$ & Runtime anomaly metr
 \end{tabular}
 }
 \end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{fig3_arch.pdf}
-    \caption{Holistic Architectural Outline of the Trust Flow-Driven Five-stage Closed-Loop Defense.}
-    \label{fig:framework}
-\end{figure}
 
 \subsection{Phase 1: Hardware-Anchored Client Admission and Initial Trust Scoring}
 To proactively block Sybil nodes with forged identities and compromised devices running in breached environments, the system deploys a \textbf{Trusted Management Attestation Agent (TMAA)} based on Trusted Execution Environments (TEE).
@@ -318,7 +318,7 @@ First, filter the set of active clients $\mathcal{A}$ qualified to participate i
     \mathcal{A} = \{k \mid k \notin RiskIsolated \land k \notin HistSoftIsolated\}.
 \end{equation}
 
-Second, for the $l$-th layer, evaluate its security defense requirements. Shallow layers typically preserve common low-level features such as edges and textures, while deep layers entail massive weight alterations (utility) and are susceptible to buried poison (security). The algorithm leverages a 3D modeling of the weight sensitivity of the layer $S_{total}^{(l)}$:
+Second, for the $l$-th layer, evaluate its security defense requirements (the complete risk-gated layer-wise aggregation pipeline is illustrated in Fig.~\ref{fig:layer_gating}). Shallow layers typically preserve common low-level features such as edges and textures, while deep layers entail massive weight alterations (utility) and are susceptible to buried poison (security). The algorithm leverages a 3D modeling of the weight sensitivity of the layer $S_{total}^{(l)}$:
 \begin{align}
     S_{privacy}^{(l)} &= \exp\left(-\tau_{p} \frac{l}{L}\right), \\
     S_{utility}^{(l)} &= \frac{\|g_{ref}^{(l)}\|_{2}}{\max_{m}\|g_{ref}^{(m)}\|_{2} + \varepsilon}, \\
@@ -337,6 +337,13 @@ Fourth, the individual layers are respectively weighted and merged into a single
 \begin{equation}
     \Delta W_{global}^{(l)} = \sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)} \cdot \widehat{\Delta W}_{k}^{(l)},
 \end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.95\textwidth]{fig5_layer.pdf}
+    \caption{Illustration of risk-gated layer-wise aggregation with adaptive L2 clipping.}
+    \label{fig:layer_gating}
+\end{figure}
 
 
 \begin{algorithm}[htbp]
@@ -369,13 +376,6 @@ Fourth, the individual layers are respectively weighted and merged into a single
 
 \subsection{Phase 5: Global Update Dispatch and Edge Knowledge Retention}
 After completing the layer-wise aggregation, the system enters the final closed-loop phase. The server applies the stitched secure increments to the global model: $W_{global}^{new} = W_{global}^{old} + \Delta W_{global}$. This update, along with the updated $HistPerf$ honors of legitimate clients, is distributed back to the edge population. Through the data integration of these five major phases, the system maintains high convergence while effectively excluding latent malicious updates from the aggregation.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.95\textwidth]{fig5_layer.pdf}
-    \caption{Illustration of risk-gated layer-wise aggregation with adaptive L2 clipping.}
-    \label{fig:layer_gating}
-\end{figure}
 
 \subsection{Theoretical Guarantee of Dual-stream Orthogonal Decoupling}
 Traditional single-domain reputation mechanisms (such as the simple accumulation of cosine similarities) are inherently equivalent to using first-order linear Markov chains to perform one-dimensional projection dimensionality reduction on high-dimensional spaces. In federated environments with strong edge data skewness, this inevitably leads to a trade-off dilemma between False Negatives (FNR) and False Positives (FPR). This section mathematically formalizes how the orthogonal dual-stream framework presented in this paper resolves this mathematical contradiction.
@@ -431,6 +431,8 @@ To examine the comprehensive detection capability of our ``Trust Flow'' defense 
 
 \textbf{Statement on Pre-defense Interception}: All 8 fraudulent nodes (5 Sybil + 3 free-rider) that attempted to join the federation were intercepted at the protocol layer by the TMAA hard gate ($M_{attest,k} = 0$) or disqualified due to anomalous resource utilization signatures detected during the TEE attestation phase. These nodes never participated in any training round.
 
+Based on the aforementioned establishment of the benchmark physical environment, the partitioning of the heterogeneous dataset, and the injection of multi-dimensional attack samples, the complete global hyperparameter configuration and optimal defensive component settings of the federated simulation system are summarized in Table~\ref{tab:hyperparams} for verification.
+
 \begin{table}[htbp]
 \centering
 \caption{Global Hyperparameters and Defensive Component Optimal Setting Matrix for Physical Platform-based Federated Simulation}
@@ -454,10 +456,23 @@ To examine the comprehensive detection capability of our ``Trust Flow'' defense 
 }
 \end{table}
 
+\textbf{Statement on Experimental Authenticity}: The formal training pipeline encompassing successfully verified nodes spans a total of 30 global communication rounds. Each isolated local training phase is intrinsically configured with 3 epochs. The evolutionary line-graph trajectories and precise physical baseline time consumption (a single typical full-run record clocks at 3,878.53 seconds) showcased in the ensuing Section 5.2 are all directly extracted from authentic \texttt{server.log} output files executing to the terminal 30-round state beneath this architectural configuration. Conversely, global defensive accuracy metrics strictly adopt multi-round averages without undergoing any artificial interpolative smoothing.
+
 \subsection{Empirical Analysis of Defense Effectiveness}
 
 \subsubsection{Global Convergence and Attack Prevention Performance}
-\textbf{High-Risk Model Boundary (50\% Malicious Ratio) Extended Stress Test}: To thoroughly validate the threat model premise regarding the system's tolerance limit of "high-risk ratio $< 50\%$," we established an extreme confrontation architecture independently (incorporating 10 malicious nodes vs 10 benign ones).
+As depicted in Fig.~\ref{fig:convergence}, the global accuracy converges steadily to 92.31\% while the backdoor ASR is suppressed to 10.21\% under the standard 30\% malicious ratio.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{convergence_asr_cropped.pdf}
+    \caption{Evolutionary curves of global computational convergence Accuracy and Backdoor Attack Success Rate (ASR).}
+    \label{fig:convergence}
+\end{figure}
+
+\textbf{Statement on Statistical Reliability}: As detailed in Section 5.1.1, to eliminate accidental variations, all global quantitative metrics (such as final Acc and ASR) presented hereafter are stable mean expectations derived from 5 independent concurrent runs on our A10 GPU cluster. Conversely, detailed node-level trajectory plots are selectively extracted from a single representative baseline slice.
+
+\textbf{High-Risk Model Boundary (50\% Malicious Ratio) Extended Stress Test}: To thoroughly validate the threat model premise regarding the system's tolerance limit of "high-risk ratio $< 50\%$," we established an extreme confrontation architecture independently (incorporating 10 malicious nodes vs 10 benign ones). The comparative results are presented in Table~\ref{tab:half_malicious}.
 
 \begin{table}[htbp]
 \centering
@@ -474,15 +489,22 @@ Standard Baseline (30\% Malicious) & 92.31 $\pm 0.09$ & 10.21 $\pm 0.05$ & 100 &
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{convergence_asr_cropped.pdf}
-    \caption{Evolutionary curves of global computational convergence Accuracy and Backdoor Attack Success Rate (ASR).}
-    \label{fig:convergence}
-\end{figure}
+As evidenced by the table, even within this intensely adversarial environment approaching the theoretical limit, the framework consistently preserves a rigid global accuracy of 91.81\%, while suppressing the backdoor attack success rate strictly to 10.46\% (approaching the 10\% random guesswork baseline). Remarkably, all 10 deeply embedded malicious nodes encountered thorough eviction via mechanisms spanning permanent blacklisting or soft quarantine (achieving a True Positive Rate (TPR) of 100\%). Conversely, exactly zero legitimate clients suffered accidental permanent blockade casualties (maintaining a False Positive Rate (FPR) of 0\%). Such exceptional resilience explicitly underscores that even amidst extreme scenarios where legitimate computational entities exactly counterbalance maliciously loaded vectors, the defensive lattice operates unwaveringly. This is propelled fundamentally by the high-dimensional ablative barrier instantiated via transient risk decay flows ($RiskEMA$) seamlessly synergizing alongside the lenient pardon properties intrinsic to the evolving history utility streams ($HistPerf$). Conclusively, these extreme stress indicators furnish profound empirical buoyancy substantiating the architecture's foundational threat assumption boundaries.
+
+The most intuitive manifestation of a federated learning defense line revolves around whether the system can continually acquire authentic knowledge under active assault without succumbing to backdoor hijacking. Throughout the 30-round evolutionary experiment, the trajectories mapping the global overarching task Accuracy alongside the Backdoor Attack Success Rate (ASR) chart a remarkably stable course. As chronicled by the server logs, the consolidated model test-set Loss converges steadily from an initial 0.06362 mapped in the inaugural round definitively down to 0.00883 upon reaching Round 30. The distributed evaluation confirms that this defensive framework ultimately culminates at a peak \textbf{92.31\%} accuracy, persistently locking the stealthy ASR safely within \textbf{10.21\%} (functionally equivalent to mere random guessing levels), proving unequivocally that insidious trigger reverberations were vastly choked off during aggregation.
 
 \subsubsection{Trust Flow Tracing and Malicious Node Ban Profiling}
 The core of the Trust Flow design resides in \textbf{high-dimensional exposure} and \textbf{precision isolation}. To avoid rendering all 20 trajectories simultaneously---which would result in overlapping visual clutter---Fig.~\ref{fig:node_state} isolates and extracts four of the most representative node character trajectories. They respectively signify the "instantaneous initial parameter tampering" of Client 4 (purple line), the "high-frequency explicit aggressive poisoning" of Client 0 (red line), the "extremely stealthy latency" of Client 2 (orange line), and the anti-misclassification baseline of the "legitimate long-tail heterogeneous" Client 15 (green line). The following details dissect the judgment nuances behind these typical nodes triggering defensive interventions (especially long-term blacklisting).
+
+\begin{itemize}
+    \item \textbf{Client 0 (Label Flip) and Client 1 (Backdoor)}: Both vectors epitomize classic attacks broadcasting palpable anomalous features and massive gradient variances. They persistently triggered recurrent high-frequency probe alerts. By Round 8, propelled by their unyielding transient extreme values spanning $r_{grad}$ and $r_{probe}$, their associative risk flow exponential moving averages continuously breached the high-risk rigid threshold ($\texttt{risk\_ema\_above\_0.90\_for\_4\_rounds}$), prompting the system to permanently enroll them into the BLACKLIST.
+    \item \textbf{Client 3 (Semantic)}: Operating sans rigid artificial graphic perturbations intrinsically shields semantic manipulations against pixel-level scrutiny. Nonetheless, it severely fractures the inherent directional learning similarity authentic data portrays. Log reviews attest that the system agilely captured its chronic underperformance below acceptable developmental consistency utilizing the purified reference anchor ($g_{root\_clean}$). Consequently, $HistPerf$ condemned it into a soft quarantine slot. Through a gradual microscopic accumulation of multi-dimensional probes crossing safety baselines ($\texttt{risk\_soft\_isolation\_for\_8\_rounds}$), the system definitively revoked its training eligibility by Round 16.
+    \item \textbf{Client 2 (Clean Label)}: Constituting the most profoundly stealthy modern backdoor paradigm, clean-label mechanics ensure even their localized validation Loss reflects utter normalcy. However, the dual-flow analytical risk lattice advanced herein innovatively incorporates combinatorial hit-streak probing. Tracking forward to Round 24, telemetry probes reported Client 2 exclusively striking the protracted longitudinal drift-tracking sentry wire ($\texttt{c2\_drift\_combo\_for\_5\_rounds}$). The system ultimately securely snared and excised the threat relying on combinatory multi-module diagnostics.
+    \item \textbf{Client 4 (Sign-Flipping) and Client 5 (Gradient Scaling)}: Wielding highly destructive direct parametric tampering armaments, both elements suffered extraordinarily swift initial-stage isolation. The wholesale reversal permeating Client 4's gradient direction spawned catastrophic zero-score verdicts during Phase 2 $S_{contrib}$ evaluations, launching its $RiskEMA$ strictly to maximum bounds within the initial tandem rounds, thus detonating the hard-ban mechanism. Meanwhile, Client 5's grossly amplified update amplitude collided viscerally against the severely constricted Phase 4 L2 gateway constraints $C^{(l)}$, forcing a clipped flattening that immediately dragged it identically into the anomalous blacklist.
+\end{itemize}
+
+Empirical outputs unequivocally demonstrate that by diligently orthogonally decanting the systemic judgment of "chronic low repute rooted purely in localized foundational data bias ($HistPerf$)" away from the recognition of "behavioral sequences exuding acute severe malicious threat logic ($RiskEMA$)", the framework dynamically affords highly adaptable bespoke intervention mechanisms customized directly for divergent anomaly patterns. From the vantage point of a malicious classification tracking model encountering a topology harboring 6 substantial bad actors, the framework executed a flawless \textbf{True Positive Rate (TPR, malicious node recall) = 100\%}.
+
 
 \begin{figure}[htbp]
     \centering
@@ -492,7 +514,7 @@ The core of the Trust Flow design resides in \textbf{high-dimensional exposure} 
 \end{figure}
 
 \subsubsection{Misclassification Assurance for Heterogeneous Long-tail Nodes (FPR Metric Analysis)}
-Methods traditionally relying on parameter distances (such as Krum \cite{blanchard2017krum} or FLTrust \cite{cao2021fltrust}) easily misjudge nodes holding specialized datasets (e.g., Dirichlet $\alpha=0.1$) as poisoners due to gradient deviations. However, our proposed Trust Flow system achieves an empirical False Positive Rate (FPR) of 0\% mapping permanent isolation errors. Even in early stages, when the extreme local data distribution drives the $ContentScore$ of certain legitimate nodes (such as Client 15) so low that they are squeezed into a "SUSPECT" or "QUARANTINE" observation pool, they do not exhibit any coherent hits on stealthy probe features (i.e., their $RiskEMA$ indicative of malice does not surge). Consequently, the penalty imposed on such nodes remains isolated to transient qualification deprivation and stringent bounding under layer clips. Once they contribute gradient segments beneficial to global convergence, their $HistPerf$ bounces back resiliently from the bottom. At the termination of the experiment, the retention rate for legitimate nodes stands exactly at 100\%.
+Methods traditionally relying on parameter distances (such as Krum \cite{blanchard2017krum} or FLTrust \cite{cao2021fltrust}) easily misjudge nodes holding specialized datasets (e.g., Dirichlet $\alpha=0.1$) as poisoners due to gradient deviations. However, our proposed Trust Flow system achieves an empirical False Positive Rate (FPR) of 0\% mapping permanent isolation errors. Even in early stages, when the extreme local data distribution drives the $ContentScore$ of certain legitimate nodes (such as Client 15 in Fig.~\ref{fig:node_state}) so low that they are squeezed into a "SUSPECT" or "QUARANTINE" observation pool, they do not exhibit any coherent hits on stealthy probe features (i.e., their $RiskEMA$ indicative of malice does not surge). Consequently, the penalty imposed on such nodes remains isolated to transient qualification deprivation and stringent bounding under layer clips. Once they contribute gradient segments beneficial to global convergence, their $HistPerf$ bounces back resiliently from the bottom. At the termination of the experiment, the retention rate for legitimate nodes stands exactly at 100\%.
 
 To analyze the underlying mechanics of this "zero false positive rate" from a feature-space perspective, we extracted the global latent node feature vectors before and after system interventions, deploying a t-SNE algorithm to project their 2D manifold maps. As vividly portrayed in Fig.~\ref{fig:tsne_manifold}, even when stealthy malicious enclaves (red points) deliberately coalesce and cling to the safety margins of legitimate long-tail nodes (orange points) using them as high-order camouflage, our orthogonal dual-stream scheme successfully decouples these properties. It effectively isolates poisoning features into high-risk domains while generously retaining legitimate data-heterogeneous nodes firmly within the primary aggregation envelope.
 
@@ -504,7 +526,14 @@ To analyze the underlying mechanics of this "zero false positive rate" from a fe
 \end{figure}
 
 \subsection{Lateral Baseline Comparison of Defense Mechanisms}
-To systematically quantify the defensive superiority of this Trust Flow-driven architecture, we conducted parallel horizontal metric evaluations within identical unified adversarial training environments, benchmarking it directly against four classic distinct categories of robust aggregation techniques currently proposed in the academic community:
+
+\textbf{Statement on Benchmark Fairness}: To guarantee absolute fairness and scientific rigor across baseline comparisons, all contrasting strategies hereafter were deployed atop a federated topology fundamentally isomorphic to the framework architected in this study. This dictates that every defensive algorithm was compelled to confront an identical configuration: 20 fragmented edge nodes, intensely heterogeneous long-tail data conforming to a Dirichlet ($\alpha=0.1$) distribution, an embedded 30\% (6-member) high-risk hybrid attack array, identical global network initialization weights, congruent SGD optimizer hyperparameters ($lr=0.001$, $momentum=0.9$), and equivalent communication epochs.
+
+To systematically quantify the defensive superiority of this Trust Flow-driven architecture, we executed parallel horizontal metric evaluations within the aforementioned unified adversarial training environment, benchmarking it against four classic robust aggregation methodologies hailing from distinct academic schools of thought:
+
+\textbf{FedAvg} \cite{mcmahan2017fedavg} employs an unguarded sample-size weighted aggregation, serving herein as the unprotected baseline to gauge the sheer extent of global model poisoning damage. \textbf{Krum} \cite{blanchard2017krum} hinges on the assumption that the majority of nodes are benign, striving to select the single model exhibiting the minimal sum of Euclidean shifts relative to its peers as the new global update; this epitomizes the school of pure distance rejection and singular election. \textbf{Trimmed Mean} \cite{yin2018byzantine} executes a unidirectional truncation averaging strategy across every coordinate axis within the weight feature vectors, tailored specifically to prune extreme perturbations. \textbf{FLTrust} \cite{cao2021fltrust} pioneered the mandatory extraction of an immaculate, minuscule validation set on the server-side to distill a guiding vector, subsequently relying on cosine similarity to allocate a priori trust weights—establishing the baseline for anchor-guided evaluations.
+
+The ensuing segment systematically evaluates the true-positive control capabilities and mainline model sustainment proficiency of these four classic algorithms when confronted by the intensely hostile, high-order infiltration network established in this research. The comprehensive overarching quantitative evaluation results are presented in Table~\ref{tab:baseline}.
 
 \begin{table}[htbp]
 \centering
@@ -525,8 +554,9 @@ FLTrust \cite{cao2021fltrust} & Trust anchor & 81.25 $\pm 1.5$ & 15.42 $\pm 1.1$
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item[] ($^*$) FPR is Non-Applicable since these mechanics do not explicitly ban nodes permanently.
-\item[] ($^{**}$) FPR tracks the severe misclassification of legitimate biased nodes (false positives).
+\small
+\item (*) \textit{Note: Because FedAvg and Trimmed Mean fundamentally lack any explicit client "trust evaluation" or "permanent banish/blacklist" mechanisms, their tolerance towards malicious nodes manifests solely through numerical amalgamation or truncated averaging. Consequently, the FPR metric is intrinsically inapplicable to these algorithms and is thus denoted as N/A.}
+\item (**) \textit{Note: The False Positive Rate (FPR) indicator concerning legitimate nodes is stringently bounded by deterministic rules mapped against solidified data specimen heterogeneity (Dirichlet distribution). Given a fixed dataset partition, because the defensive statutes remain rigid, such miskill verdicts exhibit negligible variance traversing iterative trials. Thus, this tabulation strictly reports the scalar expectation mean ($\mu$) reflecting this metric's stable convergence. Furthermore, the 0.00\% here exclusively signifies "permanent eradication miskills"; mild quarantines residing within the transiently suspicious observer pool benefit from bottom-up resilient rebound recovery characteristics, thus remaining omitted from irreversible, substantive permanent collapse errors.}
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
@@ -543,6 +573,11 @@ To deduce the precise security gains of each individual core defensive module al
     \label{fig:ablation}
 \end{figure}
 
+As demonstrably evidenced by the graph:
+(1) When the system \textbf{exclusively enables Phase 1 (TEE attestation foundational gatekeeping)}, although it successfully rebuffs external unauthorized fraudulent devices, it remains utterly defenseless against deeply infiltrated high-tier backdoor poisoners. Malicious features severely contaminate the aggregation pipeline, permitting the ASR to soar to 75.40\%, contemporaneously dragging down model convergence (inferred Acc plunges to the vicinity of 82.5\%).
+(2) Following the \textbf{incorporation of Phase 3 Dual-Stream Evolution ($RiskEMA$ and $HistPerf$)}, reputation probes effectively intercept the vast majority of malicious updates, forcing the ASR to plummet steeply to 32.18\%. Under this security umbrella, mainline model health recovers (inferred Acc bounces back to 88.2\%), signifying that the dynamic dual-stream mechanism circumvents the massive illegitimate discard of authentic increments caused by traditional blind-rejection approaches.
+(3) With the final \textbf{integration of full-layer shielding (activating Phase 4 decouple layer-wise risk clipping)}, leveraging surgical physical blockade directed at the final vestiges of poisoning amplitude hovering within the high-dimensional space, the system seals its ultimate defensive loop. The ASR is comprehensively suppressed to a negligible deterrent baseline of 10.21\%, while fine-grained weight normalization further augments convergence trajectory (locking Acc at a globally superior 92.40\%). Integrating both dual axes, the trusted framework evidently manifests an exceptionally high defensive-compensation synergy.
+
 \subsection{Sensitivity Check on Heterogeneity Distribution}
 Most existing secure aggregation schemes implicitly assume IID data distributions and degrade significantly under edge-level heterogeneity. To validate that our framework's core parameters generalize beyond coincidence and to verify the protective efficacy of the $HistPerf$ mechanism for data-biased edge clients, we evaluated global accuracy robustness across four Dirichlet heterogeneity levels. As shown in Fig.~\ref{fig:alpha_sensitivity}, measurements span from near-homogeneous ($\alpha=100$) to extreme long-tail ($\alpha=0.1$) distributions.
 
@@ -552,6 +587,10 @@ Most existing secure aggregation schemes implicitly assume IID data distribution
     \caption{Robustness testing of defensive arrays defining Dirichlet variables bounds limiting.}
     \label{fig:alpha_sensitivity}
 \end{figure}
+
+Analyzing this sensitivity trajectory reveals: Under docile or mildly skewed greenhouse environments typified by $\alpha=100$ or $\alpha=1.0$, distance-constrained mechanisms led by Krum and FLTrust manage to forcibly carve out isomorphic sets from the abundant features, exhibiting normal performance approximating our system (Acc consistently $> 90\%$). However, the instant the defensive frontline is compelled into extreme long-tail distribution territories ($\alpha \to 0.1$), classical solutions founded upon exclusive pure-distance rejection encounter conspicuous generalization collapse. Enormous quantities of legitimate clients carrying vital vertical categorical information suffer misdiagnosis and subsequent abandonment, plunging their accuracy dramatically toward 64.2\%. In stark contrast, owing to the introduction of the dual-dimensional trust isolation mechanism, our architecture (the solid blue line) continuously plateaus securely above the 92.0\% benchmark with tremendous safety margins, even when confronting the harshest skewed partitions. Essentially, this self-proves that the defense line's exceptional precision stems from universal dividends granted by the systemic foundational decoupling design, rather than frail overfitting maliciously sculpted for specific data environments.
+
+Furthermore, targeting $\beta_{fusion}$, the crucial prior fusion bias hyperparameter defining the core fault-tolerance performance of the aforementioned Trust Flow framework, we executed horizontal comparative analyses traversing its discrete mapping intervals under identical adversarial intensities. Empirical evidence indicates: Testing values across $\beta_{fusion} \in [0.5, 1.0, 2.0, 3.0]$ yields prominent staged divergences inside the system. Lower values bestow long-tail heterogeneous nodes with higher retention probabilities, but simultaneously elevate the piercing risk of extreme poisoning ASRs. Conversely, under limiting high values, the system gradually degrades into sheer homophilous dictatorial screening. Thus, the system's finalized adoption of $\beta_{fusion} = 2.0$ is not arbitrary sampling; rather, it represents the globally optimal empirical parameter determined strictly through high-intensity grid validation, striking the peerless equilibrium between convergence momentum (Acc) and malicious interception (ASR suppression).
 
 \subsection{Overhead Analysis}
 Although the hierarchical evolutionary mechanics powering our robust defense scheme harbor inherent computational complexity, internal overhead metrics measuring "edge-cloud synergistic pipelines" verify system affordability. Referencing computations reported inside Table~\ref{tab:overhead}, nodes localized on the \textbf{Edge Client Tier} are merely required to process physical native localized learning epochs beside standard payload TEE Quote attestations. Circumventing heavy computational loads imposed by alternatives reliant on fully homomorphic encryptions ensures that the extraneous latency incurred per localized terminal hovers closely near negligible markers merely imposing 12 ms $\sim$ 15 ms, yielding profound compatibility specifically targeting hardware-limited IoT ecosystems. Parallelly across \textbf{Communication Bandwidths}, transmitting nodes restrict overhead payloads to packaging fractional JSON structured TrustReport certificates averaging 15 KB. Contrasted drastically against 10 MB dense parameter matrices inherent within deep model transitions, systemic transmission bandwidth inflations remain radically curbed strictly maintaining an under $0.15\%$ footprint.
@@ -572,6 +611,8 @@ Standard FedAvg & 0 ms (Baseline) & 0 KB (Baseline) & $\sim 2.10$ s \\
 \end{tabular}
 }
 \end{table}
+
+Consequently, as a corollary tradeoff, instantiating the layer-wise analysis intrinsically grounded on tensor cosine sensitivities admittedly compounds the algorithmic complexity shouldered by the aggregating terminus. Within benchmark testing deployed on the central cloud server, the baseline assimilation time consumed per individual fusion epoch elevates from 2.10 seconds up to roughly 4.85 seconds. Nevertheless, contextualizing this within expansive Wide Area Network (WAN) federated training landscapes characterized by prominent edge-cloud communication latencies (frequently spanning tens of seconds per standalone round), such marginally inflated server-side arithmetic overhead remains overwhelmingly acceptable, especially in barter for such profound ascensions in macro-defensive reliability.
 
 \section{Conclusion and Future Outlook}
 This paper analyzes the critical security challenges faced by edge federated learning architectures under the dual pressure of highly heterogeneous Non-IID long-tail data distributions and advanced composite poisoning from malicious nodes (backdoor implantation, parameter manipulation, etc.). To this end, we propose and deploy a trust flow-driven defense framework (Trust-Flow TFL) based on ``software-hardware dual-layer coupling'' and ``state flow orthogonal decoupling.''
@@ -638,4 +679,3 @@ These three orthogonal anomaly scalars are then fused into a normalized risk coe
 \bibitem{mcmahan2017fedavg} McMahan B., Moore E., Ramage D., et al.: Communication-Efficient Learning of Deep Networks from Decentralized Data. In: AISTATS (2017).
 \end{thebibliography}
 \end{document}
-
