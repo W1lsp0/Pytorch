@@ -37,7 +37,7 @@
     \end{center}
 
     \begin{abstract}
-        面向边缘计算场景，联邦学习在提升数据可用性的同时，也面临非独立同分布数据、模型投毒和运行环境不确定性叠加带来的鲁棒性挑战。本文提出一种信任流驱动的可信联邦学习框架，将客户端可信验证、参数内容审查、历史信誉演化、风险状态更新以及分层鲁棒聚合串联为统一的状态闭环。方法上，本文构建了硬门禁与指数衰减结合的信任评分机制，引入服务器优先的纯净参考方向用于贡献度验证，设计历史流与风险流正交更新策略，并在聚合阶段采用风险门控下的逐层准入、二次归一化与动态裁剪机制。基于Flower实现并在CIFAR-10上完成20客户端、6种高危混合攻击的实证。5轮独立实验（$n=5$）统计结果显示：在设定的对抗区间内可有效识别各类恶意客户端，且正常节点永久误杀率维持向零收敛（瞬时可疑率 $<$ 0.01\%）；系统取得了 $92.31\% (\pm 0.09\%)$ 的均值收敛准确率，并将后门攻击成功率（ASR）极值期望控制在 $10.21\% (\pm 0.05\%)$；单次 30 轮仿真基准耗时为 3878.53s。结果表明，信任流正交建模能够在异构边缘环境中提供稳健的恶意节点识别能力。
+        面向边缘计算场景，联邦学习在提升数据可用性的同时，也面临 Non-IID 数据、模型投毒与运行环境不确定性叠加带来的鲁棒性挑战。本文提出信任流驱动的可信联邦学习框架，将客户端可信验证、参数审查、历史信誉演化、风险状态更新和分层鲁棒聚合统一为闭环流程。方法上，框架结合硬件门禁与指数衰减信任评分，引入服务器优先的纯净参考方向进行贡献度评估，采用历史流与风险流正交更新，并在聚合阶段执行风险门控下的逐层准入、重归一化与动态裁剪。基于 Flower 在 CIFAR-10 上开展 20 客户端、6 类混合攻击实验。5 轮独立实验（$n=5$）表明：框架可稳定识别恶意客户端，正常节点永久误杀率趋近于 0（瞬时可疑率 $<$ 0.01\%）；全局准确率达到 $92.31\% (\pm 0.09\%)$，后门攻击成功率（ASR）控制在 $10.21\% (\pm 0.05\%)$；单次 30 轮仿真耗时 3878.53s。结果表明，该框架在异构边缘环境中具备稳定的恶意节点识别能力与收敛性能。
     \end{abstract}
 
     关键词：联邦学习；边缘计算；可信执行环境；风险状态建模；分层鲁棒聚合；后门防御
@@ -64,44 +64,50 @@ trust-flow orthogonal modeling provides robust malicious-client detection
 while maintaining practical convergence under heterogeneous edge settings.
 
     \section{引言}
-联邦学习（Federated Learning, FL）作为一种新兴的分布式机器学习范式，通过“数据不出本地，仅交换模型参数”的机制，为边缘计算（Edge Computing）场景下的数据孤岛问题和隐私保护需求提供了理想的解决方案\cite{kairouz2021flsurvey}。在工业物联网、医疗诊断、自动驾驶等边缘应用中，海量智能设备产生的丰富感知数据可在不暴露原始数据的前提下，协同训练高性能的全局模型。
+联邦学习（Federated Learning, FL）通过“数据不出本地、仅交换模型参数”的机制，为边缘计算（Edge Computing）场景中的数据孤岛与隐私保护问题提供了可行路径\cite{kairouz2021flsurvey}。在工业物联网、医疗诊断等应用中，海量终端能够在不泄露原始敏感样本的前提下协作训练全局模型。
 
-然而，当联邦学习从理想化的数据中心走向真实的边缘计算拓扑时，系统不可避免地面临由\textbf{极端环境不确定性、数据非独立同分布（Non-IID）与高阶行为欺诈}相互交织而成的复合安全挑战。在“内忧”层面，自然分布的边缘设备不仅算力受限，其独立感知的碎片化场景导致本地样本呈现极度倾斜的长尾特性。从形式化优化的视角来看，这种剧烈的结构性异构偏差导致诚实节点的局部梯度更新方差极大（即 $\operatorname{Var}(|| \nabla \mathcal{L}_k ||) \gg \sigma_{threshold}$），从而天然引发强烈的全局模型空间漂移。在“外患”层面，无强制物理准入的边缘网络缺乏信任根，脆弱的端侧层极易遭到敌手利用。恶意参与者可针对性地实施纵深复合型的模型投毒与隐蔽后门攻击（如干净标签污染、深层语义后门）\cite{gu2017badnets,wang2019neuralcleanse}。更为致命的是，在恶劣交叠的宏观场景中，面临“内忧”所提供的高扰动背景，敌手往往通过精心构造满足隐蔽微调约束（即针对特定后门路径使得 $||\Delta W_{malicious} - \Delta W_{benign}|| < \epsilon$）的高阶投毒梯度，轻易绕开传统异常检测界限。\textbf{“高方差的诚实特征漂移”极大模糊了传统基于距离度量算法的安全识别边界}，致使依赖表面参数统计距离或单一梯度的基础防线往往陷入高漏报（防不住高级潜伏）与高误报（易错杀合法极性边缘）交织的性能权衡困境。
+然而，当 FL 部署至开放且异构的真实边缘环境中时，由于其分布式的计算机制，系统面临着严峻的安全性挑战。一方面，边缘节点产生的数据天然具有长尾与非独立同分布（Non-IID）特征，导致合法客户端的本地更新存在显著的波动性。另一方面，开放的边缘网络缺乏强制的计算监管机制，潜在的攻击者能够发起模型投毒乃至隐蔽的后门攻击（如干净标签污染、语义后门）\cite{gu2017badnets,wang2019neuralcleanse}。这类攻击可将触发器微小特征隐藏在常规参数波动中，从而在特定任务上诱导模型预测失效。在海量异构噪声与隐蔽投毒交织的场景下，传统检测机制往往在“漏报隐蔽后门”与“误判合法异构节点”之间陷入两难境地。
 
-现有的联邦学习主动防御机制未能完美破解上述困境。绝大多数研究聚焦于模型聚合阶段的“拜占庭容错（Byzantine-Robust）”设计，如 Krum、Trimmed Mean 以及 RFA 等经典算法试图通过距离测算或几何中位数的统计机制剔除异常梯度\cite{blanchard2017krum,yin2018byzantine,pillutla2022robust}。然而，这类防线由于缺乏底层物理维度的信任根，在高度异构的边缘环境中极易失效。另一方面，FLTrust 等方案探索了跨轮的时间维度信任管理\cite{cao2021fltrust,fung2020foolsgold}，但在面对投毒者采用“前期潜伏攒虚假信誉、后期小批量持续投毒”的高级水坑策略时，粗放的单线积分管理往往出现重大的判定滞后；更为致命的是，在强 Non-IID 环境下，诚实长尾节点的梯度方向天然与全局参考存在较大夹角，导致基于余弦相似度的核心机制在强异构数据分布下可能低估此类节点的贡献权重（正如本文后续实证发现，在 Dirichlet $\alpha=0.1$ 设置下此类基线的 FPR 高达 21.4\%，见表~\ref{tab:baseline}），进而压缩了联邦学习涵盖多元宽广知识体系的初衷设计。
+为了在高度异构的边缘环境中实现安全聚合，亟需设计更为鲁棒的防御策略。然而，实现这一目标并非易事，现有方案在实际部署中主要面临以下三大核心挑战：
 
-为在给定的边缘网络异构约束条件下显著缓解上述困境，本文立足于全局系统视角，摒弃了传统防线单一的评估局限，提出一种基于“信任流（Trust Flow）”驱动的可信联邦学习主动防御框架。该框架旨在将原本散落的验证模块，通过\textbf{“软硬件联动的纵深信任锚”}与\textbf{“时序动态评估机制”}密切协同。在底层物理域，系统引入可信执行环境（TEE）构筑硬件门禁防线，缓解外部身份伪造与越权进程篡改风险；在应用算法层，打破了常规审视盲区，创新性设计了“历史价值流与多维瞬发风险流”的正交状态转移自动机，从而在确保模型广域知识收敛的同时，实现对各类高维潜伏威胁的全周期协同防御。
+\textbf{挑战一：强异构数据下的“鲁棒拦截”与“泛化包容”两难。} 现有工作（如 Krum\cite{blanchard2017krum}、Trimmed Mean\cite{yin2018byzantine}）多通过空间距离度量和统计裁剪来防御模型投毒。然而，在以 Non-IID 为典型特征的边缘场景中，此类基于纯粹排斥力的算法退化严重：它们极易将拥有合法偏置数据（长尾特征）的节点错误判定为恶意节点并予以剔除，导致正常边缘数据的价值归零，模型在获得防御能力的同时严重牺牲了泛化性能。
+
+\textbf{挑战二：长线潜伏型复合攻击的隐蔽性难以捕捉。} 为弥补静态截断导致的数据浪费，部分方法引入了跨轮次的时序信誉评估机制（如 FLTrust\cite{cao2021fltrust}、FoolsGold\cite{fung2020foolsgold}）。但此类算法依然十分滞后。面对高级攻击者“前期提供正向贡献以积累声誉、后期持续微量投毒”的潜伏伪装策略时，传统声誉衰减机制难以在特定的深层网络异动中迅速锁定隐蔽后门。
+
+\textbf{挑战三：开放网络下物理执行完整性的缺失。} 上述无论软件防御算法设计多精妙，均隐式依赖于一项不切实际的根本假设——即“默认客户端必定切实执行了完整的本地训练任务”。但在执行环境高度不可控的边缘计算体系中，攻击者完全可以跳开训练环节，直接伪造极具破坏性的梯度字典注入网络。因此，缺乏底层强制物理验证的纯软件统计算法防线，在遭遇高权限系统劫持时将形同虚设。
+
+为逐一攻破上述挑战，本文提出了一套软硬件协同的“信任流（Trust Flow）”驱动可信联邦学习防御框架。针对挑战三，本框架果断在物理域引入可信执行环境（TEE）构建强制硬件验证机制，利用硬件级隔离技术从源端彻底阻断恶意节点凭空伪造更新的攻击路径；针对挑战二，本框架在算法层不仅提取了全局参考系，更首创了“历史效用流（HistPerf）”与“瞬时风险流（RiskEMA）”的正交演化评估体系，该机制能够瞬间捕捉高危的异常跳变（针对突发投毒），且不会因长期伪装而麻痹僵化（针对潜伏攻击）；针对挑战一，本框架通过分流评估将“防毒”与“容错”彻底解耦，在物理切断恶意投毒的同时，为合法的 Non-IID 节点提供了充分的试错反弹与包容空间，辅以全局网络深浅逐层 L2 裁剪，最终实现了极高精度的精细抑制。
 
 本文的主要贡献总结如下：
 \begin{enumerate}
-    \item \textbf{构建软硬件双结合的信任锚与全生命周期防御机制}。有别于仅在聚合瞬间被动过滤的单点防线，本设计将防御纵深全面前置并贯穿模型演化始终。在硬件端，依托 TEE 芯上飞地构筑难以篡改的物理节点准入与运行时环境指纹；在软件端，自然承接硬件初始基准，实现了跨硬件入场、纯净内容审查、时序信誉演算与分层动态控制的长效闭环管理。
-    \item \textbf{提出适应长期边缘环境的双流正交信誉演化体系}。针对以往累积信誉机制在长周期运作中“常引发长尾合法节点被永久误杀、而高级潜伏者难被揪出”的痛点核心，本文首创将身份评估逻辑降维解耦为两极独立互斥的运行轨道：以纯净贡献度积淀的“历史效用流（HistPerf）”用于温和保障异构合规群组的话语权特赦（\textit{在直觉层面，$HistPerf$ 犹如央行下发的个人信用评分：允许合规节点产生因数据偏科导致的暂时性更新落后，但鼓励其在长期长尾交互中赚回信誉特赦红利}）；而汇聚多层神经网络深层敏感探针的激进型“瞬发风险流（RiskEMA）”则专司执行极速的高危熔断拦截（\textit{相反，$RiskEMA$ 犹如登机口的零容忍安检仪：一旦触发特定投毒特征则不管其历史贡献多高，当轮触发即高压斩断}），系统在设计的实验与理论假设范围内（恶意占比$<50\%$、Non-IID $\alpha \geq 0.1$），有效缓解了防漏杀与抗误伤之间的权衡挑战。
-    \item \textbf{建立基于纯净基准的分层差异化聚合机制}。在抵御高级后门时，框架引入了基于服务器少量隔离数据提炼的核心参考原点，并结合深浅神经网络对投毒敏感度分化不同，实施风险门控下的逐层准入、受信任幸存者的动向重调校与细粒度参数动态 L2 裁剪，系统性阻断深层神经元恶意触发器透传。
-    \item \textbf{完成多形态安全环境下的实证与端到端平台部署}。本文利用包含 20 客户端集群的跨算力边缘架构进行了深度仿真测试（$n=5$ 独立重复实验）。面对 6 种混编攻击及长尾数据异构分布环境，体系在实验设定的对抗强度区间内（涵盖逼近 50\% 理论极限占比的极高危混编测试）取得了极高且稳定的恶意节点召回表现（TPR）；并借助向零收敛的系统永久误杀率（FPR $\approx$ 0\%）维系了全体协作信任，取得了 $92.31\% (\pm 0.09\%)$ 的主任务均值精度，及将后门攻击 ASR 期望有效牵制于 $10.21\% (\pm 0.05\%)$，由此验证了其作为高可靠联邦引擎架构在实际应用中的落地韧性。
+    \item \textbf{构建软硬件协同的全流程防御框架}。不同于仅在聚合时做一次性过滤的方案，本文将防线前移并贯穿训练全周期。硬件侧依托 TEE 建立可信准入与运行时完整性约束，软件侧完成内容审查、状态演化与分层聚合控制，形成闭环。
+    \item \textbf{提出双流正交信誉演化机制}。本文将信誉评估拆分为“历史效用流（HistPerf）”与“瞬时风险流（RiskEMA）”：前者用于长期贡献累积与误伤缓释，后者用于高风险行为快速熔断。在设定条件下（恶意占比 $<50\%$、Non-IID $\alpha \geq 0.1$），该设计兼顾了高召回与低误杀。
+    \item \textbf{设计基于纯净参考的分层差异化聚合策略}。框架引入服务器侧少量隔离数据构建参考方向，并按层实施风险门控准入、幸存者重归一化与动态 L2 裁剪，以抑制深层后门触发器透传。
+    \item \textbf{完成端到端实现与实证评估}。基于 Flower 在 20 客户端、6 类混合攻击条件下开展 $n=5$ 独立实验。结果显示：在逼近 50\% 恶意占比的压力场景中，框架仍保持高恶意召回（TPR）与接近零的永久误杀（FPR），并达到 $92.31\% (\pm 0.09\%)$ 的主任务精度和 $10.21\% (\pm 0.05\%)$ 的 ASR。
 \end{enumerate}
 
 
 \section{背景与相关工作}
 
 \subsection{联邦学习与边缘计算协同架构}
-联邦学习（Federated Learning, FL）作为一种隐私保护计算范式，允许数据在不出本地物理域的前提下，通过联调参数实现全局知识模型的联合构建。在边缘计算场景中，端-边-云（Client-Edge-Cloud）协同架构被广泛实施：边缘节点（涵盖物联网设备及基层算力网关）承接本地计算压力并生成梯度，中心异构服务器则负责全局模型的汇总聚合与时序下发。然而，该架构由于通信链条的长跨度以及边缘计算设备的极端参差不齐，天然产生极其严重的“系统异构性”及“数据非独立同分布（Non-IID）”特征。针对这一架构瓶颈，近年涌现了如簇状联邦（Clustered FL）\cite{r9_clustered}、自适应模型剪枝展开（FedPE）\cite{fedpe} 以及拆分联邦框架（ParallelSFL）\cite{parallelsfl} 等前沿探索。但随着架构越发复杂，此等演进不仅拉伸了主线收敛的时间轴，也为具有敌意的拜占庭（Byzantine）节点的潜伏渗透提供了更多可乘之机。
+联邦学习（Federated Learning, FL）在“数据不出本地”的约束下，通过参数协同完成全局模型训练。在边缘计算场景中，端-边-云（Client-Edge-Cloud）架构已被广泛采用：边缘侧负责本地训练并上传更新，中心服务器负责聚合与模型下发。该架构天然存在通信延迟、设备异构和数据 Non-IID 等问题。为缓解这些挑战，已有研究提出簇式联邦（Clustered FL）\cite{r9_clustered}、自适应剪枝扩展（FedPE）\cite{fedpe} 和拆分式联邦（ParallelSFL）\cite{parallelsfl} 等方法。但随着系统复杂度提升，攻击面也随之扩大，恶意节点更易潜伏并影响训练过程。
 
 \subsection{边缘伪装、模型投毒与隐蔽后门攻击}
-在完全开放且无强制准入审核的联邦广域交互中，中心枢纽难以甄别本地数据收集源的合法性与梯度纯净度度量。这导致目前的恶意攻击手段在边缘侧演化出了两个致命的高危分支：一是破坏性极强的\textbf{无差别投毒攻击}（Untargeted Poisoning），例如符号强行反转（Sign-flipping）和幅度暴力拉扯（Gradient Scaling），其目的在于使全局权重突变失锁，直接达成大范围拒绝服务（DoS）；二是高度隐蔽的\textbf{隐蔽目标后门攻击}（Targeted Backdoor），攻击方（如标签翻转、干净噪声标签注入、深层语义后门投毒）通过在隐秘的小规模样本中潜藏像素级触发器（Trigger），平时对主导分类任务伪装成高精度贡献，但在遭遇具有特定印记（Pattern）的推断时便使模型对含触发器样本产生定向误分类。
+在开放且缺少强制准入的联邦网络中，服务器难以准确判断客户端身份与更新质量，攻击手段主要分为两类：其一是\textbf{无目标投毒}（Untargeted Poisoning），如 Sign-flipping 与 Gradient Scaling，目标是破坏全局收敛并造成拒绝服务；其二是\textbf{目标后门攻击}（Targeted Backdoor），如标签翻转、干净标签污染和语义后门，通过隐蔽触发器在推理阶段诱导定向误分类。
 
 \subsection{现有主动防御防线的机制与不可调和的局限性}
-为了应对上述安全威胁，先驱防御手段大多采取了几何统计学的过滤机制（如距离隔离的 Krum \cite{blanchard2017krum} 与逐维中值裁剪的 Trimmed Mean \cite{yin2018byzantine}）。而在最新的前沿研究中，基于时序观察的主动信任评估正成为主流：例如基于小批干净验证集的 FLTrust 余弦导向评估\cite{cao2021fltrust}、FoolsGold 的抗合谋相似性剔除\cite{fung2020foolsgold}，甚至是集成在边缘层级的自适应动态聚合器 RaSA\cite{wang2025rasa} 等方案。同时，专注于恶意客户端广义检测 \cite{dou2025toward}、细粒度可信训练框架设计（如 TMT-FL）\cite{lu2025tmt}，以及多级自适应保护架构 \cite{wang2024federated} 的探索，也极大丰富了纯软件评估防线的维度。除此之外，针对由模型投毒衍生的隐蔽后门与共谋攻击，学界也相应提出了基于解耦对比训练的 FLPurifier \cite{flpurifier}、主打目标共谋防御的 RoseAgg \cite{roseagg} 以及利用双重陷门构建污染缓解机制的 ShieldFL \cite{shieldfl}。
-然而，上述全软件层面的防御在强 Non-IID 和高阶攻击场景下面临严峻挑战：如果提高排异警阈门控，则容易将携带稀有正义特征的正当节点也扫地出门（导致 FPR 误杀率显著上升）；此外，对于具备系统较高操作权限（如 Root 级）的攻击者，纯软件的探针因为缺乏物理信任根，往往难以实现完全针对由于底层监控篡改引发的违规防护闭环。
+为应对上述威胁，早期防御多依赖几何统计过滤，例如 Krum\cite{blanchard2017krum} 与 Trimmed Mean\cite{yin2018byzantine}。近期研究进一步引入时序信任评估，如 FLTrust\cite{cao2021fltrust}、FoolsGold\cite{fung2020foolsgold} 与 RaSA\cite{wang2025rasa}，并在恶意检测\cite{dou2025toward}、可信训练框架\cite{lu2025tmt}、分级保护\cite{wang2024federated} 等方向持续扩展。针对后门与合谋攻击，也已有 FLPurifier\cite{flpurifier}、RoseAgg\cite{roseagg} 和 ShieldFL\cite{shieldfl} 等方案。
+但纯软件防御在强 Non-IID 与高权限攻击下仍有明显短板：阈值收紧会抬高误杀率（FPR），阈值放宽又可能放过潜伏攻击；同时，当攻击者控制底层环境时，缺少硬件信任根的软件探针难以形成完整闭环。
 
 \subsection{联邦环境下的可信硬件信任根 (TEE)}
-为了弥补纯算法对宿主机环境把空的物理真空，学术界开始借助诸如 Intel SGX、ARM TrustZone 等可信执行环境（Trusted Execution Environment, TEE）在联邦参与设备内部构建具备高安全隔离等级的“芯上飞地”。TEE 隔离区利用加密内存区运行机要代码，即便攻击者获取了底层操作系统权限，也难以篡改存放于内的密钥证明与校验签名（在不考虑高级侧信道攻击的标准安全假设前提下）（如 Liao 等证明的防篡改推理机制\cite{liao2024verifiable}与 RPPFL 硬件封装防线\cite{zhang2025rppfl}）。近期研究更加广泛地证实了 TEE 在联邦训练完整性保障 \cite{r1_tee_integrity}、对抗性攻击缓解 \cite{r5_tee_mitigating} 以及工业物联网数据分布式信任共享 \cite{r12_iot_tee} 中的兜底基石作用，其在 SGX 环境下的分布式联邦扩展应用可行性 \cite{xu2021distributed} 与高效层级并发训练加速策略 \cite{yan2024efficient} 也得到了业界成功展示。
-本文体系吸收这一最纯粹的硬件隔离底座，由此构建出软硬件协同的纵深防御体系。与 RPPFL \cite{zhang2025rppfl} 仅利用 TEE 进行梯度静态加密机制，或是 TMT-FL \cite{lu2025tmt} 单维聚焦于后端异常评测的研究存在本质区别，据我们所知，本文在边缘联邦学习场景中首次将底层的硬件远程证明（Remote Attestation）与顶层的双流正交动态信誉演化进行了时序协同耦合：不仅由系统内核（云）核查参数，同时借硬件之手在边侧加装具备反向侦听与高度可信证据上报的软锚锁（TMAA），实现了跨硬件强制准入规则与软件动态风险熔断机制的毫秒级时序协同。
+为补齐物理可信性的缺口，研究开始引入 Intel SGX、ARM TrustZone 等可信执行环境（TEE）。TEE 通过隔离执行与受保护内存保证关键代码和密钥材料的完整性，即便宿主 OS 被攻陷，在标准假设下攻击者也难以直接篡改证明流程\cite{liao2024verifiable,zhang2025rppfl}。已有工作表明，TEE 在训练完整性\cite{r1_tee_integrity}、对抗缓解\cite{r5_tee_mitigating} 和工业 IoT 信任共享\cite{r12_iot_tee} 中具备现实价值，其在 SGX 环境下的联邦扩展与效率优化也得到验证\cite{xu2021distributed,yan2024efficient}。
+本文在此基础上构建软硬件协同防御体系。与仅做静态加密或单维异常评测的方法不同，本文将硬件远程证明（Remote Attestation）与双流信誉演化进行时序耦合：云端负责参数审查，边缘侧 TMAA 提供可信证据与运行时监测，实现“强制准入 + 动态熔断”的联动防护。
 
 
 \section{系统模型与问题定义}
 
 \subsection{端边云协同架构与系统流转建模}
-在本文设计的“信任流”防御逻辑网格中，系统运行在一个典型的大型端-边-云（Client-Edge-Cloud）异构不信任通信链路环境中（全局协同物理架构如图~\ref{fig:system_arch} 所示）。整个业务架构包含顶端的\textbf{参数汇总审查验证中心（Server, $\mathcal{S}$）}，以及下方 $K$ 个游离在网络浅滩、不定期上线且随时可能沦落为受控投毒者的\textbf{边缘节点容器组合} $\mathcal{C}=\{c_1, c_2, \dots, c_K\}$。
+本文考虑一个典型的端-边-云（Client-Edge-Cloud）异构通信环境（见图~\ref{fig:system_arch}）。系统由中心\textbf{聚合服务器（Server, $\mathcal{S}$）}与 $K$ 个边缘客户端组成，记为 $\mathcal{C}=\{c_1, c_2, \dots, c_K\}$。客户端可能动态上下线，且部分节点可能被攻击者控制。
 
 \begin{figure}[htbp!]
     \centering
@@ -109,28 +115,28 @@ while maintaining practical convergence under heterogeneous edge settings.
     \caption{联邦计算网络交互：基于 TEE 锚点加密的端边云协同物理架构图}
     \label{fig:system_arch}
 \end{figure}
-系统首先通过部署硬接入凭证，在各边缘 $c_k$ 设备内核开辟出 TEE 加密信道，随后才运行其参与联合建模目标：最小化定义在所有物理边缘侧数据集 $\mathcal{D}_k$ 分布总和上的经验求导风险期望：
+训练开始前，系统先通过硬件凭证建立 TEE 可信通道，再执行联邦优化目标，即最小化所有客户端数据分布上的经验风险：
 \begin{equation}
 \min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)
 \end{equation}
-其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$。在第 $t$ 轮训练伊始，服务器广播基线模型副本 $W_{global}^{(t-1)}$，安全代理节点（以 $W_{k,0}^{(t)} \equiv W_{global}^{(t-1)}$ 为起点）在其非独立同分布数据集（Non-IID）上进行 $E$ 轮基于局部学习率 $\eta_l$ 的本地随机梯度下降（SGD）计算，最终得出的局部收敛参数增益可表示为累计张量偏移：
+其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$。在第 $t$ 轮，服务器下发全局模型 $W_{global}^{(t-1)}$，客户端以其为初值在本地 Non-IID 数据上执行 $E$ 轮学习率为 $\eta_l$ 的 SGD，得到本地更新：
 \begin{equation}
 \Delta W_{k}^{(t)} = W_{k, E}^{(t)} - W_{global}^{(t-1)}, \quad \text{其中 } W_{k, e}^{(t)} = W_{k, e-1}^{(t)} - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)]
 \end{equation}
-其中，期望 $\mathbb{E}[\cdot]$ 表示对本地数据集 $\mathcal{D}_k$ 的随机小批量（mini-batch）采样取期望（本研究仿真框架中 batch size 设定为 64）。
-最后，合法的增量与其由 TEE 签名背书的“硬件级防篡改报告信物（Attestation Quote）”，一并上传入风险过滤网卡，从而让中心服务器能够基于多流演化的信任评分系统实施鲁棒更新：
+其中，期望 $\mathbb{E}[\cdot]$ 表示对本地数据集 $\mathcal{D}_k$ 的 mini-batch 采样期望（本文设置 batch size=64）。
+随后，客户端上传更新量及 TEE 签名的远程证明（Attestation Quote），服务器基于信任流评分执行鲁棒聚合：
 \begin{equation}
 W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})
 \end{equation}
-其中，$\Phi \subseteq \mathcal{C}$ 表示在本轮中共识存活下来的有效客户端组合；而 $\mathrm{Agg}(\cdot)$ 代表本文所设计的核心安全信任聚合算子，其基于长效历史得分与多维瞬发风险解耦的具体自适应融合方程机制，将在第 4 节体系化地展开。
+其中，$\Phi \subseteq \mathcal{C}$ 表示本轮通过审查的有效客户端集合；$\mathrm{Agg}(\cdot)$ 为本文提出的安全聚合算子，具体机制见第 4 节。
 
 
 \subsection{复合型威胁假设与强信任底座边界 (Threat Model)}
-任何前置安全声明都必须界定攻防两端不对等的能力界限与假设底仓。为了充分榨取框架的潜能，本文刻画了三种分层的防范假定实体与系统基床信任红线（边缘网络下的多维攻击面如图~\ref{fig:threat_model} 所示）：
+为清晰界定攻防能力边界，本文采用如下威胁模型（见图~\ref{fig:threat_model}）：
 \begin{itemize}
-    \item \textbf{硬件隔离安全边界假设（信任基石）}：系统根植于可受验证的安全边界限制之内：即在标准安全模型假定下（在不探究针对硅芯片的微架构时序探测、侧信道分析或物理强力暴力窃取（Physical Probing）的前提制约下\cite{zhang2025rppfl}），假定即使外部宿主操作系统（OS）遭遇内核越权渗透与控制，内部驻留的硬件特权高地（譬如由 TrustZone/SGX 构建的 TEE 安全验证辖内）依旧确保高计算复杂度安全等级的处理隔离。这就为体系提供了签发不可低成本抵赖防伪运行特征的基础基床。
-    \item \textbf{半诚实偏好奇的云端聚合总库（Honest-but-curious）}：这保证了我们部署的信誉双流积分池与分层聚合乘数会被代码丝毫不差地遵循演算推进；防备的是其探看明文原属照片图集等违规窥探操作行为。
-    \item \textbf{无孔不入且伪装精妙的内部串通派系（Internal Attackers/Poisoners）}：有别于仅能嵅探公网报文却无法发送有效握手证书的外部被动攻击者，假定我们的假想敌已经成功潜伏进了拥有合法准入凭证的正当设备阵列之列（高危占比上限 $< 50\%$）。内部破坏者拥有更改当前节点本地标签体系、混入脏数据（生成带噪声的 Clean-label 污染原图）、甚至暴力拉扯底层 PyTorch SGD 更新返回的步频张量进行强行符号倒置与数量级放大（参数缩放与修改指令）的近乎无约束权利。需要说明的是，虽然理论分析假定的系统容灾界限为 50\% 高危恶意占比，但为了符合现实威胁模型下的大多数分布情况，本研究的框架性实验基础测评重点首先聚焦于高危强度典型的 30\% 从属环境；而随后逼近 50\% 界线深水区的抗打击延伸测试，则作为系统威胁假设边界的独立压力检验被单列汇报。
+    \item \textbf{硬件隔离边界（信任根）}：在标准安全假设下（不考虑微架构侧信道与物理探针等高级攻击\cite{zhang2025rppfl}），即使宿主 OS 被攻陷，TEE（如 TrustZone/SGX）仍可保证关键执行与证明流程的完整性。
+    \item \textbf{云端半诚实（Honest-but-curious）}：服务器按协议执行双流评分和分层聚合流程，但可能尝试额外推断客户端隐私信息。
+    \item \textbf{内部恶意客户端（Internal Attackers/Poisoners）}：攻击者可持有合法接入身份，并在本地执行标签篡改、样本污染、符号翻转、梯度缩放等操作。本文假设恶意占比上限为 $<50\%$；主实验采用 30\% 作为典型高风险设置，并额外给出 50\% 边界压力测试。
 \end{itemize}
 
 \begin{figure}[htbp!]
@@ -141,17 +147,17 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
 \end{figure}
 
 \subsection{安全架构核心防护优化导向 (Design Goals)}
-在面临极高数据离散度分布与高达 30\% 到半数的恶意渗透风险交叉重压下，本文提出的体系旨在攻克如下三个高度挑战性的安全防御工程约束机制：
+针对高异构数据与高比例恶意参与者，本文框架的设计目标如下：
 \begin{enumerate}
-    \item \textbf{极高的真阳清扫力与鲁棒的网络收敛主干}：无论内部隐蔽投毒者进行多么漫长周期与微小角度的拉扯偏移与合算共谋，系统须有效识别并剔除恶意节点。即保障主线收敛大局，实现真阳性恶意召回率逼近 100\% 并极限压低后门 ASR 致其不可引发安全失控。
-    \item \textbf{对于异构合规群组小角特色的零绝断防卫}：彻底摆脱传统几何与纯分数切断的误杀问题——容许因为地域数据极为倾斜偏差的小型合规设备因方向脱离大流遭遇短暂截流；但赋予这些数据异构但行为合规的节点保留其参与职能的能力，并促使其在演化长流的积分宽容特赦机制下恢复参与资格（保障永久合法假阳率 FPR 归零）。
-    \item \textbf{精干的时空算力流转与开销控制}：放弃为防止投毒而叠加动辄高达千百倍延迟的全局全同态验证层或零知识繁琐自证运算；将系统资源核心开销仅仅锁定在不可绕开的硬件特征微鉴别与高维度正交状态演化变量数组追踪上，满足算力资源紧凑的边缘 LXC/Docker 拓扑容限响应要求。
+    \item \textbf{高恶意召回与稳定收敛并存}：在多类投毒与后门攻击下，尽可能提高 TPR 并压低 ASR，同时维持主任务收敛。
+    \item \textbf{降低异构合法节点误杀}：避免将因 Non-IID 导致方向偏离的诚实节点长期误判出局，保障永久误杀率（FPR）接近 0。
+    \item \textbf{控制系统开销}：在不引入重型密码学负担的前提下实现可信防护，使边缘设备和云端均可承受额外计算与通信成本。
 \end{enumerate}
 
 
 \section{本文方法：信任流驱动的可信联邦框架}
 
-针对上述威胁模型，本节详述所提出的“信任流驱动的可信联邦学习”防御框架（全局五阶段闭环防御架构如图~\ref{fig:framework} 所示）。系统的核心理念是将整个联邦学习的聚合周期划分为训练前准入、本地监控、聚合前内容审查、正交状态演化与分层动态聚合五个关键阶段。框架摒弃了孤立的点状防御（Point-defense），转而在五大阶段之间传递并演算客户端的\textbf{信任流（Trust Flow）}，从而形成长效闭环跟踪。
+针对上述威胁模型，本文提出“信任流驱动的可信联邦学习”框架（见图~\ref{fig:framework}）。每轮聚合被划分为五个阶段：训练前准入、内容审查、状态演化、分层聚合和全局下发。不同于单点防御，该框架在阶段间持续传递并更新\textbf{信任流（Trust Flow）}，形成闭环控制。
 
 \begin{figure}[htbp]
     \centering
@@ -160,7 +166,7 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
     \label{fig:framework}
 \end{figure}
 
-为便于后续算法与公式的推导，表~\ref{tab:notations} 列出了本文核心数学符号的规范化定义。
+为便于后续推导，表~\ref{tab:notations} 给出核心符号定义。
 
 \begin{table}[htbp]
 \centering
@@ -181,22 +187,20 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{table}
 
 \subsection{阶段一：硬件锚定的客户端准入与信任起步评分}
-为从源头阻断轻易伪造身份的“女巫节点”与运行环境被严重破坏的脆弱设备，系统采用可信执行环境（TEE）技术构建\textbf{可信管理代理（TMAA）}。
-每次训练前，客户端需通过其内部不可导出的硬件密钥（DUK）向服务器提交一份包含平台配置寄存器（PCRs）链值的远程证明报告（Attestation Quote）。如果设备通过了系统完整性与防篡改硬门禁检查，定义其通过标志 $M_{attest,k} = 1$（否则为 0，将被直接拒绝接入）。
+为阻断身份伪造与受损设备接入，系统引入基于 TEE 的\textbf{可信管理代理（TMAA）}。每轮训练前，客户端需使用不可导出的硬件密钥提交包含 PCR 链值的远程证明（Attestation Quote）。证明通过时记 $M_{attest,k}=1$，否则为 0 且直接拒绝接入。
 
-基于 TMAA 提供的监控日志（如 CPU 资源模式、进程内省合法性），系统为一个通过门禁的客户端 $k$ 映射出其行为指纹异常分数 $A_k \in [0, \infty)$。随后，服务端计算本轮用于聚合审查的初始门禁信任分 $TrustScore_k \in [0, 1]$：
+基于 TMAA 监控日志（如 CPU 行为模式、进程完整性），系统为通过门禁的客户端 $k$ 计算异常分数 $A_k \in [0, \infty)$，并据此得到初始信任分 $TrustScore_k \in [0,1]$：
 \begin{equation}
     TrustScore_{k} = M_{attest,k} \cdot \exp\left(-\lambda \cdot\max(0, A_{k} - \tau)^{\rho}\right),
 \end{equation}
-其中参数 $\lambda$ 控制随异常程度增加而降分的陡峭度，$\tau$ 充当容忍正常波动的安全死区阈值，$\rho$ 则为指数衰减加速因子（在本实验默认配置中经验取值为 $\lambda=5.0, \tau=0.1, \rho=2.0$，各阶段核心超参数的敏感性组合详见第~\ref{sec:experiments} 节的具体列表）。
+其中，$\lambda$ 控制降分斜率，$\tau$ 为正常波动容忍阈值，$\rho$ 为衰减指数（默认 $\lambda=5.0,\tau=0.1,\rho=2.0$）。
 
 \subsection{阶段二：服务器优先的参考方向构建与同构协调审查}
-纯粹在客户端梯度间做两两余弦相似度测算极易因攻击者相互抱团（合谋攻击）而受骗。为此，本文设计了\textbf{优先纯净基准（Vanilla Reference Prioritization）}。
-首先，当服务端具备一个数量极少的隔离验证集（Pure Clean Set）时，系统利用上轮全局模型计算真实梯度的方向，称之为 $g_{root\_clean}$。如果条件受限无法提取，框架降级使用上轮信任度非空的安全池节点的加权平均梯度 $g_{ref}$。权重的选择上，摒弃了传统随样本量分配的均匀方式，而是采用 TrustScore 与上一轮累积风险（RiskEMA）协同门控的非线性系数：
+仅依赖客户端两两余弦相似度容易被合谋攻击误导。为此，本文引入\textbf{优先纯净参考（Vanilla Reference Prioritization）}。当服务器持有少量隔离验证集（Pure Clean Set）时，先计算 $g_{root\_clean}$ 作为参考方向；若该方向不可用，则由高信任、低风险客户端更新构造退化参考 $g_{ref}$。其权重定义为：
 \begin{equation}
     \omega_{k}^{ref} = TrustScore_{k} \cdot (1 - RiskEMA_{k}^{prev})^{2}.
 \end{equation}
-本轮的最终全局参考方向 $g_{root}$ 则被设定为：
+最终参考方向 $g_{root}$ 为：
 \begin{equation}
     g_{root}=
     \begin{cases}
@@ -205,13 +209,13 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
     \end{cases}
 \end{equation}
 
-在获取 $g_{root}$ 后，服务端需要评价客户端权重增量 $\Delta W_k$ 的“内容质量分”。为兼顾全局贡献度（防御恶意偏移）以及局部多样性协同（保留长尾知识），系统对贡献度分（与根节点夹角）与一致性分（与其他高信誉节点的群体夹角）进行非对称调和融合得到内容分 $ContentScore_k$：
+在得到 $g_{root}$ 后，服务器对每个客户端更新 $\Delta W_k$ 计算内容质量分。该分数同时考虑全局贡献（与参考方向一致性）和群体一致性（与其他高信誉客户端一致程度）：
 \begin{align}
     S_{contrib,k} &= \max\left(0,\ \alpha_{1} + \alpha_{2} \cdot \cos(\Delta W_{k}, g_{root})\right), \\
     S_{consist,k} &= \frac{\sum_{j\neq k} TrustScore_{j} \cdot \max\left(0,\ \alpha_{1} + \alpha_{2} \cdot \cos(\Delta W_{k}, \Delta W_{j})\right)}{\sum_{j\neq k} TrustScore_{j} + \varepsilon}, \\
     ContentScore_{k} &= \frac{(1 + \beta_{fusion}^{2}) \cdot S_{consist,k} \cdot S_{contrib,k}}{\beta_{fusion}^{2}\cdot S_{consist,k} + S_{contrib,k} + \varepsilon}.
 \end{align}
-此处 $\alpha_{1}$ 与 $\alpha_{2}$（且 $\alpha_1 + \alpha_2 = 1.0$）用于平滑并标定余弦距离的敏感映射区间；$\beta_{fusion} > 1.0$（实验默认经验收敛值设定为 $\beta_{fusion}=2.0$）为先验融合偏置，这表示系统有意令绝对贡献度（靠近纯净大方向）的权重高于群体协作一致性，以应对隐蔽合谋攻击并强力锚定正确的全局演化路径。
+其中，$\alpha_1+\alpha_2=1.0$ 用于调节余弦映射区间；$\beta_{fusion}>1.0$（默认 $\beta_{fusion}=2.0$）表示适当提高“与纯净方向一致”的权重，以增强对合谋偏移的抑制能力。
 
 \begin{algorithm}[htbp]
 \caption{基于 TEE 硬件锚点与纯净参考的准入与内容审查}
@@ -246,18 +250,18 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 
 \subsection{阶段三：历史绩效流与瞬时风险流的正交状态演化}
-传统依靠“低分拉黑”的方法，其缺陷在于：当一个合法的冷门异构节点长年被评为低分，终究会被误杀出局。本文的创新在于将演化逻辑“降维拆分”为相互正交的两个时序流：用于门槛竞争的\textbf{历史效用流 ($HistPerf$)}，与独立裁决淘汰的\textbf{风险惩戒流 ($RiskEMA$)}。
+传统“低分即淘汰”的策略容易长期误伤长尾合法节点。为此，本文将状态更新拆分为两个正交时序流：用于长期贡献评估的\textbf{历史效用流（$HistPerf$）}，以及用于快速处置异常行为的\textbf{风险流（$RiskEMA$）}。
 
-\textbf{(1) 历史效用流 ($HistPerf$)} 主要承担长期能力的评估。它并不含有“判负”决定权。每轮基于 $ContentScore$ 在全队列中的相对标准差分布（$z_k$ 分数），采用平滑函数与底线阈值的加权得到当轮的增量 $Signal_k^{upd}$：
+\textbf{(1) 历史效用流（$HistPerf$）}用于长期能力评估，不直接触发封禁。每轮基于 $ContentScore$ 的相对位置（$z_k$）与绝对阈值共同得到更新信号 $Signal_k^{upd}$：
 \begin{align}
     z_{k} &= \frac{ContentScore_{k} - \mu_{content}}{\sigma_{content} + \varepsilon}, \quad Signal_{k}^{rel} = \sigma(z_{k}), \\
     Signal_{k}^{abs} &= \mathrm{clip}\left(\frac{ContentScore_{k} - b}{s}, 0, 1\right), \\
     Signal_{k}^{upd} &= \gamma_{rel} \cdot Signal_{k}^{rel} + \gamma_{abs} \cdot Signal_{k}^{abs}, \\
     HistPerf_{k}^{(t)} &= \beta_{h} \cdot HistPerf_{k}^{(t-1)} + (1 - \beta_{h}) \cdot Signal_{k}^{upd}.
 \end{align}
-其中，常量 $b, s$ 是用于绝对得分的归一缩放边界；$\gamma_{rel}$ 与 $\gamma_{abs}$（和为 $1.0$）分别调节相对竞争与绝对表现的比重。当 $HistPerf$ 极低时，节点只会被置入名为“Hist软隔离”的临时席位（无法参与本轮聚合，但依然存留在网络内）。这一设计保全了冷门数据节点。
+其中，$b,s$ 为绝对得分缩放边界；$\gamma_{rel}$ 与 $\gamma_{abs}$（和为 $1.0$）分别控制相对与绝对两类信号占比。当 $HistPerf$ 较低时，节点进入临时软隔离，暂停本轮聚合但不被永久移除，以保留潜在有效的长尾信息。
 
-\textbf{(2) 瞬时风险流 ($RiskEMA$)} 则是拦截攻击者的核心。它绕过了单纯的梯度角度匹配，综合采用了来自梯度的多维探针数据（损失震荡 $r_{probe}$、神经元极性分布 $r_{grad}$、隐蔽后门通道 $r_{trigger}$ 甚至图像级预审查的 $r_{pixel}$）。我们提取每轮所有风险探针通道的最高瞬时极值：
+\textbf{(2) 瞬时风险流（$RiskEMA$）}负责快速识别攻击行为。该流融合多维探针（如 $r_{probe}, r_{grad}, r_{trigger}, r_{pixel}$），并采用每轮最大风险值：
 \begin{equation}
     Risk_{k}^{inst} = \max\{r_{report}, r_{grad}, r_{probe}, r_{pixel}, r_{trigger}, r_{sign}, r_{peer}, \dots \},
 \end{equation}
@@ -265,14 +269,14 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \begin{equation}
     RiskEMA_{k}^{(t)} = \beta_{r} \cdot RiskEMA_{k}^{(t-1)} + (1 - \beta_{r}) \cdot Risk_{k}^{inst}.
 \end{equation}
-结合上述多维风险与历史效用的正交演算，框架对受控联盟内的所有节点建立了一个安全生命周期的状态转移自动机（其拓扑如图~\ref{fig:node_state_machine} 所示），共划定四大监管象限：
+在双流联合驱动下，客户端状态按图~\ref{fig:node_state_machine} 在四类监管状态间转移：
 \begin{itemize}
-    \item \textbf{正常节点 (NORMAL)}：完全参与本轮聚合分发。当探针敏锐捕获到异常（RiskEMA 升高）或历史效用滑坡时，节点将分别向右转移至嫌疑或处于隔离软状态。
-    \item \textbf{嫌疑节点 (SUSPECT)}：对其触发警报的维度加强局部监控。若观测风险回落则赦免恢复至 NORMAL；若持续触发红线阈值，则移交隔离程序。
-    \item \textbf{隔离观察 (QUARANTINE)}：剥夺本轮全局汇聚的物理参数并入权，仅允许贡献非关键计算。若观察其后续产出合规（条件解除），可再退回 NORMAL；反之若劣迹斑斑触发封禁法则，则跌入深渊。
-    \item \textbf{黑名单封禁 (BLACKLIST)}：永久性不可逆拉黑。命中硬阈值并在 TEE 证书层完全斩断握手，终止一切后续协同资质。
+    \item \textbf{正常节点（NORMAL）}：正常参与聚合。若风险上升或历史贡献下降，可转入 SUSPECT/QUARANTINE。
+    \item \textbf{嫌疑节点（SUSPECT）}：进入重点监控。风险回落可恢复 NORMAL，持续异常则升级隔离。
+    \item \textbf{隔离节点（QUARANTINE）}：暂时剥夺聚合资格，观察后可恢复或继续升级处理。
+    \item \textbf{黑名单（BLACKLIST）}：触发硬阈值后永久封禁，并在 TEE 认证层终止后续接入。
 \end{itemize}
-这种强隐式且兼顾历史宽容度（允许特赦）的状态解耦机制，使得框架得以大胆筛选异构梯度的同时维持误杀率向零收敛。
+该机制在保证快速拦截攻击的同时，为合法长尾节点保留恢复通道，有助于降低永久误杀。
 
 \begin{figure}[H]
     \centering
@@ -281,12 +285,12 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
     \label{fig:node_state_machine}
 \end{figure}
 
-最后，$TrustScore$（硬件信誉）、$ContentScore$（当轮努力）与 $HistPerf$（历史声望）汇聚为一个用于本轮聚合绝对权重的基础指标，叠加风险折扣后产生 $RawScore_k$：
+最后，将 $TrustScore$（硬件可信）、$ContentScore$（当轮质量）与 $HistPerf$（历史表现）融合为基础分，并叠加风险折扣得到 $RawScore_k$：
 \begin{align}
     RawScore_{k}^{base} &= (TrustScore_{k})^{\alpha} \cdot (ContentScore_{k})^{\beta} \cdot (HistPerf_{k}^{(t-1)})^{\gamma}, \\
     RawScore_{k} &= RawScore_{k}^{base} \cdot (1 - RiskEMA_{k}^{prev})^{p},
 \end{align}
-其中指数化超参数 $\alpha, \beta, \gamma, p$ 分别决定了上述四大维度对最终话语权（权值反馈）的控制强度（其最优控制变量矩阵同样见实验超参数设定）。
+其中，$\alpha,\beta,\gamma,p$ 控制各维度对最终聚合权重的影响强度。
 
 
 
@@ -323,29 +327,29 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 
 \subsection{阶段四：风险门控驱动的分层差异化鲁棒聚合}
-攻击者的隐蔽后门往往隐藏在深层的特定神经元中。直接对整个模型的梯度做统一乘加权重合并仍存在被潜伏后门透传的风险。因此，我们提出按网络层深度 $l$ 执行差异化（Layer-wise）入场门控聚合策略。
+隐蔽后门通常集中在深层参数中。若对整网统一聚合，潜伏更新仍可能透传。为此，本文采用按层（Layer-wise）门控的差异化聚合策略。
 
-第一步，筛选本轮具备资格参与的活跃客户端集合 $\mathcal{A}$：
+第一步，确定本轮活跃客户端集合 $\mathcal{A}$：
 \begin{equation} \label{eq:active_clients}
     \mathcal{A} = \{k \mid k \notin RiskIsolated \land k \notin HistSoftIsolated\}.
 \end{equation}
 
-第二步，对第 $l$ 层，度量其安全防卫诉求（完整的风险门控分层聚合流程如图~\ref{fig:layer_gating} 所示）。网络浅层常保留物理图像边缘结构等公共隐私，深层涉及大权重变易（实用性）且容易埋藏投毒（安全性）。算法三维建模该层的权重敏感度 $S_{total}^{(l)}$：
+第二步，对每一层 $l$ 计算综合敏感度 $S_{total}^{(l)}$（见图~\ref{fig:layer_gating}），该指标由隐私、效用和安全三部分构成：
 \begin{align}
     S_{privacy}^{(l)} &= \exp\left(-\tau_{p} \frac{l}{L}\right), \\
     S_{utility}^{(l)} &= \frac{\|g_{ref}^{(l)}\|_{2}}{\max_{m}\|g_{ref}^{(m)}\|_{2} + \varepsilon}, \\
     S_{security}^{(l)} &= 1 - \frac{\sum_{k\in\mathcal{A}}TrustScore_{k}\cdot\cos(\Delta W_{k}^{(l)}, g_{ref}^{(l)})}{\sum_{k\in\mathcal{A}}TrustScore_{k} + \varepsilon}, \\
     S_{total}^{(l)} &= w_p S_{privacy}^{(l)} + w_u S_{utility}^{(l)} + w_s S_{security}^{(l)}.
 \end{align}
-其中 $w_p, w_u, w_s$ 为满足归一化条件的层级诉求加权因子。若该层安全分层敏感度总和 $S_{total}^{(l)}$ 极高，证明该层是后门注入的重灾区，系统会立刻拔高等比入场门槛 $\theta^{(l)} = \mu_{base} + \lambda_{s} \cdot S_{total}^{(l)}$ 并收紧 L2 裁剪空间 $C^{(l)} = C_{base} / (S_{total}^{(l)} + \varepsilon_{c})$。
+其中 $w_p,w_u,w_s$ 为归一化权重。若某层 $S_{total}^{(l)}$ 较高，说明该层风险更高，系统将提高准入门槛 $\theta^{(l)}$ 并收紧该层裁剪半径 $C^{(l)}$。
 
-第三步，只有在当轮 $RawScore_k$ 突破 $\theta^{(l)}$ 的那些“本层幸存者” $\Phi^{(l)}$ 才能提交更新进行聚合。进入幸存者名单后，实施归一化权重分配 $\tilde{w}_{k}^{(l)}$ 并强制裁剪恶意的超大梯度振幅（$scale_k^{(l)}$）：
+第三步，仅允许满足 $RawScore_k \ge \theta^{(l)}$ 的客户端进入该层幸存集 $\Phi^{(l)}$。对幸存者执行权重重归一化，并进行 L2 动态裁剪：
 \begin{align}
     \Phi^{(l)} &= \{k \in \mathcal{A} \mid RawScore_{k} \ge \theta^{(l)} \}, \quad \tilde{w}_{k}^{(l)} = \frac{RawScore_{k}}{\sum_{j\in\Phi^{(l)}}RawScore_{j} + \varepsilon}, \\
     scale_{k}^{(l)} &= \max\left(1, \frac{\|\Delta W_{k}^{(l)}\|_{2}}{C^{(l)}}\right), \quad
     \widehat{\Delta W}_{k}^{(l)} = \frac{\Delta W_{k}^{(l)}}{scale_{k}^{(l)}}.
 \end{align}
-第四步，各层分别加权合并为单层增量：
+第四步，按层加权聚合得到 $\Delta W_{global}^{(l)}$：
 \begin{equation}
     \Delta W_{global}^{(l)} = \sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)} \cdot \widehat{\Delta W}_{k}^{(l)},
 \end{equation}
@@ -370,7 +374,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
     \STATE 效用敏感度 $S_{utility}^{(l)} \leftarrow \|g_{ref}^{(l)}\|_2 / \max_m\|g_{ref}^{(m)}\|_2$
     \STATE 安全敏感度 $S_{security}^{(l)} \leftarrow 1 - \frac{\sum_{k\in\mathcal{A}} TrustScore_k \cos(\Delta W_k^{(l)}, g_{ref}^{(l)})}{\sum_{k\in\mathcal{A}} TrustScore_k + \varepsilon}$
     \STATE 总防御诉求敏感度 $S_{total}^{(l)} \leftarrow w_p S_{privacy}^{(l)} + w_u S_{utility}^{(l)} + w_s S_{security}^{(l)}$
-    \STATE \textbf{步骤 2: 动态风险门控与 L2 面包圈裁剪自适应}
+    \STATE \textbf{步骤 2: 动态风险门控与 L2 自适应裁剪}
     \STATE 拔高本层安全入场分数门槛 $\theta^{(l)} \leftarrow \mu_{base} + \lambda_s \cdot S_{total}^{(l)}$
     \STATE 收紧本层恶意振幅裁剪边界 $C^{(l)} \leftarrow C_{base} / (S_{total}^{(l)} + \varepsilon_c)$
     \STATE \textbf{步骤 3: 幸存节点挑选与二次重调校}
@@ -378,7 +382,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
     \STATE 对幸存者重新归一化有效权重 $\tilde{w}_k^{(l)} \leftarrow RawScore_k / \sum_{j\in\Phi^{(l)}} RawScore_j$
     \STATE 依法则执行 L2 等比缩小 $\widehat{\Delta W}_k^{(l)} \leftarrow \Delta W_k^{(l)} / \max(1, \|\Delta W_k^{(l)}\|_2 / C^{(l)})$
     \STATE \textbf{步骤 4: 分层合并拼接}
-    \STATE 提炼本层高度安全的无病灶梯段 $\Delta W_{global}^{(l)} \leftarrow \sum_{k\in\Phi^{(l)}} \tilde{w}_k^{(l)} \cdot \widehat{\Delta W}_k^{(l)}$
+    \STATE 计算本层安全聚合增量 $\Delta W_{global}^{(l)} \leftarrow \sum_{k\in\Phi^{(l)}} \tilde{w}_k^{(l)} \cdot \widehat{\Delta W}_k^{(l)}$
     \STATE 拼接连入全局模型更新量 $\Delta W_{global} \leftarrow \Delta W_{global} \cup \Delta W_{global}^{(l)}$
 \ENDFOR
 \RETURN $\Delta W_{global}$
@@ -387,64 +391,64 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 
 \subsection{阶段五：全局更新下发与边缘知识留存}
-完成分层聚合后，系统进入最终的闭环阶段。服务器将拼接后的安全增量应用至全局模型：$W_{global}^{new} = W_{global}^{old} + \Delta W_{global}$。该更新连同更新后的合法客户端 $HistPerf$ 荣誉分发往边缘群体。系统借由上述五大阶段的数据打通，便能在维持高收敛性的同时，有效将潜伏的恶意更新排除在聚合之外。
+分层聚合完成后，服务器将安全增量应用到全局模型：$W_{global}^{new} = W_{global}^{old} + \Delta W_{global}$，并同步下发更新后的模型及客户端状态（含 $HistPerf$）。至此形成一轮完整闭环，在保证收敛的同时持续过滤恶意更新。
 
 \subsection{双流正交解耦的理论保证 (Theoretical Analysis)}
-传统单域信誉机制（如单纯的余弦相似度累加）本质上等价于利用一阶线性的马尔可夫链对高维空间进行一维投影降维。这在存在强边缘数据倾斜的联邦环境中，不可避免地陷入漏杀（False Negative, FNR）与误伤（False Positive, FPR）的权衡困境。本节形式化地证明本文的正交双流框架如何消除这一数学矛盾。
+传统单一信誉分数（如简单余弦累加）本质上将高维行为压缩到单轴判断。在强 Non-IID 场景下，这会放大漏检（FNR）与误杀（FPR）的冲突。本节给出双流正交机制的理论分析。
 
 \textbf{引理 1（长尾节点的方差收敛特性，Lemma 1）}
-假设合规的长尾客户端 $k$ 的单轮原始内容得分 $ContentScore_{k}^{(t)}$ 服从期望为 $\mu_{clean}$，因 Non-IID 产生的极大方差为 $\sigma_{clean}^2$ 的扰动分布。在传统的刚性单线截断阈值 $\tau_{hard}$ 下，当 $\tau_{hard} > \mu_{clean} - \sigma_{clean}$ 时该节点面临持续淘汰的高概率。但在本文的历史效用流平滑积分规则下，该节点的长程状态期望 $\mathbb{E}[HistPerf_k^{(\infty)}] = \mu_{clean}$，且长时程方差被极限压缩为：
+设长尾合法客户端 $k$ 的单轮内容分 $ContentScore_{k}^{(t)}$ 服从期望 $\mu_{clean}$、方差 $\sigma_{clean}^2$ 的扰动分布。在刚性阈值 $\tau_{hard}$ 下，若 $\tau_{hard} > \mu_{clean} - \sigma_{clean}$，该节点将有较高概率被持续淘汰。采用历史效用流平滑后，其稳态期望满足 $\mathbb{E}[HistPerf_k^{(\infty)}] = \mu_{clean}$，且方差收敛为：
 \begin{equation}
     \operatorname{Var}(HistPerf_{k}^{(\infty)}) = \frac{1-\beta_h}{1+\beta_h} \sigma_{clean}^{2}
 \end{equation}
-由于 $0 < \beta_h < 1$，当宽容度 $\beta_h \to 1$ 时单期扰动极大地被时域消弭。只要客户端真实贡献期望 $\mu_{clean}$ 高于系统绝对生存底线，积分流即可作为低通滤波器，以概率 $P \to 1$ 保障其挺过瞬时分数的探底低谷，即理论上达成 $\lim_{t \to \infty} \text{FPR} = 0$。
+由于 $0 < \beta_h < 1$，当 $\beta_h \to 1$ 时，短时扰动被显著平滑。只要 $\mu_{clean}$ 高于生存阈值，历史效用流可作为低通滤波器提高合法节点长期存活概率，理论上支持 $\lim_{t \to \infty} \text{FPR} = 0$。
 
 \textbf{引理 2（高阶潜伏投毒的瞬时冲激响应，Lemma 2）}
-对于采用“前期高频伪装、极少频次隐秘爆发”的高层后门投毒节点 $m$，尽管其前期积攒满足够红利使得 $\mathbb{E}[HistPerf_m] \ge \mu_{clean}$，但其在第 $t$ 轮释放恶性微调参数时，其深浅层触发探针值远大于常态（即 $\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$）。为便于理论分析，我们考虑如下下界形式：由于 $Risk_k^{inst} = \max\{r_{grad}, r_{probe}, r_{trigger}, \dots\}$，且 EMA 更新关于 $Risk_k^{inst}$ 单调递增，此时 RiskEMA 轨迹满足如下理想化极大值算子下界：
+对“长期伪装、间歇爆发”的后门节点 $m$，即使其前期累积了较高 $HistPerf$，在攻击轮次仍会触发异常探针峰值（$\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$）。由于 $Risk_k^{inst}$ 取多探针最大值，且 EMA 对输入单调，RiskEMA 轨迹满足下界：
 \begin{equation}
     RiskEMA_m^{(t)} \ge \max \left( \beta_r \cdot RiskEMA_m^{(t-1)},\ \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \right)
 \end{equation}
-由于 $\mathcal{F}_{probe}$ 在检测到投毒特征时产生瞬时突变，这导致风险导数在触发瞬间呈现出逼近阻断阈值的冲激增量（Impulse Response），形成瞬时的绝对隔离。
+当 $\mathcal{F}_{probe}$ 触发异常突变时，风险值会在短时间内跃升并逼近或超过门限，从而触发隔离。
 
 \textbf{定理 1（双流熔断正交解耦，Theorem 1）}
-\textit{在本文建立的双轨评估机制中，诚实长尾节点的局部非独立同分布方差在 $HistPerf$ 平面被低通极限平滑；而任何超限的恶性投毒梯度，由于瞬时探针 $Risk^{inst}$ 的极大值约束下界，必然产生跨越门控熔断阈值的单边突跃。系统对这两类具有截然相反特征分布的事件实施了绝对的正交解析隔离，从理论底层打破了单分数防线无法同时兼顾 $\text{FPR} \to 0$ 和 $\text{ASR} \to 0$ 的维数灾难。}
+\textit{在双流机制下，诚实长尾节点的高方差更新由 $HistPerf$ 通道平滑吸收；恶意攻击的突发行为则由 $Risk^{inst}$ 通道快速放大并触发熔断。两类信号在判别空间中被解耦处理，从而缓解单分数机制难以同时优化 $\text{FPR}$ 与 $\text{ASR}$ 的矛盾。}
 
 \section{实验与分析}
 \label{sec:experiments}
 \subsection{实验设置与可复现参数}
 
 \subsubsection{基准环境与系统软硬件栈}
-本节评估实验的完整逻辑基于 Flower (1.5.0) 联邦学习框架与 PyTorch 深度学习引擎从头构建。为保证实验真实性与系统负载的可信度，所有仿真试验均直接部署在一台物理架构为 Inspur NF5468M6 的商用高性能计算服务器上，该服务器搭载双路高主频 CPU，并由 5 块独立分配的 NVIDIA A10 (24GB) GPU 提供全并发算力支持，操作系统为 Ubuntu 20.04.6 LTS 与 CUDA 12.8 驱动环境。
+实验基于 Flower (1.5.0) 与 PyTorch 实现。所有仿真均部署在一台 Inspur NF5468M6 服务器上，硬件配置为双路 CPU + 5 块 NVIDIA A10 (24GB) GPU，软件环境为 Ubuntu 20.04.6 LTS 与 CUDA 12.8。
 
-为实现严格的学术可复现性，实验框架所涉及的核心测绘日志、代码仓库与启动脚本（Bash）均留存备验。需要特别说明的是：为绘制具备连贯演化逻辑的具体节点状态追踪图（如后续图~\ref{fig:node_state} 等轨迹分析），我们提取了绑定特定随机种子（如 \texttt{seed=42}）下的一次典型 Full-Round 运行切片；而对于全局防御性能的刚性指标量化（如最终 Acc、ASR 等数值列表），系统则采用了变更随机种子重复运行 5 波次后的稳定均值期望，以确保度量的统计客观性。
+为保证可复现性，本文保留了完整日志、代码与启动脚本。需要说明的是：节点状态轨迹图（如图~\ref{fig:node_state}）来自固定随机种子（如 \texttt{seed=42}）的一次代表性运行；Acc、ASR 等总体指标则采用 5 次独立随机种子实验的均值统计。
 
 \subsubsection{数据集异构划分方式}
-模型采用经典的轻量级卷积神经网络架构，数据集采用基准的 CIFAR-10。为制造高度非独立同分布（Non-IID）的场景，所有 50000 张训练图像被划分为三类群体下发：
+模型使用轻量级卷积神经网络，数据集为 CIFAR-10。为构造 Non-IID 环境，50000 张训练图像按以下方式划分：
 \begin{itemize}
-    \item \textbf{共享基础池}：抽取 5000 个类别均衡的样本由所有合法节点共享，作为初始知识。
-    \item \textbf{弱异构客户群 (Group A, 节点 6-11)}：通过 Dirichlet 分布 ($\alpha=1.0$) 划分，模拟数据分布略有倾斜但不极端的普通边缘节点。
-    \item \textbf{强长尾异构群 (Group B \& C, 节点 12-19)}：通过 Dirichlet 分布 ($\alpha=0.1$) 划分，这些客户端各自有极强的“偏科”现象，通常只持有某几个特定类别的海量数据。它们容易被传统余弦防御误杀。
+    \item \textbf{共享基础池}：抽取 5000 个类别均衡样本供所有合法节点共享，用于基础对齐。
+    \item \textbf{弱异构群（Group A, 节点 6-11）}：Dirichlet($\alpha=1.0$)，模拟中等程度分布偏斜。
+    \item \textbf{强长尾异构群（Group B \& C, 节点 12-19）}：Dirichlet($\alpha=0.1$)，客户端类别分布高度偏斜，更易被传统余弦机制误判。
 \end{itemize}
 
 \subsubsection{恶意攻击实例与比例}
-为了检验本文“信任流”防御模型的全方位鉴别能力，实验在 20 个节点中混入了 6 个长期活跃在此网络中的恶意节点（高危占比 30\%）。我们不仅配置了传统的数据投毒，还引入了更具破坏性的直接模型参数操纵攻击：
+为评估框架在复杂威胁下的识别能力，实验在 20 个节点中注入 6 个恶意节点（占比 30\%），覆盖数据投毒与参数操纵两类攻击：
 \begin{itemize}
-    \item \textbf{Client 0 - 标签翻转投毒（Label Flip, $\gamma=0.5$）}：将其本地真实数据集中的某类别强行映射至另一类，向网络灌输错误边界。
-    \item \textbf{Client 1 - 隐蔽后门注入（Backdoor, $\gamma=0.2$）}：在 20\% 的训练样本图片角落打上特定像素斑块（Trigger），并将它们贴上目标类别 $0$ 的标签，企图在推断时误导系统。
-    \item \textbf{Client 2 - 干净标签后门（Clean Label, $\gamma=0.5$）}：这是最高阶的攻击，利用生成对抗噪声扰乱目标类 $0$ 的输入像素，但不修改其标签类别 0，意乱梯度特征提取。
-    \item \textbf{Client 3 - 语义后门投毒（Semantic, $\gamma=0.5$）}：不利用人造贴图，而是让模型把自然界中特定背景颜色的图像统统强关联至错误类别。
-    \item \textbf{Client 4 - 符号反转攻击（Sign-Flipping, 模型投毒）}：攻击者直接操控训练后的回传步骤，强行翻转部分层梯度的正负号（$\Delta \widehat{W}_k = - \gamma \cdot \Delta W_k$），企图引发全局严重的收敛偏离与拒绝服务。
-    \item \textbf{Client 5 - 梯度缩放激增（Gradient Scaling, 模型投毒）}：在隐蔽后门的基础上，强行将恶意增量幅度放大 100 倍（$\Delta \widehat{W}_k = 100 \times \Delta W_k$），试图通过极大权重比例直接覆盖全局参数。
-    \item \textbf{女巫与环境欺诈节点 (Sybil \& Free-rider)}：为实证阶段一 TMAA 硬件防线抵抗篡改的有效性，系统在初始化连接阶段额外并发了 5 个未携带有效 TEE 证书的女巫节点，及 3 个试图在训练中伪造 CPU 负载休眠（跳过本地 Epoch 欲节省电量）的搭便车资源虚假节点。
+    \item \textbf{Client 0 - 标签翻转（Label Flip, $\gamma=0.5$）}：将部分样本标签映射到错误类别。
+    \item \textbf{Client 1 - 触发器后门（Backdoor, $\gamma=0.2$）}：在 20\% 样本中加入触发器并定向标记为目标类 $0$。
+    \item \textbf{Client 2 - 干净标签后门（Clean Label, $\gamma=0.5$）}：扰动目标类输入但保持标签不变，提升隐蔽性。
+    \item \textbf{Client 3 - 语义后门（Semantic, $\gamma=0.5$）}：利用自然语义偏置诱导错误关联。
+    \item \textbf{Client 4 - 符号翻转（Sign-Flipping）}：对回传梯度执行符号反转（$\Delta \widehat{W}_k = - \gamma \cdot \Delta W_k$）。
+    \item \textbf{Client 5 - 梯度缩放（Gradient Scaling）}：将恶意增量放大 100 倍（$\Delta \widehat{W}_k = 100 \times \Delta W_k$）。
+    \item \textbf{女巫与搭便车节点（Sybil \& Free-rider）}：额外注入 5 个无有效 TEE 证书节点与 3 个伪造低负载节点，用于验证阶段一硬件门禁。
 \end{itemize}
 
-\textbf{防御前置拦截测算声明}：上述共计 8 个企图从外部渗透系统以及拒绝真实计算过程的诈骗节点，全部在阶段协议层即被 TMAA 硬门禁（$M_{attest,k}$）无情拦截，或因资源监控池的瞬发异常（$A_k$ 剧增令 $TrustScore_k \to 0$）彻底褫夺了接驳权。因此，下文（包含 5.2 节的追踪轨迹与 5.3 节的精度表现）所统计展示的 20 个正式入围全生命周期演化节点，均特指艰难越过了 TMAA 第一阶段硬壳审核的内部高级隐蔽投毒群体。
+\textbf{前置拦截说明}：上述 8 个外部渗透或资源欺诈节点均在协议阶段被拦截，要么未通过 TMAA 硬件门禁（$M_{attest,k}=0$），要么因异常行为导致 $TrustScore_k \to 0$。因此，后续统计的 20 个节点均为通过阶段一准入后的正式参与者。
 
-基于上述基准物理环境的搭建、异构数据集的划分以及多维攻击样例的注入，本文联邦仿真系统的完整全局超参数与防御组件最优设定矩阵最终汇总于表~\ref{tab:hyperparams} 供查阅验证。
+实验使用的全局超参数与防御组件配置见表~\ref{tab:hyperparams}。
 
 \begin{table}[htbp]
 \centering
-\caption{基于物理平台的联邦仿真全局超参数与防御组件最优设定速查矩阵}
+\caption{基于物理平台的联邦仿真全局超参数与防御组件配置}
 \label{tab:hyperparams}
 \begin{tabular}{p{4cm} p{8.5cm} p{2cm}}
 \toprule
@@ -463,12 +467,12 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{tabular}
 \end{table}
 
-\textbf{实验真实性说明}：正式有效入群节点训练总计实施 $30$ 轮（Rounds）。单回合本地训练配置为 3 Epochs。后续 5.2 节所展示的折线演化轨迹与精确物理时间基准耗时（单次典型运行记录为 3878.53 秒），均直接截取自该组配置下运行至 30 轮终态的真实 \texttt{server.log} 输出文件，而对于防御准确率指标则采用多轮均值，未做任何插值平滑处理。
+\textbf{运行说明}：正式实验执行 30 轮联邦训练，每轮本地训练 3 个 Epoch。轨迹图和单次耗时（3878.53 s）来自真实 \texttt{server.log}；准确率类指标报告 5 次重复实验均值，未做插值平滑。
 
 \subsection{防御效果实证分析}
 
 \subsubsection{全局收敛性与攻击防范表现}
-如图~\ref{fig:convergence} 所示，在标准 30\% 恶意占比下，全局精度稳定收敛至 92.31\%，后门 ASR 被压制至 10.21\%。
+如图~\ref{fig:convergence} 所示，在 30\% 恶意占比下，模型精度稳定收敛至 92.31\%，后门 ASR 降至 10.21\%。
 
 \begin{figure}[htbp]
     \centering
@@ -477,9 +481,9 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
     \label{fig:convergence}
 \end{figure}
 
-\textbf{统计可靠性说明}：如 5.1.1 节所述，为消除偶然性误差，本小节及后续展示的所有全局量化指标（Acc、ASR 等）均基于我们在 A10 显卡群上重复运行 5 轮获得的标准均值；而节点轨迹演化等具象分析图表则剥离自单次具备代表性的基准运行切片。
+\textbf{统计可靠性说明}：本节及后续全局指标（Acc、ASR 等）均来自 5 次重复实验均值；节点轨迹图来自单次代表性运行。
 
-\textbf{极高危模型边界（50\% 恶意占比）抗压延伸验证}：为了充分验证第 3.2 节中针对系统容忍限度"高危占比上限 $< 50\%$"的威胁模型前提，我们在标准基线部署之外附加独立组建并验证了触及边界设定的极限高强度对抗架构（即 \textit{Flwr-half} 1:1 对等混编环境：10 名恶意多维深度投毒节点——涵盖全部 6 种攻击类型——与 10 名合法独立同分布感知终端共建系统）。具体量化结果如表~\ref{tab:half_malicious} 所示。
+\textbf{50\% 恶意占比边界测试}：为验证第 3.2 节假设上限（恶意占比 $<50\%$）附近的行为，本文额外构建 \textit{Flwr-half} 1:1 对抗环境（10 恶意 + 10 合法，覆盖全部 6 类攻击）。结果见表~\ref{tab:half_malicious}。
 
 \begin{table}[htbp]
 \centering
@@ -496,21 +500,18 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{tabular}
 \end{table}
 
-如表所示，在这一逼近理论极限的高强度对抗环境中，框架仍然保持了 91.81\% 的全局准确率，后门攻击成功率控制在 10.46\%（接近随机猜测基线 10\%）。全部 10 个恶意节点均被系统通过永久拉黑或软隔离机制完整剔除（TPR=100\%），而全部 10 个合法客户端无一触发永久封禁机制（FPR=0\%）。该结果表明，即使在合法计算要素体量与恶意载体对等的极端场景下，依靠瞬时风险衰减流（RiskEMA）的高维剥落阻隔与历史效用流（HistPerf）的宽容特赦，防御网格仍然能够稳固运作。这为架构针对其威胁假设边界提供了充分的实验支撑。
-
-联邦学习防线的最直观表现是：在面临攻击时系统能否学到正确知识，且是否被后门劫持。实验在 30 轮的演化过程中，全局主任务测试准确率（Accuracy）和后门攻击成功率（Attack Success Rate, ASR）的轨迹呈现稳定趋势。
-如服务器日志所示，模型测试集 Loss 从首轮的 $0.06362$ 稳步收敛至第 30 轮的 $0.00883$。分布式环境评估显示，最终本防御框架达成了 $\textbf{92.31\%}$ 的准确率，并将 ASR 稳定控制在 $\textbf{10.21\%}$（接近随机猜测水平），表明触发器影响在聚合过程中得到了显著抑制。
+如表所示，在接近理论边界的强对抗环境下，框架仍保持 91.81\% 的准确率，ASR 为 10.46\%（接近随机猜测基线 10\%）。10 个恶意节点全部被识别并剔除（TPR=100\%），10 个合法节点无永久误封（FPR=0\%）。此外，30 轮日志显示测试集 Loss 从 $0.06362$ 下降至 $0.00883$，说明模型在防御条件下仍保持稳定收敛。
 
 
 \subsubsection{信任流追溯与恶意节点封禁剖析}
-信任流设计的核心在于\textbf{高维暴露}与\textbf{精准隔离}。为避免所有20组折线同时渲染导致图像重叠混乱，图~\ref{fig:node_state} 筛选提取了 4 条最具代表性的极性人设轨迹：分别代表“开局瞬间参数篡改”的 Client 4（紫线）、“高频显性激进投毒”的 Client 0（红线）、“极度隐蔽潜伏”的 Client 2（橙线）以及作为对比抗误杀基准的“合法长尾异构” Client 15（绿线）。下面提炼分析这些典型节点触发防御干预（特别是长期封禁 Blacklist）的判定细节。
+信任流机制的关键在于“及时暴露异常”和“分级处置风险”。图~\ref{fig:node_state} 为避免曲线拥挤，仅展示 4 个代表性节点：Client 4（早期参数篡改）、Client 0（高频显性投毒）、Client 2（隐蔽潜伏后门）和合法长尾节点 Client 15。其判定过程如下：
 \begin{itemize}
-    \item \textbf{Client 0 (Label Flip) 与 Client 1 (Backdoor)}：这两类属于典型的具有明显异常特征与梯度方差的攻击。它们高频触发了系统探针告警。在进行至第 8 轮时，由于它们在 $r_{grad}$ 和 $r_{probe}$ 上的瞬时极值持续高企，致使其风险流指数均线持续突破高危硬门槛（$\texttt{risk\_ema\_above\_0.90\_for\_4\_rounds}$），系统据此将其纳入黑名单（BLACKLIST）。
-    \item \textbf{Client 3 (Semantic)}：语义攻击因其没有生硬的人为贴图扰动而难以被像素审查发现，然而它破坏了正常数据固有的学习方向相似度。日志反映，系统通过纯净参考基准 ($g_{root\_clean}$) 敏锐捕捉到了它贡献度与一致性常年低于期望。因此 $HistPerf$ 将其打入软隔离席位，且随着多维探测微小累积触发了安全下限要求（$\texttt{risk\_soft\_isolation\_for\_8\_rounds}$），最终于第 16 轮切断其参训资格。
-    \item \textbf{Client 2 (Clean Label)}：干净标签作为最隐蔽的新型后门手段，连自身本地的验证 Loss 都显得非常正常。然而，本文提出的双流风险系统结合了连击探测（Streak）。在第 24 轮，探针报告 Client 2 命中了独有的长期漂移追踪警戒线（$\texttt{c2\_drift\_combo\_for\_5\_rounds}$），系统最终依靠多模块组合将其精准捕获并剔除。
-    \item \textbf{Client 4 (Sign-Flipping) 与 Client 5 (Gradient Scaling)}：作为极具破坏性的直接参数篡改攻击，它们在初始阶段即被系统迅速隔离。Client 4 的梯度方向全反导致在第二阶段 $S_{contrib}$ 评估时遭遇断崖式零分判定，并促使 $RiskEMA$ 在前两轮瞬间触顶，触发了硬封禁机制；而 Client 5 的大幅更新振幅使其在阶段四触碰了极度收缩的 L2 门控 $C^{(l)}$，被强制修剪抹平，随后同样触发异常黑名单。
+    \item \textbf{Client 0（Label Flip）与 Client 1（Backdoor）}：两者在 $r_{grad}$ 与 $r_{probe}$ 上持续高风险，至第 8 轮触发 $\texttt{risk\_ema\_above\_0.90\_for\_4\_rounds}$，进入黑名单。
+    \item \textbf{Client 3（Semantic）}：像素扰动不明显，但长期偏离纯净参考 $g_{root\_clean}$。其先进入软隔离，随后触发 $\texttt{risk\_soft\_isolation\_for\_8\_rounds}$，第 16 轮被移除。
+    \item \textbf{Client 2（Clean Label）}：本地 Loss 表面正常，但长期漂移特征被连击规则命中（$\texttt{c2\_drift\_combo\_for\_5\_rounds}$），第 24 轮完成识别与剔除。
+    \item \textbf{Client 4（Sign-Flipping）与 Client 5（Gradient Scaling）}：前者因方向反转导致 $S_{contrib}$ 迅速降为低值并触发硬封禁；后者因超大振幅命中分层 L2 门控后进入异常处置并被剔除。
 \end{itemize}
-实验结果表明，依靠分离“基于本地数据偏差的长期信誉低下 ($HistPerf$)”与“极具安全威胁的攻击行为序列 ($RiskEMA$)”，框架为各种异常行为序列提供了具备针对性的响应干预机制。从恶意分类模型视角来看，对于包含 6 名实质性坏人的拓扑，框架做到了\textbf{真阳性识别率 (TPR, 恶意节点召回率) = 100\%}。
+结果表明，双流解耦机制能够将“数据异构导致的低分”与“真实攻击行为”分开处理。在包含 6 个恶意节点的设置下，系统达到 \textbf{TPR=100\%}。
 
 \begin{figure}[htbp]
     \centering
@@ -521,11 +522,10 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 
 
 \subsubsection{异构长尾节点的误杀保障 (FPR 指标分析)}
-以往依靠参数距离（例如 Krum \cite{blanchard2017krum} 或 FLTrust \cite{cao2021fltrust}）的方法，极易因为节点 12-19 持有的数据样本（即 Dirichlet $\alpha=0.1$）产生的梯度偏差而将其误判为投毒者。
-而本文实验证明：\textbf{整个 30 轮内，所有的正常（Benign）节点无一触发永久拉黑机制，假阳性误杀率 (FPR) 为 0\%。}
-即便在初期由于极端的本地数据分布，个别合法节点（如图~\ref{fig:node_state} 中的 Client 15）的 $ContentScore$ 极低甚至被挤压进\textbf{“可疑（SUSPECT）”}或是\textbf{“软隔离（QUARANTINE）”}池进行观察，但由于其未表现出隐蔽探针特征的连贯击中（即代表恶意的 $RiskEMA$ 并未暴发涨高），因此该节点的惩罚仅限于当轮的入场资格剥夺与层级裁剪 $scale_k$ 严管。一旦其开始补充有益全局收敛的梯度片段，其 $HistPerf$ 依然能触底反弹式恢复。实验终止时，合法节点留存率为 100\%。
+传统距离型方法（如 Krum\cite{blanchard2017krum}、FLTrust\cite{cao2021fltrust}）在 Dirichlet $\alpha=0.1$ 的强异构环境中容易误判合法长尾节点。本文实验显示：\textbf{30 轮训练中所有合法节点均未触发永久封禁，FPR=0\%。}
+即使早期部分合法节点（如 Client 15）因数据偏斜出现较低 $ContentScore$ 并进入 SUSPECT/QUARANTINE，其 $RiskEMA$ 未持续升高，故仅会受到临时准入限制与分层裁剪。随着后续贡献恢复，$HistPerf$ 可逐步回升，最终合法节点留存率为 100\%。
 
-为进一步从特征空间尺度直观剖析“零误杀”的深层成因，我们提取了系统干预前后的全局节点潜在特征向量，并利用 t-SNE 绘制了二维流形映射。如图~\ref{fig:tsne_manifold} 所示，即便隐蔽恶意集群（红色）试图刻意混杂并附着于合法长尾节点（橙色）的安全边界上作为高阶掩体，本文的双流正交系统依然能通过正交解耦机制将投毒特征有效分离至高危区域，而宽容地将数据异构的合法节点保留在主聚合包络内。
+为进一步解释“低误杀”现象，本文提取干预前后的节点特征并用 t-SNE 可视化。图~\ref{fig:tsne_manifold} 显示，双流机制可将恶意簇与合法长尾簇有效分离，同时保留合法异构节点在主聚合区域内。
 
 \begin{figure}[htbp]
     \centering
@@ -535,13 +535,13 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{figure}
 
 \subsection{防御机制横向基准对比 (Baseline Comparison)}
-\textbf{基准评估的公平性声明}：为确保基线对比的绝对公平与科学严谨，以下所有对比策略均部署在与本文框架完全同构的联邦拓扑中运行。这意味着所有的防御算法都必须面对完全一致的：$20$ 个边缘节点切分、Dirichlet ($\alpha=0.1$) 强异构长尾数据、$30\%$ (6名) 的高危混合攻击阵列植入、相同的全局网络初始化权重、一致的 SGD 优化器参数（$lr=0.001$, $momentum=0.9$）以及相同的通讯回合数。
+\textbf{公平性说明}：所有基线均在与本文完全相同的联邦设置下运行，包括节点划分（20 个）、数据异构度（Dirichlet $\alpha=0.1$）、攻击配置（30\% 混合攻击）、初始化参数、优化器设置（$lr=0.001$, $momentum=0.9$）和通信轮次。
 
-为进一步量化该 Trust Flow 驱动架构的防御优越性，我们在上述统一对抗训练环境中，将其与目前学术界四类不同流派的经典 robust aggregation 方法进行了并行横向对比测量：
+在统一环境下，本文将所提方法与四类经典鲁棒聚合方法进行横向比较：
 
-\textbf{FedAvg}\cite{mcmahan2017fedavg} 采用无防备的样本数加权聚合，本实验中将其作为评估全局模型被毒化受损程度的对比基线；\textbf{Krum}\cite{blanchard2017krum} 算法依靠假设大多数节点是善意的，旨在每轮挑选出与其他同流节点欧氏推移距离总和最小的那一个单一模型作为新的全局模型，代表着纯粹的距离排斥与唯一性推举流派；\textbf{Trimmed Mean}\cite{yin2018byzantine} 实施在向量的每个权重特征维度坐标系下单向掐头去尾的截断均值策略，专门针对极端值扰动；\textbf{FLTrust}\cite{cao2021fltrust} 则首次强制提取服务器端的全干净极小验证集提炼一个指导向量，依靠余弦相似度进行先验信任权重分配，开创了有锚基准的评判流派。
+\textbf{FedAvg}\cite{mcmahan2017fedavg} 作为无防御基线，反映模型在受攻击时的退化程度；\textbf{Krum}\cite{blanchard2017krum} 通过最小欧氏距离选择单个代表更新；\textbf{Trimmed Mean}\cite{yin2018byzantine} 在坐标维度执行截断均值；\textbf{FLTrust}\cite{cao2021fltrust} 借助服务器小规模干净集构造参考向量并按余弦相似度加权。
 
-本段将系统地评估上述四大经典算法在面对本文所搭建的高度恶劣的高阶渗透网络时的真阳控制力与主线模型维持能力，全维度的具体量化评估结果如表~\ref{tab:baseline} 所示。
+各方法在该高风险场景下的量化结果见表~\ref{tab:baseline}。
 
 \begin{table}[htbp]
 \centering
@@ -568,10 +568,10 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
 \end{threeparttable}
 \end{table}
 
-实验数据表明：面对隐蔽后门与直接参数投毒的混编组合，传统 FedAvg 防线 ASR 达到 92.34\%。Krum 将 ASR 抑制至 12.15\%，但由于其距离度量排斥异构数据，导致正常节点误杀率达到 64.2\%，模型主任务精度下降至 64.20\%。相比之下，本文架构在实验观测中未产生任何假阳性永久误杀（FPR = 0\%）的前提下，取得了相对最高的收敛准确率（92.31\%）。此外，通过基于多次独立重复实验的 $t$ 检验（Student's $t$-test）分析，本文方法对于主干分类 Acc 的提升以及对后门 ASR 的极限压制，相较于最高基线（如 FLTrust）的优势均表现出了极高的统计显著性（$p < 0.05$），验证了系统优异的鲁棒泛化能力。
+结果显示：FedAvg 在混合攻击下 ASR 高达 92.34\%；Krum 可将 ASR 降至 12.15\%，但 FPR 升至 64.2\%，准确率降至 64.20\%。相比之下，本文方法在保持 FPR=0\% 的同时取得最高准确率 92.31\%，并实现最低 ASR（10.21\%）。基于多次重复实验的 Student's $t$-test 显示，相比强基线（如 FLTrust）差异具有统计显著性（$p<0.05$）。
 
 \subsection{多阶段防御架构消融实验 (Ablation Study)}
-为探究各个核心防御模块的安全增益与对全局主干特征的保护能力，本文采用逐级剥离法（Ablation）追踪了系统在不同阶段组合下的“防御力”与“可用性”协同变化，具体评估其双轴指标（全局收敛精度 Acc 与 对隐蔽后门的压制率 ASR），结果如图~\ref{fig:ablation} 的双 Y 轴分布所示。
+为评估各防御模块的贡献，本文采用逐级剥离（Ablation）方式，比较不同阶段组合下的 Acc 与 ASR（见图~\ref{fig:ablation}）。
 
 \begin{figure}[htbp]
     \centering
@@ -580,10 +580,10 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
     \label{fig:ablation}
 \end{figure}
 
-如图可知：(1) 当系统\textbf{仅启用阶段一（TEE 认证基础门禁）}时，虽然能将外部未授权欺诈设备拒之门外，但对已渗入的高端后门投毒者束手无策。恶意特征污染了聚合通道，使得攻击成功率（ASR）高达 75.40\%，并拖累了模型收敛（推断 Acc 骤降至 82.5\% 附近）；(2) \textbf{引入阶段三双流演化（RiskEMA 与 HistPerf）}后，信誉探针有效抦截了绝大部分恶意更新，使得 ASR 骤降至 32.18\%。在此保护下，主模型健康度回升（推断 Acc 回暖至 88.2\%），说明动态双流机制避免了传统直接丢弃造成的合法增量流失；(3) \textbf{引入全层防护（开启阶段四的 L2 深浅层风险裁剪）}后，凭借着对高维空间中最后一丝投毒振幅的物理阻断，系统实现了安全防御的终极闭环。ASR 彻底被压制至低威慑线的 10.21\%，并且通过精细粒度的权重归一化，进一步促进了收敛（Acc 锁定至全场最优的 92.40\%）。综合两项指标，本可信框架实现了极高的防御代偿比。
+结果表明：1）仅启用阶段一（TEE 门禁）时，系统可拦截外部伪装节点，但对内部投毒抑制有限，ASR 仍达 75.40\%，Acc 约 82.5\%；2）加入阶段三双流演化后，ASR 降至 32.18\%，Acc 回升至 88.2\%；3）再加入阶段四分层裁剪后，ASR 进一步降至 10.21\%，Acc 提升至 92.40\%。这说明各模块存在明显互补性，组合后可同时提升安全性与可用性。
 
 \subsection{长尾异构数据分布极限抗压试验 (Sensitivity on Data Heterogeneity)}
-主流的安全聚合常常具有“IID 依赖症”（即在数据同分布下表现良好，一旦遭遇边缘异构便断崖式失效）。为了证明本文系统核心参数具有非偶然的泛化能力，以及 $HistPerf$ 维度对于数据偏科者的“底盘护卫”硬性功效，我们在四类不同烈度的狄利克雷分布（从 $\alpha=100$ 的近似同分布至 $\alpha=0.1$ 的极限长尾）下测算并推断了维系防御稳态时的全局准确率表现，如图~\ref{fig:alpha_sensitivity} 所示。
+许多鲁棒聚合方法对 IID 条件依赖较强。为评估本文框架在不同异构强度下的稳定性，本文在四组 Dirichlet 分布（$\alpha=100,1.0,\dots,0.1$）下测试全局准确率，结果见图~\ref{fig:alpha_sensitivity}。
 
 \begin{figure}[htbp]
     \centering
@@ -592,13 +592,12 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
     \label{fig:alpha_sensitivity}
 \end{figure}
 
-分析该灵敏度演替曲线可知：在 $\alpha=100$ 或 $\alpha=1.0$ 这类平和或轻度倾斜的温室场景下，以 Krum 和 FLTrust 为代表的距离约束机制能从宽裕的特征中勉强找到同构集，并有着与本文系统接近的正常表现（Acc 均 > 90\%）。然而，一旦防御战线被迫进入极端长尾分布 ($\alpha \to 0.1$) 区域，基于排他性纯距排斥的传统解法出现了明显的泛化崩塌，大量携带重要垂直类别信息的合法客户端因被误诊而抛弃，准确率显著下降至 64.2\%。相比之下，本架构（蓝实线）由于引入了双维度信任隔离机制，即便面对最严苛的偏科分布，也能始终以巨大的安全裕量横盘维系在 92.0\% 的准线之上。这从本质层面自证了：该防线的极高精度是由系统底层解耦设计赋予的普适红利，而非刻意修饰特定数据环境而产生的脆弱过拟合现象。
+从曲线可见：在 $\alpha=100$ 或 $\alpha=1.0$ 的弱异构场景下，Krum 与 FLTrust 表现接近本文方法（Acc 均大于 90\%）；但在极端长尾场景（$\alpha \to 0.1$）中，传统距离型方法明显退化，准确率最低降至 64.2\%。本文方法在同条件下仍稳定在约 92\%，说明双流解耦机制对强异构具有更好的鲁棒性。
 
-此外，针对决定上述框架信任流容错核心表现的关键超参数先验融合偏置 $\beta_{fusion}$，我们在同等对抗强度下横向比对了其离散映射区间。实证表明：当测试 $\beta_{fusion} \in [0.5, 1.0, 2.0, 3.0]$ 等数值时，系统呈现出显著的阶段性差异。数值偏低时会赋予长尾异构较高的留存概率，但同时也抬高了极端投毒 ASR 穿刺的风险；而在极限高值下系统逐渐退化为绝对的同质化独裁筛选。因此，系统最终采用的 $\beta_{fusion} = 2.0$ 并非随意抽样，而是经由高强度网格验证后确定的、在收敛速度（Acc）和恶意拦截（ASR 压制）之间取得最佳效用的全局经验最优参数。
+此外，本文对关键参数 $\beta_{fusion}$ 做了离散测试（$[0.5,1.0,2.0,3.0]$）。较小取值有利于保留长尾节点，但 ASR 风险上升；过大取值会过度偏向同质更新。综合 Acc 与 ASR，最终选择 $\beta_{fusion}=2.0$。
 
 \subsection{系统计算与通信额外开销分析 (Overhead Analysis)}
-虽然本防御方案内部演化逻辑复杂，但在基于“边云协同”的微服务架构下计算与通信开销依旧可控。如表~\ref{tab:overhead} 所示，由于在\textbf{边缘客户端}仅仅是生成 TEE Quote 以及执行原生的本地训练，无需进行沉重的全同态加密计算，终端的额外延迟仅为 $12 \sim 15$ 毫秒，对性能极其受限的 IoT 设备极其友好。
-而在\textbf{通信频段}上，每一台设备上报参数时只需附带一份轻量级（约 $15$ KB）的 TrustReport JSON 证书文件，相比于动辄 $10$ MB 级别的权重矩阵传输，带宽增量 $<0.15\%$，近乎忽略不计（Negligible）。
+尽管框架包含多阶段评估流程，其计算与通信开销仍可控。表~\ref{tab:overhead} 显示：边缘侧仅新增 TEE Quote 生成与轻量监测，额外延迟约 $12 \sim 15$ ms；通信侧每次仅附带约 $15$ KB 的 TrustReport，相对约 $10$ MB 量级模型传输，带宽增量低于 0.15\%。
 
 \begin{table}[htbp]
 \centering
@@ -610,48 +609,44 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
 \textbf{系统架构} & \textbf{边缘端额外计算延迟} & \textbf{上行单次通信外加包大小} & \textbf{云端中央聚合总耗时} \\
 \midrule
 标准基线 FedAvg & 0 ms (Baseline) & 0 KB (Baseline) & $\sim 2.10$ s \\
-\textbf{可信联邦 (Ours)} & \textbf{$\sim 15$ ms (仅 TEE 签名)} & \textbf{$\sim 15$ KB (传输信条)} & \textbf{$\sim 4.85$ s (包含审查与双流)} \\
+\textbf{可信联邦 (Ours)} & \textbf{$\sim 15$ ms (仅 TEE 签名)} & \textbf{$\sim 15$ KB (附加报告)} & \textbf{$\sim 4.85$ s (包含审查与双流)} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-作为代价，基于张量余弦相似度的分层计算增加了聚合端的算法复杂度。在核心云服务器测试中，单回合融合计算时间从 $2.10$ 秒增加至 $4.85$ 秒。考虑到广域网联邦训练中显著的端云通信延迟（单轮通常长达数十秒），此类服务器端的计算开销处于可接受的范围，且换取了防御效能的提升。
+代价方面，分层余弦评估会增加服务器端计算量。测试中单轮聚合耗时由 $2.10$ s 增至 $4.85$ s。考虑到广域网场景单轮通信通常在数十秒量级，该开销在工程上可接受。
 
 \section{结论与未来展望}
-本文深入剖析了边缘联邦学习架构在面临高度离散的非独立同分布（Non-IID）长尾数据偏置，以及恶意节点高阶复合投毒（后门植入、参数操纵等）双重夹击下的结构性脆弱困局。为此，我们创新性地提出并部署了一套基于“软硬双层联结”与“状态流正交解耦”的信任流驱动防御框架（Trust-Flow TFL）。
+本文面向边缘联邦学习在强 Non-IID 与混合攻击下的安全问题，提出了“硬件可信准入 + 双流信誉演化 + 分层鲁棒聚合”的 Trust-Flow TFL 框架。该框架通过 TEE 提供物理信任根，并在算法层以 HistPerf 和 RiskEMA 的正交建模实现“低误杀与高召回”的协同。
 
-通过将防御战线战略性前移，系统利用 TEE（可信执行环境）锚定了具备高度置信证明的边缘物理准入与运行时环境指纹；在逻辑层，我们彻底摒弃了传统单纯以空间距离过滤或单一聚合权重的盲区。通过构筑基于“历史增益效用（HistPerf）”与“多维瞬发风险（RiskEMA）”各自独立演替的正交信誉系统，配合基于层级敏感度的风险门控 L2 裁剪机制，本体系在算术与物理的双重钳制下阻断了深度触发器的投毒同化。
+实验结果表明，框架在 30\% 混合攻击下取得 $92.31\% (\pm 0.09\%)$ 的准确率与 $10.21\% (\pm 0.05\%)$ 的 ASR；在 50\% 边界压力测试下仍保持稳定性能，并实现 TPR=100\%、FPR=0\%（永久封禁口径）。这说明该方法在强对抗和强异构条件下具有较好的实用性。
 
-真实高性能边缘联邦仿真集群系统上的高压力实证结果表明：无论是在涵盖泛型模型/数据投毒、干净标签等交叉污染的基础校验，还是在逼近系统抗打击理论极限值（即多达 50\% 异常比例延伸测评框架下的深水区博弈）里，本研究架构在本评测的实验框架内，均强韧保障了对内嵌风险载体的纵深剥离剔除职能。在系列交叉评价下，它不仅稳固将主观的后门植入攻击成功比率（ASR）中枢期望锁定在 $10.21\% (\pm 0.05\%)$ 临界点内的极低风险水段，同时通过温和解脱的留存分控架构设计（FPR 极限向零收敛），有效抑制了核心合法分布资源的荒废抛弃危机，推动着分布式多域协作算网整体步入 $92.31\% (\pm 0.09\%)$ 综合广域识别率的高效稳定收敛信道之上。
-
-\textbf{横向对比局限性与呼吁}：在联邦学习安全前沿，近期涌现了诸如 RPPFL\cite{zhang2025rppfl}、TMT-FL\cite{lu2025tmt} 等借助 TEE 构筑多端防御的出色理论验证框架。然而，由于这些前沿研究当前均暂未提供可供公共审查与跨设备真实部署的完整开源代码实现，导致在本文所设定的“高度长尾偏斜联合 6 种混编协同投毒”的严苛实战网络下，脱离其原始工程超参数去强行进行黑盒重构底层框架极易引入实验侧评估偏差。因此，出于维护科学比较的严谨性与公平性，本研究在此阶段暂未将其硬性纳入同构量化基线跑分（Baseline）。为破除这一实验孤岛困境，我们将随着本文定稿一并开源底层的跨层攻防拓扑组件引擎，以期为未来的可信边缘计算领域孕育一套具备严苛对抗场景检验的标准化 TEE-FL 模块化基准验证平台。
-
-\textbf{纵向场景展望}：现有的信誉多维探针主要根植于密集型 CV 像素特征的统计先验，对于高维极度稀疏的词嵌入流形仍具挑战。未来，我们将考量将这套极低运行开销的“瞬发信任风险流探针”体系纵深扩展至大语言模型（LLM/NLP）的越狱微调（Jailbreak Fine-tuning）投毒防御基座中，在更庞大且莫测的跨模态参数空间里，标定可信联邦框架的崭新泛化航标。
+\textbf{局限性与后续工作}：由于部分 TEE-FL 新方法尚未公开可复现实现，本文未将其纳入同构对比基线，后续计划随论文定稿开放代码与实验脚本，便于社区复现和扩展。未来还将把风险探针从 CV 场景扩展到 LLM/NLP 联邦微调任务，以验证跨模态场景下的泛化能力。
 
 \appendix
 \section{瞬发风险流 (Risk Flow) 探针计算机制细节}
-为了保证联邦防御机制的可重构性与系统透明度，本附录详细披露正文第 4 节中多维瞬发风险流模块核心探针（$r_{grad}$, $r_{probe}$, $r_{trigger}$）的具体代数评估逻辑。网络在第 $t$ 轮进行防御聚合阶段时，计算逻辑如下：
+为增强可复现性与透明度，本附录给出第 4 节瞬时风险流核心探针（$r_{grad}, r_{probe}, r_{trigger}$）的计算细节。第 $t$ 轮聚合时各探针定义如下：
 
 \subsection{A.1 梯度方向与幅度物理探针 ($r_{grad}$)}
-$r_{grad}$ 旨在衡量客户端上传梯度 $\Delta W_k^{(t)}$ 与全局纯净演化基准 $g_{root}^{(t)}$ 的几何惩罚距离，以捕捉大尺度符号反转与幅度投毒攻击。其度量融合了方向偏离（余弦惩罚）与数量级剧变（L2 范数异常偏差）：
+$r_{grad}$ 衡量客户端更新 $\Delta W_k^{(t)}$ 与参考方向 $g_{root}^{(t)}$ 的几何偏离，用于检测符号翻转与幅度异常。该指标同时考虑方向偏离（余弦项）与尺度突变（L2 异常项）：
 \begin{equation}
     r_{grad, k}^{(t)} = \lambda_{d} \left(1 - \frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{||\Delta W_k^{(t)}|| \cdot ||g_{root}^{(t)}||}\right) + \lambda_{m} \max\left(0, \frac{||\Delta W_k^{(t)}||_2 - \mu^{(t)}}{\sigma^{(t)}}\right)
 \end{equation}
-其中，常量 $\lambda_d$ 与 $\lambda_m$ 为控制方向偏离与幅度突变惩罚强度的平衡超参数（本文默认等权设定为 $0.5$）；而 $\mu^{(t)}$ 与 $\sigma^{(t)}$ 严格定义为当前第 $t$ 聚合轮次（单次全场，非跨轮截断滑动）内所有入围审查节点局部梯度 L2 范数分布的统计平均标量与标准偏差。
+其中，$\lambda_d$ 与 $\lambda_m$ 控制方向项和幅度项的权重（默认均为 $0.5$）；$\mu^{(t)}$ 与 $\sigma^{(t)}$ 分别为第 $t$ 轮入围节点梯度 L2 范数的均值与标准差。
 
 \subsection{A.2 小样本先验验证交叉熵探针 ($r_{probe}$)}
-基于纯粹软件距离层面的探测往往无法防范针对非主线类别的精准毒化。$r_{probe}$ 利用中心服务器端物理隔离持有的极小规模纯净辅助集（Probe Dataset, $\mathcal{D}_{probe}$），通过比较融合该局部模型前后的前向推理损失激增量（Loss Surge），精准测定深水区的降维打击：
+仅靠距离统计难以识别对非主类的定向污染。$r_{probe}$ 使用服务器侧小规模纯净探针集 $\mathcal{D}_{probe}$，比较合并前后交叉熵损失增量（Loss Surge）：
 \begin{equation}
     r_{probe, k}^{(t)} = \text{ReLU}\left( \mathcal{L}_{CE}(W_{global}^{(t-1)} + \Delta W_k^{(t)}; \mathcal{D}_{probe}) - \mathcal{L}_{CE}(W_{global}^{(t-1)}; \mathcal{D}_{probe}) \right)
 \end{equation}
 
 \subsection{A.3 深层神经元隐蔽后门激活探针 ($r_{trigger}$)}
-针对高度隐蔽的生成对抗级污染（如 Clean-Label Attack），常规的统计与验证 Loss 可能失灵。本系统监控高层特征映射的激活散度。$r_{trigger}$ 提取特定客户端模型经过深层特征网络前向推理验证集时的分类前置活化张量输出 $A_k$。此处记号 $\mathcal{H}(\cdot)$ 定义为将原生非界化神经元输出经由 Softmax 归一化映射为概率单形（Probability Simplex，即强制性转化为非负且总和为 1 的后验概率分布体系），以此从数学层面上严格满足规范理论对 KL 散度算子输入的约束前置条件：
+针对 Clean-Label 等高隐蔽攻击，常规统计与验证 Loss 可能不足。$r_{trigger}$ 通过高层特征激活分布差异进行检测。设 $A_k$ 为客户端模型在验证集上的前置激活输出，$\mathcal{H}(\cdot)$ 表示 Softmax 归一化到概率单形，以满足 KL 散度计算条件：
 \begin{equation}
     r_{trigger, k}^{(t)} = \text{KL-Divergence}\left( \mathcal{H}(A_{base}) \| \mathcal{H}(A_k) \right)
 \end{equation}
 
-经过上述高阶独立评估后，系统将这三维正交的异常标量汇聚并归一化，形成最终融入当轮历史指数衰减均值（EMA）阵列的单次综合危险系数 $Risk_{k}^{(t)}$，以此支持毫秒级的熔断拉黑决策。
+上述三类异常信号经归一化融合后形成单轮风险值 $Risk_{k}^{(t)}$，并进入 EMA 更新，用于后续快速熔断决策。
 
 \begin{thebibliography}{99}
     \bibitem{kairouz2021flsurvey} Kairouz P, McMahan H B, Avent B, et al. Advances and Open Problems in Federated Learning[J]. Foundations and Trends in Machine Learning, 2021.
