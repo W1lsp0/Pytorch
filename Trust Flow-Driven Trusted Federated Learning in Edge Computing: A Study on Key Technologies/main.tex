@@ -102,14 +102,14 @@ while maintaining practical convergence under heterogeneous edge settings.
 但纯软件防御在强 Non-IID 与高权限攻击下仍有明显短板：阈值收紧会抬高误杀率（FPR），阈值放宽又可能放过潜伏攻击；同时，当攻击者控制底层环境时，缺少硬件信任根的软件探针难以形成完整闭环。
 
 \subsection{联邦环境下的可信硬件信任根 (TEE)}
-为补齐物理可信的缺口，研究开始引入 Intel SGX、ARM TrustZone 等可信执行环境（TEE）。TEE 通过隔离执行与受保护内存保证关键代码和密钥材料的完整性，即便宿主 操作系统被攻陷，攻击者也难以直接篡改证明流程\cite{liao2024verifiable,zhang2025rppfl}。现有的工作表明，TEE 在训练完整性\cite{r1_tee_integrity}、威胁缓解\cite{r5_tee_mitigating} 和工业 IoT 信任共享\cite{r12_iot_tee} 中具备现实价值，其在 SGX 环境下的联邦扩展与效率优化也得到验证\cite{xu2021distributed,yan2024efficient}。
+为补齐物理可信的缺口，研究开始引入 Intel SGX、ARM TrustZone 等可信执行环境（TEE）。TEE 通过隔离执行与受保护内存保证关键代码和密钥材料的完整性，即便宿主操作系统被攻陷，攻击者也难以直接篡改证明流程\cite{liao2024verifiable,zhang2025rppfl}。现有的工作表明，TEE 在训练完整性\cite{r1_tee_integrity}、威胁缓解\cite{r5_tee_mitigating} 和工业 IoT 信任共享\cite{r12_iot_tee} 中具备现实价值，其在 SGX 环境下的联邦扩展与效率优化也得到验证\cite{xu2021distributed,yan2024efficient}。
 本文在此基础上构建软硬件协同防御体系。与仅做静态加密或单维异常评测的方法不同，本文将硬件远程证明（Remote Attestation）与双流信誉演化进行时序耦合：云端负责参数审查，边缘侧 TMAA 提供可信证据与运行时监测，实现“强制准入 + 动态熔断”的联动防护。
 
 
 \section{系统模型与问题定义}
 
 \subsection{端边云协同架构与系统流转建模}
-本文考虑的是一个典型的端-边-云（Client-Edge-Cloud）异构通信环境（见图~\ref{fig:system_arch}）。系统由中心\textbf{聚合服务器（Server, $\mathcal{S}$）}与 $K$ 个边缘客户端组成，记为 $\mathcal{C}=\{c_1, c_2, \dots, c_K\}$。客户端可能动态上下线，且部分节点可能被攻击者控制。
+本文考虑一个典型的端-边-云（Client-Edge-Cloud）异构通信环境（见图~\ref{fig:system_arch}）。系统由中心\textbf{聚合服务器（Server, $\mathcal{S}$）}与 $K$ 个边缘客户端组成，记为 $\mathcal{C}=\{c_1, c_2, \dots, c_K\}$。客户端可能动态上下线，且部分节点可能被攻击者控制。
 
 \begin{figure}[htbp!]
     \centering
@@ -189,7 +189,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{table}
 
 \subsection{阶段一：硬件锚定的客户端准入与信任起步评分}
-为识别身份伪造与恶意设备接入，系统引入基于 TEE 的\textbf{可信管理代理（TMAA）}。每轮训练前，客户端需使用不可导出的硬件密钥提交包含 PCR 链值的远程证明（Attestation Quote）。证明通过时记 $M_{attest,k}=1$，否则为 0 且直接拒绝接入。
+为阻断身份伪造与恶意设备接入，系统引入基于 TEE 的\textbf{可信管理代理（TMAA）}。每轮训练前，客户端需使用不可导出的硬件密钥提交包含 PCR 链值的远程证明（Attestation Quote）。证明通过时记 $M_{attest,k}=1$，否则为 0 且直接拒绝接入。
 
 基于 TMAA 监控日志（如 CPU 行为模式、进程完整性），系统为通过门禁的客户端 $k$ 计算异常分数 $A_k \in [0, \infty)$，并据此得到初始信任分 $TrustScore_k \in [0,1]$：
 \begin{equation}
@@ -396,7 +396,7 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 分层聚合完成后，服务器将安全增量应用到全局模型：$W_{global}^{new} = W_{global}^{old} + \Delta W_{global}$，并同步下发更新后的模型及客户端状态（含 $HistPerf$）。至此形成一轮完整闭环，在保证收敛的同时持续过滤恶意更新。
 
 \subsection{双流正交解耦的理论保证 (Theoretical Analysis)}
-传统单一信誉分数（如简单余弦累加）本质上将高维行为压缩到单轴判断。在强 Non-IID 场景下，这会使得漏检（FNR）与误杀（FPR）的冲突增强。本节给出双流正交机制的理论分析。
+传统单一信誉分数（如简单余弦累加）本质上将高维行为压缩到单轴判断。在强 Non-IID 场景下，这会使得漏检（FNR）与误杀（FPR）的冲突加剧。本节给出双流正交机制的理论分析。
 
 \textbf{引理 1（长尾节点的方差收敛特性，Lemma 1）}
 设长尾合法客户端 $k$ 的单轮内容分 $ContentScore_{k}^{(t)}$ 服从期望 $\mu_{clean}$、方差 $\sigma_{clean}^2$ 的扰动分布。在刚性阈值 $\tau_{hard}$ 下，若 $\tau_{hard} > \mu_{clean} - \sigma_{clean}$，该节点将有较高概率被持续淘汰。采用历史效用流平滑后，其稳态期望满足 $\mathbb{E}[HistPerf_k^{(\infty)}] = \mu_{clean}$，且方差收敛为：
@@ -565,7 +565,7 @@ FLTrust \cite{cao2021fltrust} & 单向信任锚点 & 81.25 $\pm 1.5$ & 15.42 $\p
 \begin{tablenotes}
 \small
 \item (*) \textit{注：FedAvg 与 Trimmed Mean 算法由于自身不具备任何客户端“显式信任评估”或“永久拉黑剔除 (Ban)”机制，其对恶意节点的容忍表现为数值融合或截断计算，因此 FPR 指标不适用于此类算法，标记为 N/A。}
-\item (**) \textit{注：正常节点误杀率（FPR）这一指标受确定性规则与固化数据样本异构度（Dirichlet分布）的强约束。在固定的数据集切分下，由于防御规则是刚性的，该类误杀裁决在各次重复实验中观测到方差极小，因此本列表仅呈报该指标稳定收敛的标量期望均值 $\mu$。同时，此处的 0.00 专指“永久封禁误杀”，部分处于瞬时可疑池中的轻度隔离由于具有触底恢复反弹特性，不计入模型不可挽回的实质性永久击溃错误。}
+\item (**) \textit{注：正常节点误杀率（FPR）这一指标受确定性规则与固化数据样本异构度（Dirichlet分布）的强约束。在固定的数据集切分下，由于防御规则是确定性的，该类误杀裁决在各次重复实验中观测到方差极小，因此本列表仅呈报该指标稳定收敛的标量期望均值 $\mu$。同时，此处的 0.00 专指“永久封禁误杀”，部分处于瞬时可疑池中的轻度隔离由于具有触底恢复反弹特性，不计入模型不可挽回的实质性永久击溃错误。}
 \end{tablenotes}
 \end{threeparttable}
 \end{table}
