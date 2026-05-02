@@ -185,9 +185,9 @@
 \centering
 \caption{核心系统参数与信任流符号定义}
 \label{tab:notations}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{>{\raggedright\arraybackslash}p{1.7cm} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}p{1.7cm} >{\raggedright\arraybackslash}p{4.0cm}}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\raggedright\arraybackslash}p{2.0cm} >{\raggedright\arraybackslash}p{4.7cm} >{\raggedright\arraybackslash}p{2.0cm} >{\raggedright\arraybackslash}p{4.7cm}}
 \toprule
 \textbf{符号} & \textbf{定义描述} & \textbf{符号} & \textbf{定义描述} \\
 \midrule
@@ -198,7 +198,8 @@ $ContentScore_k$ & 双参比下的当轮内容质量得分 & $RiskEMA_k$ & 瞬�
 $RawScore_k$ & 融合三维得分并施加风险折扣的最终权限分 & $M_{attest,k}$ & 硬件远程证明 (Attestation) 验证通过标志 \\
 $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 的物理资源运行时异常分数 \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
+\renewcommand{\arraystretch}{1.0}
 \end{table}
 
 \subsection{阶段一：硬件锚定准入与基于卡尔曼滤波的动态信任度量}
@@ -284,50 +285,54 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{algorithm}
 
 
-\subsection{阶段三：历史绩效流与瞬时风险流的正交状态演化}
-传统“低分即淘汰”的策略容易误伤长尾合法节点。为此，本文将状态更新拆分为两个正交时序流：用于长期贡献评估的\textbf{历史效用流（$HistPerf$）}，以及用于快速处置异常行为的\textbf{风险流（$RiskEMA$）}。
+\subsection{阶段三：历史效用与瞬时风险的正交解耦与演化}
+在强 Non-IID（非独立同分布）边缘计算场景中，传统“低分即淘汰”的策略往往混淆了“数据长尾性导致的低效用”与“恶意投毒导致的高风险”，容易引发严重的误杀（FPR）。为破解这一困境，本研究提出构建一个二维正交解耦空间，将客户端的状态演化拆分为两个相互正交的时序流：用于长期能力评估的\textbf{历史效用流（$HistPerf$）}，以及用于捕捉突发异常的\textbf{瞬时风险流（$RiskEMA$）}。这种正交解耦策略在一定程度上缓解了传统单维评分体系中误检与漏检的内在冲突。
 
-\textbf{(1) 历史效用流（$HistPerf$）}用于长期能力评估，不直接触发硬性封禁。本文引入贝叶斯推断（Beta 信誉系统），将客户端 $k$ 提供高质量更新的概率建模为 Beta 分布 $\text{Beta}(\alpha_k, \beta_k)$。其中 $\alpha_k$ 记录累积的良性贡献，$\beta_k$ 记录异常或低质量行为。每轮基于 $ContentScore_k$ 提取正向增益 $r_{k}^{good}$ 与负向衰减 $r_{k}^{bad}$，并执行贝叶斯后验更新：
+\textbf{(1) 历史效用流（基于贝叶斯后验推断）}
+该支流致力于对节点的持续贡献进行长期评估。在此，本研究引入贝叶斯推断框架（Beta 信誉系统），将客户端 $k$ 提供高质量梯度的概率建模为 Beta 分布 $\text{Beta}(\alpha_k, \beta_k)$。假设其初始状态为无信息先验 $\text{Beta}(1,1)$，其中 $\alpha_k$ 记录其累积的良性表现，$\beta_k$ 则映射其低质量行为。在联邦学习的每一轮次中，系统基于当轮内容得分 $ContentScore_k$ 提取正向增益证据 $r_{k}^{good}$ 与负向衰减证据 $r_{k}^{bad}$，并严格遵循贝叶斯法则进行后验更新：
 \begin{align}
     r_{k}^{good} &= \mathrm{clip}\left(\frac{ContentScore_{k} - \mu_{content}}{\sigma_{content} + \varepsilon}, 0, 1\right), \\
     r_{k}^{bad} &= 1 - r_{k}^{good}, \\
     \alpha_{k}^{(t)} &= \lambda_h \cdot \alpha_{k}^{(t-1)} + r_{k}^{good}, \\
     \beta_{k}^{(t)} &= \lambda_h \cdot \beta_{k}^{(t-1)} + r_{k}^{bad}.
 \end{align}
-其中，$\lambda_h \in (0,1]$ 为历史衰减因子，用于逐步遗忘陈旧行为以适应动态环境。客户端的长期历史效用值最终取为该 Beta 分布的数学期望：
+在此体系下，参数 $\lambda_h \in (0,1]$ 作为历史衰减因子，不仅使得信誉评估能够动态适应边缘节点的设备环境漂移，更构成了一种天然的“遗忘机制”。这一机制客观上限制了部分高级持续性威胁（APT）攻击者试图通过前期长时间伪装来“养号（累积超高信誉）”的操作空间。客户端的长期历史效用值最终取为该后验分布的数学期望：
 \begin{equation}
     HistPerf_{k}^{(t)} = \frac{\alpha_{k}^{(t)}}{\alpha_{k}^{(t)} + \beta_{k}^{(t)} + \varepsilon}
 \end{equation}
-当 $HistPerf$ 较低时，说明客户端近期未能提供足够的正向贡献，节点进入临时软隔离，暂停本轮聚合但不被永久移除，以保留潜在有效的长尾信息。
+当某节点的 $HistPerf$ 偏低时，仅意味着其近期未能提供充足的正向贡献。系统将对其执行临时软隔离（Soft-Isolation），暂停其本轮聚合权重，但不作永久移除处理。这种设计机制可能最大限度地保留了长尾合法节点在未来回放真实数据的渠道。
 
-\textbf{(2) 瞬时风险流（$RiskEMA$）}负责快速识别攻击行为。该流融合多维探针（如 $r_{probe}, r_{grad}, r_{trigger}, r_{pixel}$），并采用每轮最大风险值：
+\textbf{(2) 瞬时风险流（安全一票否决权）}
+与相对平滑的效用流保持正交，风险流被独立设计以应对潜在的恶意攻击瞬发事件。该流融合 TEE 远程证明、模型参数振幅等多个维度的硬核探针（如 $r_{probe}, r_{grad}, r_{trigger}, r_{pixel}$），在每一聚合轮次中直接抓取最大风险极值，以此构建具备一票否决效力的风险度量：
 \begin{equation}
     Risk_{k}^{inst} = \max\{r_{report}, r_{grad}, r_{probe}, r_{pixel}, r_{trigger}, r_{sign}, r_{peer}, \dots \},
 \end{equation}
-而后向后做指数衰减记忆（$\beta_r = 0.85$ 为平滑系数）：
+随后借助指数平滑（EMA）以保存短时的危险印记（设 $\beta_r = 0.85$）：
 \begin{equation}
     RiskEMA_{k}^{(t)} = \beta_{r} \cdot RiskEMA_{k}^{(t-1)} + (1 - \beta_{r}) \cdot Risk_{k}^{inst}.
 \end{equation}
-在双流联合驱动下，客户端状态按图~\ref{fig:node_state_machine} 在四类监管状态间转移：
+
+为了更具体地呈现该正交解耦机制的防御效能，可以假想一个典型的“潜伏-爆发”投毒实战。设想某恶意客户端前期一直恪守规则，其累积的历史效用 $HistPerf_k$ 已经逼近 1.0 的满分状态；在第 $T$ 轮时，该节点利用其高信誉光环，突然混入包含语义触发器的恶意更新。如果联邦服务器仅仅依赖传统的单维聚合评分系统，其长期积累的高额历史分数会轻易掩盖这一次的异常跳变。而在本文构建的二维正交框架约束下，本次恶意操作会瞬间拉爆 $r_{trigger}$ 探针，导致正交的风险流 $RiskEMA_k$ 发生跃升并击穿硬性隔离门限。这赋予了系统在面临高信誉节点叛变时依然能够“一剑封喉”的果决判定力，从而彻底阻断了后门特征被上传的路径。
+
+在双流正交联合驱动下，客户端状态按图~\ref{fig:node_state_machine} 所示，在四类监管状态间动态流转：
 \begin{itemize}
-    \item \textbf{正常节点（NORMAL）}：正常参与聚合。若风险上升或历史贡献下降，可转入 SUSPECT/QUARANTINE。
-    \item \textbf{嫌疑节点（SUSPECT）}：进入重点监控。风险回落可恢复 NORMAL，持续异常则升级隔离。
-    \item \textbf{隔离节点（QUARANTINE）}：暂时剥夺聚合资格，观察后可恢复或继续升级处理。
-    \item \textbf{黑名单（BLACKLIST）}：触发硬阈值后永久封禁，并在 TEE 认证层终止后续接入。
+    \item \textbf{正常节点（NORMAL）}：平稳参与聚合。若风险攀升或历史贡献滑落，可被转入 SUSPECT 或 QUARANTINE。
+    \item \textbf{嫌疑节点（SUSPECT）}：进入重点监控区域。若风险指标回落则可恢复为 NORMAL，若异常行为固化则实施升级隔离。
+    \item \textbf{隔离节点（QUARANTINE）}：暂时褫夺模型聚合资格。经过一段观察期后可能恢复原状，或面临进一步的权限降级处理。
+    \item \textbf{黑名单（BLACKLIST）}：一旦触发风险流硬阈值，即被执行永久封禁，并在底层 TEE 硬件认证端终止所有后续连接请求。
 \end{itemize}
-该机制在保证快速拦截攻击的同时，为合法长尾节点保留恢复通道，有助于降低永久误杀。
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{fig4_state.pdf}
-    \caption{客户端积弊历史与瞬发风险叠加下的四态监管转移自动机逻辑图}
+    \caption{历史效用演进与瞬发风险叠加驱动下的客户端监管状态转移自动机}
     \label{fig:node_state_machine}
 \end{figure}
 
-最后，将 $TrustScore$（硬件可信）、$ContentScore$（当轮质量）与 $HistPerf$（历史表现）融合为基础分，并叠加风险折扣得到 $RawScore_k$：
+最终，服务器依据硬件层面的信任背书（$TrustScore$）、当轮数据协同质量（$ContentScore$）以及演化所得的长期效用（$HistPerf$），融合成基础评分向量；进而叠加瞬时风险折扣率，输出用于指导后续阶段门控的最终权限融合因子 $RawScore_k$：
 \begin{align}
     RawScore_{k}^{base} &= (TrustScore_{k})^{\alpha} \cdot (ContentScore_{k})^{\beta} \cdot (HistPerf_{k}^{(t-1)})^{\gamma}, \\
-    RawScore_{k} &= RawScore_{k}^{base} \cdot (1 - RiskEMA_{k}^{prev})^{p},
+    RawScore_{k} &= RawScore_{k}^{base} \cdot (1 - RiskEMA_{k}^{(t-1)})^{p},
 \end{align}
 其中，$\alpha,\beta,\gamma,p$ 控制各维度对最终聚合权重的影响强度。
 
