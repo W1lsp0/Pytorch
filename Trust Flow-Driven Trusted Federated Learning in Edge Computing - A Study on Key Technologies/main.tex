@@ -37,7 +37,7 @@
     \end{center}
 
     \begin{abstract}
-        近年来，联邦学习凭借“数据不出本地、仅交换模型参数”的训练范式，为隐私约束下的多方协同建模提供了有效路径，已成为边缘智能的重要支撑。然而，在开放的边缘计算环境中，非独立同分布（Non-IID）数据、终端设备异构性与不可信客户端等因素叠加，使现有鲁棒聚合方法在安全性、鲁棒性与泛化能力之间面临显著权衡。为此，本文从软硬件协同角度提出一种基于全流程信任流的可信联邦聚合机制。首先，融合基于可信执行环境（TEE）的远程证明与运行时监测，在本地模型训练阶段实现客户端强制准入与执行完整性验证；其次，针对潜伏攻击的跨轮识别问题，设计双流正交信誉演化方法，将客户端信任状态分解为表征长期贡献的历史效用流和表征短期异常的瞬时风险流，实现长期稳定性与快速风险熔断的协同；最后，提出基于纯净参考方向的分层差异化聚合策略，通过按层门控、权重重归一化和动态裁剪，在抑制恶意更新传播的同时保留合法异构贡献，缓解 Non-IID 条件下模型泛化能力下降问题。基于 Flower 平台在 CIFAR-10 数据集上的 20 客户端、6 类混合攻击实验结果表明，本文机制在保证模型精度达到 $92.31\% (\pm 0.09\%)$ 的同时，将后门攻击成功率（ASR）控制在 $10.21\% (\pm 0.05\%)$，且正常客户端的永久误杀率趋近于 0。
+        近年来，联邦学习以其数据不出本地仅交换参数的范式促进隐私保护下的多方模型协同优化，已成为边缘智能的关键支撑。然而，在愈加开放的边缘计算场景中，非独立同分布（Non-IID）数据、终端设备异构化、不可信客户端等情形叠加，导致现有的鲁棒聚合方法面临着严峻挑战。由此，本文从软硬件协同角度提出一种基于全流程信任流的可信联邦聚合机制。首先，该机制融合基于可信执行环境（TEE）的远程证明和运行监测方法，以从本地模型训练阶段就约束参与客户端的强制准入与执行完整性验证；其次，通过刻画客户端的长期历史贡献和短期行为风险，设计了基于客户端信任状态的双流正交信誉演化方法，以分解客户端信任状态为历史效用流和瞬时风险流，解决潜伏攻击的跨轮识别挑战；最后，提出了基于纯净参考方向的分层差异化聚合方法，融合按层门控、重归一化和动态裁剪思想，以在聚合阶段抑制恶意更新并保留合法异构贡献，缓解 Non-IID 下泛化能力下降问题。基于 Flower 平台在 CIFAR-10 数据集上的 20 客户端、6 类混合攻击实验结果表明，本文机制在保证模型精度达到 $92.31\% (\pm 0.09\%)$ 的同时，将后门攻击成功率（ASR）控制在 $10.21\% (\pm 0.05\%)$，且正常客户端的永久误杀率趋近于 0。
     \end{abstract}
 
     关键词：联邦学习；边缘计算；可信执行环境；风险状态建模；分层鲁棒聚合；后门防御
@@ -52,16 +52,18 @@
     effects of non-independent and identically distributed (Non-IID) data,
     device heterogeneity, and untrusted clients expose significant tradeoffs
     among security, robustness, and generalization for existing robust
-    aggregation methods. To address this issue, we propose a trusted federated
-    aggregation mechanism based on end-to-end trust flow from a hardware-software
-    co-design perspective. First, remote attestation and runtime monitoring based
-    on trusted execution environments (TEEs) are integrated to enforce client
+    aggregation methods. To address this issue, we propose a trust-flow-driven
+    trusted federated aggregation mechanism that covers client admission, runtime
+    monitoring, and secure aggregation from a hardware-software co-design
+    perspective. First, remote attestation and runtime monitoring based on
+    trusted execution environments (TEEs) are integrated to enforce client
     admission and verify execution integrity during local training. Second, to
     identify stealthy attacks across training rounds, we design an orthogonal
-    dual-stream reputation evolution method that decomposes client trust state
-    into a historical utility stream for long-term contribution and an instant
-    risk stream for short-term anomalous behavior, enabling coordinated long-term
-    stability and rapid risk cut-off. Third, we propose a layer-wise
+    dual-stream reputation evolution method centered on client trust states,
+    decomposing them into a historical utility stream for long-term contribution
+    and an instant risk stream for short-term anomalous behavior, thereby
+    providing persistent dynamic trust signals for subsequent auditing and
+    aggregation control. Third, we propose a layer-wise
     differentiated aggregation strategy guided by a clean reference direction.
     By combining layer-wise gating, weight re-normalization, and dynamic
     clipping, the method suppresses malicious updates while preserving legitimate
@@ -73,26 +75,18 @@
     positive rate on benign clients approaching zero.
 
 \section{引言}
-联邦学习（Federated Learning, FL）通过“数据不出本地、仅交换模型参数”的机制，在保护数据隐私的同时实现多方协同建模\cite{kairouz2021flsurvey}。该模式已成为边缘智能的重要基础能力，并在工业物联网、医疗诊断等场景中得到广泛应用。随着 FL 从实验环境走向开放网络，系统性能不再仅由模型结构与优化器决定，聚合阶段的可信性与稳健性日益成为影响整体可用性的关键因素。究其原因在于：边缘端数据天然分布异构、设备能力具有显著的差异、参与方行为难以完全约束，这些特征在云端聚合时会显著放大统计偏移与安全风险。
+当前，随着终端设备所具备的计算能力愈加强大，越来越多的终端设备能够高效地利用本地数据支持本地模型训练，同时，为更好地以聚合多终端训练经验以支持多方模型协同优化并保护各设备的本地数据隐私，联邦学习范型被深入研究\cite{kairouz2021flsurvey}，其所具备的数据不出本地仅通过模型参数交换的特性被广泛应用于模型的分布式协同训练场景，已然成为边缘智能发展的关键支撑技术。然而，随着万物互联构成的网络环境愈加开放，基于联邦学习的经验聚合以促进模型协同优化所面临的性能瓶颈不再局限于模型结构和优化器设计层面，聚合阶段的可信性和稳健性日益成为影响整体可用性的关键因素。因为在实际应用场景中，不仅各边缘设备端的数据分布具有异构性且处理能力也有显著差异，另外，模型协同优化的各参与方相关行为也难以完全约束，这些特征在经验聚合时显然会放大统计偏移和带来安全风险。
 
-在标准 FL 流程中，客户端在本地完成训练并上传更新参数，服务器执行聚合参数后下发新模型，训练通过多轮迭代达到收敛，但是该训练流程在真实边缘计算环境中面临三重安全风险。首先，Non-IID 数据会增加最优更新的方向离散度，使“正常波动”与“异常偏移”的边界变得不清晰。其次，攻击者可实施参数投毒与隐蔽后门等攻击（如干净标签污染、语义后门）\cite{gu2017badnets,wang2019neuralcleanse}，并将恶意触发特征嵌入常规更新分布参数，降低单轮检测成功率。最后，由于开放执行环境缺少强制完整性约束，客户端可能绕过真实训练过程直接构造上报训练参数，进一步降低服务器对更新来源与行为真实性的判断能力。当这些因素叠加出现时，系统常陷入“拦截阈值收紧导致误杀率上升、阈值放宽导致漏检增加”的结构性权衡。
+在通常的联邦学习范型中，客户端完成本地数据处理及本地模型训练后，会将模型相关参数上传，服务端聚合各客户端模型参数后会下发更新后的模型参数，以此通过多轮迭代直至收敛，显然，上述流程在实际愈加开放的万物互联多边缘网络环境下面面临着多重风险。具体来说，首先，开放的训练环境缺少强制完整性约束，恶意客户端可以绕过真实训练而直接构造并上传模型参数，也会极大地影响服务端对聚合参数真实性的判断能力，一些研究工作提出了基于可信执行或可验证训练的方法\cite{lu2025tmt,zhang2025rppfl,r1_tee_integrity}，以硬件远程证明等方式保证客户端对模型训练的真实性，但仍然缺乏应对训练过程真实而模型更新却嵌入恶意特征等手段。其次，恶意客户端实施参数投毒、隐蔽后门等攻击\cite{gu2017badnets,wang2019neuralcleanse}，通过将恶意触发特征嵌入常规更新分布参数中，会显著降低单轮检测成功率，一些研究工作提出了基于时序信誉与相似性的方法\cite{cao2021fltrust,fung2020foolsgold}，通过引入跨轮信息来缓解单轮判断的不稳定问题，但对于恶意客户端前期积累信誉后期持续小幅度投毒等潜伏式攻击显然存在识别滞后问题，而且，单一信誉分与固定阈值机制对深层异常触发特征的识别能力也有很大不足。
 
-现有研究主要有三条技术路线，但尚难形成统一闭环。第一类是几何鲁棒聚合（如 Krum、Trimmed Mean），这类方法对明显异常的参数更新有抑制效果，但在强 Non-IID 条件下易误伤合法的长尾客户端\cite{blanchard2017krum,yin2018byzantine}。第二类是时序信誉与相似性方法（如 FLTrust、FoolsGold），引入了跨轮信息以缓解单轮判断的不稳定，但对“前期伪装、后期小剂量持续投毒”的潜伏攻击仍存在识别滞后的问题\cite{cao2021fltrust,fung2020foolsgold}。第三类是可信执行或可验证训练方法（如 TMT-FL）\cite{lu2025tmt}，重点在训练完整性证明。与此同时，RaSA\cite{wang2025rasa} 等工作强化了异构场景下的聚合鲁棒性，但在“强异构统计偏移 + 跨轮潜伏攻击 + 开放执行环境”三个不利条件同时出现时，仍缺少统一状态建模与联动决策机制。基于此，本文聚焦如下问题：如何在开放异构边缘联邦中，同时实现客户端准入可信、聚合过程中对客户端实现低误杀率且高召回率，并维持模型收敛与泛化性能？
+另外，不同设备的非独立同分布数据（Non-IID）会增加最优更新的方向离散度，很容易模糊正常波动和异常偏移之间的边界，导致强 Non-IID 条件下鲁棒性和泛化性之间的冲突，一些研究工作提出了基于距离排斥或统计截断等的方法抑制异常更新\cite{blanchard2017krum,yin2018byzantine}，还有一些研究工作通过自适应权重调整来缓解异构影响\cite{wang2025rasa}，但强长尾分布情形下，这些方法会将合法偏移的参数更新误判为异常参数，可能导致关键异构信息被过度剔除而显著降低模型泛化能力。在实际场景中，上述执行环境更加开放、跨轮潜伏攻击、强异构统计偏移等挑战往往不会单独出现，尤其是在万物互联的边缘智能场景中数个因素很可能出现叠加出现的情形，很容易导致诸如拦截阈值收紧误杀率上升、拦截阈值放宽漏检率增加等多种难以权衡的难题。由此，如何构建覆盖全流程的统一状态建模与联动决策机制，在兼顾客户端本地模型训练的准入及可信和聚合时对客户端低误杀率且高召回率的要求下，维持模型协同优化的收敛和泛化性能成为亟需解决的关键问题。
 
-尽管上述思路具有可行性，但要在同一框架下同时满足这些目标仍面临以下三项关键挑战：
-
-\textbf{挑战一：强 Non-IID 条件下的鲁棒性与泛化性冲突。} 现有方法主要通过距离排斥或统计截断抑制异常更新\cite{blanchard2017krum,yin2018byzantine}，并有工作尝试利用自适应权重缓解异构影响\cite{wang2025rasa}。但在强长尾分布下，这类机制仍容易将合法偏斜的参数更新误判为异常参数，导致关键异构信息被过度剔除，模型泛化能力下降。
-
-\textbf{挑战二：潜伏型复合攻击下的跨轮识别困难。} 时序信誉与相似性约束可一定程度提升稳健性\cite{cao2021fltrust,fung2020foolsgold,dou2025toward}，但当攻击者采用“前期积累信誉、后期持续小幅度投毒”的策略时，单一信誉分与固定阈值机制对深层异常触发特征的识别能力不足，难以及时识别后门潜伏行为。
-
-\textbf{挑战三：开放环境下的训练执行完整性证明缺失。} 纯软件聚合下的防御通常默认客户端执行过程可信。尽管已有研究通过 TEE 或可验证训练增强执行完整性（如 TMT-FL、RPPFL）\cite{lu2025tmt,zhang2025rppfl,r1_tee_integrity}，其重点仍在训练真实性证明，尚未与“强异构下的低误杀聚合”和“潜伏攻击的跨轮识别”形成统一防御闭环。
-
-为应对上述挑战，本文提出软硬件协同的“信任流（Trust Flow）”可信联邦框架。针对挑战一，我们采用历史效用与瞬时风险解耦聚合过程，并在聚合阶段引入按层门控与动态裁剪，以抑制恶意更新的同时保留合法异构贡献；针对挑战二，我们构建双流正交状态演化（HistPerf 与 RiskEMA），以“长期积累 + 瞬时熔断”联合机制增强潜伏攻击识别能力；针对挑战三，我们引入基于 TEE 的远程证明与运行监测，建立客户端侧的强制准入与执行时的可信能力，并将硬件证明与软件风险评估进行时序联动。
+为应对以上所述的三个主要难题，本文从软硬件协同角度提出一种基于全流程信任流的可信联邦聚合机制。在该机制中，我们首先引入了面向客户端模型训练的远程证明及其运行监测方法，利用 TEE 环境内部熵变分析和卡尔曼滤波，从各终端设备的客户端侧建立强制准入与执行时的可信能力，解决了传统环境执行完整性缺失的问题，为硬件证明与软件风险评估的时序联动提供关键支撑；然后，我们设计了基于客户端信任状态的双流正交信誉演化方法，从客户端的长期历史贡献和短期行为风险相结合的角度评估各参与方的信任状态，其中引入贝叶斯推断（Beta信誉系统）建模长期历史效用，并结合瞬时风险流构建融合长期积累和瞬时熔断的联合机制，有效增强了对于潜伏攻击的跨轮识别能力；最后，我们提出了基于纯净参考方向的分层差异化聚合方法，在聚合阶段融合了按层门控、重归一化和动态裁剪的思想，以此应对强长尾分布带来的泛化性冲突，在抑制多模型聚合时存在的恶意更新同时保留合法异构的贡献，进而缓解 Non-IID 下整体泛化能力下降问题。
 
 本文的主要贡献总结如下：
 \begin{enumerate}
-    \item \textbf{提出软硬件协同的信任流防御框架}。通过“TEE 准入验证 + 内容审查 + 状态演化 + 分层聚合”构建全流程闭环防线，覆盖从客户端接入到模型更新的完整路径。
-    \item \textbf{提出双流正交信誉演化机制}。将客户端状态拆分为历史效用流（HistPerf）与瞬时风险流（RiskEMA），分别处理长期贡献与短时异常，在设定条件下兼顾高恶意召回与低永久误杀。
+    \item \textbf{提出软硬件协同的信任流防御框架}。通过“TEE 准入验证 + 运行监测 + 内容审查 + 状态演化 + 分层聚合”构建覆盖“准入-监测-聚合”的全流程闭环防线，覆盖从客户端接入到模型更新的完整路径。
+    \item \textbf{提出贯穿全过程的双流正交信誉演化机制}。将客户端状态拆分为历史效用流（HistPerf）与瞬时风险流（RiskEMA），分别处理长期贡献与短时异常，并作为后续审查、状态转移与聚合控制的核心依据，在设定条件下兼顾高恶意召回与低永久误杀。
     \item \textbf{设计基于纯净参考的分层差异化聚合策略}。利用服务器侧参考方向与按层风险门控，实现逐层准入、幸存者重归一化与动态 L2 裁剪，降低深层后门透传风险。
     \item \textbf{完成端到端实现与实证验证}。在 Flower 平台完成 20 客户端、6 类混合攻击实验（$n=5$）；结果显示框架在高对抗设置下仍保持 $92.31\% (\pm 0.09\%)$ 精度、$10.21\% (\pm 0.05\%)$ ASR，以及接近 0 的永久误杀率。
 \end{enumerate}
@@ -101,7 +95,19 @@
 \section{背景与相关工作}
 
 \subsection{联邦学习与边缘计算协同架构}
-联邦学习（Federated Learning, FL）在“数据不出本地”的约束下，通过参数协同完成全局模型训练。在边缘计算场景中，端-边-云（Client-Edge-Cloud）的架构模式已被广泛采用：边缘侧负责本地训练并上传更新，中心服务器负责聚合与模型下发。但是该架构天然存在通信延迟、设备异构和数据 Non-IID 等问题。为缓解这些挑战，已有研究提出簇式联邦（Clustered FL）\cite{r9_clustered}、自适应剪枝扩展（FedPE）\cite{fedpe} 和拆分式联邦（ParallelSFL）\cite{parallelsfl} 等方法。但随着系统复杂度提升，攻击面也随之扩大，恶意节点也更易潜伏并影响训练过程。
+联邦学习（Federated Learning, FL）在“数据不出本地”的约束下，通过参数协同完成全局模型训练。在边缘计算场景中，端-边-云（Client-Edge-Cloud）的架构模式已被广泛采用：边缘侧负责本地训练并上传更新，中心服务器负责聚合与模型下发。
+
+在标准的 FL 设置中，全局优化目标为最小化所有客户端数据分布上的经验风险：
+\begin{equation}
+\min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)
+\end{equation}
+其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$ 为数据量占比。在第 $t$ 轮，服务器下发全局模型 $W_{global}^{(t-1)}$，客户端 $k$ 以其为初值在本地数据上执行 $E$ 轮学习率为 $\eta_l$ 的 SGD，得到本地更新：
+\begin{equation}
+\Delta W_{k}^{(t)} = W_{k, E}^{(t)} - W_{global}^{(t-1)}, \quad \text{其中 } W_{k, e}^{(t)} = W_{k, e-1}^{(t)} - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)]
+\end{equation}
+其中，期望 $\mathbb{E}[\cdot]$ 表示对本地数据集 $\mathcal{D}_k$ 的 mini-batch 采样期望。随后，客户端上传更新量，服务器执行某种形式的参数聚合：$W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})$。
+
+但是该架构天然存在通信延迟、设备异构和数据 Non-IID 等问题。为缓解这些挑战，已有研究提出簇式联邦（Clustered FL）\cite{r9_clustered}、自适应剪枝扩展（FedPE）\cite{fedpe} 和拆分式联邦（ParallelSFL）\cite{parallelsfl} 等方法。但随着系统复杂度提升，攻击面也随之扩大，恶意节点也更易潜伏并影响训练过程。
 
 \subsection{边缘伪装、模型投毒与隐蔽后门攻击}
 在开放且缺少强制准入的联邦网络中，服务器难以准确判断客户端身份与更新质量，攻击手段主要分为两类：其一是\textbf{无目标投毒}（Untargeted Poisoning），如 Sign-flipping 与 Gradient Scaling，目标是破坏全局收敛并造成拒绝服务；其二是\textbf{目标后门攻击}（Targeted Backdoor），如标签翻转、干净标签污染和语义后门，通过隐蔽触发器在推理阶段诱导定向误分类。
@@ -126,20 +132,16 @@
     \caption{联邦计算网络交互：基于 TEE 锚点加密的端边云协同物理架构图}
     \label{fig:system_arch}
 \end{figure}
-训练开始前，系统先通过硬件凭证建立 TEE 可信通道，再执行联邦优化目标，即最小化所有客户端数据分布上的经验风险：
-\begin{equation}
-\min_{W} \mathcal{L}(W) = \sum_{k=1}^K p_k \mathcal{L}_k(W)
-\end{equation}
-其中 $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$。在第 $t$ 轮，服务器下发全局模型 $W_{global}^{(t-1)}$，客户端以其为初值在本地 Non-IID 数据上执行 $E$ 轮学习率为 $\eta_l$ 的 SGD，得到本地更新：
-\begin{equation}
-\Delta W_{k}^{(t)} = W_{k, E}^{(t)} - W_{global}^{(t-1)}, \quad \text{其中 } W_{k, e}^{(t)} = W_{k, e-1}^{(t)} - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)]
-\end{equation}
-其中，期望 $\mathbb{E}[\cdot]$ 表示对本地数据集 $\mathcal{D}_k$ 的 mini-batch 采样期望（本文设置 batch size=64）。
-随后，客户端上传更新量及 TEE 签名的远程证明（Attestation Quote），服务器基于信任流评分执行鲁棒聚合：
-\begin{equation}
-W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})
-\end{equation}
-其中，$\Phi \subseteq \mathcal{C}$ 表示本轮通过审查的有效客户端集合；$\mathrm{Agg}(\cdot)$ 为本文提出的安全聚合算子，具体机制见第 4 节。
+
+基于上述网络交互拓扑，本文提出的信任流驱动可信联邦框架在端云之间构建了一条完整的信任传递与评估链路。系统的整体工作流程与主要物理实体模块的相互关系定义如下：
+
+\begin{enumerate}
+    \item \textbf{边缘客户端侧（可信执行与特征提取）}：每个接入的客户端需配备可信执行环境（TEE）及部署其内的可信管理代理（TMAA）。在本地训练阶段，TMAA 不仅负责在训练前生成远程证明报告（Attestation Quote）以静态验证执行环境的完整性，还会持续监测训练过程中的关键行为特征序列（如梯度方向变化、损失值波动等）。随后，利用信息熵和卡尔曼滤波进行初步的动态信任评估，连同模型更新参数一并上传至云端。
+    
+    \item \textbf{中心服务器侧（审查、演化与聚合控制）}：服务器作为全局协调者，接收到客户端的更新及信任证明后，执行基于信任流的三阶联动防御。首先进行\textbf{内容审查}，提取纯净参考方向并利用余弦相似度计算高维更新质量；其次进入\textbf{双流状态演化}，利用 Beta 贝叶斯推断建立历史效用流以评估长期贡献，并结合多维最大值探针更新瞬时风险流以识别突发异常；最后执行\textbf{分层鲁棒聚合}，根据不同网络层的安全敏感度进行差异化门控裁剪与幸存者权重重归一化，得到全局安全更新并下发。
+\end{enumerate}
+
+通过上述端与云实体模块的协同交互，系统实现了“硬件门禁准入 $\to$ 运行特征监测 $\to$ 信任状态演化 $\to$ 风险门控聚合”的全生命周期物理与逻辑流转闭环。
 
 
 \subsection{复合型威胁假设与强信任底座边界 (Threat Model)}
@@ -152,7 +154,7 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
 
 \begin{figure}[htbp!]
     \centering
-    \includegraphics[width=0.75\textwidth]{threat_model.pdf}
+    \includegraphics[width=0.88\textwidth]{threat_model.pdf}
     \caption{边缘广域网络下的安全渗透与多维复合型投毒威胁模型示意图}
     \label{fig:threat_model}
 \end{figure}
@@ -168,7 +170,7 @@ W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k
 
 \section{本文方法：信任流驱动的可信联邦框架}
 
-针对上述威胁模型，本文提出“信任流驱动的可信联邦学习”框架（见图~\ref{fig:framework}）。每轮次被划分为五个阶段：训练前准入、内容审查、状态演化、分层聚合和全局下发。不同于单点防御，每阶段产生的数据在该框架内的阶段间持续传递并更新\textbf{信任流（Trust Flow）}，形成闭环控制。
+针对上述威胁模型，本文提出“信任流驱动的可信联邦学习”框架（见图~\ref{fig:framework}）。每轮次被划分为五个阶段：训练前准入、内容审查、状态演化、分层聚合和全局下发。若从过程视角进一步抽象，该框架可归纳为“准入-监测-聚合”的三段式闭环，其中双流信誉状态是贯穿内容审查、状态演化与分层聚合的核心控制变量。不同于单点防御，每阶段产生的数据在该框架内的阶段间持续传递并更新\textbf{信任流（Trust Flow）}，形成闭环控制。
 
 \begin{figure}[htbp]
     \centering
@@ -197,14 +199,30 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{tabular}
 \end{table}
 
-\subsection{阶段一：硬件锚定的客户端准入与信任起步评分}
-为阻断身份伪造与恶意设备接入，系统引入基于 TEE 的\textbf{可信管理代理（TMAA）}。每轮训练前，客户端需使用不可导出的硬件密钥提交包含 PCR 链值的远程证明（Attestation Quote）。证明通过时记 $M_{attest,k}=1$，否则为 0 且直接拒绝接入。
+\subsection{阶段一：硬件锚定准入与基于卡尔曼滤波的动态信任度量}
+本框架将客户端的初始可信度划分为静态准入与动态评估两个维度。
 
-基于 TMAA 监控日志（如 CPU 行为模式、进程完整性），系统为通过门禁的客户端 $k$ 计算异常分数 $A_k \in [0, \infty)$，并据此得到初始信任分 $TrustScore_k \in [0,1]$：
-\begin{equation}
-    TrustScore_{k} = M_{attest,k} \cdot \exp\left(-\lambda \cdot\max(0, A_{k} - \tau)^{\rho}\right),
-\end{equation}
-其中，$\lambda$ 控制降分斜率，$\tau$ 为正常波动容忍阈值，$\rho$ 为衰减指数（默认 $\lambda=5.0,\tau=0.1,\rho=2.0$）。
+\begin{enumerate}
+    \item \textbf{静态准入（Static Admission）}：在训练伊始，客户端需通过其内部不可导出的硬件密钥（DUK）向服务器提交包含平台配置寄存器（PCRs）链值的远程证明报告（Attestation Quote）。服务器验证代码段与运行环境未被篡改，通过者授予初始准入资格 $M_{attest,k}=1$。
+    \item \textbf{特征序列提取与熵分析（Entropy Analysis）}：为捕捉潜在的运行时违规，TEE 内部持续记录训练过程中的关键行为特征序列 $\mathcal{X}_k = \{ \Delta \text{grad}, \Delta \text{loss}, \text{instr\_dist} \}$。系统计算该序列的信息熵 $H(\mathcal{X}_k)$：
+    \begin{equation}
+        H(\mathcal{X}_k) = -\sum p(x_i) \log p(x_i)
+    \end{equation}
+    高熵值反映了客户端行为的高度不确定性或异常剧烈波动（如遭受投毒控制或指令集篡改）。
+    \item \textbf{动态信任演化（Kalman-based Evolution）}：利用卡尔曼滤波（Kalman Filter）反映客户端行为的动态演化。建立信息熵与测量噪声协方差 $R_k$ 的映射关系 $R_k = f(H(\mathcal{X}_k))$。在“预测-更新”循环中：
+    \begin{itemize}
+        \item \textbf{预测阶段}：基于前序状态预测当前信任值 $\hat{T}_k^-$。
+        \item \textbf{更新阶段}：将实时观测到的行为特征融入，得到后验信任估计 $\hat{T}_k$ 及其估计协方差 $P_k$。
+    \end{itemize}
+    其中，$P_k$ 反映了当前信任值的置信度：$P_k$ 越小，表明测量噪声受控，该信任值越可靠。
+\end{enumerate}
+
+系统在文中引入新的状态转移方程与协方差更新：
+\begin{align}
+    \hat{T}_k^{(t)} &= \hat{T}_k^{(t-1)} + K_k^{(t)} (Z_k^{(t)} - \hat{T}_k^{(t-1)}) \\
+    R_k^{(t)} &= \exp(\lambda \cdot H(\mathcal{X}_k^{(t)}))
+\end{align}
+这里 $Z_k^{(t)}$ 是基于实时行为的观测分，$R_k^{(t)}$ 会随着熵值的增加而迅速增大，从而通过增益 $K_k^{(t)}$ 削弱异常客户端对信任状态的影响。最终，将卡尔曼滤波产生的估计值融合协方差得到用于后续的初始门禁信任分：$TrustScore_k = \hat{T}_k^{(t)} \cdot (1 / (1 + P_k^{(t)}))$。
 
 \subsection{阶段二：服务器优先的参考方向构建与同构协调审查}
 仅依赖客户端之间的余弦相似度容易被合谋攻击误导，为此，本文引入\textbf{优先纯净参考（Vanilla Reference Prioritization）}。当服务器持有少量隔离验证集（Pure Clean Set）时，先计算 $g_{root\_clean}$ 作为参考方向；若该方向不可用，则由高信任、低风险客户端更新构造退化参考 $g_{ref}$。其权重定义为：
@@ -234,13 +252,17 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \begin{algorithmic}[1]
 \REQUIRE 客户端集合 $\mathcal{C}$，本轮收到的参数更新 $\{\Delta W_k\}_{k\in\mathcal{C}}$，上轮状态 $RiskEMA^{(t-1)}$
 \ENSURE $TrustScore_k$, $ContentScore_k$, 有效参考基准 $g_{root}$
-\STATE \textbf{第一阶段：硬件锚定准入}
+\STATE \textbf{第一阶段：硬件锚定与动态信任度量}
 \FOR{每个客户端 $k \in \mathcal{C}$}
-    \IF{$M_{attest,k} == 1$ (TEE 远程证明通过)}
-        \STATE 获取物理异常特征 $A_k$
-        \STATE 门禁信任分 $TrustScore_k \leftarrow \exp(-\lambda \max(0, A_k-\tau)^\rho)$
+    \IF{$M_{attest,k} == 0$ (TEE 远程证明失败)}
+        \STATE 拒绝接入：$TrustScore_k \leftarrow 0$，并跳过本轮
     \ELSE
-        \STATE 拒绝接入：$TrustScore_k \leftarrow 0$
+        \STATE \textit{TEE 内部}: 记录行为序列 $\mathcal{X}_k = \{ \Delta \text{grad}, \Delta \text{loss}, \text{instr\_dist} \}$
+        \STATE 计算信息熵 $H_k \leftarrow -\sum p(x_i) \log p(x_i)$
+        \STATE 将熵映射为测量噪声 $R_k \leftarrow \exp(\lambda \cdot H_k)$
+        \STATE \textit{卡尔曼滤波更新}:
+        \STATE 信任估计 $\hat{T}_k$, 协方差 $P_k \leftarrow \mathrm{KalmanFilter}(H_k, \text{前序状态})$
+        \STATE 门禁信任分 $TrustScore_k \leftarrow \hat{T}_k \cdot \frac{1}{1 + P_k}$
     \ENDIF
 \ENDFOR
 \STATE \textbf{第二阶段：参考方向构建与同构审查}
@@ -263,14 +285,18 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \subsection{阶段三：历史绩效流与瞬时风险流的正交状态演化}
 传统“低分即淘汰”的策略容易误伤长尾合法节点。为此，本文将状态更新拆分为两个正交时序流：用于长期贡献评估的\textbf{历史效用流（$HistPerf$）}，以及用于快速处置异常行为的\textbf{风险流（$RiskEMA$）}。
 
-\textbf{(1) 历史效用流（$HistPerf$）}用于长期能力评估，不直接触发封禁。每轮基于 $ContentScore$ 的相对位置（$z_k$）与绝对阈值共同得到更新信号 $Signal_k^{upd}$：
+\textbf{(1) 历史效用流（$HistPerf$）}用于长期能力评估，不直接触发硬性封禁。本文引入贝叶斯推断（Beta 信誉系统），将客户端 $k$ 提供高质量更新的概率建模为 Beta 分布 $\text{Beta}(\alpha_k, \beta_k)$。其中 $\alpha_k$ 记录累积的良性贡献，$\beta_k$ 记录异常或低质量行为。每轮基于 $ContentScore_k$ 提取正向增益 $r_{k}^{good}$ 与负向衰减 $r_{k}^{bad}$，并执行贝叶斯后验更新：
 \begin{align}
-    z_{k} &= \frac{ContentScore_{k} - \mu_{content}}{\sigma_{content} + \varepsilon}, \quad Signal_{k}^{rel} = \sigma(z_{k}), \\
-    Signal_{k}^{abs} &= \mathrm{clip}\left(\frac{ContentScore_{k} - b}{s}, 0, 1\right), \\
-    Signal_{k}^{upd} &= \gamma_{rel} \cdot Signal_{k}^{rel} + \gamma_{abs} \cdot Signal_{k}^{abs}, \\
-    HistPerf_{k}^{(t)} &= \beta_{h} \cdot HistPerf_{k}^{(t-1)} + (1 - \beta_{h}) \cdot Signal_{k}^{upd}.
+    r_{k}^{good} &= \mathrm{clip}\left(\frac{ContentScore_{k} - \mu_{content}}{\sigma_{content} + \varepsilon}, 0, 1\right), \\
+    r_{k}^{bad} &= 1 - r_{k}^{good}, \\
+    \alpha_{k}^{(t)} &= \lambda_h \cdot \alpha_{k}^{(t-1)} + r_{k}^{good}, \\
+    \beta_{k}^{(t)} &= \lambda_h \cdot \beta_{k}^{(t-1)} + r_{k}^{bad}.
 \end{align}
-其中，$b,s$ 为绝对得分缩放边界；$\gamma_{rel}$ 与 $\gamma_{abs}$（和为 $1.0$）分别控制相对与绝对两类信号占比。当 $HistPerf$ 较低时，节点进入临时软隔离，暂停本轮聚合但不被永久移除，以保留潜在有效的长尾信息。
+其中，$\lambda_h \in (0,1]$ 为历史衰减因子，用于逐步遗忘陈旧行为以适应动态环境。客户端的长期历史效用值最终取为该 Beta 分布的数学期望：
+\begin{equation}
+    HistPerf_{k}^{(t)} = \frac{\alpha_{k}^{(t)}}{\alpha_{k}^{(t)} + \beta_{k}^{(t)} + \varepsilon}
+\end{equation}
+当 $HistPerf$ 较低时，说明客户端近期未能提供足够的正向贡献，节点进入临时软隔离，暂停本轮聚合但不被永久移除，以保留潜在有效的长尾信息。
 
 \textbf{(2) 瞬时风险流（$RiskEMA$）}负责快速识别攻击行为。该流融合多维探针（如 $r_{probe}, r_{grad}, r_{trigger}, r_{pixel}$），并采用每轮最大风险值：
 \begin{equation}
@@ -311,13 +337,14 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \begin{algorithmic}[1]
 \REQUIRE $ContentScore_k$, 多维风险探针集合 $\{r_{probe}, r_{grad}, \dots\}$
 \ENSURE $HistPerf_k^{(t)}$，瞬时风险流 $RiskEMA_k^{(t)}$，全局权值总分 $RawScore_k$
-\STATE \textbf{流 A：历史效用流演化 (竞争软权限)}
+\STATE \textbf{流 A：历史效用流演化 (基于 Beta 信誉系统)}
 \STATE 计算全局内容得分均值 $\mu_{content}$ 与标准差 $\sigma_{content}$
 \FOR{通过准入的客户端 $k$}
-    \STATE 相对竞争信号 $Signal_k^{rel} \leftarrow \sigma((ContentScore_k - \mu_{content})/(\sigma_{content} + \varepsilon))$
-    \STATE 绝对基准信号 $Signal_k^{abs} \leftarrow \mathrm{clip}((ContentScore_k - b)/s, 0, 1)$
-    \STATE 综合增量 $Signal_k^{upd} \leftarrow \gamma_{rel} Signal_k^{rel} + \gamma_{abs} Signal_k^{abs}$
-    \STATE 更新 $HistPerf_k^{(t)} \leftarrow \beta_h HistPerf_k^{(t-1)} + (1 - \beta_h) Signal_k^{upd}$
+    \STATE 提取正向增益证据 $r_{k}^{good} \leftarrow \mathrm{clip}((ContentScore_k - \mu_{content}) / (\sigma_{content} + \varepsilon), 0, 1)$
+    \STATE 提取负向衰减证据 $r_{k}^{bad} \leftarrow 1 - r_{k}^{good}$
+    \STATE 更新 Beta 参数 $\alpha_{k}^{(t)} \leftarrow \lambda_h \cdot \alpha_{k}^{(t-1)} + r_{k}^{good}$
+    \STATE 更新 Beta 参数 $\beta_{k}^{(t)} \leftarrow \lambda_h \cdot \beta_{k}^{(t-1)} + r_{k}^{bad}$
+    \STATE 计算期望效用 $HistPerf_k^{(t)} \leftarrow \alpha_k^{(t)} / (\alpha_k^{(t)} + \beta_k^{(t)} + \varepsilon)$
 \ENDFOR
 \STATE \textbf{流 B：瞬时风险惩戒流演化 (一票否决权)}
 \FOR{每个客户端 $k$}

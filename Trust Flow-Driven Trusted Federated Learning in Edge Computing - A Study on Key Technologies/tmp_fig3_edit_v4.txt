@@ -1,0 +1,45 @@
+Edit the provided five-stage federated learning architecture diagram into a tighter final version.
+
+Use Image 1 as the current enhanced candidate.
+Use Image 2 as the original semantic reference.
+
+Goal:
+Keep the current five-stage layout and improved information density, but reduce visual redundancy and make the diagram feel more concise and publication-ready.
+
+Required edits:
+1. Keep the five-stage structure unchanged.
+2. Remove redundant subtitle repetition.
+   - Each stage should have one strong stage title only.
+   - Do not repeat the same wording again as a second subtitle line.
+3. Keep the small semantic tags, but shorten them.
+   Suggested short tags:
+   - Stage 1: Attestation Quote, Runtime Evidence
+   - Stage 2: Clean Reference, Client Consistency
+   - Stage 3: Dual-Stream State
+   - Stage 4: Layer Gate, Clip Radius
+   - Stage 5: Model Broadcast
+4. Keep arrow labels, but make them concise and uniform.
+   Use short labels such as:
+   - Admission Score
+   - Content Audit
+   - Risk Weighting
+   - Layer Filtering
+   - Secure Update
+5. Shorten the bottom feedback label to exactly:
+   Trust Flow Feedback
+6. Keep Stage 4 and Stage 5 visually substantial, but reduce text bulk in those boxes if needed.
+7. Preserve highlighted output boxes for core outputs only.
+8. Keep all labels in English only.
+
+Visual constraints:
+- clean scholarly systems diagram
+- flat vector-like rendering
+- pale pastel stage panels
+- crisp dark outlines and arrows
+- compact but readable
+- no large top title
+- no watermark
+- no distorted text
+- formal academic look
+
+Do not change the high-level five-stage trust-flow logic. This is a refinement pass for clarity and visual compression, not a redesign.

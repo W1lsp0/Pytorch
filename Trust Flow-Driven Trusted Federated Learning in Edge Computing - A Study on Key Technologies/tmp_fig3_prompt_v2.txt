@@ -1,0 +1,65 @@
+Create a publication-quality academic systems diagram for a federated learning paper.
+
+This is Figure 3: an overview of a trust-flow-driven trusted federated learning framework with a five-stage closed-loop defense architecture.
+
+Use case: scientific-educational.
+The output must be a clean English-only academic infographic, not a poster and not a marketing graphic.
+
+Core structure:
+- Show five clearly separated stages in a closed-loop architecture.
+- Keep the general left-to-right then lower return-flow organization of the reference image.
+- Stage 1, Stage 2, Stage 3 on the upper row.
+- Stage 4 and Stage 5 on the lower row.
+- A visible closed-loop feedback path should connect the final global model state back toward Stage 1.
+
+Required stage titles:
+- Stage 1: Hardware Access
+- Stage 2: Origin Content Calibration
+- Stage 3: Multi-track Flow Decoupling
+- Stage 4: Layer Dynamic Throttle
+- Stage 5: Causal Evolution Assembly
+
+Required semantic nodes:
+Stage 1:
+- TEE Hardware Attestation
+- Resource Probe Anomaly
+- TrustScore
+
+Stage 2:
+- Prioritized Clean Anchor
+- Dual-Dim Model Quality
+- ContentScore
+
+Stage 3:
+- Historic Utility Evolution (HistPerf)
+- Fatal Risk Probe Flow (RiskEMA)
+- RawScore
+
+Stage 4:
+- Layer Defense Sensitivity
+- L2 Adaptive Clipping
+- Strict Threshold Survivor List
+
+Stage 5:
+- Secure Layer Aggregation
+- New Global Model Setup
+
+Visual requirements:
+- flat vector-like scholarly infographic
+- pale pastel stage background panels, one distinct soft color per stage
+- thin dark outlines, crisp arrows, clean spacing
+- highlighted output nodes can use soft warm accent boxes
+- all labels in English only
+- text must be crisp, typeset-like, short, and readable at paper scale
+- no oversized title, no watermark, no distorted text
+- keep the overall style formal, neat, and suitable for a systems/security paper
+
+Closed-loop requirement:
+- show a dashed or visually distinct feedback arrow from the final global model state back to the beginning of the pipeline
+- make the loop clear but not visually noisy
+
+Important constraints:
+- preserve the five-stage semantics of the reference figure
+- improve neatness, alignment, and visual consistency
+- avoid clutter and unnecessary decorative elements
+- do not change the high-level logic of the original figure
