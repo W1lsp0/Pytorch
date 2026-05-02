@@ -128,7 +128,7 @@
 
 \begin{figure}[htbp!]
     \centering
-    \includegraphics[width=0.85\textwidth]{system_arch.pdf}
+    \includegraphics[width=0.90\textwidth]{system_arch.pdf}
     \caption{联邦计算网络交互：基于 TEE 锚点加密的端边云协同物理架构图}
     \label{fig:system_arch}
 \end{figure}
@@ -185,7 +185,9 @@
 \centering
 \caption{核心系统参数与信任流符号定义}
 \label{tab:notations}
-\begin{tabular}{cl | cl}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{>{\raggedright\arraybackslash}p{1.7cm} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}p{1.7cm} >{\raggedright\arraybackslash}p{4.0cm}}
 \toprule
 \textbf{符号} & \textbf{定义描述} & \textbf{符号} & \textbf{定义描述} \\
 \midrule
@@ -364,33 +366,28 @@ $g_{root}$ & 服务器提取的纯净指导锚点方向 & $A_k$ & 客户端 $k$ 
 \end{algorithm}
 
 
-\subsection{阶段四：风险门控驱动的分层差异化鲁棒聚合}
-隐蔽后门通常集中在深层参数中，若对整网统一聚合，潜伏更新仍可能透传。为此，本文采用按层（Layer-wise）门控的差异化聚合策略。
+\subsection{阶段四：多维风险门控驱动的分层约束聚合}
+隐蔽后门往往倾向于潜伏在深层网络参数中。在此情境下，若对全局整网执行无差别聚合，异常更新仍有可能发生跨层透传。针对这一潜在隐患，本文摒弃了粗粒度的统一聚合模式，提出一种结合多维风险门控与约束规划思想的分层（Layer-wise）聚合机制（见图~\ref{fig:layer_gating}）。
 
-第一步，确定本轮活跃客户端集合 $\mathcal{A}$：
-\begin{equation} \label{eq:active_clients}
-    \mathcal{A} = \{k \mid k \notin RiskIsolated \land k \notin HistSoftIsolated\}.
-\end{equation}
-
-第二步，对每一层 $l$ 计算综合敏感度 $S_{total}^{(l)}$（见图~\ref{fig:layer_gating}），该指标由隐私、效用和安全三部分构成：
+首先，构建\textbf{多维风险门控网络（Risk Gating Network）}以动态感知各个网络层的脆弱性差异。设 $\mathcal{A}$ 为本轮未被软硬隔离的活跃客户端集合（$\mathcal{A} = \{k \mid k \notin RiskIsolated \land k \notin HistSoftIsolated\}$）。对任意网络层 $l$，其综合防御门控敏感度 $S_{total}^{(l)}$ 建模为隐私、效用与安全三个维度的线性组合：
 \begin{align}
     S_{privacy}^{(l)} &= \exp\left(-\tau_{p} \frac{l}{L}\right), \\
     S_{utility}^{(l)} &= \frac{\|g_{ref}^{(l)}\|_{2}}{\max_{m}\|g_{ref}^{(m)}\|_{2} + \varepsilon}, \\
-    S_{security}^{(l)} &= 1 - \frac{\sum_{k\in\mathcal{A}}TrustScore_{k}\cdot\cos(\Delta W_{k}^{(l)}, g_{ref}^{(l)})}{\sum_{k\in\mathcal{A}}TrustScore_{k} + \varepsilon}, \\
-    S_{total}^{(l)} &= w_p S_{privacy}^{(l)} + w_u S_{utility}^{(l)} + w_s S_{security}^{(l)}.
+    S_{security}^{(l)} &= 1 - \frac{\sum_{k\in\mathcal{A}}TrustScore_{k}\cdot\cos(\Delta W_{k}^{(l)}, g_{ref}^{(l)})}{\sum_{k\in\mathcal{A}}TrustScore_{k} + \varepsilon}.
 \end{align}
-其中 $w_p,w_u,w_s$ 为归一化权重。若某层 $S_{total}^{(l)}$ 较高，说明该层风险更高，系统将提高准入门槛 $\theta^{(l)}$ 并收紧该层裁剪半径 $C^{(l)}$。
+基于上述三项指标，经加权合成得到 $S_{total}^{(l)} = w_p S_{privacy}^{(l)} + w_u S_{utility}^{(l)} + w_s S_{security}^{(l)}$。门控网络会根据每一层的实时风险波动，动态输出该层的准入门槛 $\theta^{(l)} = \mu_{base} + \lambda_s \cdot S_{total}^{(l)}$ 以及自适应裁剪边界 $C^{(l)} = C_{base} / (S_{total}^{(l)} + \varepsilon_c)$。
 
-第三步，仅允许满足 $RawScore_k \ge \theta^{(l)}$ 的客户端进入该层幸存集 $\Phi^{(l)}$。对幸存者执行权重重归一化，并进行 L2 动态裁剪：
-\begin{align}
-    \Phi^{(l)} &= \{k \in \mathcal{A} \mid RawScore_{k} \ge \theta^{(l)} \}, \quad \tilde{w}_{k}^{(l)} = \frac{RawScore_{k}}{\sum_{j\in\Phi^{(l)}}RawScore_{j} + \varepsilon}, \\
-    scale_{k}^{(l)} &= \max\left(1, \frac{\|\Delta W_{k}^{(l)}\|_{2}}{C^{(l)}}\right), \quad
-    \widehat{\Delta W}_{k}^{(l)} = \frac{\Delta W_{k}^{(l)}}{scale_{k}^{(l)}}.
-\end{align}
-第四步，按层加权聚合得到 $\Delta W_{global}^{(l)}$：
+其次，引入\textbf{约束规划思想（Optimization Perspective）}执行幸存者权重重归一化。系统排除了 $RawScore_k < \theta^{(l)}$ 的高风险节点后，构建本层的幸存子集 $\Phi^{(l)}$。在此环节中，聚合权重的分配被转化为了一个可信域内的投影优化过程，力求在安全约束内最大化高信誉节点的贡献：
 \begin{equation}
-    \Delta W_{global}^{(l)} = \sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)} \cdot \widehat{\Delta W}_{k}^{(l)},
+    \tilde{w}_{k}^{(l)} = \frac{RawScore_{k}}{\sum_{j\in\Phi^{(l)}}RawScore_{j} + \varepsilon}, \quad \text{s.t.} \sum_{k\in\Phi^{(l)}} \tilde{w}_{k}^{(l)} \approx 1, \tilde{w}_{k}^{(l)} \ge 0.
 \end{equation}
+
+最后，实施\textbf{动态 L2 裁剪与分层组装}。为防止幸存恶意节点在极端方向上拉偏模型，采用缩放算子将偏离预期振幅的更新量强制投影至安全球心内，并逐层完成加权聚合：
+\begin{equation}
+    \widehat{\Delta W}_{k}^{(l)} = \frac{\Delta W_{k}^{(l)}}{\max\left(1, \frac{\|\Delta W_{k}^{(l)}\|_{2}}{C^{(l)}}\right)}, \quad \Delta W_{global}^{(l)} = \sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)} \cdot \widehat{\Delta W}_{k}^{(l)}.
+\end{equation}
+
+为更为直观地阐明该机制的实际运作逻辑，可以考察一个隐蔽后门植入案例。假设攻击者试图在网络深层的全连接层嵌入语义触发器；由于恶意更新偏离了正常分布，安全敏感度 $S_{security}^{(l)}$ 剧增。此时门控网络将即刻做出联合干预：一方面大幅抬高信誉门槛 $\theta^{(l)}$ 剔除部分攻击者，另一方面通过大幅缩小 $C^{(l)}$ 严格限制该层参数范数。这种微观层级的自适应阻断，在一定程度上削弱了深层后门特征向全局模型的渗透，同时也有可能最大限度地保障了浅层通用特征提取过程的完整性。
 
 \begin{figure}[htbp]
     \centering
