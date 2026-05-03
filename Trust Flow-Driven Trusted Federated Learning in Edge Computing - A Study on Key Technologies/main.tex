@@ -75,11 +75,11 @@ attack success rate (ASR) to 10.21\% ($\pm$ 0.05\%), with the permanent false
 positive rate on benign clients approaching zero.
 
 \section{引言}
-当前，随着终端设备所具备的计算能力愈加强大，越来越多的终端设备能够高效地利用本地数据支持本地模型训练，同时，为更好地以聚合多终端训练经验以支持多方模型协同优化并保护各设备的本地数据隐私，联邦学习范型被深入研究\cite{kairouz2021flsurvey}，其所具备的数据不出本地仅通过模型参数交换的特性被广泛应用于模型的分布式协同训练场景，已然成为边缘智能发展的关键支撑技术。然而，随着万物互联构成的网络环境愈加开放，基于联邦学习的经验聚合以促进模型协同优化所面临的性能瓶颈不再局限于模型结构和优化器设计层面，聚合阶段的可信性和稳健性日益成为影响整体可用性的关键因素。因为在实际应用场景中，不仅各边缘设备端的数据分布具有异构性且处理能力也有显著差异，另外，模型协同优化的各参与方相关行为也难以完全约束，这些特征在经验聚合时显然会放大统计偏移和带来安全风险。
+当前，随着终端设备所具备的计算能力愈加强大，越来越多的终端设备能够高效地利用本地数据支持本地模型训练，同时，为更好地以聚合多终端训练经验以支持多方模型协同优化并保护各设备的本地数据隐私，联邦学习范式被深入研究\cite{kairouz2021flsurvey}，其所具备的数据不出本地仅通过模型参数交换的特性被广泛应用于模型的分布式协同训练场景，已然成为边缘智能发展的关键支撑技术。然而，随着万物互联构成的网络环境愈加开放，基于联邦学习的经验聚合以促进模型协同优化所面临的性能瓶颈不再局限于模型结构和优化器设计层面，聚合阶段的可信性和稳健性日益成为影响整体可用性的关键因素。因为在实际应用场景中，不仅各边缘设备端的数据分布具有异构性且处理能力也有显著差异，另外，模型协同优化的各参与方相关行为也难以完全约束，这些特征在经验聚合时显然会放大统计偏移和带来安全风险。
 
-在通常的联邦学习范型中，客户端完成本地数据处理及本地模型训练后，会将模型相关参数上传，服务端聚合各客户端模型参数后会下发更新后的模型参数，以此通过多轮迭代直至收敛，显然，上述流程在实际愈加开放的万物互联多边缘网络环境下面面临着多重风险。具体来说，首先，开放的训练环境缺少强制完整性约束，恶意客户端可以绕过真实训练而直接构造并上传模型参数，也会极大地影响服务端对聚合参数真实性的判断能力，一些研究工作提出了基于可信执行或可验证训练的方法\cite{lu2025tmt,zhang2025rppfl,r1_tee_integrity}，以硬件远程证明等方式保证客户端对模型训练的真实性，但仍然缺乏应对训练过程真实而模型更新却嵌入恶意特征等手段。其次，恶意客户端实施参数投毒、隐蔽后门等攻击\cite{gu2017badnets,wang2019neuralcleanse}，通过将恶意触发特征嵌入常规更新分布参数中，会显著降低单轮检测成功率，一些研究工作提出了基于时序信誉与相似性的方法\cite{cao2021fltrust,fung2020foolsgold}，通过引入跨轮信息来缓解单轮判断的不稳定问题，但对于恶意客户端前期积累信誉后期持续小幅度投毒等潜伏式攻击显然存在识别滞后问题，而且，单一信誉分与固定阈值机制对深层异常触发特征的识别能力也有很大不足。
+在通常的联邦学习范式中，客户端完成本地数据处理及本地模型训练后，会将模型相关参数上传，服务端聚合各客户端模型参数后会下发更新后的模型参数，以此通过多轮迭代直至收敛，显然，上述流程在实际愈加开放的万物互联多边缘网络环境下，面临着多重风险。具体来说，首先，开放的训练环境缺少强制完整性约束，恶意客户端可以绕过真实训练而直接构造并上传模型参数，也会极大地影响服务端对聚合参数真实性的判断能力，一些研究工作提出了基于可信执行或可验证训练的方法\cite{lu2025tmt,zhang2025rppfl,r1_tee_integrity}，以硬件远程证明等方式保证客户端对模型训练的真实性，但仍然缺乏应对训练过程真实而模型更新却嵌入恶意特征等手段。其次，恶意客户端实施参数投毒、隐蔽后门等攻击\cite{gu2017badnets,wang2019neuralcleanse}，通过将恶意触发特征嵌入常规更新分布参数中，会显著降低单轮检测成功率，一些研究工作提出了基于时序信誉与相似性的方法\cite{cao2021fltrust,fung2020foolsgold}，通过引入跨轮信息来缓解单轮判断的不稳定问题，但对于恶意客户端前期积累信誉后期持续小幅度投毒等潜伏式攻击显然存在识别滞后问题，而且，单一信誉分与固定阈值机制对深层异常触发特征的识别能力也有很大不足。
 
-另外，不同设备的非独立同分布数据（Non-IID）会增加最优更新的方向离散度，很容易模糊正常波动和异常偏移之间的边界，导致强 Non-IID 条件下鲁棒性和泛化性之间的冲突，一些研究工作提出了基于距离排斥或统计截断等的方法抑制异常更新\cite{blanchard2017krum,yin2018byzantine}，还有一些研究工作通过自适应权重调整来缓解异构影响\cite{wang2025rasa}，但强长尾分布情形下，这些方法会将合法偏移的参数更新误判为异常参数，可能导致关键异构信息被过度剔除而显著降低模型泛化能力。在实际场景中，上述执行环境更加开放、跨轮潜伏攻击、强异构统计偏移等挑战往往不会单独出现，尤其是在万物互联的边缘智能场景中数个因素很可能出现叠加出现的情形，很容易导致诸如拦截阈值收紧误杀率上升、拦截阈值放宽漏检率增加等多种难以权衡的难题。由此，如何构建覆盖全流程的统一状态建模与联动决策机制，在兼顾客户端本地模型训练的准入及可信和聚合时对客户端低误杀率且高召回率的要求下，维持模型协同优化的收敛和泛化性能成为亟需解决的关键问题。
+另外，不同设备的非独立同分布数据（Non-IID）会增加最优更新的方向离散度，很容易模糊正常波动和异常偏移之间的边界，导致强 Non-IID 条件下鲁棒性和泛化性之间的冲突，一些研究工作提出了基于距离排斥或统计截断等的方法抑制异常更新\cite{blanchard2017krum,yin2018byzantine}，还有一些研究工作通过自适应权重调整来缓解异构影响\cite{wang2025rasa}，但强长尾分布情形下，这些方法会将合法偏移的参数更新误判为异常参数，可能导致关键异构信息被过度剔除而显著降低模型泛化能力。在实际场景中，上述执行环境更加开放、跨轮潜伏攻击、强异构统计偏移等挑战往往不会单独出现，尤其是在万物互联的边缘智能场景中，数个因素很可能相互叠加，很容易导致诸如拦截阈值收紧误杀率上升、拦截阈值放宽漏检率增加等多种难以权衡的难题。由此，如何构建覆盖全流程的统一状态建模与联动决策机制，在兼顾客户端本地模型训练的准入及可信和聚合时对客户端低误杀率且高召回率的要求下，维持模型协同优化的收敛和泛化性能成为亟需解决的关键问题。
 
 为应对以上所述的三个主要难题，本文从软硬件协同角度提出一种基于全流程信任流的可信联邦聚合机制。该机制按照联邦学习的执行链路展开：在客户端接入和本地训练阶段，引入 TEE 远程证明、运行特征熵分析与卡尔曼滤波，形成可随轮次更新的动态准入信任分；在服务器审查阶段，基于纯净参考方向计算当轮内容质量，并进一步将客户端状态拆分为历史效用流和瞬时风险流，以贝叶斯后验和风险 EMA 分别刻画长期贡献与短时异常；在聚合阶段，依据上述信任状态执行分层风险门控、幸存者重归一化和动态裁剪，从而在抑制恶意更新的同时保留合法异构贡献，缓解 Non-IID 条件下安全性与泛化性之间的冲突。
 
@@ -226,11 +226,11 @@ positive rate on benign clients approaching zero.
     \hat{T}_k^{(t)} & = \hat{T}_k^{(t-1)} + K_k^{(t)} (Z_k^{(t)} - \hat{T}_k^{(t-1)}) \\
     R_k^{(t)}       & = \exp(\lambda \cdot H(\mathcal{X}_k^{(t)}))
 \end{align}
-方程中 $Z_k^{(t)}$ 映射了节点实时的基线观测效用。当客户端行为发生高风险跳变（即高熵）时，指数级放大的 $R_k^{(t)}$ 会促使卡尔曼增益 $K_k^{(t)}$ 迅速衰减。这一机制迫使滤波器自动且强硬地拒绝吸收高风险的异常瞬时观测值，以此维持信任后验估计的平稳抗毁性。
+方程中 $Z_k^{(t)}$ 映射了节点实时的基线观测效用。当客户端行为发生高风险跳变（即高熵）时，指数级放大的 $R_k^{(t)}$ 会促使卡尔曼增益 $K_k^{(t)}$ 迅速衰减。这一机制促使滤波器自动抑制高风险异常瞬时观测值的吸收，以此维持信任后验估计的平稳抗毁性。
 
-进一步地，根据贝叶斯滤波的数学本质，滤波器迭代输出的协方差矩阵 $P_k$ 天然且客观地表征了该节点动态信任估计值的“置信度边界”——$P_k$ 值越小，表明当前滤波器的测量噪声得到有效压制，信誉评分的可靠程度越高。藉此，阶段一不再输出粗粒度的二分类裁决，而是将卡尔曼滤波产生的期望均值与不确定性进行联合演化，形成具备时序韧性的门禁权限因子 $TrustScore_k = \hat{T}_k^{(t)} \cdot (1 / (1 + P_k^{(t)}))$。
+进一步地，根据贝叶斯滤波的数学本质，滤波器迭代输出的协方差矩阵 $P_k$ 天然且客观地表征了该节点动态信任估计值的“置信度边界”——$P_k$ 值越小，表明当前滤波器的测量噪声得到有效压制，信誉评分的可靠程度越高。借此，阶段一不再输出粗粒度的二分类裁决，而是将卡尔曼滤波产生的期望均值与不确定性进行联合演化，形成具备时序韧性的门禁权限因子 $TrustScore_k = \hat{T}_k^{(t)} \cdot (1 / (1 + P_k^{(t)}))$。
 
-\subsection{阶段二：服务器优先的参考方向构建与同构协调审查}
+\subsection{阶段二：服务器优先的参考方向构建与协同一致性审查}
 仅依赖客户端之间的余弦相似度容易被合谋攻击误导，为此，本文引入\textbf{优先纯净参考（Vanilla Reference Prioritization）}。当服务器持有少量隔离验证集（Pure Clean Set）时，先计算 $g_{root\_clean}$ 作为参考方向；若该方向不可用，则由高信任、低风险客户端更新构造退化参考 $g_{ref}$。其权重定义为：
 \begin{equation}
     \omega_{k}^{ref} = TrustScore_{k} \cdot (1 - RiskEMA_{k}^{prev})^{2}.
@@ -271,7 +271,7 @@ positive rate on benign clients approaching zero.
         \STATE 门禁信任分 $TrustScore_k \leftarrow \hat{T}_k \cdot \frac{1}{1 + P_k}$
         \ENDIF
         \ENDFOR
-        \STATE \textbf{第二阶段：参考方向构建与同构审查}
+        \STATE \textbf{第二阶段：参考方向构建与协同一致性审查}
         \IF{具备服务器纯净验证集数据}
         \STATE 提取真实指导梯度 $g_{root} \leftarrow g_{root\_clean}$
         \ELSE
@@ -322,7 +322,7 @@ positive rate on benign clients approaching zero.
 \begin{itemize}
     \item \textbf{正常节点（NORMAL）}：平稳参与聚合。若风险攀升或历史贡献滑落，可被转入 SUSPECT 或 QUARANTINE。
     \item \textbf{嫌疑节点（SUSPECT）}：进入重点监控区域。若风险指标回落则可恢复为 NORMAL，若异常行为固化则实施升级隔离。
-    \item \textbf{隔离节点（QUARANTINE）}：暂时褫夺模型聚合资格。经过一段观察期后可能恢复原状，或面临进一步的权限降级处理。
+    \item \textbf{隔离节点（QUARANTINE）}：暂时取消模型聚合资格。经过一段观察期后可能恢复原状，或面临进一步的权限降级处理。
     \item \textbf{黑名单（BLACKLIST）}：一旦触发风险流硬阈值，即被执行永久封禁，并在底层 TEE 硬件认证端终止所有后续连接请求。
 \end{itemize}
 
@@ -365,7 +365,7 @@ positive rate on benign clients approaching zero.
         \STATE 加入长期隔离黑名单 $RiskIsolated \leftarrow RiskIsolated \cup \{k\}$
         \ENDIF
         \ENDFOR
-        \STATE \textbf{最终权限融算}
+        \STATE \textbf{最终权限融合计算}
         \FOR{活跃客户端 $k \notin RiskIsolated$}
         \STATE 融合分数 $RawScore_k \leftarrow (TrustScore_k)^\alpha (ContentScore_k)^\beta (HistPerf_k^{(t-1)})^\gamma$
         \STATE 风险折扣 $RawScore_k \leftarrow RawScore_k \cdot (1 - RiskEMA_k^{(t-1)})^p$
@@ -411,7 +411,7 @@ positive rate on benign clients approaching zero.
     \label{alg:phase4}
     \begin{algorithmic}[1]
         \REQUIRE 活跃节点 $\mathcal{A}$，分数 $RawScore_k$，分层更新梯度 $\{\Delta W_k^{(l)}\}$，网络深度 $L$
-        \ENSURE 本轮全局梯度安全总成 $\Delta W_{global}$
+        \ENSURE 本轮全局安全梯度 $\Delta W_{global}$
         \STATE 初始化全局增量 $\Delta W_{global} \leftarrow 0$
         \FOR{网络每一层 $l = 1, 2, \dots, L$}
         \STATE \textbf{步骤 1: 层级敏感度三维联合测算}
@@ -420,15 +420,15 @@ positive rate on benign clients approaching zero.
         \STATE 安全敏感度 $S_{security}^{(l)} \leftarrow 1 - \frac{\sum_{k\in\mathcal{A}} TrustScore_k \cos(\Delta W_k^{(l)}, g_{ref}^{(l)})}{\sum_{k\in\mathcal{A}} TrustScore_k + \varepsilon}$
         \STATE 总防御诉求敏感度 $S_{total}^{(l)} \leftarrow w_p S_{privacy}^{(l)} + w_u S_{utility}^{(l)} + w_s S_{security}^{(l)}$
         \STATE \textbf{步骤 2: 动态风险门控与 L2 自适应裁剪}
-        \STATE 拔高本层安全入场分数门槛 $\theta^{(l)} \leftarrow \mu_{base} + \lambda_s \cdot S_{total}^{(l)}$
+        \STATE 提高本层安全入场分数门槛 $\theta^{(l)} \leftarrow \mu_{base} + \lambda_s \cdot S_{total}^{(l)}$
         \STATE 收紧本层恶意振幅裁剪边界 $C^{(l)} \leftarrow C_{base} / (S_{total}^{(l)} + \varepsilon_c)$
-        \STATE \textbf{步骤 3: 幸存节点挑选与二次重调校}
+        \STATE \textbf{步骤 3: 幸存节点挑选与二次重校准}
         \STATE 筛选本层幸存者名单 $\Phi^{(l)} \leftarrow \{k \in \mathcal{A} \mid RawScore_k \ge \theta^{(l)}\}$
         \STATE 对幸存者重新归一化有效权重 $\tilde{w}_k^{(l)} \leftarrow RawScore_k / \sum_{j\in\Phi^{(l)}} RawScore_j$
-        \STATE 依法则执行 L2 等比缩小 $\widehat{\Delta W}_k^{(l)} \leftarrow \Delta W_k^{(l)} / \max(1, \|\Delta W_k^{(l)}\|_2 / C^{(l)})$
+        \STATE 按规则执行 L2 等比缩小 $\widehat{\Delta W}_k^{(l)} \leftarrow \Delta W_k^{(l)} / \max(1, \|\Delta W_k^{(l)}\|_2 / C^{(l)})$
         \STATE \textbf{步骤 4: 分层合并拼接}
         \STATE 计算本层安全聚合增量 $\Delta W_{global}^{(l)} \leftarrow \sum_{k\in\Phi^{(l)}} \tilde{w}_k^{(l)} \cdot \widehat{\Delta W}_k^{(l)}$
-        \STATE 拼接连入全局模型更新量 $\Delta W_{global} \leftarrow \Delta W_{global} \cup \Delta W_{global}^{(l)}$
+        \STATE 拼接并写入全局模型更新量 $\Delta W_{global} \leftarrow \Delta W_{global} \cup \Delta W_{global}^{(l)}$
         \ENDFOR
         \RETURN $\Delta W_{global}$
     \end{algorithmic}
@@ -503,8 +503,8 @@ positive rate on benign clients approaching zero.
                                                            & 本地训练 SGD 优化起步参数 ($lr$, $Momentum$)                      & $0.001$, $0.9$       \\
         \midrule
         \multirow{3}{*}{\textbf{双流协同：阶段 1 $\to$ 3}} & TMAA 基准罚时陡峭度 $\lambda$，死区 $\tau$，衰减指数 $\rho$       & $5.0$, $0.1$, $2.0$  \\
-                                                           & 二维同构审查常量约束映射 $\alpha_1, \alpha_2$ 及 $\beta_{fusion}$ & $0.6$, $0.4$, $2.0$  \\
-                                                           & 历史留存平滑阀值 $\beta_h$ 与瞬发风险半衰期 $\beta_r$             & $0.9$, $0.85$        \\
+                                                           & 二维协同审查常量约束映射 $\alpha_1, \alpha_2$ 及 $\beta_{fusion}$ & $0.6$, $0.4$, $2.0$  \\
+                                                           & 历史留存平滑阈值 $\beta_h$ 与瞬发风险半衰期 $\beta_r$             & $0.9$, $0.85$        \\
         \midrule
         \multirow{2}{*}{\textbf{逐层裁剪：阶段 4}}         & 得分融合非线性指数调和阀 ($\alpha, \beta, \gamma, p$)             & $3.0, 1.0, 0.5, 1.0$ \\
                                                            & 门槛拦截控制下界 $\mu_{base}$ 及惩戒放大基线 $\lambda_s$          & $0.4$, $1.2$         \\
@@ -627,13 +627,13 @@ positive rate on benign clients approaching zero.
 
 结果表明：1）仅启用阶段一（TEE 门禁）时，系统可拦截外部伪装节点，但对内部投毒抑制有限，ASR 仍达 75.40\%，Acc 约 82.5\%；2）加入阶段三双流演化后，ASR 降至 32.18\%，Acc 回升至 88.2\%；3）再加入阶段四分层裁剪后，ASR 进一步降至 10.21\%，Acc 提升至 92.40\%。这说明各模块存在明显互补性，组合后可同时提升安全性与可用性。
 
-\subsection{长尾异构数据分布极限抗压试验 (Sensitivity on Data Heterogeneity)}
+\subsection{长尾异构数据分布极限压力测试 (Sensitivity on Data Heterogeneity)}
 许多鲁棒聚合方法对 IID 条件依赖较强。为评估本文框架在不同异构强度下的稳定性，本文在四组 Dirichlet 分布（$\alpha=100,1.0,\dots,0.1$）下测试全局准确率，结果见图~\ref{fig:alpha_sensitivity}。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{alpha_sensitivity.pdf}
-    \caption{环境数据异构度（Dirichlet $\alpha$）衰减下的各类安全聚合算法健壮性压测对比}
+    \caption{环境数据异构度（Dirichlet $\alpha$）衰减下的各类安全聚合算法鲁棒性压力测试对比}
     \label{fig:alpha_sensitivity}
 \end{figure}
 
@@ -646,7 +646,7 @@ positive rate on benign clients approaching zero.
 
 \begin{table}[htbp]
     \centering
-    \caption{传统联邦系统与本可信联邦框架系统的端云开销对比 (20 Client)}
+    \caption{传统联邦系统与本文可信联邦框架的端云开销对比 (20 Client)}
     \vspace{4pt}
     \label{tab:overhead}
     \begin{tabular}{l c c c}
