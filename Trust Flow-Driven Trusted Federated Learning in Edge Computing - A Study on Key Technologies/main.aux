@@ -119,20 +119,29 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}防御机制横向基准对比 (Baseline Comparison)}{21}{subsection.5.3}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces 不同联邦学习防御策略在 30\% 高危混合攻击环境下的性能对比}}{21}{table.4}\protected@file@percent }
 \newlabel{tab:baseline}{{4}{21}{不同联邦学习防御策略在 30\% 高危混合攻击环境下的性能对比}{table.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}多阶段防御架构消融实验 (Ablation Study)}{21}{subsection.5.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces 多阶段防御机制消融剥离分析}}{22}{figure.9}\protected@file@percent }
-\newlabel{fig:ablation}{{9}{22}{多阶段防御机制消融剥离分析}{figure.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}长尾异构数据分布极限压力测试 (Sensitivity on Data Heterogeneity)}{22}{subsection.5.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}系统计算与通信额外开销分析 (Overhead Analysis)}{22}{subsection.5.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces 传统联邦系统与本文可信联邦框架的端云开销对比 (20 Client)}}{22}{table.5}\protected@file@percent }
-\newlabel{tab:overhead}{{5}{22}{传统联邦系统与本文可信联邦框架的端云开销对比 (20 Client)}{table.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces 环境数据异构度（Dirichlet $\alpha $）衰减下的各类安全聚合算法鲁棒性压力测试对比}}{23}{figure.10}\protected@file@percent }
-\newlabel{fig:alpha_sensitivity}{{10}{23}{环境数据异构度（Dirichlet $\alpha $）衰减下的各类安全聚合算法鲁棒性压力测试对比}{figure.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}结论与未来展望}{23}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {A}瞬发风险流 (Risk Flow) 探针计算机制细节}{23}{appendix.A}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}A.1 梯度方向与幅度物理探针 ($r_{grad}$)}{23}{subsection.A.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}组件级核心机制消融分析 (Component-level Ablation Study)}{21}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.1}双流信誉解耦有效性分析}{21}{subsubsection.5.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces 正交解耦对误杀率与召回率的作用剥离分析}}{22}{table.5}\protected@file@percent }
+\newlabel{tab:ablation_stream}{{5}{22}{正交解耦对误杀率与召回率的作用剥离分析}{table.5}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}多维风险探针剥离分析}{22}{subsubsection.5.4.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces 多维风险探针对不同渗透类型的攻击成功率（ASR）压制对比}}{22}{figure.9}\protected@file@percent }
+\newlabel{fig:ablation_probes}{{9}{22}{多维风险探针对不同渗透类型的攻击成功率（ASR）压制对比}{figure.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.3}分层门控与重归一化收敛效益}{23}{subsubsection.5.4.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces 动态权重重归一化机制对全局模型收敛速率及精度的增益效益}}{23}{figure.10}\protected@file@percent }
+\newlabel{fig:ablation_renorm}{{10}{23}{动态权重重归一化机制对全局模型收敛速率及精度的增益效益}{figure.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}长尾异构数据分布极限压力测试 (Sensitivity on Data Heterogeneity)}{23}{subsection.5.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces 环境数据异构度（Dirichlet $\alpha $）衰减下的各类安全聚合算法鲁棒性压力测试对比}}{24}{figure.11}\protected@file@percent }
+\newlabel{fig:alpha_sensitivity}{{11}{24}{环境数据异构度（Dirichlet $\alpha $）衰减下的各类安全聚合算法鲁棒性压力测试对比}{figure.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}系统计算与通信额外开销分析 (Overhead Analysis)}{24}{subsection.5.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces 传统联邦系统与本文可信联邦框架的端云开销对比 (20 Client)}}{24}{table.6}\protected@file@percent }
+\newlabel{tab:overhead}{{6}{24}{传统联邦系统与本文可信联邦框架的端云开销对比 (20 Client)}{table.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}结论与未来展望}{24}{section.6}\protected@file@percent }
 \bibcite{kairouz2021flsurvey}{1}
 \bibcite{gu2017badnets}{2}
+\@writefile{toc}{\contentsline {section}{\numberline {A}瞬发风险流 (Risk Flow) 探针计算机制细节}{25}{appendix.A}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.1}A.1 梯度方向与幅度物理探针 ($r_{grad}$)}{25}{subsection.A.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}A.2 小样本先验验证交叉熵探针 ($r_{probe}$)}{25}{subsection.A.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}A.3 深层神经元隐蔽后门激活探针 ($r_{trigger}$)}{25}{subsection.A.3}\protected@file@percent }
 \bibcite{wang2019neuralcleanse}{3}
 \bibcite{blanchard2017krum}{4}
 \bibcite{yin2018byzantine}{5}
@@ -141,8 +150,6 @@
 \bibcite{fung2020foolsgold}{8}
 \bibcite{r9_clustered}{9}
 \bibcite{fedpe}{10}
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.2}A.2 小样本先验验证交叉熵探针 ($r_{probe}$)}{24}{subsection.A.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {A.3}A.3 深层神经元隐蔽后门激活探针 ($r_{trigger}$)}{24}{subsection.A.3}\protected@file@percent }
 \bibcite{parallelsfl}{11}
 \bibcite{wang2025rasa}{12}
 \bibcite{dou2025toward}{13}
@@ -161,4 +168,4 @@
 \bibcite{mcmahan2017fedavg}{26}
 \bibcite{chen2017maximum}{27}
 \bibcite{li2026multidimensional}{28}
-\gdef \@abspage@last{26}
+\gdef \@abspage@last{27}
