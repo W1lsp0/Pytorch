@@ -1,0 +1,13 @@
+Upscale and refine this academic mechanism diagram while preserving the exact content, layout, reading order, and overall composition.
+
+Requirements:
+- keep the same three-part structure: Inputs, Control & Decision, Constrained Execution
+- preserve all existing labels, formulas, icons, arrows, and box positions as closely as possible
+- improve resolution, text crispness, line sharpness, icon clarity, and overall readability
+- keep the academic paper figure style
+- do not redesign the diagram
+- do not add new blocks, titles, legends, formulas, or decorative elements
+- do not remove existing content
+- preserve the original color palette and emphasis hierarchy
+- make thin lines and formulas clearer at print scale
+- output a higher-resolution, cleaner version suitable for paper use
