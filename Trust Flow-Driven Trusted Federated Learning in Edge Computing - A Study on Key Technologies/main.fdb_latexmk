@@ -1,9 +1,9 @@
 # Fdb version 3
-["xdvipdfmx"] 1777795245 "main.xdv" "main.pdf" "main" 1777795246
-  "main.xdv" 1777795245 455560 eeb9445ff273124782805289631e26a1 "xelatex"
+["xdvipdfmx"] 1777796873 "main.xdv" "main.pdf" "main" 1777796873
+  "main.xdv" 1777796873 455540 7db038c6b25687916a8124c6ee3d1b07 "xelatex"
   (generated)
   "main.pdf"
-["xelatex"] 1777795244 "main.tex" "main.xdv" "main" 1777795245
+["xelatex"] 1777796872 "main.tex" "main.xdv" "main" 1777796873
   "/etc/texmf/web2c/texmf.cnf" 1774855958 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -200,17 +200,17 @@
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1774856661 5134474 66fc2af16408ea9157bac7f571fe474b ""
   "fig10_ablation_renorm.pdf" 1777789826 23547 c94d2cc8a157f5af509c0cd835c41393 ""
   "fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
-  "fig1_system_arch.pdf" 1777793612 4719268 ec90f6cc89ec2836fbb341b154230ee5 ""
-  "fig2_threat_model.pdf" 1777793612 4719268 b90b3da3d12061550929ee9e0c53dac6 ""
+  "fig1_system_arch.pdf" 1777796864 12681894 b80972509a69dc3ce1f9a0268da8669d ""
+  "fig2_threat_model.pdf" 1777796864 12772134 685e8734fd93b50cbc62803f867e0b25 ""
   "fig3_arch.pdf" 1777793612 7078564 0b587a69c144d18dbbee4ecd14f25492 ""
-  "fig4_state.pdf" 1777793612 4719268 1d401d5bf634e18c1005af51e4c3ec57 ""
-  "fig5_layer.pdf" 1777793433 3314796 8832d09f57a5c2cf85053f5e5bafe99c ""
+  "fig4_state.pdf" 1777796864 12772134 4015644bb328820111b8dd3715a15781 ""
+  "fig5_layer.pdf" 1777796864 12772134 75c2d25e88b20a85848f676e668139ae ""
   "fig6_convergence_asr.pdf" 1775065191 21123 eb6882f1e84d2e8ca49ebc8d1644ef38 ""
   "fig7_node_state_evolution.pdf" 1775065191 36703 1d55e01905845a52f23af088d368006e ""
   "fig8_tsne_visualization.pdf" 1775058888 37861 c84ffbfaea90913434b08603dbb30f1d ""
   "fig9_ablation_probes.pdf" 1777789842 27407 1cae32553fba451e88a8ba7353dd2554 ""
-  "main.aux" 1777795245 14715 9e0902ec7867215fc5afc0a9459ac884 "xelatex"
-  "main.out" 1777795245 7394 c2620d0ad6bfa3600e1e349a0bc7ddad "xelatex"
+  "main.aux" 1777796873 14715 b8640429f5020eb6e924c03620514852 "xelatex"
+  "main.out" 1777796873 7394 c2620d0ad6bfa3600e1e349a0bc7ddad "xelatex"
   "main.tex" 1777795239 78257 eb465621c7010e45e8c0a8c9f1166221 ""
   (generated)
   "main.aux"
