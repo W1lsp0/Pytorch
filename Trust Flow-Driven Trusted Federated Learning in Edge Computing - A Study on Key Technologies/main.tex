@@ -189,7 +189,7 @@ positive rate on benign clients approaching zero.
     \label{tab:notations}
     \renewcommand{\arraystretch}{1.25}
     \setlength{\tabcolsep}{3pt}
-    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\raggedright\arraybackslash}p{2.0cm} >{\raggedright\arraybackslash}p{4.7cm} >{\raggedright\arraybackslash}p{2.0cm} >{\raggedright\arraybackslash}p{4.7cm}}
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\raggedright\arraybackslash}p{2.8cm} >{\raggedright\arraybackslash}p{4.5cm} >{\raggedright\arraybackslash}p{2.2cm} >{\raggedright\arraybackslash}p{4.5cm}}
         \toprule
         \textbf{符号} & \textbf{定义描述} & \textbf{符号} & \textbf{定义描述} \\
         \midrule
@@ -204,7 +204,7 @@ positive rate on benign clients approaching zero.
     \renewcommand{\arraystretch}{1.0}
 \end{table}
 
-\subsection{阶段一：硬件锚定准入与基于卡尔曼滤波的动态信任度量}
+\subsection{硬件准入与动态信任评估}
 客户端的准入机制不应局限于一次性的身份校验，而需建立一套反映本地训练持续可信度的追踪体系。为此，本研究将初始可信度解耦为“静态准入”与“动态评估”双层架构：前者依赖底层硬件判断执行环境的合法性；后者则利用信息理论学习（Information Theoretic Learning, ITL）的前沿范式\cite{chen2017maximum}，将训练过程中的瞬态行为波动转化为动态观测信号，借由滤波机制输出可持续传递的 $TrustScore$。
 
 \begin{enumerate}
@@ -230,7 +230,7 @@ positive rate on benign clients approaching zero.
 
 进一步地，根据贝叶斯滤波的数学本质，滤波器迭代输出的协方差矩阵 $P_k$ 天然且客观地表征了该节点动态信任估计值的“置信度边界”——$P_k$ 值越小，表明当前滤波器的测量噪声得到有效压制，信誉评分的可靠程度越高。借此，阶段一不再输出粗粒度的二分类裁决，而是将卡尔曼滤波产生的期望均值与不确定性进行联合演化，形成具备时序韧性的门禁权限因子 $TrustScore_k = \hat{T}_k^{(t)} \cdot (1 / (1 + P_k^{(t)}))$。
 
-\subsection{阶段二：服务器优先的参考方向构建与协同一致性审查}
+\subsection{参考方向构建与一致性审查}
 仅依赖客户端之间的余弦相似度容易被合谋攻击误导，为此，本文引入\textbf{优先纯净参考（Vanilla Reference Prioritization）}。当服务器持有少量隔离验证集（Pure Clean Set）时，先计算 $g_{root\_clean}$ 作为参考方向；若该方向不可用，则由高信任、低风险客户端更新构造退化参考 $g_{ref}$。其权重定义为：
 \begin{equation}
     \omega_{k}^{ref} = TrustScore_{k} \cdot (1 - RiskEMA_{k}^{prev})^{2}.
@@ -288,7 +288,7 @@ positive rate on benign clients approaching zero.
 \end{algorithm}
 
 
-\subsection{阶段三：历史效用与瞬时风险的正交解耦与演化}
+\subsection{历史效用与瞬时风险的双流演化}
 在强 Non-IID（非独立同分布）边缘计算场景中，传统“低分即淘汰”的策略往往混淆了“数据长尾性导致的低效用”与“恶意投毒导致的高风险”，容易引发严重的误杀（FPR）。为破解这一困境，本研究构建二维正交解耦空间，将客户端的状态演化拆分为两个相互独立但在决策阶段汇合的时序流：用于长期能力评估的\textbf{历史效用流（$HistPerf$）}，以及用于捕捉突发异常的\textbf{瞬时风险流（$RiskEMA$）}。前者解决“是否长期有贡献”，后者解决“本轮是否存在安全风险”。两类信号不在同一轴上互相抵消，从而缓解传统单维评分体系中误检与漏检的内在冲突。
 
 \textbf{(1) 历史效用流（基于贝叶斯后验推断）}
@@ -375,7 +375,7 @@ positive rate on benign clients approaching zero.
 \end{algorithm}
 
 
-\subsection{阶段四：多维风险门控驱动的分层约束聚合}
+\subsection{风险门控驱动的分层聚合}
 隐蔽后门往往倾向于潜伏在深层网络参数中。在此情境下，若对全局整网执行无差别聚合，异常更新仍有可能发生跨层透传。针对这一潜在隐患，本文摒弃粗粒度的统一聚合模式，提出一种结合多维风险门控与约束规划思想的分层（Layer-wise）聚合机制（见图~\ref{fig:layer_gating}）。该阶段接收上一阶段输出的 $RawScore_k$，并针对不同网络层分别决定“谁能进入本层聚合、以多大权重参与、其更新幅度是否需要裁剪”。
 
 首先，构建\textbf{多维风险门控网络（Risk Gating Network）}以动态感知各个网络层的脆弱性差异。设 $\mathcal{A}$ 为本轮未被软硬隔离的活跃客户端集合（$\mathcal{A} = \{k \mid k \notin RiskIsolated \land k \notin HistSoftIsolated\}$）。对任意网络层 $l$，其综合防御门控敏感度 $S_{total}^{(l)}$ 建模为隐私、效用与安全三个维度的线性组合：
@@ -435,7 +435,7 @@ positive rate on benign clients approaching zero.
 \end{algorithm}
 
 
-\subsection{阶段五：全局更新下发与边缘知识留存}
+\subsection{模型更新下发与知识留存}
 分层聚合完成后，服务器将安全增量应用到全局模型：$W_{global}^{new} = W_{global}^{old} + \Delta W_{global}$，并同步下发更新后的模型及客户端状态（含 $HistPerf$）。至此形成一轮完整闭环，在保证收敛的同时持续过滤恶意更新。
 
 \subsection{双流正交解耦的理论保证 (Theoretical Analysis)}
