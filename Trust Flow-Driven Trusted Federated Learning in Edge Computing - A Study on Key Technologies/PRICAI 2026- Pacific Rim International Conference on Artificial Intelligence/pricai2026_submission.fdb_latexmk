@@ -1,6 +1,6 @@
 # Fdb version 3
-["pdflatex"] 1778249503 "pricai2026_submission.tex" "pricai2026_submission.pdf" "pricai2026_submission" 1778249504
-  "..//fig10_ablation_renorm.pdf" 1777789826 23547 c94d2cc8a157f5af509c0cd835c41393 ""
+["pdflatex"] 1778263040 "pricai2026_submission.tex" "pricai2026_submission.pdf" "pricai2026_submission" 1778263040
+  "..//fig10_ablation_renorm.pdf" 1778259837 24854 6d76eda2c47d0b485b75221468c075d6 ""
   "..//fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
   "..//fig1_system_arch.pdf" 1778248623 678376 e51e11bab50e77342f8b40e9b7f50eff ""
   "..//fig2_threat_model.pdf" 1778248623 871432 1dd3aec3da25e029db6b6d9f83e553b3 ""
@@ -27,6 +27,7 @@
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecti0900.tfm" 1136768653 3072 a603fa6d934ebc72197ed1c389943d86 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ecti1000.tfm" 1136768653 3072 3bce340d4c075dffe6d4ec732b4c32fe ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ectt0800.tfm" 1136768653 1536 0b0b8ca286de6a006b681926403f35cd ""
+  "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ectt0900.tfm" 1136768653 1536 ae7aab2f8a4bc9edfce2899f53ba88c3 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ectt1000.tfm" 1136768653 1536 06717a2b50de47d4087ac0e6cd759455 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1246382020 1120 1e8878807317373affa7f7bba4cf2f6a ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy7.tfm" 1246382020 1120 7f9f170e8aa57527ad6c49feafd45d54 ""
@@ -228,14 +229,15 @@
   "/usr/share/texmf/fonts/type1/public/cm-super/sfrm1000.pfb" 1636152094 138258 6525c253f16cededa14c7fd0da7f67b2 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfti0900.pfb" 1774856645 183673 6df73819bb3e1246a6315a4913a2d331 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sfti1000.pfb" 1636152094 186554 e8f0fa8ca05e038f257a06405232745f ""
+  "/usr/share/texmf/fonts/type1/public/cm-super/sftt0900.pfb" 1774856645 170827 2e4b634de7b58578eae1dc93e51dfe48 ""
   "/usr/share/texmf/fonts/type1/public/cm-super/sftt1000.pfb" 1636152094 169201 9ebf99020dde51a5086e186761a34e8f ""
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1774856892 4379155 98693266ff65f58d9f98aff394de12d2 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1774856671 2801209 9f48ed8dc565a219995f72e939ed6c86 ""
   "llncs.cls" 1778242474 43402 5fb5a2dc40571aa40f3d199c00cbb986 ""
-  "pricai2026_submission.aux" 1778249503 15068 8fbbe7db46508202a18008729e4fd630 "pdflatex"
-  "pricai2026_submission.out" 1778249503 534 6527dc87bef8ef9685ba6bf16170fdb2 "pdflatex"
-  "pricai2026_submission.tex" 1778243610 94031 2d87678b6260d7d6a0bda3b93fc17135 ""
+  "pricai2026_submission.aux" 1778263040 15055 8249ce5209e0709895530c134b7ee53b "pdflatex"
+  "pricai2026_submission.out" 1778263040 534 6527dc87bef8ef9685ba6bf16170fdb2 "pdflatex"
+  "pricai2026_submission.tex" 1778263021 94534 0b23c51c802a55c524d435ec13ea5027 ""
   (generated)
   "pricai2026_submission.aux"
   "pricai2026_submission.log"

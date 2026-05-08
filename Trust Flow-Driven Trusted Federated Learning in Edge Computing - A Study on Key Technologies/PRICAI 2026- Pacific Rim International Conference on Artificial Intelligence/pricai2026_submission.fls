@@ -1021,6 +1021,7 @@ INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmmib5.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/cm/cmbsy10.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy7.tfm
 INPUT /usr/share/texlive/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm
+INPUT /usr/share/texlive/texmf-dist/fonts/tfm/jknappen/ec/ectt0900.tfm
 INPUT pricai2026_submission.aux
 INPUT ./pricai2026_submission.out
 INPUT ./pricai2026_submission.out
@@ -1056,4 +1057,5 @@ INPUT /usr/share/texmf/fonts/type1/public/cm-super/sfrm0900.pfb
 INPUT /usr/share/texmf/fonts/type1/public/cm-super/sfrm1000.pfb
 INPUT /usr/share/texmf/fonts/type1/public/cm-super/sfti0900.pfb
 INPUT /usr/share/texmf/fonts/type1/public/cm-super/sfti1000.pfb
+INPUT /usr/share/texmf/fonts/type1/public/cm-super/sftt0900.pfb
 INPUT /usr/share/texmf/fonts/type1/public/cm-super/sftt1000.pfb
