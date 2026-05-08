@@ -28,34 +28,34 @@
 \end{center}
 
 \begin{abstract}
-In recent years, federated learning has become a key enabler of edge
-intelligence by supporting collaborative model optimization under privacy
-constraints through the paradigm of keeping data local and exchanging only
-model parameters. However, in open edge-computing environments, the combined
-effects of non-independent and identically distributed (Non-IID) data,
-device heterogeneity, and untrusted clients expose significant tradeoffs
-among security, robustness, and generalization for existing robust
-aggregation methods. To address this issue, this paper proposes a trust-flow-driven
-trusted federated aggregation mechanism that covers client admission, runtime
-monitoring, and secure aggregation from a hardware-software co-design
-perspective. First, remote attestation and runtime monitoring based on
-trusted execution environments (TEEs) are integrated to enforce client
-admission and verify execution integrity during local training. Second, to
-identify stealthy attacks across training rounds, this paper designs an orthogonal
-dual-stream reputation evolution method centered on client trust states,
-decomposing them into a historical utility stream for long-term contribution
-and an instant risk stream for short-term anomalous behavior, thereby
-providing persistent dynamic trust signals for subsequent auditing and
-aggregation control. Third, this paper proposes a layer-wise
-differentiated aggregation strategy guided by a clean reference direction.
-By combining layer-wise gating, weight re-normalization, and dynamic
-clipping, the method suppresses malicious updates while preserving legitimate
-heterogeneous contributions, thereby mitigating the degradation of
-generalization under Non-IID settings. Experiments on Flower with CIFAR-10
-under 20 clients and six mixed attack types show that the proposed mechanism
-achieves an average accuracy of 92.31\% ($\pm$ 0.09\%) while limiting the
-attack success rate (ASR) to 10.21\% ($\pm$ 0.05\%), with the permanent false
-positive rate on benign clients approaching zero.
+    In recent years, federated learning has become a key enabler of edge
+    intelligence by supporting collaborative model optimization under privacy
+    constraints through the paradigm of keeping data local and exchanging only
+    model parameters. However, in open edge-computing environments, the combined
+    effects of non-independent and identically distributed (Non-IID) data,
+    device heterogeneity, and untrusted clients expose significant tradeoffs
+    among security, robustness, and generalization for existing robust
+    aggregation methods. To address this issue, this paper proposes a trust-flow-driven
+    trusted federated aggregation mechanism that covers client admission, runtime
+    monitoring, and secure aggregation from a hardware-software co-design
+    perspective. First, remote attestation and runtime monitoring based on
+    trusted execution environments (TEEs) are integrated to enforce client
+    admission and verify execution integrity during local training. Second, to
+    identify stealthy attacks across training rounds, this paper designs an orthogonal
+    dual-stream reputation evolution method centered on client trust states,
+    decomposing them into a historical utility stream for long-term contribution
+    and an instant risk stream for short-term anomalous behavior, thereby
+    providing persistent dynamic trust signals for subsequent auditing and
+    aggregation control. Third, this paper proposes a layer-wise
+    differentiated aggregation strategy guided by a clean reference direction.
+    By combining layer-wise gating, weight re-normalization, and dynamic
+    clipping, the method suppresses malicious updates while preserving legitimate
+    heterogeneous contributions, thereby mitigating the degradation of
+    generalization under Non-IID settings. Experiments on Flower with CIFAR-10
+    under 20 clients and six mixed attack types show that the proposed mechanism
+    achieves an average accuracy of 92.31\% ($\pm$ 0.09\%) while limiting the
+    attack success rate (ASR) to 10.21\% ($\pm$ 0.05\%), with the permanent false
+    positive rate on benign clients approaching zero.
 \end{abstract}
 
 \noindent\textbf{Keywords:} Federated Learning; Edge Computing; Trusted Execution Environment; Risk State Modeling; Layered Robust Aggregation; Backdoor Defense
@@ -77,6 +77,8 @@ The primary contributions of this paper are:
     \item \textbf{Designing a layered risk gating aggregation strategy tailored for strong Non-IID scenarios.} Guided by a server-side clean reference direction, layer-wise security sensitivities, and dynamic L2 clipping, this approach applies differentiated admission thresholds and survivor weight re-normalization across network layers. It reduces the risk of deep backdoor penetration while preserving valid updates from legitimate long-tail nodes.
     \item \textbf{Implementing and validating the framework end-to-end under mixed attack scenarios.} Experiments involving 20 clients and 6 mixed attack types ($n=5$) were conducted on the Flower platform. Results demonstrate that under high-adversarial settings, the proposed framework maintains an accuracy of $92.31\% (\pm 0.09\%)$ and restricts the ASR to $10.21\% (\pm 0.05\%)$, with the permanent false positive rate approaching zero.
 \end{enumerate}
+
+\section{Background and Related Work}
 
 \subsection{Federated Learning and Edge Computing Collaborative Architecture}
 Federated learning (FL) completes global model training through parameter-level collaboration under the constraint that data remain local. In edge computing scenarios, the client-edge-cloud architecture has been widely adopted: the edge side performs local training and uploads updates, while the central server handles aggregation and model distribution.
@@ -152,7 +154,7 @@ For highly heterogeneous data and a high proportion of malicious participants, t
 \end{enumerate}
 
 
-\section{Proposed Method: Trust Flow-Driven Trusted Federated Framework}
+\section{Proposed Method: Trust-Flow Framework}
 
 For the threat model above, this paper proposes a trust-flow-driven trusted federated learning framework (see Figure~\ref{fig:framework}). Following the execution order of federated learning, the framework first performs trusted admission and runtime monitoring on the client side, then conducts current-round content auditing and cross-round reputation evolution on the server side, and finally enters layered security control during aggregation. Each training round is therefore divided into five phases: pre-training admission, content auditing, state evolution, layered aggregation, and global distribution. At a higher level of abstraction, these phases correspond to three layers: client admission and monitoring, server auditing and evolution, and aggregation security assurance.
 
@@ -198,7 +200,7 @@ Client admission should not be limited to one-time identity verification. It req
               H(\mathcal{X}_k) = -\sum p(x_i) \log p(x_i)
           \end{equation}
           A high entropy value in the sequence usually indicates greater uncertainty in system operation. In physical terms, this often corresponds to backdoor-controlled execution, severe disturbance in gradient direction, or abnormal underlying instruction distributions.
-    \item \textbf{Information-Theory-Driven Dynamic Trust Evolution (Kalman-based Evolution)}: To prevent abrupt anomalies from contaminating the trust state, this framework constructs an entropy-driven adaptive covariance mapping mechanism. Instead of assuming a constant prior, the system maps the dynamically captured information entropy to the measurement-noise covariance matrix $R_k = f(H(\mathcal{X}_k))$ in the Kalman observation equation. In the classical predict-update recursion:
+    \item \textbf{ITL-Driven Dynamic Trust Evolution (Kalman-based)}: To prevent abrupt anomalies from contaminating the trust state, this framework constructs an entropy-driven adaptive covariance mapping mechanism. Instead of assuming a constant prior, the system maps the dynamically captured information entropy to the measurement-noise covariance matrix $R_k = f(H(\mathcal{X}_k))$ in the Kalman observation equation. In the classical predict-update recursion:
           \begin{itemize}
               \item \textbf{Prediction stage}: Based on the posterior distribution from the previous round, the prior trust expectation $\hat{T}_k^-$ at the current moment is extrapolated.
               \item \textbf{Update stage}: The instantaneous behavioral features of the current round are introduced for measurement update, yielding the posterior trust estimate $\hat{T}_k$ and the corresponding state error covariance matrix $P_k$.
@@ -240,7 +242,7 @@ Here, $\alpha_1+\alpha_2=1.0$ adjusts the cosine mapping interval. The parameter
     \caption{Admission and content auditing based on TEE hardware anchors and clean reference}
     \label{alg:phase12}
     \begin{algorithmic}[1]
-        \REQUIRE Client set $\mathcal{C}$, current-round parameter updates $\{\Delta W_k\}_{k\in\mathcal{C}}$, previous-round state $RiskEMA^{(t-1)}$
+        \REQUIRE $\mathcal{C}$, $\{\Delta W_k\}_{k\in\mathcal{C}}$, $RiskEMA^{(t-1)}$
         \ENSURE $TrustScore_k$, $ContentScore_k$, valid reference baseline $g_{root}$
         \STATE \textbf{Phase 1: Hardware Anchoring and Dynamic Trust Measurement}
         \FOR{each client $k \in \mathcal{C}$}
@@ -474,21 +476,24 @@ The global hyperparameters and defensive component configurations employed in th
     \centering
     \caption{Global Hyperparameters and Defense Component Configuration}
     \label{tab:hyperparams}
-    \begin{tabular}{p{4cm} p{8.5cm} p{2cm}}
-        \toprule
-        \textbf{Module}                              & \textbf{Hyperparameter Description}                         & \textbf{Value}  \\
-        \midrule
-        \multirow{2}{*}{\textbf{Base Environment}}       & Total nodes in heterogeneous topology ($K$)                                  & $20$            \\
-                                                           & Local SGD parameters ($lr$, $Momentum$)                      & $0.001$, $0.9$       \\
-        \midrule
-        \multirow{3}{*}{\textbf{Dual-Stream: Phase 1--3}} & TMAA penalty steepness $\lambda$, dead zone $\tau$, decay $\rho$       & $5.0$, $0.1$, $2.0$  \\
-                                                           & 2D audit mapping $\alpha_1, \alpha_2$ and $\beta_{fusion}$ & $0.6$, $0.4$, $2.0$  \\
-                                                           & History smoothing $\beta_h$ and risk half-life $\beta_r$             & $0.9$, $0.85$        \\
-        \midrule
-        \multirow{2}{*}{\textbf{Layer Clipping: Phase 4}}         & Score fusion exponents ($\alpha, \beta, \gamma, p$)             & $3.0, 1.0, 0.5, 1.0$ \\
-                                                           & Threshold lower bound $\mu_{base}$ and penalty scale $\lambda_s$          & $0.4$, $1.2$         \\
-        \bottomrule
-    \end{tabular}
+    {\small
+        \setlength{\tabcolsep}{3pt}
+        \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\raggedright\arraybackslash}p{3.1cm} >{\raggedright\arraybackslash}p{7.8cm} >{\raggedright\arraybackslash}p{3.2cm}}
+            \toprule
+            \textbf{Module}                              & \textbf{Hyperparameter Description}                         & \textbf{Value}  \\
+            \midrule
+            \multirow{2}{*}{\shortstack[l]{\textbf{Base}\\\textbf{Environment}}}       & Total nodes in heterogeneous topology ($K$)                                  & $20$            \\
+            & Local SGD parameters ($lr$, $Momentum$)                      & $0.001$, $0.9$       \\
+            \midrule
+            \multirow{3}{*}{\shortstack[l]{\textbf{Dual-Stream}\\\textbf{Phases 1--3}}} & TMAA penalty steepness $\lambda$, dead zone $\tau$, decay $\rho$       & $5.0$, $0.1$, $2.0$  \\
+            & 2D audit mapping $\alpha_1, \alpha_2$ and $\beta_{fusion}$ & $0.6$, $0.4$, $2.0$  \\
+            & History smoothing $\beta_h$ and risk half-life $\beta_r$             & $0.9$, $0.85$        \\
+            \midrule
+            \multirow{2}{*}{\shortstack[l]{\textbf{Layer Clipping}\\\textbf{Phase 4}}}         & Score fusion exponents ($\alpha, \beta, \gamma, p$)             & $3.0, 1.0, 0.5, 1.0$ \\
+            & Threshold lower bound $\mu_{base}$ and penalty scale $\lambda_s$          & $0.4$, $1.2$         \\
+            \bottomrule
+        \end{tabular*}
+    }
 \end{table}
 
 \textbf{Execution Details}: The formal experiment executes 30 rounds of federated training, with each round comprising 3 local Epochs. The trajectory charts and single-run duration (3878.53 s) are extracted from the authentic \texttt{server.log}. Metrics pertaining to accuracy report the mean of 5 replicated experiments, devoid of any interpolation smoothing.
@@ -514,14 +519,17 @@ As illustrated in Figure~\ref{fig:convergence}, under a 30\% malicious proportio
     \caption{\textbf{Extreme 50\% Malicious Ratio Stress Test vs. Standard 30\% Baseline}}
     \vspace{4pt}
     \label{tab:half_malicious}
-    \begin{tabular}{l c c c c}
-        \toprule
-        \textbf{Setting}                    & \textbf{Acc (\%)}         & \textbf{ASR (\%)}         & \textbf{TPR (\%)} & \textbf{FPR (\%)} \\
-        \midrule
-        Standard Baseline (30\% malicious, 6/20)           & 92.31 $\pm 0.09$          & 10.21 $\pm 0.05$          & 100               & 0.00              \\
-        \textbf{Stress Test (50\% malicious, 10/20)} & \textbf{91.81 $\pm 0.10$} & \textbf{10.46 $\pm 0.06$} & \textbf{100}      & \textbf{0.00}     \\
-        \bottomrule
-    \end{tabular}
+    {\small
+        \setlength{\tabcolsep}{3pt}
+        \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\raggedright\arraybackslash}p{5.1cm} c c c c}
+            \toprule
+            \textbf{Setting}                    & \textbf{Acc (\%)}         & \textbf{ASR (\%)}         & \textbf{TPR (\%)} & \textbf{FPR (\%)} \\
+            \midrule
+            Standard Baseline (30\% malicious, 6/20)           & 92.31 $\pm 0.09$          & 10.21 $\pm 0.05$          & 100               & 0.00              \\
+            \textbf{Stress Test (50\% malicious, 10/20)} & \textbf{91.81 $\pm 0.10$} & \textbf{10.46 $\pm 0.06$} & \textbf{100}      & \textbf{0.00}     \\
+            \bottomrule
+        \end{tabular*}
+    }
 \end{table}
 
 As demonstrated in the table, under the intense adversarial environment approaching the theoretical boundary, the framework sustains an accuracy of 91.81\%, alongside an ASR of 10.46\% (proximate to the random guess baseline of 10\%). All 10 malicious nodes are successfully identified and excised (TPR=100\%), while none of the 10 legitimate nodes suffer permanent erroneous bans (FPR=0\%). Furthermore, the 30-round log indicates a reduction in the test set Loss from $0.06362$ to $0.00883$, unequivocally proving that the model maintains stable convergence even under stringent defensive constraints.
@@ -571,17 +579,20 @@ The quantitative outcomes of each method in this high-risk scenario are document
         \caption{Performance Comparison of FL Defense Strategies under 30\% Mixed Attacks}
         \vspace{4pt}
         \label{tab:baseline}
-        \begin{tabular}{l l c c c}
-            \toprule
-            \textbf{Defense Strategy}                    & \textbf{Core Mechanism}      & \textbf{\shortstack{Global Acc. $\mu \pm \sigma$                                               \\ (Acc. \%)}} & \textbf{\shortstack{ASR $\mu \pm \sigma$\\ (ASR \%)}} & \textbf{\shortstack{Benign FPR $\mu$\\ (FPR \%)}} \\
-            \midrule
-            FedAvg \cite{mcmahan2017fedavg}      & No defense baseline                 & 86.15 $\pm 1.2$                                 & 92.34 $\pm 5.1$           & N/A ($*$)       \\
-            Krum \cite{blanchard2017krum}        & Euclidean distance               & 64.20 $\pm 2.8$                                 & 12.15 $\pm 0.9$           & 64.20 ($^{**}$) \\
-            Trimmed Mean \cite{yin2018byzantine} & Coordinate-wise trimming             & 71.35 $\pm 2.4$                                 & 38.60 $\pm 4.2$           & N/A ($*$)       \\
-            FLTrust \cite{cao2021fltrust}        & Unidirectional trust anchor               & 81.25 $\pm 1.5$                                 & 15.42 $\pm 1.1$           & 21.40 ($^{**}$) \\
-            \textbf{Proposed (Trust Flow)}       & \textbf{Dual-stream + layered clipping} & \textbf{92.31 $\pm 0.09$}                       & \textbf{10.21 $\pm 0.05$} & \textbf{0.00}   \\
-            \bottomrule
-        \end{tabular}
+        {\small
+            \setlength{\tabcolsep}{2.5pt}
+            \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\raggedright\arraybackslash}p{2.75cm} >{\raggedright\arraybackslash}p{3.05cm} c c c}
+                \toprule
+                \textbf{Defense Strategy}                    & \textbf{Core Mechanism}      & \textbf{\shortstack{Global Acc. $\mu \pm \sigma$                                               \\ (Acc. \%)}} & \textbf{\shortstack{ASR $\mu \pm \sigma$\\ (ASR \%)}} & \textbf{\shortstack{Benign FPR $\mu$\\ (FPR \%)}} \\
+                \midrule
+                FedAvg \cite{mcmahan2017fedavg}      & No defense baseline                 & 86.15 $\pm 1.2$                                 & 92.34 $\pm 5.1$           & N/A ($*$)       \\
+                Krum \cite{blanchard2017krum}        & Euclidean distance               & 64.20 $\pm 2.8$                                 & 12.15 $\pm 0.9$           & 64.20 ($^{**}$) \\
+                Trimmed Mean \cite{yin2018byzantine} & Coordinate-wise trimming             & 71.35 $\pm 2.4$                                 & 38.60 $\pm 4.2$           & N/A ($*$)       \\
+                FLTrust \cite{cao2021fltrust}        & Unidirectional trust anchor               & 81.25 $\pm 1.5$                                 & 15.42 $\pm 1.1$           & 21.40 ($^{**}$) \\
+                \textbf{Proposed (Trust Flow)}       & \textbf{Dual-stream + layered clipping} & \textbf{92.31 $\pm 0.09$}                       & \textbf{10.21 $\pm 0.05$} & \textbf{0.00}   \\
+                \bottomrule
+            \end{tabular*}
+        }
         \begin{tablenotes}
             \small
             \item (*) \textit{Note: FedAvg and Trimmed Mean do not include any explicit client trust evaluation or permanent blacklist removal (Ban) mechanism. Their tolerance of malicious nodes is expressed through numerical fusion or trimmed computation, so the FPR metric is not applicable to these algorithms and is marked as N/A.}
@@ -593,7 +604,7 @@ The quantitative outcomes of each method in this high-risk scenario are document
 The results demonstrate: FedAvg under mixed attacks suffers an ASR soaring to 92.34\%. While Krum manages to suppress the ASR to 12.15\%, it catastrophically inflates the FPR to 64.2\%, dragging accuracy down to 64.20\%. In stark contrast, the method proposed in this paper achieves the zenith of accuracy at 92.31\% while preserving an FPR of 0\%, simultaneously recording the lowest ASR (10.21\%). A Student's $t$-test based on multiple independent runs confirms that the variance, when juxtaposed against strong baselines (e.g., FLTrust), harbors statistical significance ($p<0.05$).
 
 \subsection{Component-Level Ablation Study}
-Addressing the ubiquitous "black-box" performance evaluations in current federated security research, this section abandons coarse-grained, phase-level superimposition tests in favor of component-level ablation experiments. This methodology rigorously investigates the independent contributions of core modules—such as dual-stream orthogonal decoupling, multi-dimensional risk probes, and layer-wise dynamic re-normalization—to defensive robustness and system availability.
+Addressing the common "black-box" performance evaluations in current federated security research, this section replaces coarse-grained phase superimposition tests with component ablation experiments. This methodology examines how core modules, including dual-stream orthogonal decoupling, multi-dimensional risk probes, and layer-wise dynamic re-normalization, independently contribute to defensive robustness and system availability.
 
 \subsubsection{Effectiveness of Dual-Stream Reputation Decoupling}
 To substantiate that the system's exceptionally low false positive rate (FPR) stems not from conservative defensive thresholds, but intrinsically from the orthogonal decoupling of historical utility and instantaneous risk, two degraded variants are constructed for comparison: a Single-Stream Exponential Moving Average (Single-Stream EMA) and a HistPerf-Only model. Table~\ref{tab:ablation_stream} delineates the precise interception performance of these divergent mechanisms under the intense pressure of severe Non-IID conditions and a 30\% mixed attack scenario.
@@ -604,13 +615,13 @@ To substantiate that the system's exceptionally low false positive rate (FPR) st
     \label{tab:ablation_stream}
     \begin{tabular}{l c c c}
         \toprule
-        \textbf{Reputation Architecture}                & \textbf{Threshold Control} & \textbf{FPR} & \textbf{TPR} \\
+        \textbf{Reputation Architecture}              & \textbf{Threshold Control} & \textbf{FPR}    & \textbf{TPR}     \\
         \midrule
-        \multirow{2}{*}{Single-Stream EMA (Baseline)} & Aggressive (anti-poison)         & 18.25\%               & 95.12\%               \\
-                                             & Conservative (anti-FP)         & 2.10\%                & 48.33\%               \\
+        \multirow{2}{*}{Single-Stream EMA (Baseline)} & Aggressive (anti-poison)   & 18.25\%         & 95.12\%          \\
+                                                      & Conservative (anti-FP)     & 2.10\%          & 48.33\%          \\
         \midrule
-        HistPerf-Only           & Dynamic adaptive            & 0.15\%                & 21.05\%               \\
-        \textbf{Dual-Stream Decoupling (Proposed)}         & Dynamic adaptive            & \textbf{0.05\%}       & \textbf{98.50\%}      \\
+        HistPerf-Only                                 & Dynamic adaptive           & 0.15\%          & 21.05\%          \\
+        \textbf{Dual-Stream Decoupling (Proposed)}    & Dynamic adaptive           & \textbf{0.05\%} & \textbf{98.50\%} \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -653,7 +664,7 @@ A plethora of robust aggregation methods lean heavily upon IID conditions. To me
 
 The curves substantiate that within weakly heterogeneous environments dictated by $\alpha=100$ or $\alpha=1.0$, Krum and FLTrust exhibit performance rivaling the proposed method (both registering Acc $> 90\%$). However, within extreme long-tail settings ($\alpha \to 0.1$), traditional distance-based methods undergo marked degradation, with accuracy plummeting to a dismal 64.2\%. Resiliently, the proposed approach stabilizes at approximately 92\% under identical adversity, thereby verifying that the dual-stream decoupling architecture possesses superior robustness against profound heterogeneity.
 
-Furthermore, discrete testing ($[0.5,1.0,2.0,3.0]$) was conducted on the pivotal parameter $\beta_{fusion}$. A smaller magnitude fosters the retention of long-tail nodes but simultaneously escalates ASR risks; conversely, an oversized value skews the aggregation excessively towards homogeneous updates. Weighing the trade-offs between Acc and ASR, $\beta_{fusion}=2.0$ was definitively selected.
+Furthermore, discrete testing at 0.5, 1.0, 2.0, and 3.0 was conducted on the pivotal parameter $\beta_{fusion}$. A smaller magnitude fosters the retention of long-tail nodes but simultaneously escalates ASR risks; conversely, an oversized value skews the aggregation excessively towards homogeneous updates. Weighing the trade-offs between Acc and ASR, $\beta_{fusion}=2.0$ was definitively selected.
 
 \subsection{System Computation and Communication Overhead Analysis}
 Despite harboring a multi-phase evaluation protocol, the computational and communication overhead of the framework remains stringently tractable. Table~\ref{tab:overhead} demonstrates that the edge merely incurs the generation of a TEE Quote and lightweight monitoring, yielding an auxiliary delay of roughly $12 \sim 15$ ms. Concurrently, the communication tier merely appends a TrustReport of approximately $15$ KB per transmission. When juxtaposed against the $\sim 10$ MB scale of model transfer, the bandwidth overhead rests below an imperceptible 0.15\%.
@@ -663,14 +674,17 @@ Despite harboring a multi-phase evaluation protocol, the computational and commu
     \caption{Edge-Cloud Overhead: Standard FL vs. Proposed Framework (20 Clients)}
     \vspace{4pt}
     \label{tab:overhead}
-    \begin{tabular}{l c c c}
-        \toprule
-        \textbf{System Architecture}        & \textbf{Edge Extra Latency}         & \textbf{Upload Extra Payload}  & \textbf{Cloud Aggregation Time}             \\
-        \midrule
-        Standard FedAvg          & 0 ms (Baseline)                     & 0 KB (Baseline)                  & $\sim 2.10$ s                           \\
-        \textbf{Trusted FL (Proposed)} & \textbf{$\sim 15$ ms (TEE signing only)} & \textbf{$\sim 15$ KB (appended report)} & \textbf{$\sim 4.85$ s (incl. audit \& dual-stream)} \\
-        \bottomrule
-    \end{tabular}
+    {\small
+        \setlength{\tabcolsep}{3pt}
+        \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} >{\raggedright\arraybackslash}p{3.0cm} >{\centering\arraybackslash}p{3.05cm} >{\centering\arraybackslash}p{3.1cm} >{\centering\arraybackslash}p{4.4cm}}
+            \toprule
+            \textbf{System Architecture}        & \textbf{Edge Extra Latency}         & \textbf{Upload Extra Payload}  & \textbf{Cloud Aggregation Time}             \\
+            \midrule
+            Standard FedAvg          & 0 ms (Baseline)                     & 0 KB (Baseline)                  & $\sim 2.10$ s                           \\
+            \textbf{Trusted FL (Proposed)} & \textbf{$\sim 15$ ms (TEE signing only)} & \textbf{$\sim 15$ KB (appended report)} & \textbf{$\sim 4.85$ s (incl. audit \& dual-stream)} \\
+            \bottomrule
+        \end{tabular*}
+    }
 \end{table}
 
 Regarding specific costs, the layer-wise cosine evaluation inherently inflates the computational load on the server. In the empirical trials, the aggregation duration per round escalated from $2.10$ s to $4.85$ s. Given that a single round of communication over a Wide Area Network (WAN) habitually consumes tens of seconds, this nominal computational overhead is entirely acceptable from an engineering perspective.
@@ -686,20 +700,20 @@ Empirical results dictate that under a 30\% mixed attack vector, the framework a
 \section{Detailed Computation of Instant Risk Flow Probes}
 To augment reproducibility and transparency, this appendix mathematically delineates the calculation details of the core probes ($r_{grad}, r_{probe}, r_{trigger}$) underpinning the instant risk stream originally introduced in Section 4. During the $t$-th aggregation round, the probes are defined as follows:
 
-\subsection{A.1 Gradient Direction and Amplitude Probe ($r_{grad}$)}
+\subsection{A.1 Gradient Direction and Amplitude Probe \texorpdfstring{($r_{grad}$)}{(r-grad)}}
 The $r_{grad}$ probe quantifies the geometric deviation of the client update $\Delta W_k^{(t)}$ relative to the reference direction $g_{root}^{(t)}$, tasked specifically with detecting sign flipping and amplitude anomalies. This metric concurrently evaluates directional deflection (cosine term) and scale mutation (L2 anomaly term):
 \begin{equation}
     r_{grad, k}^{(t)} = \lambda_{d} \left(1 - \frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{||\Delta W_k^{(t)}|| \cdot ||g_{root}^{(t)}||}\right) + \lambda_{m} \max\left(0, \frac{||\Delta W_k^{(t)}||_2 - \mu^{(t)}}{\sigma^{(t)}}\right)
 \end{equation}
 Wherein $\lambda_d$ and $\lambda_m$ modulate the weighting of the directional and amplitude terms, respectively (defaulting to $0.5$ for both); $\mu^{(t)}$ and $\sigma^{(t)}$ signify the mean and standard deviation of the gradient L2 norms across the admitted nodes for round $t$.
 
-\subsection{A.2 Small-Sample Cross-Entropy Probe ($r_{probe}$)}
+\subsection{A.2 Small-Sample Cross-Entropy Probe \texorpdfstring{($r_{probe}$)}{(r-probe)}}
 Relying exclusively on distance statistics is grossly inadequate for identifying targeted pollution directed against minority classes. The $r_{probe}$ leverages a small-scale, pristine probe set on the server, denoted as $\mathcal{D}_{probe}$, calculating the incremental surge in cross-entropy loss (Loss Surge) pre- and post-merger:
 \begin{equation}
     r_{probe, k}^{(t)} = \text{ReLU}\left( \mathcal{L}_{CE}(W_{global}^{(t-1)} + \Delta W_k^{(t)}; \mathcal{D}_{probe}) - \mathcal{L}_{CE}(W_{global}^{(t-1)}; \mathcal{D}_{probe}) \right)
 \end{equation}
 
-\subsection{A.3 Deep Neuron Backdoor Activation Probe ($r_{trigger}$)}
+\subsection{A.3 Deep Neuron Backdoor Activation Probe \texorpdfstring{($r_{trigger}$)}{(r-trigger)}}
 Countering profoundly concealed threats like Clean-Label attacks, standard statistical and validation losses often fall short. The $r_{trigger}$ discerns anomalies through the distributional variance of high-level feature activations. Assuming $A_k$ denotes the client model's pre-activation outputs on the validation set, and $\mathcal{H}(\cdot)$ signifies the Softmax normalization into a probability simplex to satisfy the KL-Divergence prerequisites:
 \begin{equation}
     r_{trigger, k}^{(t)} = \text{KL-Divergence}\left( \mathcal{H}(A_{base}) \| \mathcal{H}(A_k) \right)
