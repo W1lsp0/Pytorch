@@ -60,7 +60,7 @@
 
 联邦学习通过参数交换训练全局模型，并将数据保留在边缘设备本地\cite{kairouz2021flsurvey,mcmahan2017fedavg}。这一范式适合边缘智能场景，但当客户端身份、执行完整性和更新语义无法完全可信时，聚合阶段会变得脆弱。实际边缘网络还同时存在设备异构和强偏斜数据分布，因此鲁棒聚合必须区分恶意偏移和合法长尾更新。在复合攻击下，这一区分更加困难，因为攻击者可能提交投毒参数、注入定向后门，或利用跨轮伪装降低可见异常。
 
-已有工作从不同角度处理这一问题。Krum 和 Trimmed Mean 等几何或统计防御会剔除离群更新\cite{blanchard2017krum,yin2018byzantine}；FLTrust、FoolsGold、RaSA 以及相关检测方案则利用干净参考、相似性历史或自适应信任机制\cite{cao2021fltrust,fung2020foolsgold,wang2025rasa,dou2025toward,wang2024federated}。面向后门的防御进一步考察触发器行为或合谋模式\cite{bagdasaryan2020backdoor,wang2019neuralcleanse,flpurifier,roseagg,shieldfl}。这些机制仍面临两类反复出现的张力：静态软件检查不能保证本地执行确实真实；过强过滤又容易将 Non-IID 长尾更新误判为攻击。TEE 辅助的联邦学习和可信推理系统提供了硬件信任根\cite{liao2024verifiable,zhang2025rppfl,r1_tee_integrity,r5_tee_mitigating,r12_iot_tee,xu2021distributed,yan2024efficient,lu2025tmt}，但客户端准入之后，TEE 本身并不能判断真实训练产生的模型更新是否在语义上安全。
+已有工作从不同角度处理这一问题。Krum 和 Trimmed Mean 等几何或统计防御会剔除离群更新\cite{blanchard2017krum,yin2018byzantine}；FLTrust 与 RaSA 则利用干净参考或自适应安全聚合\cite{cao2021fltrust,wang2025rasa}。面向后门的防御进一步考察触发器行为或合谋模式\cite{bagdasaryan2020backdoor,wang2019neuralcleanse,flpurifier,roseagg}。这些机制仍面临两类反复出现的张力：静态软件检查不能保证本地执行确实真实；过强过滤又容易将 Non-IID 长尾更新误判为攻击。TEE 辅助联邦系统提供了硬件信任根\cite{zhang2025rppfl,r1_tee_integrity,r5_tee_mitigating,lu2025tmt}，但客户端准入之后，TEE 本身并不能判断真实训练产生的模型更新是否在语义上安全。
 
 本文提出 \emph{Trust Flow}，一个面向边缘联邦学习的全流程可信聚合框架。其核心思想是让信任证据在准入、审查、时序状态演化和聚合之间持续流动，而不是把每一轮视作孤立的过滤决策。本文贡献如下：
 \begin{tightenumerate}
@@ -72,13 +72,13 @@
 
 \section{背景与相关工作}
 
-\textbf{边缘计算中的联邦学习。} 标准 FL 工作流中，客户端完成本地训练并向服务器提交参数更新，服务器聚合后再分发全局模型。该流程保留了数据本地性，却使服务器高度依赖上传更新的真实性和质量。边缘计算进一步增加了复杂度，因为客户端的算力、通信稳定性和数据分布均存在差异。簇式 FL、自适应剪枝扩展和拆分式联邦学习已被用于处理异构性和资源约束\cite{r9_clustered,fedpe,parallelsfl}。然而，系统越开放、层级越复杂，客户端准入、本地执行和更新聚合周围的攻击面也越大。
+\textbf{边缘计算中的联邦学习。} 标准 FL 工作流中，客户端完成本地训练并向服务器提交参数更新，服务器聚合后再分发全局模型。该流程保留了数据本地性，却使服务器高度依赖上传更新的真实性和质量。边缘计算进一步增加了复杂度，因为客户端的算力、通信稳定性和数据分布均存在差异。系统越开放、层级越复杂，客户端准入、本地执行和更新聚合周围的攻击面也越大。
 
 \textbf{投毒与后门攻击。} FL 中的攻击主要包括无目标投毒和目标后门。符号翻转、梯度缩放等无目标投毒旨在破坏收敛；标签翻转、触发器后门、干净标签投毒和语义后门则试图保持主任务行为，同时植入定向误分类。后门攻击尤其棘手，因为恶意更新可在方向上接近正常更新，却改变隐藏特征\cite{bagdasaryan2020backdoor,wang2019neuralcleanse}。在多轮训练中，攻击者还可能先正常行为以积累信任，再注入低幅度或间歇式恶意更新。
 
-\textbf{主动防御及其局限。} 鲁棒聚合通常依赖几何距离、坐标级统计、干净锚点或时序相似性。Krum 与 Trimmed Mean 拒绝或抑制离群更新\cite{blanchard2017krum,yin2018byzantine}；FLTrust 使用服务器端干净参考方向\cite{cao2021fltrust}；FoolsGold 利用历史相似性降低 Sybil 影响\cite{fung2020foolsgold}；RaSA 和近期检测框架进一步在边缘辅助场景下调整聚合或安全聚合\cite{wang2025rasa,dou2025toward,wang2024federated}。FLPurifier、RoseAgg 和 ShieldFL 等后门防御提高了对触发器和合谋模式的保护能力\cite{flpurifier,roseagg,shieldfl}。但这些防御对强 Non-IID 分布仍较敏感：阈值严格会增加良性误杀，阈值宽松则会放过隐蔽攻击。
+\textbf{主动防御及其局限。} 鲁棒聚合通常依赖几何距离、坐标级统计、干净锚点或自适应聚合。Krum 与 Trimmed Mean 拒绝或抑制离群更新\cite{blanchard2017krum,yin2018byzantine}；FLTrust 使用服务器端干净参考方向\cite{cao2021fltrust}；RaSA 在边缘辅助场景下调整安全聚合\cite{wang2025rasa}。FLPurifier 和 RoseAgg 等后门防御提高了对触发器或合谋模式的保护能力\cite{flpurifier,roseagg}。但这些防御对强 Non-IID 分布仍较敏感：阈值严格会增加良性误杀，阈值宽松则会放过隐蔽攻击。
 
-\textbf{TEE 辅助可信训练。} Intel SGX 和 ARM TrustZone 等可信执行环境可提供隔离执行与受保护密钥材料。已有研究展示了 TEE 在可验证推理、鲁棒隐私保护 FL、训练完整性、攻击缓解和工业 IoT 信任共享中的价值\cite{liao2024verifiable,zhang2025rppfl,r1_tee_integrity,r5_tee_mitigating,r12_iot_tee,xu2021distributed,yan2024efficient,lu2025tmt}。不过，TEE 准入不能单独判断一个真实训练过程生成的模型更新是否语义安全。因此，Trust Flow 将硬件根准入与跨轮风险建模、分层鲁棒聚合结合起来。
+\textbf{TEE 辅助可信训练。} Intel SGX 和 ARM TrustZone 等可信执行环境可提供隔离执行与受保护密钥材料。已有研究展示了 TEE 在鲁棒隐私保护 FL、训练完整性、攻击缓解和可信模型训练中的价值\cite{zhang2025rppfl,r1_tee_integrity,r5_tee_mitigating,lu2025tmt}。不过，TEE 准入不能单独判断一个真实训练过程生成的模型更新是否语义安全。因此，Trust Flow 将硬件根准入与跨轮风险建模、分层鲁棒聚合结合起来。
 
 \section{系统模型与威胁假设}
 
@@ -122,27 +122,21 @@ Trust Flow 将每一轮 FL 划分为四个相互连接的阶段：准入与运�
 
 从更高层看，该框架是一条信任状态转移管线。第一阶段输出 $TrustScore$，刻画客户端是否具有可信参与基础；第二阶段输出 $ContentScore$，衡量当前更新是否与干净参考和群体方向一致；第三阶段将这些信号沉淀为 $HistPerf$ 与 $RiskEMA$，分离长期贡献和短时异常；第四阶段将状态融合为 $RawScore$ 并执行差异化分层聚合。这一设计避免把某一轮低分直接视为恶意证据，这对强 Non-IID 数据下的长尾客户端尤其重要。
 
+从操作流程看，每一轮都遵循相同的决策路径。服务器先移除未通过准入证明的客户端，因为这些更新无法绑定到受保护执行路径；随后对剩余更新计算其相对干净参考和可信群体的质量，但该分数仍只是临时证据。临时证据会被沉淀到慢速效用状态和快速风险状态中，最后才转化为按层聚合权限。这样的顺序是有意设计的：前置阶段回答证据是否可信，中间阶段判断当前更新是有用还是有风险，最终阶段再决定该更新能在哪些网络层参与贡献。因此，框架避免在每轮开始时设置单一硬门槛，从而降低强 Non-IID 下的脆弱性，同时在风险证据持续存在时仍能执行硬隔离。
+
 \subsection{准入与内容审查}
 
 每个准入客户端都必须通过 TEE 式准入检查。令 $M_{\text{attest},k}\in\{0,1\}$ 表示证明报告是否有效。初始化期间，客户端调用设备唯一密钥并生成远程证明 quote，其中包含 PCR 链、代码段签名和运行配置等完整性测量。只有通过该检查的客户端才获得通信权限。本地训练期间，可信管理代理监测行为序列
-$\mathcal{X}_k=\{\Delta\text{grad},\Delta\text{loss},\text{instr\_dist}\}$，并将其熵映射为测量不确定性：
-\begin{equation}
-    H(\mathcal{X}_k)=-\sum_i p(x_i)\log p(x_i),\qquad
-    R_k^{(t)}=\exp(\lambda H(\mathcal{X}_k^{(t)})).
-\end{equation}
+$\mathcal{X}_k=\{\Delta\text{grad},\Delta\text{loss},\text{instr\_dist}\}$。其熵 $H(\mathcal{X}_k)=-\sum_i p(x_i)\log p(x_i)$ 被映射为测量不确定性 $R_k^{(t)}=\exp(\lambda H(\mathcal{X}_k^{(t)}))$。直观地看，若某个客户端的本地训练突然呈现高熵状态，它未必已经恶意，但本轮证据的可信度应低于稳定执行下产生的证据。
+
 依据信息论滤波视角\cite{chen2017maximum}和多维信任评估方法\cite{li2026multidimensional}，信任估计按下式更新：
 \begin{equation}
     \hat{T}_{k}^{(t)}=\hat{T}_{k}^{(t-1)}+K_k^{(t)}(Z_k^{(t)}-\hat{T}_{k}^{(t-1)}),\quad
     TrustScore_k=\hat{T}_{k}^{(t)}(1+P_k^{(t)})^{-1}.
 \end{equation}
-高熵运行行为会增大 $R_k^{(t)}$，降低卡尔曼增益，防止突发异常观测被吸收到长期信任估计中。协方差 $P_k^{(t)}$ 作为置信边界：协方差越小，信任估计越可靠。因此，准入结果不是一次性二元决策，而是可持续更新的权限因子，并可传递到后续审查与聚合阶段。
+高熵运行行为因此会降低卡尔曼增益，防止突发异常观测被吸收到长期信任估计中。协方差 $P_k^{(t)}$ 作为置信边界：协方差越小，信任估计越可靠。因此，准入结果不是一次性二元决策，而是可持续更新的权限因子，并可传递到后续审查与聚合阶段。
 
-随后，服务器构造干净指导方向。若存在小型干净验证梯度，则 $g_{root}=g_{root\_clean}$；否则，使用高信任、低风险客户端：
-\begin{equation}
-    \omega_k^{ref}=TrustScore_k(1-RiskEMA_k^{prev})^2,\quad
-    g_{root}=\sum_k\frac{\omega_k^{ref}}{\sum_j\omega_j^{ref}}\Delta W_k .
-\end{equation}
-对每个客户端更新，内容质量由参考一致性和群体一致性共同构成：
+随后，服务器构造干净指导方向。若存在小型干净验证梯度，则 $g_{root}=g_{root\_clean}$；否则，使用高信任且上一轮风险较低的客户端，并以 $\omega_k^{ref}=TrustScore_k(1-RiskEMA_k^{prev})^2$ 作为参考权重。该退化参考在边缘部署中很重要：服务器侧干净集可能很小甚至不存在，此时参考方向应保持保守，但不能被近期可疑客户端主导。对每个客户端更新，内容质量由参考一致性和群体一致性共同构成：
 \begin{align}
 S_{contrib,k}&=\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,g_{root})),\\
 S_{consist,k}&=\frac{\sum_{j\ne k}TrustScore_j\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,\Delta W_j))}
@@ -150,30 +144,23 @@ S_{consist,k}&=\frac{\sum_{j\ne k}TrustScore_j\max(0,\alpha_1+\alpha_2\cos(\Delt
 ContentScore_k&=\frac{(1+\beta_{fusion}^2)S_{consist,k}S_{contrib,k}}
 {\beta_{fusion}^2S_{consist,k}+S_{contrib,k}+\varepsilon}.
 \end{align}
-其中 $\beta_{fusion}>1$ 会提高干净方向的影响，有助于抵抗合谋漂移。
+其中 $\beta_{fusion}>1$ 会提高干净方向的影响，有助于抵抗合谋漂移。这里采用调和式融合并非只为数值平滑，而是要求客户端同时在干净参考和可信群体两个方向上都具有合理性。仅有较高群体一致性不足以抵抗合谋，只有较高参考一致性又可能过度惩罚合法 Non-IID 更新。
 
 \subsection{双流状态演化}
 
-单一信誉分会混淆由数据偏斜导致的低效用和由攻击导致的高风险。Trust Flow 因此将客户端状态分为历史效用流和瞬时风险流。历史流使用 Beta 信誉更新：
-\begin{align}
-r_k^{good}&=\mathrm{clip}\left((ContentScore_k-\mu_{content})/(\sigma_{content}+\varepsilon),0,1\right),\\
-\alpha_k^{(t)}&=\lambda_h\alpha_k^{(t-1)}+r_k^{good},\quad
-\beta_k^{(t)}=\lambda_h\beta_k^{(t-1)}+(1-r_k^{good}),\\
-HistPerf_k^{(t)}&=\alpha_k^{(t)}/(\alpha_k^{(t)}+\beta_k^{(t)}+\varepsilon).
-\end{align}
-该通道刻意保持缓慢：合法长尾节点可在暂时低内容分之后恢复。较低 $HistPerf$ 表示该节点近期贡献有限，它会导致软隔离，而不是永久移除。风险流则快速响应，并采用最大探针规则：
-\begin{align}
-Risk_k^{inst} &= \max\{r_{report},r_{grad},r_{probe},r_{pixel},
-r_{trigger},r_{sign},r_{peer}\},\\
-RiskEMA_k^{(t)} &= \beta_rRiskEMA_k^{(t-1)}+(1-\beta_r)Risk_k^{inst}.
-\end{align}
-探针包括梯度方向与幅度、小型干净集损失上升、触发器激活漂移、报告异常、符号不一致和群体分歧。这两个流只在计算聚合权限时汇合：
+单一信誉分会混淆由数据偏斜导致的低效用和由攻击导致的高风险。Trust Flow 因此将客户端状态分为历史效用流和瞬时风险流。历史流将归一化后的内容质量视为 Beta 信誉模型中的软证据：正向证据增加 $\alpha_k$，弱证据增加 $\beta_k$，二者均带有衰减系数 $\lambda_h$；历史效用期望为 $HistPerf_k^{(t)}=\alpha_k^{(t)}/(\alpha_k^{(t)}+\beta_k^{(t)}+\varepsilon)$。
+
+该通道刻意保持缓慢。合法长尾节点可能因为本地数据分布不同于多数客户端而在若干轮中获得较低内容分，这不应被立即解释为攻击。较低 $HistPerf$ 因此只会降低聚合权限或触发临时软隔离，而不是永久移除。风险流的作用正好相反：它对报告异常、梯度方向与幅度、小型干净集损失上升、触发器激活漂移、符号不一致和群体分歧等探针取最大值，并按 $RiskEMA_k^{(t)}=\beta_rRiskEMA_k^{(t-1)}+(1-\beta_r)Risk_k^{inst}$ 更新。这样，单次强攻击信号不会被历史良性行为平均掉。
+
+这种分离还改变了边界客户端的处置方式。若某个客户端内容质量偏弱但风险没有上升，系统会保留其参与资格并降低影响力，让后续轮次继续判断低分是否由 Non-IID 漂移造成。若某个客户端历史效用尚可但瞬时风险突然升高，则当前更新会在进入敏感层之前被降权或阻断。这种非对称响应是实验中永久误封率较低的关键，因为框架不再要求同一个阈值同时承担质量筛选和攻击检测两种任务。
+
+这两个流只在计算聚合权限时汇合：
 \begin{align}
 RawScore_k &= (TrustScore_k)^\alpha(ContentScore_k)^\beta
 (HistPerf_k^{(t-1)})^\gamma \nonumber\\
 &\quad \times (1-RiskEMA_k^{(t-1)})^p .
 \end{align}
-最终状态机区分 NORMAL、SUSPECT、QUARANTINE 与 BLACKLIST，如图~\ref{fig:state_machine} 所示。潜伏-爆发型攻击者可在早期良性轮次积累较高 $HistPerf$，但后续触发注入会激活 $r_{trigger}$ 或 $r_{probe}$ 并提高 $RiskEMA$，从而在历史效用较高时仍被阻断。相反，当前相似性较低的长尾良性客户端主要由缓慢效用流处理，并可在后续正向贡献后恢复。
+乘法形式使最终权限保持保守：客户端需要同时具有足够的执行可信度、当轮内容质量、历史效用和较低近期风险。最终状态机区分 NORMAL、SUSPECT、QUARANTINE 与 BLACKLIST，如图~\ref{fig:state_machine} 所示。潜伏-爆发型攻击者可在早期良性轮次积累较高 $HistPerf$，但后续触发注入会激活触发器或干净探针通道并提高 $RiskEMA$，从而在历史效用较高时仍被阻断。相反，当前相似性较低的长尾良性客户端主要由缓慢效用流处理，并可在后续正向贡献后恢复。
 
 \begin{figure}[t]
     \centering
@@ -191,18 +178,8 @@ RawScore_k &= (TrustScore_k)^\alpha(ContentScore_k)^\beta
     \caption{风险门控的按层裁剪与差异化聚合。}
     \label{fig:layer_gating}
 \end{figure}
-\begin{align}
-S_{privacy}^{(l)}&=\exp(-\tau_p l/L),\quad
-S_{utility}^{(l)}=\|g_{ref}^{(l)}\|_2/(\max_m\|g_{ref}^{(m)}\|_2+\varepsilon),\\
-S_{security}^{(l)}&=1-\frac{\sum_{k\in\mathcal{A}}TrustScore_k\cos(\Delta W_k^{(l)},g_{ref}^{(l)})}
-{\sum_{k\in\mathcal{A}}TrustScore_k+\varepsilon},\\
-S_{total}^{(l)}&=w_pS_{privacy}^{(l)}+w_uS_{utility}^{(l)}+w_sS_{security}^{(l)} .
-\end{align}
-层阈值和裁剪半径为
-\begin{equation}
-\theta^{(l)}=\mu_{base}+\lambda_sS_{total}^{(l)},\qquad
-C^{(l)}=C_{base}/(S_{total}^{(l)}+\varepsilon_c).
-\end{equation}
+该分数融合三类信号：隐私暴露、参考梯度效用和安全偏离。隐私项随深度衰减，效用项度量该层参考梯度范数的相对大小，安全项度量可信客户端更新相对参考方向的漂移程度。三者加权得到 $S_{total}^{(l)}$，并同时控制层准入阈值 $\theta^{(l)}=\mu_{base}+\lambda_sS_{total}^{(l)}$ 与裁剪半径 $C^{(l)}=C_{base}/(S_{total}^{(l)}+\varepsilon_c)$。因此，若某层出现更强可疑漂移，该层会变得更难进入且裁剪更紧；若某层仍稳定接近参考方向，则保留更多良性异构容量。
+
 幸存者集合为 $\Phi^{(l)}=\{k\in\mathcal{A}\mid RawScore_k\ge\theta^{(l)}\}$，其权重重新归一化为
 \begin{equation}
 \tilde{w}_{k}^{(l)}=\frac{RawScore_k}{\sum_{j\in\Phi^{(l)}}RawScore_j+\varepsilon},\quad
@@ -210,7 +187,9 @@ C^{(l)}=C_{base}/(S_{total}^{(l)}+\varepsilon_c).
 \end{equation}
 最终更新为 $\Delta W_{global}^{(l)}=\sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)}\widehat{\Delta W}_k^{(l)}$。权重重归一化可以防止剔除风险客户端后有效学习率缩小。
 
-这种按层控制旨在保留有用的浅层表征，同时加固攻击敏感度更高的层。若某个深层的安全项升高，则该层阈值提高、裁剪半径减小，低信任或高幅度更新更难影响该层。若浅层仍接近参考方向，则保持更宽松阈值。这种差异化处理很重要，因为统一裁剪半径会过度压制良性特征提取层，并在恶意客户端已被移出幸存集后拖慢收敛。
+这种按层控制旨在保留有用的浅层表征，同时加固攻击敏感度更高的层。以语义后门为例，攻击通常更集中地改变最终分类层或深层特征层；统一全局裁剪要么足够宽松以保留浅层特征，要么足够严格以压制深层攻击，却很难兼顾二者。Trust Flow 允许不同层在同一轮采用不同策略：深层可以拒绝低权限客户端并收紧更新半径，浅层在参考一致性稳定时仍可保持较宽松阈值。这种差异化处理很重要，因为统一裁剪半径会过度压制良性特征提取层，并在恶意客户端已被移出幸存集后拖慢收敛。
+
+重归一化步骤对收敛同样关键。若没有该步骤，剔除可疑客户端会降低有效聚合权重之和，并形成隐式学习率衰减。这种衰减容易被误认为是鲁棒性控制带来的正常副作用，但在固定 30 轮训练预算下会直接拖慢优化。Trust Flow 因此将过滤与优化视为耦合操作：移除不安全权重后，剩余可信权重会先被投影回有效聚合单纯形，再进入裁剪和分层组装。
 
 \subsection{分析视角}
 
@@ -222,19 +201,11 @@ C^{(l)}=C_{base}/(S_{total}^{(l)}+\varepsilon_c).
 
 \subsection{风险探针计算}
 
-瞬时风险流使用三个核心探针。梯度探针度量方向和幅度偏离：
-\begin{equation}
-r_{grad,k}^{(t)}=\lambda_d\left(1-\frac{\Delta W_k^{(t)}\cdot g_{root}^{(t)}}{\|\Delta W_k^{(t)}\|\|g_{root}^{(t)}\|}\right)+
-\lambda_m\max\left(0,\frac{\|\Delta W_k^{(t)}\|_2-\mu^{(t)}}{\sigma^{(t)}}\right).
-\end{equation}
-干净探针检查应用某个客户端更新后，小型服务器侧干净集 $\mathcal{D}_{probe}$ 上的交叉熵是否上升：
-\begin{equation}
-r_{probe,k}^{(t)}=\mathrm{ReLU}\left(\mathcal{L}_{CE}(W^{(t-1)}+\Delta W_k^{(t)};\mathcal{D}_{probe})
--\mathcal{L}_{CE}(W^{(t-1)};\mathcal{D}_{probe})\right).
-\end{equation}
-触发器探针通过 KL 散度比较高层特征激活，
-$r_{trigger,k}^{(t)}=\mathrm{KL}(\mathcal{H}(A_{base})\|\mathcal{H}(A_k))$，
-有助于识别低层梯度方向接近良性更新的干净标签或语义后门。
+瞬时风险流使用的探针彼此冗余，而不是各自单独作出最终裁决。梯度探针同时度量相对 $g_{root}$ 的方向偏离和相对本轮统计量的异常幅度，因此适合捕获符号翻转和梯度缩放，但对梯度方向接近良性的干净标签攻击并不充分。干净探针会将候选更新应用到服务器侧小型探针集，并记录交叉熵损失的上升。触发器探针通过 KL 散度比较高层激活直方图，$r_{trigger,k}^{(t)}=\mathrm{KL}(\mathcal{H}(A_{base})\|\mathcal{H}(A_k))$，因而更敏感于语义后门或干净标签后门造成的特征层漂移。
+
+这些探针通过最大值规则融合，是因为它们的失效模式不同。高幅度攻击者通常会先被梯度通道暴露，而隐蔽后门可能只表现为较小的干净损失变化，却伴随明显激活偏移。风险流保留本轮最强警告，使不同攻击家族都能被状态机看到，而不需要依赖一个统一的异常分数。
+
+这些探针在审查中还具有诊断作用。若梯度通道占主导，服务器会将该客户端视为优化层面的威胁，并主要通过裁剪和层阈值抑制其影响；若干净探针或触发器通道占主导，则该更新在数值上可能看似普通，但语义上并不安全，因此即使历史效用较高，状态机也会推动该客户端进入隔离观察。群体分歧只作为辅助证据，而不是单独移除的理由，因为合法长尾客户端也可能与多数方向不一致。这种诊断分离降低了防御对单一分数校准的依赖，也解释了为何同一管线能够同时处理显式参数攻击、干净标签漂移和语义后门。
 
 \section{实验}
 
@@ -398,24 +369,13 @@ Trust Flow 将准入证据、内容审查、时序信誉和按层聚合整合为
     \bibitem{blanchard2017krum} Blanchard, P., El Mhamdi, E.M., Guerraoui, R., Stainer, J.: Machine learning with adversaries: Byzantine tolerant gradient descent. In: Advances in Neural Information Processing Systems 30 (2017). \href{https://papers.nips.cc/paper/6617-machine-learning-with-adversaries-byzantine-tolerant-gradient-descent}{NeurIPS paper page}
     \bibitem{yin2018byzantine} Yin, D., Chen, Y., Kannan, R., Bartlett, P.: Byzantine-robust distributed learning: Towards optimal statistical rates. In: Proceedings of the 35th International Conference on Machine Learning, PMLR 80, pp. 5650--5659 (2018). \url{https://proceedings.mlr.press/v80/yin18a.html}
     \bibitem{cao2021fltrust} Cao, X., Fang, M., Liu, J., Gong, N.Z.: FLTrust: Byzantine-robust federated learning via trust bootstrapping. In: Proceedings 2021 Network and Distributed System Security Symposium (NDSS) (2021). \url{https://doi.org/10.14722/ndss.2021.24434}
-    \bibitem{fung2020foolsgold} Fung, C., Yoon, C.J.M., Beschastnikh, I.: The limitations of federated learning in Sybil settings. In: 23rd International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2020), pp. 301--316. USENIX Association (2020). \url{https://www.usenix.org/conference/raid2020/presentation/fung}
-    \bibitem{r9_clustered} Xu, Y., Tan, Y., Zhang, C., Sun, P., Zhang, Y., Ren, J., Jiang, H., Zhang, Y.: Towards privacy-enhanced and robust clustered federated learning. IEEE Transactions on Mobile Computing 24(8), 7171--7188 (2025). \url{https://doi.org/10.1109/TMC.2025.3547149}
-    \bibitem{fedpe} Yi, L., Shi, X., Wang, N., Zhang, J., Wang, G., Liu, X.: FedPE: Adaptive model pruning-expanding for federated learning on mobile devices. IEEE Transactions on Mobile Computing 23(11), 10475--10493 (2024). \url{https://doi.org/10.1109/TMC.2024.3374706}
-    \bibitem{parallelsfl} Liao, Y., Xu, Y., Xu, H., Yao, Z., Huang, L., Qiao, C.: ParallelSFL: A novel split federated learning framework tackling heterogeneity issues. In: Proceedings of the 30th Annual International Conference on Mobile Computing and Networking, pp. 845--860 (2024). \url{https://doi.org/10.1145/3636534.3690665}
     \bibitem{wang2025rasa} Wang, L., Huang, M., Zhang, Z., Li, M., Wang, J., Gai, K.: RaSA: Robust and adaptive secure aggregation for edge-assisted hierarchical federated learning. IEEE Transactions on Information Forensics and Security 20, 4280--4295 (2025). \url{https://doi.org/10.1109/TIFS.2025.3559411}
-    \bibitem{dou2025toward} Dou, Z., Wang, J., Sun, W., Liu, Z., Fang, M.: Toward malicious clients detection in federated learning. In: Proceedings of the 20th ACM Asia Conference on Computer and Communications Security, pp. 456--472 (2025). \url{https://doi.org/10.1145/3708821.3736194}
     \bibitem{lu2025tmt} Lu, Z., Wang, L., Zhang, Z., Huang, M., Wang, J., Li, M.: TMT-FL: Enabling trustworthy model training of federated learning with malicious participants. IEEE Transactions on Dependable and Secure Computing 22(3), 2723--2740 (2025). \url{https://doi.org/10.1109/TDSC.2024.3521377}
-    \bibitem{wang2024federated} Wang, Z., Yu, X., Tian, Z.: A federated learning scheme with adaptive hierarchical protection and multiple aggregation. In: 2024 IEEE 23rd International Conference on Trust, Security and Privacy in Computing and Communications (TrustCom), pp. 2106--2114 (2024). \url{https://doi.org/10.1109/TrustCom63139.2024.00292}
     \bibitem{flpurifier} Zhang, J., Zhu, C., Sun, X., Ge, C., Chen, B., Susilo, W., Yu, S.: FLPurifier: Backdoor defense in federated learning via decoupled contrastive training. IEEE Transactions on Information Forensics and Security 19, 4752--4766 (2024). \url{https://doi.org/10.1109/TIFS.2024.3384846}
     \bibitem{roseagg} Yang, H., Xi, W., Shen, Y., Wu, C., Zhao, J.: RoseAgg: Robust defense against targeted collusion attacks in federated learning. IEEE Transactions on Information Forensics and Security 19, 2951--2966 (2024). \url{https://doi.org/10.1109/TIFS.2024.3352415}
-    \bibitem{shieldfl} Ma, Z., Ma, J., Miao, Y., Li, Y., Deng, R.H.: ShieldFL: Mitigating model poisoning attacks in privacy-preserving federated learning. IEEE Transactions on Information Forensics and Security 17, 1639--1654 (2022). \url{https://doi.org/10.1109/TIFS.2022.3169918}
-    \bibitem{liao2024verifiable} Liao, L., Zheng, Y., Lu, H., Liu, X., Chen, S., Yu, Y.: Verifiable deep learning inference on heterogeneous edge devices with trusted execution environment. IEEE Sensors Journal 24(17), 28351--28362 (2024). \url{https://doi.org/10.1109/JSEN.2024.3426533}
     \bibitem{zhang2025rppfl} Zhang, X., Chen, Z., Chen, G., Feng, X., Shen, Q., Wu, Z.: RPPFL: Robust and privacy-preserving federated learning via trusted execution environments. In: ICASSP 2025 - 2025 IEEE International Conference on Acoustics, Speech and Signal Processing, pp. 1--5 (2025). \url{https://doi.org/10.1109/ICASSP49660.2025.10889398}
     \bibitem{r1_tee_integrity} Chen, Y., Luo, F., Li, T., Xiang, T., Liu, Z., Li, J.: A training-integrity privacy-preserving federated learning scheme with trusted execution environment. Information Sciences 522, 69--79 (2020). \url{https://doi.org/10.1016/j.ins.2020.02.037}
     \bibitem{r5_tee_mitigating} Queyrut, S., Schiavoni, V., Felber, P.: Mitigating adversarial attacks in federated learning with trusted execution environments. In: 2023 IEEE 43rd International Conference on Distributed Computing Systems (ICDCS), pp. 626--637 (2023). \url{https://doi.org/10.1109/ICDCS57875.2023.00069}
-    \bibitem{r12_iot_tee} Zheng, W., Cao, Y., Tan, H.: Secure sharing of industrial IoT data based on distributed trust management and trusted execution environments: A federated learning approach. Neural Computing and Applications 35(29), 21499--21509 (2023). \url{https://doi.org/10.1007/s00521-023-08375-6}
-    \bibitem{xu2021distributed} Xu, T., Zhu, K., Andrzejak, A., Zhang, L.: Distributed learning in trusted execution environment: A case study of federated learning in SGX. In: 2021 7th IEEE International Conference on Network Intelligence and Digital Content (IC-NIDC), pp. 450--454 (2021). \url{https://doi.org/10.1109/IC-NIDC54101.2021.9660433}
-    \bibitem{yan2024efficient} Yan, J., Li, Y., Yin, S., Kang, X., Wang, J., Zhang, H., Hu, B.: An efficient greedy hierarchical federated learning training method based on trusted execution environments. Electronics 13(17), 3548 (2024). \url{https://doi.org/10.3390/electronics13173548}
     \bibitem{mcmahan2017fedavg} McMahan, B., Moore, E., Ramage, D., Hampson, S., Aguera y Arcas, B.: Communication-efficient learning of deep networks from decentralized data. In: Proceedings of the 20th International Conference on Artificial Intelligence and Statistics, PMLR 54, pp. 1273--1282 (2017). \url{https://proceedings.mlr.press/v54/mcmahan17a.html}
     \bibitem{chen2017maximum} Chen, B., Liu, X., Zhao, H., Principe, J.C.: Maximum correntropy Kalman filter. Automatica 76, 70--77 (2017). \url{https://doi.org/10.1016/j.automatica.2016.10.004}
     \bibitem{li2026multidimensional} Liu, Y., He, Z., Liang, J., Li, Z., Deng, Q.: Multidimensional trust evaluation and task match based workers recruitment scheme for MCS. IEEE Transactions on Dependable and Secure Computing, 1--17 (2026). \url{https://doi.org/10.1109/TDSC.2026.3652987}
