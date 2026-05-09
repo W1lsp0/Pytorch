@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1778318992 "pricai2026_submission_16p.tex" "pricai2026_submission_16p.pdf" "pricai2026_submission_16p" 1778318992
+["pdflatex"] 1778338405 "pricai2026_submission_16p.tex" "pricai2026_submission_16p.pdf" "pricai2026_submission_16p" 1778338406
   "..//fig10_ablation_renorm.pdf" 1778259837 24854 6d76eda2c47d0b485b75221468c075d6 ""
   "..//fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
   "..//fig1_system_arch.pdf" 1778248623 678376 e51e11bab50e77342f8b40e9b7f50eff ""
@@ -136,9 +136,9 @@
   "/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map" 1774856892 4379155 98693266ff65f58d9f98aff394de12d2 ""
   "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1774856671 2801209 9f48ed8dc565a219995f72e939ed6c86 ""
   "llncs.cls" 1778242474 43402 5fb5a2dc40571aa40f3d199c00cbb986 ""
-  "pricai2026_submission_16p.aux" 1778318992 6952 f9f99a0523e8550002a58f31ca3f6722 "pdflatex"
-  "pricai2026_submission_16p.out" 1778318992 534 6527dc87bef8ef9685ba6bf16170fdb2 "pdflatex"
-  "pricai2026_submission_16p.tex" 1778318980 43409 3f1ebbc9e55927c1bb62942244aef656 ""
+  "pricai2026_submission_16p.aux" 1778338406 7231 1a2bec116c9f46a0c06e78e5ad80b06b "pdflatex"
+  "pricai2026_submission_16p.out" 1778338406 534 6527dc87bef8ef9685ba6bf16170fdb2 "pdflatex"
+  "pricai2026_submission_16p.tex" 1778338389 45456 61e044dd460419acf6bd0b9889efe137 ""
   (generated)
   "pricai2026_submission_16p.aux"
   "pricai2026_submission_16p.log"
