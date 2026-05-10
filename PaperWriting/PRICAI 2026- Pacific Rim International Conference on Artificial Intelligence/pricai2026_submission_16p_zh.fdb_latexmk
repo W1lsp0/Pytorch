@@ -1,9 +1,9 @@
 # Fdb version 3
-["xdvipdfmx"] 1778338405 "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh.pdf" "pricai2026_submission_16p_zh" 1778338406
-  "pricai2026_submission_16p_zh.xdv" 1778338405 253564 802a75e9e8a2a5d8ef8cad04239f2a5b "xelatex"
+["xdvipdfmx"] 1778424428 "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh.pdf" "pricai2026_submission_16p_zh" 1778424428
+  "pricai2026_submission_16p_zh.xdv" 1778424428 255276 01fec4d184b06ea99b0c3123bb5b99be "xelatex"
   (generated)
   "pricai2026_submission_16p_zh.pdf"
-["xelatex"] 1778338405 "pricai2026_submission_16p_zh.tex" "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh" 1778338406
+["xelatex"] 1778424427 "pricai2026_submission_16p_zh.tex" "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh" 1778424428
   "..//fig10_ablation_renorm.pdf" 1778259837 24854 6d76eda2c47d0b485b75221468c075d6 ""
   "..//fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
   "..//fig1_system_arch.pdf" 1778248623 678376 e51e11bab50e77342f8b40e9b7f50eff ""
@@ -120,9 +120,9 @@
   "/usr/share/texmf/tex/latex/CJK/CJKfntef.sty" 1485503905 12851 a92a26031294f6fa88114f524b3b794a ""
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1774856661 5134474 66fc2af16408ea9157bac7f571fe474b ""
-  "pricai2026_submission_16p_zh.aux" 1778338405 6805 4ed68275133209fb41ace64caa1b0937 "xelatex"
-  "pricai2026_submission_16p_zh.out" 1778338405 1396 2a5125beda61bada142918a23b6e4637 "xelatex"
-  "pricai2026_submission_16p_zh.tex" 1778338389 40320 3ee8fae10ebc11da8d046c5229c9e39e ""
+  "pricai2026_submission_16p_zh.aux" 1778424428 6805 80f7be24aef12e3b7fa51ad9e7863bca "xelatex"
+  "pricai2026_submission_16p_zh.out" 1778424428 1396 2a5125beda61bada142918a23b6e4637 "xelatex"
+  "pricai2026_submission_16p_zh.tex" 1778424409 41153 6fbb856c375d08cc7e1a9893e1818538 ""
   (generated)
   "pricai2026_submission_16p_zh.aux"
   "pricai2026_submission_16p_zh.log"

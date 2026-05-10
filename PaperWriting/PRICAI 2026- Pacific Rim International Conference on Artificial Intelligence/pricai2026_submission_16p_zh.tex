@@ -43,15 +43,15 @@
 \begin{document}
 
 \begin{center}
-{\Large 边缘计算中信任流驱动的可信联邦关键技术研究\par}
-\vspace{4pt}
-{\large Trust Flow-Driven Trusted Federated Learning in Edge Computing: A Study on Key Technologies\par}
-\vspace{8pt}
-{匿名作者\par}
+    {\Large 边缘计算中信任流驱动的可信联邦关键技术研究\par}
+    \vspace{4pt}
+    {\large TTFL: Trust-Flow-Driven Trusted Federated Learning for Edge Computing\par}
+    \vspace{8pt}
+    {匿名作者\par}
 \end{center}
 
 \begin{abstract}
-联邦学习（FL）通过避免原始数据迁移来支持边缘智能协同训练，但开放式边缘参与也使聚合过程暴露于不可信执行、模型投毒、隐蔽后门以及严重 Non-IID 偏移等风险之下。现有鲁棒聚合方法往往依赖更严格的阈值来拒绝恶意更新，却容易同时剔除合法的长尾客户端。本文提出一种信任流驱动的可信联邦学习框架，将硬件锚定准入、运行时信任证据、双流信誉演化和风险门控分层聚合联系起来。该方法通过历史性能流和瞬时风险流分离长期效用与短期攻击风险，再利用按层门控、裁剪和幸存者权重重归一化，在抑制投毒更新的同时保留有价值的异构贡献。基于 Flower/PyTorch 的 CIFAR-10 实验包含 20 个准入客户端、6 类混合攻击和 5 次重复运行；结果表明，在 30\% 恶意设置下，该方法达到 92.31\% 的准确率和 10.21\% 的 ASR，永久封禁误杀率接近零。
+    联邦学习（FL）通过避免原始数据迁移来支持边缘智能协同训练，但开放式边缘参与也使聚合过程暴露于不可信执行、模型投毒、隐蔽后门以及严重 Non-IID 偏移等风险之下。现有鲁棒聚合方法往往依赖更严格的阈值来拒绝恶意更新，却容易同时剔除合法的长尾客户端。本文提出一种信任流驱动的可信联邦学习框架，将硬件锚定准入、运行时信任证据、双流信誉演化和风险门控分层聚合联系起来。该方法通过历史性能流和瞬时风险流分离长期效用与短期攻击风险，再利用按层门控、裁剪和幸存者权重重归一化，在抑制投毒更新的同时保留有价值的异构贡献。基于 Flower/PyTorch 的 CIFAR-10 实验包含 20 个准入客户端、6 类混合攻击和 5 次重复运行；结果表明，在 30\% 恶意设置下，该方法达到 92.31\% 的准确率和 10.21\% 的 ASR，永久封禁误杀率接近零。
 \end{abstract}
 
 \noindent\textbf{关键词：} 联邦学习；边缘计算；可信执行环境；风险建模；分层聚合；后门防御
@@ -138,11 +138,11 @@ $\mathcal{X}_k=\{\Delta\text{grad},\Delta\text{loss},\text{instr\_dist}\}$。其
 
 随后，服务器构造干净指导方向。若存在小型干净验证梯度，则 $g_{root}=g_{root\_clean}$；否则，使用高信任且上一轮风险较低的客户端，并以 $\omega_k^{ref}=TrustScore_k(1-RiskEMA_k^{prev})^2$ 作为参考权重。该退化参考在边缘部署中很重要：服务器侧干净集可能很小甚至不存在，此时参考方向应保持保守，但不能被近期可疑客户端主导。对每个客户端更新，内容质量由参考一致性和群体一致性共同构成：
 \begin{align}
-S_{contrib,k}&=\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,g_{root})),\\
-S_{consist,k}&=\frac{\sum_{j\ne k}TrustScore_j\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,\Delta W_j))}
-{\sum_{j\ne k}TrustScore_j+\varepsilon},\\
-ContentScore_k&=\frac{(1+\beta_{fusion}^2)S_{consist,k}S_{contrib,k}}
-{\beta_{fusion}^2S_{consist,k}+S_{contrib,k}+\varepsilon}.
+    S_{contrib,k}  & =\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,g_{root})),                                  \\
+    S_{consist,k}  & =\frac{\sum_{j\ne k}TrustScore_j\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,\Delta W_j))}
+    {\sum_{j\ne k}TrustScore_j+\varepsilon},                                                               \\
+    ContentScore_k & =\frac{(1+\beta_{fusion}^2)S_{consist,k}S_{contrib,k}}
+    {\beta_{fusion}^2S_{consist,k}+S_{contrib,k}+\varepsilon}.
 \end{align}
 其中 $\beta_{fusion}>1$ 会提高干净方向的影响，有助于抵抗合谋漂移。这里采用调和式融合并非只为数值平滑，而是要求客户端同时在干净参考和可信群体两个方向上都具有合理性。仅有较高群体一致性不足以抵抗合谋，只有较高参考一致性又可能过度惩罚合法 Non-IID 更新。
 
@@ -156,9 +156,9 @@ ContentScore_k&=\frac{(1+\beta_{fusion}^2)S_{consist,k}S_{contrib,k}}
 
 这两个流只在计算聚合权限时汇合：
 \begin{align}
-RawScore_k &= (TrustScore_k)^\alpha(ContentScore_k)^\beta
-(HistPerf_k^{(t-1)})^\gamma \nonumber\\
-&\quad \times (1-RiskEMA_k^{(t-1)})^p .
+    RawScore_k & = (TrustScore_k)^\alpha(ContentScore_k)^\beta
+    (HistPerf_k^{(t-1)})^\gamma \nonumber                      \\
+               & \quad \times (1-RiskEMA_k^{(t-1)})^p .
 \end{align}
 乘法形式使最终权限保持保守：客户端需要同时具有足够的执行可信度、当轮内容质量、历史效用和较低近期风险。最终状态机区分 NORMAL、SUSPECT、QUARANTINE 与 BLACKLIST，如图~\ref{fig:state_machine} 所示。潜伏-爆发型攻击者可在早期良性轮次积累较高 $HistPerf$，但后续触发注入会激活触发器或干净探针通道并提高 $RiskEMA$，从而在历史效用较高时仍被阻断。相反，当前相似性较低的长尾良性客户端主要由缓慢效用流处理，并可在后续正向贡献后恢复。
 
@@ -182,8 +182,8 @@ RawScore_k &= (TrustScore_k)^\alpha(ContentScore_k)^\beta
 
 幸存者集合为 $\Phi^{(l)}=\{k\in\mathcal{A}\mid RawScore_k\ge\theta^{(l)}\}$，其权重重新归一化为
 \begin{equation}
-\tilde{w}_{k}^{(l)}=\frac{RawScore_k}{\sum_{j\in\Phi^{(l)}}RawScore_j+\varepsilon},\quad
-\widehat{\Delta W}_k^{(l)}=\frac{\Delta W_k^{(l)}}{\max(1,\|\Delta W_k^{(l)}\|_2/C^{(l)})}.
+    \tilde{w}_{k}^{(l)}=\frac{RawScore_k}{\sum_{j\in\Phi^{(l)}}RawScore_j+\varepsilon},\quad
+    \widehat{\Delta W}_k^{(l)}=\frac{\Delta W_k^{(l)}}{\max(1,\|\Delta W_k^{(l)}\|_2/C^{(l)})}.
 \end{equation}
 最终更新为 $\Delta W_{global}^{(l)}=\sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)}\widehat{\Delta W}_k^{(l)}$。权重重归一化可以防止剔除风险客户端后有效学习率缩小。
 
@@ -218,21 +218,21 @@ RawScore_k &= (TrustScore_k)^\alpha(ContentScore_k)^\beta
 准确率和 ASR 报告为五次独立运行的均值与标准差。永久封禁 FPR 以被不可逆列入黑名单的良性客户端计算，临时 SUSPECT 或 QUARANTINE 状态被视为可恢复控制动作。单次运行轨迹图采用固定种子，以便展示节点级转移；聚合表格使用重复运行结果。所有基线采用相同节点划分、攻击比例、优化器配置、通信轮次和 Non-IID 划分。
 
 \begin{table}[t]
-\centering
-\caption{紧凑实验配置与主要超参数。}
-\label{tab:setup}
-\small
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.45cm} p{5.2cm} p{4.25cm}}
-\toprule
-类别 & 设置 & 取值 \\
-\midrule
-FL 任务 & 数据集/模型/准入客户端 & CIFAR-10/轻量 CNN/$K=20$ \\
-优化 & 本地 epoch、学习率、动量、轮次 & $3$, $0.001$, $0.9$, $30$ \\
-数据异构 & 共享池、Group A、Group B/C & $5000$, $\alpha=1.0$, $\alpha=0.1$ \\
-信任流 & $\alpha_1,\alpha_2,\beta_{fusion}$; $\beta_h,\beta_r$ & $0.6,0.4,2.0$; $0.9,0.85$ \\
-分层门控 & 融合指数；$\mu_{base},\lambda_s$ & $3.0,1.0,0.5,1.0$; $0.4,1.2$ \\
-\bottomrule
-\end{tabular*}
+    \centering
+    \caption{紧凑实验配置与主要超参数。}
+    \label{tab:setup}
+    \small
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.45cm} p{5.2cm} p{4.25cm}}
+        \toprule
+        类别 & 设置 & 取值 \\
+        \midrule
+        FL 任务 & 数据集/模型/准入客户端 & CIFAR-10/轻量 CNN/$K=20$ \\
+        优化 & 本地 epoch、学习率、动量、轮次 & $3$, $0.001$, $0.9$, $30$ \\
+        数据异构 & 共享池、Group A、Group B/C & $5000$, $\alpha=1.0$, $\alpha=0.1$ \\
+        信任流 & $\alpha_1,\alpha_2,\beta_{fusion}$; $\beta_h,\beta_r$ & $0.6,0.4,2.0$; $0.9,0.85$ \\
+        分层门控 & 融合指数；$\mu_{base},\lambda_s$ & $3.0,1.0,0.5,1.0$; $0.4,1.2$ \\
+        \bottomrule
+    \end{tabular*}
 \end{table}
 
 \subsection{整体防御性能}
@@ -269,30 +269,30 @@ t-SNE 可视化提供了补充视角。信任流介入前，恶意客户端和�
 \end{figure}
 
 \begin{table}[t]
-\centering
-\begin{threeparttable}
-\caption{30\% 混合攻击与边界压力测试下的性能比较。}
-\label{tab:main_results}
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.55cm} p{2.85cm} c c c}
-\toprule
-方法/设置 & 核心机制 & Acc. & ASR & Perm. FPR \\
-\midrule
-FedAvg \cite{mcmahan2017fedavg} & 无防御 & $86.15\pm1.20$ & $92.34\pm5.10$ & N/A \\
-Krum \cite{blanchard2017krum} & 欧氏选择 & $64.20\pm2.80$ & $12.15\pm0.90$ & $64.20$ \\
-Trimmed Mean \cite{yin2018byzantine} & 坐标截断 & $71.35\pm2.40$ & $38.60\pm4.20$ & N/A \\
-FLTrust \cite{cao2021fltrust} & 干净锚点加权 & $81.25\pm1.50$ & $15.42\pm1.10$ & $21.40$ \\
-\textbf{Trust Flow} & 双流 + 分层门控 & $\mathbf{92.31\pm0.09}$ & $\mathbf{10.21\pm0.05}$ & $\mathbf{0.00}$ \\
-\midrule
-边界压力：50\% 恶意 & 10/20 恶意 & $91.81\pm0.10$ & $10.46\pm0.06$ & $0.00$ \\
-\bottomrule
-\end{tabular*}
-\begin{tablenotes}
-\scriptsize
-\item FPR 表示良性客户端的不可逆误封。临时 SUSPECT/QUARANTINE 状态是可恢复控制动作，并通过轨迹单独呈现。
-\end{tablenotes}
-\end{threeparttable}
+    \centering
+    \begin{threeparttable}
+        \caption{30\% 混合攻击与边界压力测试下的性能比较。}
+        \label{tab:main_results}
+        \scriptsize
+        \setlength{\tabcolsep}{2pt}
+        \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.55cm} p{2.85cm} c c c}
+            \toprule
+            方法/设置 & 核心机制 & Acc. & ASR & Perm. FPR \\
+            \midrule
+            FedAvg \cite{mcmahan2017fedavg} & 无防御 & $86.15\pm1.20$ & $92.34\pm5.10$ & N/A \\
+            Krum \cite{blanchard2017krum} & 欧氏选择 & $64.20\pm2.80$ & $12.15\pm0.90$ & $64.20$ \\
+            Trimmed Mean \cite{yin2018byzantine} & 坐标截断 & $71.35\pm2.40$ & $38.60\pm4.20$ & N/A \\
+            FLTrust \cite{cao2021fltrust} & 干净锚点加权 & $81.25\pm1.50$ & $15.42\pm1.10$ & $21.40$ \\
+            \textbf{Trust Flow} & 双流 + 分层门控 & $\mathbf{92.31\pm0.09}$ & $\mathbf{10.21\pm0.05}$ & $\mathbf{0.00}$ \\
+            \midrule
+            边界压力：50\% 恶意 & 10/20 恶意 & $91.81\pm0.10$ & $10.46\pm0.06$ & $0.00$ \\
+            \bottomrule
+        \end{tabular*}
+        \begin{tablenotes}
+            \scriptsize
+            \item FPR 表示良性客户端的不可逆误封。临时 SUSPECT/QUARANTINE 状态是可恢复控制动作，并通过轨迹单独呈现。
+        \end{tablenotes}
+    \end{threeparttable}
 \end{table}
 
 与 FedAvg 相比，鲁棒聚合基线能够降低 ASR，但往往损失大量准确率或移除许多良性长尾客户端。Krum 将 ASR 降至 12.15\%，但其距离规则排除了大量合法长尾更新，导致准确率仅为 64.20\%。Trimmed Mean 在部分轮次比 Krum 更稳定，但坐标截断不足以抑制定向后门。FLTrust 受益于干净锚点，但当合法 Non-IID 更新偏离锚点时仍易受影响。Trust Flow 通过历史平滑保留良性异构贡献，同时用瞬时风险流阻止高信誉攻击者利用历史行为。50\% 结果显示，该框架在理论边界附近仍保持稳定，达到 91.81\% 准确率和 10.46\% ASR。
@@ -302,24 +302,24 @@ FLTrust \cite{cao2021fltrust} & 干净锚点加权 & $81.25\pm1.50$ & $15.42\pm1
 表~\ref{tab:ablation_overhead} 表明，单流信誉模型面临 FPR/TPR 权衡：激进阈值增加误封，保守阈值漏检潜伏攻击。仅使用 HistPerf 可以保护良性节点，却缺少短期攻击敏感性。双流设计在保持永久误封较低的同时获得较高召回。开销适中：TrustReport 每次上传约增加 15 KB，服务器聚合时间从每轮 2.10 s 增至 4.85 s。
 
 \begin{table}[t]
-\centering
-\caption{消融与开销概要。}
-\label{tab:ablation_overhead}
-\scriptsize
-\setlength{\tabcolsep}{2pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.1cm} p{4.45cm} c c}
-\toprule
-研究项 & 变体/架构 & FPR 或开销 & TPR / 时间 \\
-\midrule
-信誉 & 单流 EMA，激进 & 18.25\% FPR & 95.12\% TPR \\
-信誉 & 单流 EMA，保守 & 2.10\% FPR & 48.33\% TPR \\
-信誉 & HistPerf-only & 0.15\% FPR & 21.05\% TPR \\
-信誉 & \textbf{双流 Trust Flow} & \textbf{0.05\% FPR} & \textbf{98.50\% TPR} \\
-\midrule
-开销 & 标准 FedAvg & 额外 0 KB & 2.10 s 聚合 \\
-开销 & Trust Flow & $\sim$15 KB TrustReport & 4.85 s 含审查 \\
-\bottomrule
-\end{tabular*}
+    \centering
+    \caption{消融与开销概要。}
+    \label{tab:ablation_overhead}
+    \scriptsize
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.1cm} p{4.45cm} c c}
+        \toprule
+        研究项 & 变体/架构 & FPR 或开销 & TPR / 时间 \\
+        \midrule
+        信誉 & 单流 EMA，激进 & 18.25\% FPR & 95.12\% TPR \\
+        信誉 & 单流 EMA，保守 & 2.10\% FPR & 48.33\% TPR \\
+        信誉 & HistPerf-only & 0.15\% FPR & 21.05\% TPR \\
+        信誉 & \textbf{双流 Trust Flow} & \textbf{0.05\% FPR} & \textbf{98.50\% TPR} \\
+        \midrule
+        开销 & 标准 FedAvg & 额外 0 KB & 2.10 s 聚合 \\
+        开销 & Trust Flow & $\sim$15 KB TrustReport & 4.85 s 含审查 \\
+        \bottomrule
+    \end{tabular*}
 \end{table}
 
 图~\ref{fig:ablation_components} 和图~\ref{fig:alpha_sensitivity} 进一步分解了风险探针、权重重归一化和数据异构性的影响。干净参考结合浅层探针能够处理符号翻转和梯度缩放，但在梯度方向与良性更新共线时，干净标签后门仍较难识别。加入交叉熵与高层激活探针后，干净标签 ASR 降至 9.2\% 以下。重归一化同样重要：没有幸存者权重修正的分层门控会产生隐式学习率衰减，而完整 Trust Flow 能在 30 轮预算内收敛。在 Dirichlet $\alpha=0.1$ 下，Krum 与 FLTrust 明显退化，而 Trust Flow 仍保持接近 92\% 的准确率。
@@ -359,10 +359,13 @@ Trust Flow 将准入证据、内容审查、时序信誉和按层聚合整合为
 
 本文仍存在若干局限。由于多种新兴 TEE-FL 方法尚无公开可复现实现，本研究未能在相同实验设置下将其纳入直接基线。当前探针设计也主要针对视觉分类，尤其是 CIFAR-10 后门行为。后续工作将随最终稿发布源代码和实验脚本，以支持复现，评估更大规模边缘部署，并将多维风险探针扩展到 NLP 与联邦微调场景。
 
+\section*{Acknowledgments}
+This work is supported by the National Natural Science Foundation of China under Grant No.~62002261, and the Tianjin Natural Science Foundation under Grant No.~25JCQNJC00600.
+
 \begingroup
 \small
 \begin{thebibliography}{99}
-\setlength{\itemsep}{0pt}
+    \setlength{\itemsep}{0pt}
     \bibitem{kairouz2021flsurvey} Kairouz, P., McMahan, H.B., Avent, B., et al.: Advances and open problems in federated learning. Foundations and Trends in Machine Learning 14(1--2), 1--210 (2021). \url{https://doi.org/10.1561/2200000083}
     \bibitem{bagdasaryan2020backdoor} Bagdasaryan, E., Veit, A., Hua, Y., Estrin, D., Shmatikov, V.: How To Backdoor Federated Learning. In: Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics, PMLR 108, pp. 2938--2948 (2020). \url{https://proceedings.mlr.press/v108/bagdasaryan20a.html}
     \bibitem{wang2019neuralcleanse} Wang, B., Yao, Y., Shan, S., Li, H., Viswanath, B., Zheng, H., Zhao, B.Y.: Neural Cleanse: Identifying and mitigating backdoor attacks in neural networks. In: 2019 IEEE Symposium on Security and Privacy (SP), pp. 707--723 (2019). \url{https://doi.org/10.1109/SP.2019.00031}
