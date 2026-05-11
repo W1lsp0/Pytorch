@@ -83,14 +83,6 @@
     %%     %\includegraphics{grabs}
     %% \end{graphicalabstract}
 
-    %% Research highlights
-    \begin{highlights}
-        \item A TEE-anchored admission mechanism is designed for trusted edge clients.
-        \item A dual-stream reputation model separates historical utility from instant risk.
-        \item Layer-wise risk gating preserves Non-IID contributions while suppressing attacks.
-        \item Flower-based experiments validate the framework under six mixed attack types.
-    \end{highlights}
-
     \begin{keyword}
         Federated learning \sep Edge computing \sep Trusted execution environment \sep Risk state modeling \sep Layered robust aggregation \sep Backdoor defense
     \end{keyword}
@@ -233,15 +225,15 @@ Client admission should not be limited to one-time identity verification. It req
 \begin{tightenumerate}
     \item \textbf{Static Hardware Admission}: During the initialization of federated computing, each participating node must invoke its internally isolated device-unique key (DUK) and initiate a remote attestation quote to the central server, including the chain values of platform configuration registers (PCRs). The server verifies memory code segments and runtime signatures, then grants initial communication privileges to nodes that pass verification ($M_{attest,k}=1$).
     \item \textbf{Feature Sequence Extraction and Entropy Analysis}: In anti-poisoning trust assessment for distributed systems\cite{li2026multidimensional}, a single static measurement is insufficient to capture complex runtime mutations. The client-side TEE is therefore configured to continuously monitor key feature sequences during the training cycle, $\mathcal{X}_k = \{ \Delta \text{grad}, \Delta \text{loss}, \text{instr\_dist} \}$. The information entropy $H(\mathcal{X}_k)$ of this sequence is quantified as:
-          \begin{equation}
-              H(\mathcal{X}_k) = -\sum p(x_i) \log p(x_i)
-          \end{equation}
-          A high entropy value in the sequence usually indicates greater uncertainty in system operation. In physical terms, this often corresponds to backdoor-controlled execution, severe disturbance in gradient direction, or abnormal underlying instruction distributions.
+    \begin{equation}
+        H(\mathcal{X}_k) = -\sum p(x_i) \log p(x_i)
+    \end{equation}
+    A high entropy value in the sequence usually indicates greater uncertainty in system operation. In physical terms, this often corresponds to backdoor-controlled execution, severe disturbance in gradient direction, or abnormal underlying instruction distributions.
     \item \textbf{ITL-Driven Dynamic Trust Evolution (Kalman-based)}: To prevent abrupt anomalies from contaminating the trust state, this framework constructs an entropy-driven adaptive covariance mapping mechanism. Instead of assuming a constant prior, the system maps the dynamically captured information entropy to the measurement-noise covariance matrix $R_k = f(H(\mathcal{X}_k))$ in the Kalman observation equation. In the classical predict-update recursion:
-          \begin{tightitemize}
-              \item \textbf{Prediction stage}: Based on the posterior distribution from the previous round, the prior trust expectation $\hat{T}_k^-$ at the current moment is extrapolated.
-              \item \textbf{Update stage}: The instantaneous behavioral features of the current round are introduced for measurement update, yielding the posterior trust estimate $\hat{T}_k$ and the corresponding state error covariance matrix $P_k$.
-          \end{tightitemize}
+    \begin{tightitemize}
+        \item \textbf{Prediction stage}: Based on the posterior distribution from the previous round, the prior trust expectation $\hat{T}_k^-$ at the current moment is extrapolated.
+        \item \textbf{Update stage}: The instantaneous behavioral features of the current round are introduced for measurement update, yielding the posterior trust estimate $\hat{T}_k$ and the corresponding state error covariance matrix $P_k$.
+    \end{tightitemize}
 \end{tightenumerate}
 
 On this basis, combined with the high-entropy penalty property of anomalous sequences, the system introduces the following core state evolution rule:
@@ -374,24 +366,53 @@ To illustrate the practical operational logic of this mechanism, consider the ca
 Upon the completion of layered aggregation, the server applies the secure increment to the global model: $W_{global}^{new} = W_{global}^{old} + \Delta W_{global}$, and synchronously distributes the updated model along with the clients' states (including $HistPerf$). This culminates in a complete closed loop, ensuring convergence while relentlessly filtering out malicious updates.
 
 \subsection{Theoretical Guarantees of Dual-Stream Orthogonal Decoupling}
-Traditional single reputation scores compress execution quality, contribution, and attack evidence into one axis, which intensifies the FPR/FNR conflict under strong Non-IID data. The dual-stream design separates the slow historical utility channel from the fast security-risk channel.
+Traditional single reputation scores (such as simple cosine accumulation) inherently compress high-dimensional behaviors into single-axis judgments. Under formidable Non-IID scenarios, this invariably exacerbates the conflict between false negative rates (FNR) and false positive rates (FPR). This section articulates the theoretical analysis of the dual-stream orthogonal mechanism.
 
-For a legitimate long-tail client whose single-round $ContentScore_k^{(t)}$ has expectation $\mu_{clean}$ and variance $\sigma_{clean}^2$, historical smoothing yields the steady-state variance
+\textbf{Lemma 1 (Variance Convergence Property of Long-Tail Nodes)}
+Assume that the single-round content score $ContentScore_{k}^{(t)}$ of a legitimate long-tail client $k$ follows a perturbed distribution with expectation $\mu_{clean}$ and variance $\sigma_{clean}^2$. Under a rigid threshold $\tau_{hard}$, if $\tau_{hard} > \mu_{clean} - \sigma_{clean}$, this node faces a high probability of sustained elimination. Upon adopting the historical utility stream for smoothing, its steady-state expectation satisfies $\mathbb{E}[HistPerf_k^{(\infty)}] = \mu_{clean}$, and the variance converges to:
 \begin{equation}
-    \operatorname{Var}(HistPerf_{k}^{(\infty)}) = \frac{1-\beta_h}{1+\beta_h}\sigma_{clean}^{2} .
+    \operatorname{Var}(HistPerf_{k}^{(\infty)}) = \frac{1-\beta_h}{1+\beta_h} \sigma_{clean}^{2}
 \end{equation}
-Thus, as $\beta_h \to 1$, benign short-term deviations are smoothed rather than converted into permanent removal. Conversely, for a sleeper backdoor node, an attack burst activates at least one probe in $\{r_{grad}, r_{probe}, r_{trigger}\}$, and the max-risk rule makes the EMA satisfy
+Given that $0 < \beta_h < 1$, as $\beta_h \to 1$, short-term perturbations are markedly smoothed. As long as $\mu_{clean}$ exceeds the survival threshold, the historical utility stream functions as a low-pass filter, enhancing the long-term survival probability of legitimate nodes and theoretically supporting $\lim_{t \to \infty} \text{FPR} = 0$.
+
+\textbf{Lemma 2 (Instantaneous Impulse Response to High-Order Sleeper Poisoning)}
+Regarding a backdoor node $m$ executing a strategy of "long-term camouflage followed by intermittent bursts," even if it has accrued a high $HistPerf$ during early stages, it will invariably trigger an abnormal probe peak during the attack round ($\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$). Because $Risk_k^{inst}$ seizes the maximum value across multiple probes, and the EMA maintains monotonicity concerning the input, the RiskEMA trajectory satisfies the following lower bound:
 \begin{equation}
-    RiskEMA_m^{(t)} \ge \max\left(\beta_r RiskEMA_m^{(t-1)},\mathcal{F}_{probe}(r_{grad},r_{probe},r_{trigger})\right).
+    RiskEMA_m^{(t)} \ge \max \left( \beta_r \cdot RiskEMA_m^{(t-1)},\ \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \right)
 \end{equation}
-The risk stream therefore preserves abrupt malicious evidence even when historical utility is high. This orthogonal processing explains why long-tail benign updates can recover through $HistPerf$, while malicious bursts trigger rapid demotion or isolation through $RiskEMA$.
+When $\mathcal{F}_{probe}$ activates an anomalous mutation, the risk value surges rapidly, approaching or breaching the threshold within a brief timeframe, thereby triggering isolation.
+
+\textbf{Theorem 1 (Dual-Stream Circuit Breaking and Orthogonal Decoupling)}
+\textit{Under the dual-stream mechanism, the high-variance updates of honest long-tail nodes are smoothly absorbed by the $HistPerf$ channel. Conversely, the abrupt behaviors characteristic of malicious attacks are swiftly amplified by the $Risk^{inst}$ channel, triggering an immediate circuit break. These two categories of signals are decoupled and processed within distinct discriminative spaces, thereby alleviating the profound paradox wherein single-score mechanisms struggle to simultaneously optimize both FPR and ASR.}
 
 \section{Experiments and Analysis}
 \label{sec:experiments}
 \subsection{Experimental Setup and Reproducible Parameters}
-Experiments are implemented with Flower 1.5.0 and PyTorch on CIFAR-10 using a lightweight CNN. Simulations run on an Inspur server with dual CPUs and five NVIDIA A10 GPUs under Ubuntu 20.04.6 LTS and CUDA 12.8. Each formal run executes 30 communication rounds with 3 local epochs; Acc and ASR are averaged over five independent seeds, while node-state trajectories use one representative fixed-seed run.
+\subsubsection{Baseline Environment and Hardware-Software Stack}
+Experiments are implemented with Flower 1.5.0 and PyTorch on CIFAR-10 using a lightweight CNN. All simulations run on an Inspur server equipped with dual CPUs and five NVIDIA A10 (24GB) GPUs. The software stack consists of Ubuntu 20.04.6 LTS and CUDA 12.8.
 
-The 50,000 training images are split across 20 admitted clients. A 5,000-sample class-balanced shared pool provides basic alignment; clients 6--11 follow Dirichlet $\alpha=1.0$, and clients 12--19 follow strong long-tail Dirichlet $\alpha=0.1$. The 30\% malicious setting injects six official malicious clients: label flipping, trigger backdoor, clean-label backdoor, semantic backdoor, sign flipping, and gradient scaling. In addition, five Sybil nodes without valid TEE certificates and three forged-workload free-riders are used to validate Phase-One gating; these are intercepted before the 20-client statistical analysis.
+To support reproducibility, each formal run executes 30 communication rounds with 3 local epochs, and complete logs, source codes, and startup scripts are retained. Overall metrics, including Accuracy (Acc) and Attack Success Rate (ASR), are averaged over five independent seeds. Node-state trajectory charts, such as Figure~\ref{fig:node_state}, are reported from a representative fixed-seed execution.
+
+\subsubsection{Dataset Heterogeneous Partitioning}
+The 50,000 CIFAR-10 training images are partitioned across 20 admitted clients under a deliberately heterogeneous topology:
+\begin{tightitemize}
+    \item \textbf{Shared Base Pool}: A 5,000-sample class-balanced subset is shared among legitimate nodes to provide basic alignment.
+    \item \textbf{Weakly Heterogeneous Group (Nodes 6--11)}: Client distributions follow Dirichlet $\alpha=1.0$, simulating moderate distributional skew.
+    \item \textbf{Strong Long-Tail Group (Nodes 12--19)}: Client distributions follow Dirichlet $\alpha=0.1$, producing sharply skewed local class profiles and increasing the risk of false rejection by cosine-based defenses.
+\end{tightitemize}
+
+\subsubsection{Malicious Attack Instances and Proportions}
+To evaluate identification under mixed threats, six malicious nodes are injected into the 20-client training pool, corresponding to a 30\% malicious ratio. The attack set covers both data poisoning and parameter manipulation:
+\begin{tightitemize}
+    \item \textbf{Client 0 -- Label Flip ($\gamma=0.5$)}: Maps a proportion of sample labels to incorrect classes.
+    \item \textbf{Client 1 -- Trigger Backdoor ($\gamma=0.2$)}: Embeds a trigger into 20\% of samples and assigns them to class $0$.
+    \item \textbf{Client 2 -- Clean-Label Backdoor ($\gamma=0.5$)}: Perturbs target-class inputs while preserving their original labels.
+    \item \textbf{Client 3 -- Semantic Backdoor ($\gamma=0.5$)}: Exploits natural semantic bias to induce spurious associations.
+    \item \textbf{Client 4 -- Sign-Flipping}: Reverses the returned gradients, i.e., $\Delta \widehat{W}_k=-\gamma \cdot \Delta W_k$.
+    \item \textbf{Client 5 -- Gradient Scaling}: Amplifies malicious increments by a factor of 100, i.e., $\Delta \widehat{W}_k=100 \times \Delta W_k$.
+\end{tightitemize}
+
+Five additional Sybil nodes without valid TEE certificates and three forged-workload free-riders are injected only to validate Phase-One hardware gating and resource-audit screening. These external infiltration or resource-fraud nodes are intercepted before the 20-client statistical analysis: they either fail TMAA attestation ($M_{attest,k}=0$) or drive $TrustScore_k \to 0$ through anomalous workload evidence.
 
 The global hyperparameters and defensive component configurations employed in the experiment are delineated in Table~\ref{tab:hyperparams}.
 
@@ -598,11 +619,11 @@ Despite harboring a multi-phase evaluation protocol, the computational and commu
         \renewcommand{\arraystretch}{1.02}
         \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.0cm} >{\centering\arraybackslash}p{1.65cm} >{\centering\arraybackslash}p{3.75cm}@{}}
             \toprule
-            \textbf{Metric} & \textbf{FedAvg} & \textbf{Proposed Framework} \\
+            \textbf{Metric}        & \textbf{FedAvg} & \textbf{Proposed Framework}          \\
             \midrule
-            Edge extra latency & 0 ms & $\sim 15$ ms (TEE signing only) \\
-            Upload extra payload & 0 KB & $\sim 15$ KB (appended report) \\
-            Cloud aggregation time & $\sim 2.10$ s & $\sim 4.85$ s (audit \& dual-stream) \\
+            Edge extra latency     & 0 ms            & $\sim 15$ ms (TEE signing only)      \\
+            Upload extra payload   & 0 KB            & $\sim 15$ KB (appended report)       \\
+            Cloud aggregation time & $\sim 2.10$ s   & $\sim 4.85$ s (audit \& dual-stream) \\
             \bottomrule
         \end{tabular}
     }
@@ -617,6 +638,50 @@ Empirical results dictate that under a 30\% mixed attack vector, the framework a
 
 \textbf{Limitations and Future Trajectories}: Due to the absence of publicly verifiable implementations for several emerging TEE-FL methodologies, this study foregoes their inclusion within the isomorphic comparative baselines. Subsequent phases aim to release the source code and experimental scripts alongside the final manuscript publication, thereby catalyzing community reproduction and expansion. Future endeavors will also endeavor to scale these multidimensional risk probes beyond CV environments into LLM/NLP federated fine-tuning topologies, meticulously validating their generalizability across cross-modal scenarios.
 
+\appendix
+\section{Detailed Computation of Instant Risk Flow Probes}
+To augment reproducibility and transparency, this appendix mathematically delineates the calculation details of the core probes ($r_{grad}$, $r_{probe}$, $r_{trigger}$) underpinning the instant risk stream of the proposed Trust-Flow framework. During the $t$-th aggregation round, the probes are defined as follows.
+
+\subsection{Gradient Direction and Amplitude Probe \texorpdfstring{($r_{grad}$)}{(r-grad)}}
+The $r_{grad}$ probe quantifies the geometric deviation of the client update $\Delta W_k^{(t)}$ relative to the reference direction $g_{root}^{(t)}$, with a particular focus on sign flipping and amplitude anomalies. This metric evaluates both directional deflection and scale mutation:
+\begin{equation}
+    r_{grad,k}^{(t)} = \lambda_d \left(1-\frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{\|\Delta W_k^{(t)}\| \cdot \|g_{root}^{(t)}\|}\right)
+    + \lambda_m \max\left(0,\frac{\|\Delta W_k^{(t)}\|_2-\mu^{(t)}}{\sigma^{(t)}}\right).
+\end{equation}
+Here, $\lambda_d$ and $\lambda_m$ control the directional and amplitude terms, respectively, and are set to $0.5$ by default. The terms $\mu^{(t)}$ and $\sigma^{(t)}$ denote the mean and standard deviation of gradient L2 norms across admitted clients in round $t$.
+
+\subsection{Small-Sample Cross-Entropy Probe \texorpdfstring{($r_{probe}$)}{(r-probe)}}
+Distance statistics alone are insufficient for identifying targeted poisoning against minority classes. The $r_{probe}$ metric uses a small clean probe set on the server, denoted by $\mathcal{D}_{probe}$, and measures the cross-entropy loss surge before and after a client update is tentatively applied:
+\begin{equation}
+    r_{probe,k}^{(t)} = \operatorname{ReLU}\left(
+    \mathcal{L}_{CE}(W_{global}^{(t-1)}+\Delta W_k^{(t)};\mathcal{D}_{probe})
+    - \mathcal{L}_{CE}(W_{global}^{(t-1)};\mathcal{D}_{probe})
+    \right).
+\end{equation}
+
+\subsection{Deep Neuron Backdoor Activation Probe \texorpdfstring{($r_{trigger}$)}{(r-trigger)}}
+For concealed threats such as clean-label attacks, conventional statistical indicators and validation losses may remain deceptively stable. The $r_{trigger}$ probe therefore examines the distributional shift of high-level feature activations. Let $A_k$ denote the pre-activation outputs of the client model on the validation set, and let $\mathcal{H}(\cdot)$ denote Softmax normalization into a probability simplex. The trigger risk is computed as:
+\begin{equation}
+    r_{trigger,k}^{(t)} = \operatorname{KL}\left(\mathcal{H}(A_{base})\,\|\,\mathcal{H}(A_k)\right).
+\end{equation}
+After normalization and fusion, these anomalous signals form the single-round risk extremum $Risk_k^{(t)}$, which enters the EMA pipeline and supports fast circuit breaking in subsequent trust-state decisions.
+
+\subsection{Probe Normalization and Circuit-Break Fusion}
+The three probes above are deliberately heterogeneous: $r_{grad}$ focuses on geometric deviation, $r_{probe}$ reflects functional loss degradation, and $r_{trigger}$ captures latent activation drift. Directly averaging these signals would weaken sharp but security-critical outliers. The implementation therefore applies a monotone normalization to each probe and then preserves the strongest abnormal evidence through a max-fusion rule:
+\begin{equation}
+    Risk_{k}^{inst}=\max\{r_{report},r_{grad},r_{probe},r_{pixel},r_{trigger},r_{sign},r_{peer}\}.
+\end{equation}
+This design gives the risk stream a veto role. A client with high historical utility may still be demoted when any single probe exposes a sudden backdoor-like mutation, while a benign long-tail client is not permanently removed simply because one round yields a low contribution score. The resulting instant risk is further smoothed by EMA,
+\begin{equation}
+    RiskEMA_{k}^{(t)}=\beta_r RiskEMA_{k}^{(t-1)}+(1-\beta_r)Risk_{k}^{inst},
+\end{equation}
+which retains short-term attack evidence across adjacent rounds without converting isolated benign fluctuations into irreversible bans. In practice, this fusion step also limits communication overhead: the edge side only appends compact audit metadata, while the cloud side performs the probe comparison, EMA update, and subsequent privilege adjustment.
+
+\subsection{Operational Coupling with State Transitions}
+The normalized risk stream is coupled with the client-state machine rather than being used as an isolated scalar filter. During each round, clients with low historical utility but bounded risk are first routed to temporary observation states, where their aggregation privileges are reduced or suspended without immediately terminating their participation. This handling is important for strongly Non-IID edge clients, because a low current-round contribution may reflect class imbalance or long-tail local data rather than poisoning behavior. In contrast, clients that repeatedly trigger high-risk probes are escalated from SUSPECT or QUARANTINE toward permanent isolation, even if their historical utility remains high because of earlier benign behavior.
+
+This coupling also clarifies the division of responsibility between the edge and cloud sides. Edge devices provide trusted execution evidence and compact runtime reports, while the cloud server evaluates cross-client consistency, probe-set loss shifts, activation drift, and layer-wise aggregation eligibility. The final state decision therefore combines physical trust, update quality, temporal utility, and instant security evidence. Such a design avoids two common failure modes in trusted federated learning: over-trusting a device merely because it passes attestation, and over-penalizing legitimate heterogeneous clients merely because their updates are statistically distant from the majority.
+
 \section*{Declaration of competing interest}
 The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
 
@@ -630,9 +695,9 @@ This work is supported by the National Natural Science Foundation of China under
 The data and materials that support the findings of this study are available from the corresponding author upon reasonable request.
 
 \begingroup
-\scriptsize
+\renewcommand{\bibfont}{\small}
 \begin{thebibliography}{00}
-    \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+    \setlength{\itemsep}{4pt}\setlength{\parskip}{0pt}
     \bibitem{kairouz2021flsurvey} P. Kairouz, H.B. McMahan, B. Avent, et al., Advances and open problems in federated learning, Found. Trends Mach. Learn. 14 (1--2) (2021) 1--210. \url{https://doi.org/10.1561/2200000083}
     \bibitem{bagdasaryan2020backdoor} E. Bagdasaryan, A. Veit, Y. Hua, D. Estrin, V. Shmatikov, How to backdoor federated learning, in: Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics, PMLR 108, 2020, pp. 2938--2948. \url{https://proceedings.mlr.press/v108/bagdasaryan20a.html}
     \bibitem{wang2019neuralcleanse} B. Wang, Y. Yao, S. Shan, H. Li, B. Viswanath, H. Zheng, B.Y. Zhao, Neural Cleanse: Identifying and mitigating backdoor attacks in neural networks, in: 2019 IEEE Symposium on Security and Privacy (SP), 2019, pp. 707--723. \url{https://doi.org/10.1109/SP.2019.00031}
