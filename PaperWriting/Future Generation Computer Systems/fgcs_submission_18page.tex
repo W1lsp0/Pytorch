@@ -118,14 +118,18 @@ In the standard FL setting, the global optimization objective is to minimize the
 \end{equation}
 where $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$ denotes the data-volume proportion. In round $t$, the server distributes the global model $W_{global}^{(t-1)}$. Client $k$ takes it as the initial model and runs SGD for $E$ local epochs with learning rate $\eta_l$, yielding the local update:
 \begin{equation}
-    \Delta W_{k}^{(t)} = W_{k, E}^{(t)} - W_{global}^{(t-1)}, \quad \text{where } W_{k, e}^{(t)} = W_{k, e-1}^{(t)} - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)]
+\begin{aligned}
+    \Delta W_{k}^{(t)} &= W_{k, E}^{(t)} - W_{global}^{(t-1)}, \\
+    W_{k, e}^{(t)} &= W_{k, e-1}^{(t)}
+    - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)] .
+\end{aligned}
 \end{equation}
 Here, the expectation $\mathbb{E}[\cdot]$ denotes mini-batch sampling over the local dataset $\mathcal{D}_k$. The client then uploads its update, and the server applies a form of parameter aggregation: $W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})$.
 
 This architecture, however, naturally faces communication latency, device heterogeneity, and Non-IID data. To mitigate these issues, prior work has proposed methods such as Clustered FL \cite{r9_clustered}, adaptive pruning-expansion (FedPE) \cite{fedpe}, and split federated learning (ParallelSFL) \cite{parallelsfl}. As system complexity increases, the attack surface also expands, giving malicious nodes more room to remain hidden and interfere with training.
 
 \subsection{Edge Impersonation, Model Poisoning, and Stealthy Backdoor Attacks}
-In open federated networks without mandatory admission control, the server has difficulty accurately judging client identities and update quality. Attacks mainly fall into two categories. The first is \textbf{untargeted poisoning}, such as Sign-flipping and Gradient Scaling, which aims to disrupt global convergence and cause denial of service. The second is \textbf{targeted backdoor} attack, including label flipping, clean-label poisoning, and semantic backdoors, which induce targeted misclassification at inference time through concealed triggers.
+In open federated networks without mandatory admission control, the server has difficulty accurately judging client identities and update quality. Attacks mainly fall into two categories. The first is \textbf{untargeted poisoning}, such as Sign-flipping and Gradient Scaling, which aims to disrupt global convergence and cause denial of service. The second is \textbf{targeted backdoor attacks}, including label flipping, clean-label poisoning, and semantic backdoors, which induce targeted misclassification at inference time through concealed triggers.
 
 \subsection{Mechanisms and Inherent Limitations of Existing Active Defenses}
 To address these threats, early defenses largely relied on geometric and statistical filtering, such as Krum\cite{blanchard2017krum} and Trimmed Mean\cite{yin2018byzantine}. More recent studies have introduced temporal trust evaluation, including FLTrust\cite{cao2021fltrust}, FoolsGold\cite{fung2020foolsgold}, and RaSA\cite{wang2025rasa}, while continuing to expand into malicious detection\cite{dou2025toward}, trusted training frameworks\cite{lu2025tmt}, hierarchical protection\cite{wang2024federated}, and related directions. For backdoor and collusion attacks, schemes such as FLPurifier\cite{flpurifier}, RoseAgg\cite{roseagg}, and ShieldFL\cite{shieldfl} have also been developed.
@@ -254,8 +258,8 @@ The final reference direction $g_{root}$ is:
 \begin{equation}
     g_{root}=
     \begin{cases}
-        g_{root\_clean},                                                      & \text{if server validation direction available}, \\
-        \sum_{k} \frac{\omega_{k}^{ref}}{\sum_j \omega_{j}^{ref}} \Delta W_k, & \text{otherwise}.
+        g_{root\_clean}, & \text{if server validation direction available}, \\
+        \frac{\sum_k \omega_{k}^{ref}\Delta W_k}{\sum_j \omega_{j}^{ref}}, & \text{otherwise}.
     \end{cases}
 \end{equation}
 
@@ -289,7 +293,7 @@ Here, $\lambda_h \in (0,1]$ is a historical decay factor. It allows the reputati
 A low $HistPerf$ indicates that the node has not recently provided enough positive evidence. The system therefore applies temporary soft isolation, suspending or reducing its aggregation weight for the current round without permanently removing it. This gives legitimate long-tail nodes a chance to recover in later rounds.
 
 \textbf{(2) Short-Term Risk Stream (Security Veto)}
-Unlike the smoother utility stream, the risk stream responds to sudden events that may indicate an attack. It combines multidimensional security probes, including TEE attestation reports, update magnitude, probe-set loss changes, and trigger activation signals (e.g., $r_{probe}, r_{grad}, r_{trigger}, r_{pixel}$). The strongest probe response in each round is used as the instant risk value:
+Unlike the smoother utility stream, the risk stream responds to sudden events that may indicate an attack. It combines multidimensional security probes, including TEE attestation reports, update magnitude, probe-set loss changes, and trigger activation signals (e.g., $r_{probe}, r_{grad}, r_{trigger}, r_{pixel}$). The strongest probe response in each round is used as the single-round risk value:
 \begin{equation}
     Risk_{k}^{inst} = \max\{r_{report}, r_{grad}, r_{probe}, r_{pixel}, r_{trigger}, r_{sign}, r_{peer}, \dots \},
 \end{equation}
@@ -317,10 +321,16 @@ Driven by the two streams, client states move among four states, as shown in Fig
 \end{figure*}
 
 The server then combines hardware-level trust ($TrustScore$), current-round update quality ($ContentScore$), and long-term utility ($HistPerf$) into a base score. The short-term risk discount is applied on top of this score to obtain the final aggregation privilege $RawScore_k$:
-\begin{align}
-    RawScore_{k}^{base} & = (TrustScore_{k})^{\alpha} \cdot (ContentScore_{k})^{\beta} \cdot (HistPerf_{k}^{(t-1)})^{\gamma}, \\
-    RawScore_{k}        & = RawScore_{k}^{base} \cdot (1 - RiskEMA_{k}^{(t-1)})^{p},
-\end{align}
+\begin{equation}
+\begin{split}
+    RawScore_{k}^{base} ={}&
+    (TrustScore_{k})^{\alpha}(ContentScore_{k})^{\beta}\\
+    &\times (HistPerf_{k}^{(t-1)})^{\gamma}.
+\end{split}
+\end{equation}
+\begin{equation}
+    RawScore_{k} = RawScore_{k}^{base}(1 - RiskEMA_{k}^{(t-1)})^{p}.
+\end{equation}
 where $\alpha,\beta,\gamma,p$ control the influence of each dimension. $TrustScore$ reflects execution credibility, $ContentScore$ reflects current update quality, $HistPerf$ captures long-term contribution, and $RiskEMA$ acts as a security discount. This fusion prevents low-contribution clients from being permanently removed after a few weak rounds, while still allowing high-risk clients to be demoted or isolated even when their historical utility is high.
 
 
@@ -378,7 +388,11 @@ Given $0 < \beta_h < 1$, short-term perturbations are smoothed as $\beta_h \to 1
 \textbf{Lemma 2 (Short-Term Response to Sleeper Poisoning)}
 Consider a backdoor node $m$ that uses long benign warm-up rounds followed by intermittent attack bursts. Even if it accumulates high $HistPerf$ early on, an attack round triggers an abnormal probe peak ($\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$). Because $Risk_k^{inst}$ takes the maximum over multiple probes and the EMA is monotone in its input, the RiskEMA trajectory satisfies the following lower bound:
 \begin{equation}
-    RiskEMA_m^{(t)} \ge \max \left( \beta_r \cdot RiskEMA_m^{(t-1)},\ \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \right)
+\begin{aligned}
+    RiskEMA_m^{(t)} \ge
+    \max \big(&\beta_r \cdot RiskEMA_m^{(t-1)},\\
+    &\mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \big).
+\end{aligned}
 \end{equation}
 When $\mathcal{F}_{probe}$ detects an anomalous change, the risk value rises quickly and can reach the isolation threshold within a few rounds.
 
@@ -474,7 +488,7 @@ As illustrated in Figure~\ref{fig:convergence}, under a 30\% malicious proportio
     }
 \end{table*}
 
-Under the boundary setting, the framework maintains 91.81\% accuracy and 10.46\% ASR, identifies all 10 malicious nodes, and produces no permanent false bans. The 30-round log also shows test loss decreasing from $0.06362$ to $0.00883$, confirming stable convergence under stringent defensive constraints.
+Under the boundary setting, the framework maintains 91.81\% accuracy and 10.46\% ASR, identifies all 10 malicious nodes, and produces no permanent false positives. The 30-round log also shows test loss decreasing from $0.06362$ to $0.00883$, confirming stable convergence under stringent defensive constraints. The small degradation from the 30\% setting is mainly reflected in clean accuracy rather than ASR, which remains close to the random-guess level for CIFAR-10. This pattern indicates that the proposed risk stream does not merely lower ASR by freezing learning; instead, it continues to pass enough benign evidence through the aggregation channel for the global model to converge.
 
 \subsubsection{Trust Flow Tracing and Malicious Node Banning Analysis}
 Trust Flow is intended to expose malicious nodes quickly while managing risk through recoverable intermediate states. To keep the trajectory plot readable, Figure~\ref{fig:node_state} shows four representative nodes: Client 4 (early-stage parameter tampering), Client 0 (high-frequency explicit poisoning), Client 2 (concealed sleeper backdoor), and the legitimate long-tail Client 15. Their state transitions are summarized as follows:
@@ -484,7 +498,7 @@ Trust Flow is intended to expose malicious nodes quickly while managing risk thr
     \item \textbf{Client 2 (Clean Label)}: Although its local loss appears normal, its persistent drift is captured by the combination rule ($\texttt{c2\_drift\_combo\_for\_5\_rounds}$), leading to identification and removal by round 24.
     \item \textbf{Client 4 (Sign-Flipping) \& Client 5 (Gradient Scaling)}: Sign flipping sharply reduces $S_{contrib}$ through directional inversion and triggers a hard ban. Gradient scaling is detected through abnormal amplitude and constrained by layer-wise L2 gating before removal.
 \end{tightitemize}
-These trajectories show that the dual-stream mechanism separates low scores caused by data heterogeneity from actual attack behavior. With six malicious nodes, the system achieves a \textbf{TPR=100\%}.
+These trajectories show that the dual-stream mechanism separates low scores caused by data heterogeneity from actual attack behavior. With six malicious nodes, the system achieves a \textbf{TPR=100\%}. The delayed removal of Client 2 is also useful diagnostically: clean-label poisoning is not always exposed by a single large update, but its repeated small drifts accumulate in the risk probes while the historical utility stream prevents unrelated long-tail clients from being removed by the same rule.
 
 \begin{figure*}[t]
     \centering
@@ -537,18 +551,18 @@ Table~\ref{tab:baseline} reports the quantitative results under this high-risk s
         \begin{tablenotes}
             \small
             \item (*) \textit{Note: FedAvg and Trimmed Mean do not include any explicit client trust evaluation or permanent blacklist removal (Ban) mechanism. Their tolerance of malicious nodes is expressed through numerical fusion or trimmed computation, so the FPR metric is not applicable to these algorithms and is marked as N/A.}
-            \item (**) \textit{Note: The false positive rate (FPR) for benign nodes is strongly constrained by deterministic rules and the fixed heterogeneity of data samples under the Dirichlet distribution. With a fixed dataset partition, the defense rules are deterministic, and the variance observed for this type of mistaken removal across repeated experiments is extremely small. This table therefore reports only the stably converged scalar expected mean $\mu$ for this metric. The value 0.00 here specifically refers to permanent false bans. Mild isolation for nodes temporarily placed in the suspicious pool is not counted as an irreversible permanent failure of the model because it allows recovery after the score rebounds.}
+            \item (**) \textit{Note: The false positive rate (FPR) for benign nodes is strongly constrained by deterministic rules and the fixed heterogeneity of data samples under the Dirichlet distribution. With a fixed dataset partition, the defense rules are deterministic, and the variance observed for this type of mistaken removal across repeated experiments is extremely small. This table therefore reports only the stably converged scalar expected mean $\mu$ for this metric. The value 0.00 here specifically refers to permanent false positives. Mild isolation for nodes temporarily placed in the suspicious pool is not counted as an irreversible permanent failure of the model because it allows recovery after the score rebounds.}
         \end{tablenotes}
     \end{threeparttable}
 \end{table*}
 
-FedAvg suffers 92.34\% ASR, while Krum suppresses ASR but removes many benign long-tail clients, reducing accuracy to 64.20\%. The proposed method reaches 92.31\% accuracy, 10.21\% ASR, and 0\% permanent FPR. A Student's $t$-test against strong baselines such as FLTrust indicates statistical significance ($p<0.05$).
+FedAvg suffers 92.34\% ASR, while Krum suppresses ASR but removes many benign long-tail clients, reducing accuracy to 64.20\%. The proposed method reaches 92.31\% accuracy, 10.21\% ASR, and 0\% permanent FPR. A Student's $t$-test against strong baselines such as FLTrust indicates statistical significance ($p<0.05$). The comparison also shows different failure modes. Distance-based aggregation can be effective against large directional outliers, yet it becomes overly conservative when honest updates are dispersed by Dirichlet $\alpha=0.1$ partitioning. A single clean-reference anchor, as used by FLTrust, improves directional screening but still leaves limited room to distinguish benign long-tail drift from persistent backdoor behavior. Trust Flow adds temporal evidence and layer-wise eligibility control on top of content auditing, which explains why it preserves clean accuracy while keeping ASR low.
 
 \subsection{Component-Level Ablation Study}
-Component ablations examine how dual-stream decoupling, multidimensional probes, and layer-wise re-normalization contribute to robustness and availability.
+Component ablations examine how dual-stream decoupling, multidimensional probes, and layer-wise re-normalization contribute to robustness and availability. Rather than treating the framework as a black-box combination of defenses, the ablations isolate the role of temporal state modeling, probe coverage, and aggregation recovery after risky updates are removed.
 
 \subsubsection{Effectiveness of Dual-Stream Reputation Decoupling}
-To substantiate that the system's exceptionally low false positive rate (FPR) stems not from conservative defensive thresholds, but intrinsically from the orthogonal decoupling of historical utility and instantaneous risk, two degraded variants are constructed for comparison: a Single-Stream Exponential Moving Average (Single-Stream EMA) and a HistPerf-Only model. Table~\ref{tab:ablation_stream} delineates the precise interception performance of these divergent mechanisms under the intense pressure of severe Non-IID conditions and a 30\% mixed attack scenario.
+To verify that the system's low false positive rate (FPR) does not simply come from conservative defensive thresholds, but from the orthogonal decoupling of historical utility and short-term risk, two degraded variants are constructed for comparison: a Single-Stream Exponential Moving Average (Single-Stream EMA) and a HistPerf-Only model. Table~\ref{tab:ablation_stream} reports their interception performance under severe Non-IID conditions and a 30\% mixed attack scenario.
 
 \begin{table*}[t]
     \centering
@@ -567,7 +581,7 @@ To substantiate that the system's exceptionally low false positive rate (FPR) st
     \end{tabular}
 \end{table*}
 
-Single-stream scoring exposes the threshold dilemma: aggressive settings raise FPR, while conservative settings miss sleeper attacks. HistPerf-only protects long-tail clients but lacks short-term risk sensitivity. Dual-stream decoupling achieves 98.50\% TPR with only 0.05\% FPR.
+Single-stream scoring exposes the threshold dilemma: aggressive settings raise FPR, while conservative settings miss sleeper attacks. HistPerf-only protects long-tail clients but lacks short-term risk sensitivity. Dual-stream decoupling achieves 98.50\% TPR with only 0.05\% FPR. These results support the design choice of keeping $HistPerf$ and $RiskEMA$ independent until the final privilege score is computed. A benign long-tail client can survive because weak contribution evidence is smoothed across rounds, whereas a sleeper attacker cannot hide a sudden probe peak behind earlier high utility.
 
 \subsubsection{Multi-Dimensional Risk Probe Ablation}
 Figure~\ref{fig:ablation_components} contrasts the ASR suppression capabilities of Vanilla Clean-Root, shallow statistical probes, and full-dimensional deep probes, and also reports the convergence benefit of survivor weight re-normalization.
@@ -588,10 +602,10 @@ Figure~\ref{fig:ablation_components} contrasts the ASR suppression capabilities 
     \label{fig:ablation_components}
 \end{figure*}
 
-Shallow probes handle sign flipping and scaling, but clean-label backdoors remain difficult because their gradients are nearly collinear with benign updates. Adding cross-entropy and high-level activation probes reduces clean-label ASR below 9.2\%.
+Shallow probes handle sign flipping and scaling, but clean-label backdoors remain difficult because their gradients are nearly collinear with benign updates. Adding cross-entropy and high-level activation probes reduces clean-label ASR below 9.2\%. The gain comes from using complementary evidence: $r_{grad}$ captures geometric and norm anomalies, $r_{probe}$ measures whether a tentative update harms clean probe loss, and $r_{trigger}$ detects latent feature shifts that may not appear as a large cosine deviation. The max-fusion rule keeps the strongest warning signal, so a concealed backdoor can still be stopped even when most surface-level statistics look benign.
 
 \subsubsection{Layered Gating and Re-Normalization Convergence Benefits}
-Global clipping suppresses useful shallow-layer updates and stalls near 85\% accuracy. Layer-wise gating improves accuracy to about 89\%, but without weight re-normalization the survivor weights sum below one, creating implicit learning-rate decay. Trust Flow re-normalizes survivors and recovers accuracy close to the attack-free level.
+Global clipping suppresses useful shallow-layer updates and stalls near 85\% accuracy. Layer-wise gating improves accuracy to about 89\%, but without weight re-normalization the survivor weights sum below one, creating implicit learning-rate decay. Trust Flow re-normalizes survivors and recovers accuracy close to the attack-free level. This behavior is important for edge FL because the model must keep learning after malicious clients are isolated. If removal only reduces the update magnitude, the defense may appear secure while silently slowing convergence; the re-normalization step prevents this loss of optimization momentum.
 
 \subsection{Sensitivity Analysis on Data Heterogeneity}
 Many robust aggregation methods work well when client data are close to IID, but degrade as heterogeneity increases. To evaluate this effect, we test global accuracy under four Dirichlet settings ($\alpha=100,1.0,\dots,0.1$), as shown in Figure~\ref{fig:alpha_sensitivity}.
@@ -605,7 +619,7 @@ Many robust aggregation methods work well when client data are close to IID, but
 
 The curves show that when heterogeneity is weak ($\alpha=100$ or $\alpha=1.0$), Krum and FLTrust perform close to the proposed method, with Acc $> 90\%$. Under the extreme long-tail setting ($\alpha \to 0.1$), however, distance-based filtering degrades sharply, with Krum falling to 64.2\% accuracy. The proposed method remains close to 92\% accuracy under the same setting, indicating that the dual-stream design is more robust to severe heterogeneity.
 
-We also test the fusion parameter $\beta_{fusion}$ at 0.5, 1.0, 2.0, and 3.0. A smaller value keeps more long-tail clients but increases ASR, whereas a larger value suppresses attacks more strongly but can over-penalize heterogeneous benign updates. Based on the Acc/ASR tradeoff, we set $\beta_{fusion}=2.0$.
+We also test the fusion parameter $\beta_{fusion}$ at 0.5, 1.0, 2.0, and 3.0. A smaller value keeps more long-tail clients but increases ASR, whereas a larger value suppresses attacks more strongly but can over-penalize heterogeneous benign updates. Based on the Acc/ASR tradeoff, we set $\beta_{fusion}=2.0$. This value gives the clean reference enough influence to counter collusive drift, while still allowing peer consistency and historical utility to protect legitimate clients whose local class distribution is far from the global average.
 
 \subsection{System Computation and Communication Overhead Analysis}
 Although the framework uses a multi-phase evaluation protocol, its computation and communication overhead remains modest. Table~\ref{tab:overhead} shows that the edge side only generates a TEE quote and performs lightweight monitoring, adding roughly $12 \sim 15$ ms. Each upload appends a TrustReport of about $15$ KB. Compared with model transfers of approximately $\sim 10$ MB, this adds less than 0.15\% bandwidth overhead.
@@ -629,34 +643,40 @@ Although the framework uses a multi-phase evaluation protocol, its computation a
     }
 \end{table}
 
-The main extra cost lies on the server: aggregation increases from $2.10$ s to $4.85$ s per round. Since WAN-based FL rounds usually spend tens of seconds on communication and synchronization, this overhead remains practical.
+The main extra cost lies on the server: aggregation increases from $2.10$ s to $4.85$ s per round. Since WAN-based FL rounds usually spend tens of seconds on communication and synchronization, this overhead remains practical. The design also keeps edge-side requirements limited: clients only need to provide attestation evidence and compact runtime metadata, while the heavier consistency checks, probe evaluation, EMA updates, and layer-wise filtering are placed on the cloud side. This split is consistent with heterogeneous edge deployments, where client devices differ widely in compute budget.
 
 \section{Conclusion and Future Work}
 This paper presented Trust-Flow TFL, a framework for securing edge federated learning under severe Non-IID data and compound attacks. The framework combines TEE-anchored admission, dual-stream reputation evolution, and layer-wise robust aggregation. By modeling historical utility and short-term risk separately, it reduces false positives for benign long-tail clients while maintaining high attack recall.
 
 Under the 30\% mixed-attack setting, the framework achieves $92.31\% (\pm 0.09\%)$ accuracy and limits ASR to $10.21\% (\pm 0.05\%)$. In the 50\% boundary stress test, it maintains $91.81\%$ accuracy and $10.46\%$ ASR, with 100\% TPR and 0\% FPR for permanent bans. These results show that the method remains effective under strongly adversarial and heterogeneous conditions.
 
-\textbf{Limitations and future work}: Because several emerging TEE-FL methods do not provide publicly verifiable implementations, this study does not include them as direct baselines under the same experimental setting. We plan to release the source code and experimental scripts with the final manuscript to support reproduction. Future work will also extend the multidimensional risk probes beyond computer vision to NLP and federated fine-tuning scenarios, and evaluate their generalization across modalities.
+\textbf{Limitations and future work}: Because several emerging TEE-FL methods do not provide publicly verifiable implementations, this study does not include them as direct baselines under the same experimental setting. The threat model also follows standard TEE assumptions and does not cover microarchitectural side channels or physical probing. We plan to release the source code and experimental scripts with the final manuscript to support reproduction. Future work will extend the multidimensional risk probes beyond computer vision to NLP and federated fine-tuning scenarios, evaluate their generalization across modalities, and examine larger client populations with more diverse device capabilities.
 
 \appendix
-\section{Detailed Computation of Instant Risk Flow Probes}
+\section{Detailed Computation of Short-Term Risk Probes}
 To support reproducibility and transparency, this appendix gives the calculation details of the core probes ($r_{grad}$, $r_{probe}$, $r_{trigger}$) used by the short-term risk stream of the proposed Trust-Flow framework. During the $t$-th aggregation round, the probes are defined as follows.
 
 \subsection{Gradient Direction and Amplitude Probe \texorpdfstring{($r_{grad}$)}{(r-grad)}}
 The $r_{grad}$ probe quantifies the geometric deviation of the client update $\Delta W_k^{(t)}$ relative to the reference direction $g_{root}^{(t)}$, with a particular focus on sign flipping and amplitude anomalies. This metric evaluates both directional deflection and scale mutation:
 \begin{equation}
-    r_{grad,k}^{(t)} = \lambda_d \left(1-\frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{\|\Delta W_k^{(t)}\| \cdot \|g_{root}^{(t)}\|}\right)
+\begin{aligned}
+    r_{grad,k}^{(t)} ={}& \lambda_d \left(1-\frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{\|\Delta W_k^{(t)}\| \cdot \|g_{root}^{(t)}\|}\right)\\
     + \lambda_m \max\left(0,\frac{\|\Delta W_k^{(t)}\|_2-\mu^{(t)}}{\sigma^{(t)}}\right).
+\end{aligned}
 \end{equation}
 Here, $\lambda_d$ and $\lambda_m$ control the directional and amplitude terms, respectively, and are set to $0.5$ by default. The terms $\mu^{(t)}$ and $\sigma^{(t)}$ denote the mean and standard deviation of gradient L2 norms across admitted clients in round $t$.
 
 \subsection{Small-Sample Cross-Entropy Probe \texorpdfstring{($r_{probe}$)}{(r-probe)}}
 Distance statistics alone are insufficient for identifying targeted poisoning against minority classes. The $r_{probe}$ metric uses a small clean probe set on the server, denoted by $\mathcal{D}_{probe}$, and measures the cross-entropy loss surge before and after a client update is tentatively applied:
 \begin{equation}
+\begin{aligned}
     r_{probe,k}^{(t)} = \operatorname{ReLU}\left(
     \mathcal{L}_{CE}(W_{global}^{(t-1)}+\Delta W_k^{(t)};\mathcal{D}_{probe})
+    \right.\\
+    \left.
     - \mathcal{L}_{CE}(W_{global}^{(t-1)};\mathcal{D}_{probe})
     \right).
+\end{aligned}
 \end{equation}
 
 \subsection{Deep Neuron Backdoor Activation Probe \texorpdfstring{($r_{trigger}$)}{(r-trigger)}}
@@ -671,7 +691,7 @@ The three probes above are deliberately heterogeneous: $r_{grad}$ focuses on geo
 \begin{equation}
     Risk_{k}^{inst}=\max\{r_{report},r_{grad},r_{probe},r_{pixel},r_{trigger},r_{sign},r_{peer}\}.
 \end{equation}
-This design gives the risk stream a veto role. A client with high historical utility may still be demoted when any single probe exposes a sudden backdoor-like mutation, while a benign long-tail client is not permanently removed simply because one round yields a low contribution score. The resulting instant risk is further smoothed by EMA,
+This design gives the risk stream a veto role. A client with high historical utility may still be demoted when any single probe exposes a sudden backdoor-like mutation, while a benign long-tail client is not permanently removed simply because one round yields a low contribution score. The resulting single-round risk evidence is further smoothed by EMA,
 \begin{equation}
     RiskEMA_{k}^{(t)}=\beta_r RiskEMA_{k}^{(t-1)}+(1-\beta_r)Risk_{k}^{inst},
 \end{equation}
