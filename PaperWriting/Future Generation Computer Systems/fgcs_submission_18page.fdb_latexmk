@@ -1,9 +1,9 @@
 # Fdb version 3
-["xdvipdfmx"] 1778515551 "fgcs_submission_18page.xdv" "fgcs_submission_18page.pdf" "fgcs_submission_18page" 1778515551
-  "fgcs_submission_18page.xdv" 1778515551 167536 b5fe741edabcb5cb4875649c9c13cf57 "xelatex"
+["xdvipdfmx"] 1778605178 "fgcs_submission_18page.xdv" "fgcs_submission_18page.pdf" "fgcs_submission_18page" 1778605178
+  "fgcs_submission_18page.xdv" 1778605177 172036 67795d729336aa0804852a912aed0b39 "xelatex"
   (generated)
   "fgcs_submission_18page.pdf"
-["xelatex"] 1778515550 "fgcs_submission_18page.tex" "fgcs_submission_18page.xdv" "fgcs_submission_18page" 1778515551
+["xelatex"] 1778605177 "fgcs_submission_18page.tex" "fgcs_submission_18page.xdv" "fgcs_submission_18page" 1778605178
   "..//fig10_ablation_renorm.pdf" 1778259837 24854 6d76eda2c47d0b485b75221468c075d6 ""
   "..//fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
   "..//fig1_system_arch.pdf" 1778248623 678376 e51e11bab50e77342f8b40e9b7f50eff ""
@@ -11,7 +11,7 @@
   "..//fig3_arch.pdf" 1778249466 1548329 9abc9b673a4a9d19967d629a394e82e9 ""
   "..//fig4_state.pdf" 1778248623 611310 78c51bbce2802ddbd6cdae32bd8b50d5 ""
   "..//fig5_layer.pdf" 1778248623 687182 e95238c7710fde4b6b6af14732ce2031 ""
-  "..//fig6_convergence_asr.pdf" 1775065191 21123 eb6882f1e84d2e8ca49ebc8d1644ef38 ""
+  "..//fig6_convergence_asr.pdf" 1778590344 29998 28370210058de37bffac0ff2686f550a ""
   "..//fig7_node_state_evolution.pdf" 1775065191 36703 1d55e01905845a52f23af088d368006e ""
   "..//fig8_tsne_visualization.pdf" 1775058888 37861 c84ffbfaea90913434b08603dbb30f1d ""
   "..//fig9_ablation_probes.pdf" 1777789842 27407 1cae32553fba451e88a8ba7353dd2554 ""
@@ -205,10 +205,10 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1774856661 5134474 66fc2af16408ea9157bac7f571fe474b ""
   "elsarticle/elsarticle.cls" 1778464137 45320 6a09c4ebaa5b931b22a08adb773e6074 ""
-  "fgcs_submission_18page.aux" 1778515551 14666 b985b72d547bd26fe1e2f6674169e44d "xelatex"
-  "fgcs_submission_18page.out" 1778515551 12489 1a9f69be0ce4d6dc62c5a4ca8d9a21dd "xelatex"
-  "fgcs_submission_18page.spl" 1778515550 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
-  "fgcs_submission_18page.tex" 1778515530 89349 e8dc5a95cd5f045b98bbea53dd47b286 ""
+  "fgcs_submission_18page.aux" 1778605177 14980 fde4d3bc212cf6a5ee17696dd858c952 "xelatex"
+  "fgcs_submission_18page.out" 1778605177 12489 1a9f69be0ce4d6dc62c5a4ca8d9a21dd "xelatex"
+  "fgcs_submission_18page.spl" 1778605177 0 d41d8cd98f00b204e9800998ecf8427e "xelatex"
+  "fgcs_submission_18page.tex" 1778604595 91501 b40b667fa14c57ce57b7a89c56298aaf ""
   (generated)
   "fgcs_submission_18page.aux"
   "fgcs_submission_18page.log"

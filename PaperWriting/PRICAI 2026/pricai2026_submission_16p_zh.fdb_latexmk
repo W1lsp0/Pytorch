@@ -1,9 +1,9 @@
 # Fdb version 3
-["xdvipdfmx"] 1778482996 "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh.pdf" "pricai2026_submission_16p_zh" 1778482996
-  "pricai2026_submission_16p_zh.xdv" 1778482996 255256 49e8cbfd86f89e7d22f240f667d15594 "xelatex"
+["xdvipdfmx"] 1778605177 "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh.pdf" "pricai2026_submission_16p_zh" 1778605178
+  "pricai2026_submission_16p_zh.xdv" 1778605177 258024 d0369fb73623e250223caad145a84a2f "xelatex"
   (generated)
   "pricai2026_submission_16p_zh.pdf"
-["xelatex"] 1778482995 "pricai2026_submission_16p_zh.tex" "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh" 1778482996
+["xelatex"] 1778605177 "pricai2026_submission_16p_zh.tex" "pricai2026_submission_16p_zh.xdv" "pricai2026_submission_16p_zh" 1778605178
   "..//fig10_ablation_renorm.pdf" 1778259837 24854 6d76eda2c47d0b485b75221468c075d6 ""
   "..//fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
   "..//fig1_system_arch.pdf" 1778248623 678376 e51e11bab50e77342f8b40e9b7f50eff ""
@@ -11,7 +11,7 @@
   "..//fig3_arch.pdf" 1778249466 1548329 9abc9b673a4a9d19967d629a394e82e9 ""
   "..//fig4_state.pdf" 1778248623 611310 78c51bbce2802ddbd6cdae32bd8b50d5 ""
   "..//fig5_layer.pdf" 1778248623 687182 e95238c7710fde4b6b6af14732ce2031 ""
-  "..//fig6_convergence_asr.pdf" 1775065191 21123 eb6882f1e84d2e8ca49ebc8d1644ef38 ""
+  "..//fig6_convergence_asr.pdf" 1778590344 29998 28370210058de37bffac0ff2686f550a ""
   "..//fig7_node_state_evolution.pdf" 1775065191 36703 1d55e01905845a52f23af088d368006e ""
   "..//fig8_tsne_visualization.pdf" 1775058888 37861 c84ffbfaea90913434b08603dbb30f1d ""
   "..//fig9_ablation_probes.pdf" 1777789842 27407 1cae32553fba451e88a8ba7353dd2554 ""
@@ -120,9 +120,9 @@
   "/usr/share/texmf/tex/latex/CJK/CJKfntef.sty" 1485503905 12851 a92a26031294f6fa88114f524b3b794a ""
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1774856661 5134474 66fc2af16408ea9157bac7f571fe474b ""
-  "pricai2026_submission_16p_zh.aux" 1778482996 6805 84f606e16e0bdcf331aa7357bb4b5883 "xelatex"
-  "pricai2026_submission_16p_zh.out" 1778482996 1396 2a5125beda61bada142918a23b6e4637 "xelatex"
-  "pricai2026_submission_16p_zh.tex" 1778482831 41154 40b68a86a6c25e5f0412ad711ef241eb ""
+  "pricai2026_submission_16p_zh.aux" 1778605177 6813 be68fc63dbc02572b5e51855c2598038 "xelatex"
+  "pricai2026_submission_16p_zh.out" 1778605177 1396 2a5125beda61bada142918a23b6e4637 "xelatex"
+  "pricai2026_submission_16p_zh.tex" 1778605061 41388 9c050c94a4c8492e539ee298d51f07fc ""
   (generated)
   "pricai2026_submission_16p_zh.aux"
   "pricai2026_submission_16p_zh.log"

@@ -37,9 +37,14 @@
 \citation{cao2021fltrust}
 \citation{fung2020foolsgold}
 \citation{wang2025rasa}
+\citation{fldetector2022}
+\citation{flare2022}
 \citation{dou2025toward}
 \citation{lu2025tmt}
 \citation{wang2024federated}
+\citation{deepsight2022}
+\citation{flame2022}
+\citation{crowdguard2024}
 \citation{flpurifier}
 \citation{roseagg}
 \citation{shieldfl}
@@ -48,15 +53,15 @@
 \citation{r5_tee_mitigating}
 \citation{r12_iot_tee}
 \citation{xu2021distributed,yan2024efficient}
-\citation{zhang2025rppfl}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Edge Impersonation, Model Poisoning, and Stealthy Backdoor Attacks}{3}{subsection.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Mechanisms and Inherent Limitations of Existing Active Defenses}{3}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Trusted Hardware Root of Trust in Federated Environments (TEE)}{3}{subsection.2.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}System Model and Problem Definition}{3}{section.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Client-Edge-Cloud Collaborative Architecture and System Workflow Modeling}{3}{subsection.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Composite Threat Assumptions and Strong Trust-Base Boundary (Threat Model)}{3}{subsection.3.2}\protected@file@percent }
+\citation{zhang2025rppfl}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Federated computing network interaction: client-edge-cloud collaborative physical architecture based on TEE-anchored encryption}}{4}{figure.1}\protected@file@percent }
 \newlabel{fig:system_arch}{{1}{4}{Federated computing network interaction: client-edge-cloud collaborative physical architecture based on TEE-anchored encryption}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Composite Threat Assumptions and Strong Trust-Base Boundary (Threat Model)}{4}{subsection.3.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Core Defense Optimization Objectives of the Security Architecture (Design Goals)}{4}{subsection.3.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Proposed Method: Trust-Flow Framework}{4}{section.4}\protected@file@percent }
 \citation{chen2017maximum}
@@ -73,9 +78,9 @@
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Risk-Gated Layered Aggregation}{8}{subsection.4.4}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Client supervision state-transition automaton driven by historical utility and short-term risk}}{9}{figure.4}\protected@file@percent }
 \newlabel{fig:node_state_machine}{{4}{9}{Client supervision state-transition automaton driven by historical utility and short-term risk}{figure.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Model Update Distribution and Knowledge Retention}{9}{subsection.4.5}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Layered adaptive auditing and dynamic clipping mechanism driven by risk gating}}{10}{figure.5}\protected@file@percent }
 \newlabel{fig:layer_gating}{{5}{10}{Layered adaptive auditing and dynamic clipping mechanism driven by risk gating}{figure.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Model Update Distribution and Knowledge Retention}{10}{subsection.4.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Theoretical Guarantees of Dual-Stream Orthogonal Decoupling}{10}{subsection.4.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Experiments and Analysis}{11}{section.5}\protected@file@percent }
 \newlabel{sec:experiments}{{5}{11}{Experiments and Analysis}{section.5}{}}
@@ -88,16 +93,16 @@
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.2}Trust Flow Tracing and Malicious Node Banning Analysis}{11}{subsubsection.5.2.2}\protected@file@percent }
 \citation{blanchard2017krum}
 \citation{cao2021fltrust}
-\citation{mcmahan2017fedavg}
-\citation{blanchard2017krum}
-\citation{yin2018byzantine}
-\citation{cao2021fltrust}
 \@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Global Hyperparameters and Defense Component Configuration}}{12}{table.2}\protected@file@percent }
 \newlabel{tab:hyperparams}{{2}{12}{Global Hyperparameters and Defense Component Configuration}{table.2}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Global Convergence Accuracy and Backdoor ASR Evolution Curves}}{12}{figure.6}\protected@file@percent }
 \newlabel{fig:convergence}{{6}{12}{Global Convergence Accuracy and Backdoor ASR Evolution Curves}{figure.6}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.2.3}False Positive Protection for Long-Tail Nodes (FPR Analysis)}{12}{subsubsection.5.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Lateral Baseline Comparison of Defense Mechanisms}{12}{subsection.5.3}\protected@file@percent }
+\citation{mcmahan2017fedavg}
+\citation{blanchard2017krum}
+\citation{yin2018byzantine}
+\citation{cao2021fltrust}
 \citation{mcmahan2017fedavg}
 \citation{blanchard2017krum}
 \citation{yin2018byzantine}
@@ -114,16 +119,16 @@
 \newlabel{tab:baseline}{{4}{14}{Performance Comparison of FL Defense Strategies under 30\% Mixed Attacks}{table.4}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.2}Multi-Dimensional Risk Probe Ablation}{14}{subsubsection.5.4.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {5.4.3}Layered Gating and Re-Normalization Convergence Benefits}{14}{subsubsection.5.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Sensitivity Analysis on Data Heterogeneity}{14}{subsection.5.5}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Ablation Analysis of Orthogonal Decoupling on FPR and Recall}}{15}{table.5}\protected@file@percent }
 \newlabel{tab:ablation_stream}{{5}{15}{Ablation Analysis of Orthogonal Decoupling on FPR and Recall}{table.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Component-level ablation of risk probes and re-normalization.}}{15}{figure.9}\protected@file@percent }
 \newlabel{fig:ablation_components}{{9}{15}{Component-level ablation of risk probes and re-normalization}{figure.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Sensitivity Analysis on Data Heterogeneity}{15}{subsection.5.5}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Robustness Stress Test under Varying Data Heterogeneity (Dirichlet $\alpha $)}}{15}{figure.10}\protected@file@percent }
 \newlabel{fig:alpha_sensitivity}{{10}{15}{Robustness Stress Test under Varying Data Heterogeneity (Dirichlet $\alpha $)}{figure.10}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.6}System Computation and Communication Overhead Analysis}{15}{subsection.5.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Edge-Cloud Overhead: Standard FL vs. Proposed Framework (20 Clients)}}{15}{table.6}\protected@file@percent }
-\newlabel{tab:overhead}{{6}{15}{Edge-Cloud Overhead: Standard FL vs. Proposed Framework (20 Clients)}{table.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Edge-Cloud Overhead: Standard FL vs. Proposed Framework (20 Clients)}}{16}{table.6}\protected@file@percent }
+\newlabel{tab:overhead}{{6}{16}{Edge-Cloud Overhead: Standard FL vs. Proposed Framework (20 Clients)}{table.6}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion and Future Work}{16}{section.6}\protected@file@percent }
 \@writefile{toc}{\let\numberline\tmptocnumberline}
 \@writefile{toc}{\contentsline {section}{\numberline {Appendix\nobreakspace  {}A}Detailed Computation of Short-Term Risk Probes}{16}{appendix.A}\protected@file@percent }
@@ -139,25 +144,30 @@
 \bibcite{wang2019neuralcleanse}{{6}{}{{}}{{}}}
 \bibcite{cao2021fltrust}{{7}{}{{}}{{}}}
 \bibcite{fung2020foolsgold}{{8}{}{{}}{{}}}
-\bibcite{blanchard2017krum}{{9}{}{{}}{{}}}
-\bibcite{yin2018byzantine}{{10}{}{{}}{{}}}
-\bibcite{wang2025rasa}{{11}{}{{}}{{}}}
+\bibcite{fldetector2022}{{9}{}{{}}{{}}}
+\bibcite{flare2022}{{10}{}{{}}{{}}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {Appendix\nobreakspace  {}A.5}Operational Coupling with State Transitions}{17}{subsection.A.5}\protected@file@percent }
-\bibcite{r9_clustered}{{12}{}{{}}{{}}}
-\bibcite{fedpe}{{13}{}{{}}{{}}}
-\bibcite{parallelsfl}{{14}{}{{}}{{}}}
-\bibcite{dou2025toward}{{15}{}{{}}{{}}}
-\bibcite{wang2024federated}{{16}{}{{}}{{}}}
-\bibcite{flpurifier}{{17}{}{{}}{{}}}
-\bibcite{roseagg}{{18}{}{{}}{{}}}
-\bibcite{shieldfl}{{19}{}{{}}{{}}}
-\bibcite{liao2024verifiable}{{20}{}{{}}{{}}}
-\bibcite{r5_tee_mitigating}{{21}{}{{}}{{}}}
-\bibcite{r12_iot_tee}{{22}{}{{}}{{}}}
-\bibcite{xu2021distributed}{{23}{}{{}}{{}}}
-\bibcite{yan2024efficient}{{24}{}{{}}{{}}}
-\bibcite{chen2017maximum}{{25}{}{{}}{{}}}
-\bibcite{li2026multidimensional}{{26}{}{{}}{{}}}
-\bibcite{mcmahan2017fedavg}{{27}{}{{}}{{}}}
+\bibcite{blanchard2017krum}{{11}{}{{}}{{}}}
+\bibcite{yin2018byzantine}{{12}{}{{}}{{}}}
+\bibcite{wang2025rasa}{{13}{}{{}}{{}}}
+\bibcite{r9_clustered}{{14}{}{{}}{{}}}
+\bibcite{fedpe}{{15}{}{{}}{{}}}
+\bibcite{parallelsfl}{{16}{}{{}}{{}}}
+\bibcite{dou2025toward}{{17}{}{{}}{{}}}
+\bibcite{wang2024federated}{{18}{}{{}}{{}}}
+\bibcite{deepsight2022}{{19}{}{{}}{{}}}
+\bibcite{flame2022}{{20}{}{{}}{{}}}
+\bibcite{crowdguard2024}{{21}{}{{}}{{}}}
+\bibcite{flpurifier}{{22}{}{{}}{{}}}
+\bibcite{roseagg}{{23}{}{{}}{{}}}
+\bibcite{shieldfl}{{24}{}{{}}{{}}}
+\bibcite{liao2024verifiable}{{25}{}{{}}{{}}}
+\bibcite{r5_tee_mitigating}{{26}{}{{}}{{}}}
+\bibcite{r12_iot_tee}{{27}{}{{}}{{}}}
+\bibcite{xu2021distributed}{{28}{}{{}}{{}}}
+\bibcite{yan2024efficient}{{29}{}{{}}{{}}}
+\bibcite{chen2017maximum}{{30}{}{{}}{{}}}
+\bibcite{li2026multidimensional}{{31}{}{{}}{{}}}
+\bibcite{mcmahan2017fedavg}{{32}{}{{}}{{}}}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
 \gdef \@abspage@last{18}
