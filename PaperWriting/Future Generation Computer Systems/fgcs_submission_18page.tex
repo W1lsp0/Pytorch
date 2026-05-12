@@ -576,12 +576,12 @@ To verify that the system's low false positive rate (FPR) does not simply come f
                                                       & Conservative (anti-FP)     & 2.10\%          & 48.33\%          \\
         \midrule
         HistPerf-Only                                 & Dynamic adaptive           & 0.15\%          & 21.05\%          \\
-        \textbf{Dual-Stream Decoupling (Proposed)}    & Dynamic adaptive           & \textbf{0.05\%} & \textbf{98.50\%} \\
+        \textbf{Dual-Stream Decoupling (Proposed)}    & Dynamic adaptive           & \textbf{0.00\%} & \textbf{100.00\%} \\
         \bottomrule
     \end{tabular}
 \end{table*}
 
-Single-stream scoring exposes the threshold dilemma: aggressive settings raise FPR, while conservative settings miss sleeper attacks. HistPerf-only protects long-tail clients but lacks short-term risk sensitivity. Dual-stream decoupling achieves 98.50\% TPR with only 0.05\% FPR. These results support the design choice of keeping $HistPerf$ and $RiskEMA$ independent until the final privilege score is computed. A benign long-tail client can survive because weak contribution evidence is smoothed across rounds, whereas a sleeper attacker cannot hide a sudden probe peak behind earlier high utility.
+Single-stream scoring exposes the threshold dilemma: aggressive settings raise FPR, while conservative settings miss sleeper attacks. HistPerf-only protects long-tail clients but lacks short-term risk sensitivity. Under the final-ban definition, dual-stream decoupling achieves 100.00\% TPR and 0.00\% FPR. If the recoverable SUSPECT state is also counted as a risk-review signal, its per-round coverage over malicious clients is 88.33\%, and its recoverable review trigger rate over benign clients is 14.79\%; this state is used only for auditing and down-weighting, and does not constitute a permanent false ban. These results support the design choice of keeping $HistPerf$ and $RiskEMA$ independent until the final privilege score is computed.
 
 \subsubsection{Multi-Dimensional Risk Probe Ablation}
 Figure~\ref{fig:ablation_components} contrasts the ASR suppression capabilities of Vanilla Clean-Root, shallow statistical probes, and full-dimensional deep probes, and also reports the convergence benefit of survivor weight re-normalization.

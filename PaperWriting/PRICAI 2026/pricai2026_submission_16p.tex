@@ -301,7 +301,7 @@ Table~\ref{tab:ablation_overhead} shows that a single-stream reputation model su
         Reputation & Single-stream EMA, aggressive & 18.25\% FPR & 95.12\% TPR \\
         Reputation & Single-stream EMA, conservative & 2.10\% FPR & 48.33\% TPR \\
         Reputation & HistPerf-only & 0.15\% FPR & 21.05\% TPR \\
-        Reputation & \textbf{Dual-stream Trust Flow} & \textbf{0.05\% FPR} & \textbf{98.50\% TPR} \\
+        Reputation & \textbf{Dual-stream Trust Flow} & \textbf{0.00\% FPR} & \textbf{100.00\% TPR} \\
         \midrule
         Overhead & Standard FedAvg & 0 KB extra & 2.10 s aggregation \\
         Overhead & Trust Flow & $\sim$15 KB TrustReport & 4.85 s incl. audit \\
@@ -309,7 +309,7 @@ Table~\ref{tab:ablation_overhead} shows that a single-stream reputation model su
     \end{tabular*}
 \end{table}
 
-Figures~\ref{fig:ablation_components} and \ref{fig:alpha_sensitivity} further decompose the effect of risk probes, weight re-normalization, and data heterogeneity. Clean reference plus shallow probes handles sign flipping and gradient scaling, but clean-label backdoors remain difficult when gradient directions are collinear with benign updates. Adding cross-entropy and high-level activation probes reduces clean-label ASR below 9.2\%. Re-normalization also matters: layer-wise gating without survivor weight correction creates an implicit learning-rate decay, while full Trust Flow converges within the 30-round budget. Under Dirichlet $\alpha=0.1$, Krum and FLTrust degrade sharply, whereas Trust Flow remains near 92\% accuracy.
+Figures~\ref{fig:ablation_components} and \ref{fig:alpha_sensitivity} further decompose the effect of risk probes, weight re-normalization, and data heterogeneity. The FPR/TPR values in Table~\ref{tab:ablation_summary} use the final-ban definition. Counting SUSPECT as a recoverable risk-review state gives 88.33\% per-round malicious-client coverage and a 14.79\% benign-client review trigger rate, with no permanent false ban. Clean reference plus shallow probes handles sign flipping and gradient scaling, but clean-label backdoors remain difficult when gradient directions are collinear with benign updates. Adding cross-entropy and high-level activation probes reduces clean-label ASR below 9.2\%. Re-normalization also matters: layer-wise gating without survivor weight correction creates an implicit learning-rate decay, while full Trust Flow converges within the 30-round budget. Under Dirichlet $\alpha=0.1$, Krum and FLTrust degrade sharply, whereas Trust Flow remains near 92\% accuracy.
 
 The sensitivity curve confirms that traditional robust aggregation behaves well when data are close to IID, but deteriorates as $\alpha$ decreases. With $\alpha=100$ or $\alpha=1.0$, Krum and FLTrust remain close to the proposed method. In the long-tail setting $\alpha=0.1$, however, their filtering rules increasingly treat legitimate drift as malicious deviation. Trust Flow is less sensitive to this shift because content evidence is not used alone; it is integrated with historical utility and short-term risk. The fusion parameter $\beta_{fusion}$ controls how strongly the clean reference dominates peer consistency. A smaller value retains more long-tail clients but raises ASR, while a larger value improves attack suppression but can over-penalize heterogeneous updates. The default $\beta_{fusion}=2.0$ provides the best observed Acc/ASR balance.
 

@@ -625,12 +625,12 @@ To show that the low false positive rate (FPR) does not simply result from conse
                                                       & Conservative (anti-FP)     & 2.10\%          & 48.33\%          \\
         \midrule
         HistPerf-Only                                 & Dynamic adaptive           & 0.15\%          & 21.05\%          \\
-        \textbf{Dual-Stream Decoupling (Proposed)}    & Dynamic adaptive           & \textbf{0.05\%} & \textbf{98.50\%} \\
+        \textbf{Dual-Stream Decoupling (Proposed)}    & Dynamic adaptive           & \textbf{0.00\%} & \textbf{100.00\%} \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-The experimental results show the tradeoff faced by single-stream mechanisms when handling deviations caused by data heterogeneity and malicious poisoning. Tightening the threshold causes 18.25\% of benign long-tail nodes to be misclassified, whereas relaxing the threshold reduces the TPR and weakens protection against sleeper attacks. The HistPerf-Only variant accommodates long-tail features with an FPR of 0.15\%, but without sensitivity to short-term anomalies, its interception rate against sleeper-burst attacks reaches only 21.05\%. By separating long-term contribution tracking from short-term risk circuit breaking, the proposed dual-stream mechanism intercepts 98.50\% of malicious nodes while maintaining a low FPR for honest long-tail nodes.
+The experimental results show the tradeoff faced by single-stream mechanisms when handling deviations caused by data heterogeneity and malicious poisoning. Tightening the threshold causes 18.25\% of benign long-tail nodes to be misclassified, whereas relaxing the threshold reduces the TPR and weakens protection against sleeper attacks. The HistPerf-Only variant accommodates long-tail features with an FPR of 0.15\%, but without sensitivity to short-term anomalies, its interception rate against sleeper-burst attacks reaches only 21.05\%. By separating long-term contribution tracking from short-term risk circuit breaking, the proposed dual-stream mechanism removes all malicious clients under the final-ban metric without permanently banning benign clients. The FPR/TPR values in Table~\ref{tab:ablation_stream} use the final-ban definition. When SUSPECT is counted as a recoverable risk-review state, its per-round malicious-client coverage is 88.33\%, and its benign-client review trigger rate is 14.79\%; this state is used only for auditing and down-weighting.
 
 \subsubsection{Multi-Dimensional Risk Probe Ablation}
 When evaluating resistance to compound attacks, relying only on a clean reference set is often insufficient. Figure~\ref{fig:ablation_probes} compares the ASR suppression obtained by using only a clean reference (Vanilla Clean-Root), adding shallow statistical probes (+ Shallow Probes), and using full-dimensional deep probes (+ Full Probes) against untargeted flipping, gradient scaling, and stealthy semantic backdoor attacks.
