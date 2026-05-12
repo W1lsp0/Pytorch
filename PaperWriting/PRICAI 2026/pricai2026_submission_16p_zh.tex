@@ -129,7 +129,7 @@ Trust Flow 将每一轮 FL 划分为四个相互连接的阶段：准入与运�
 每个准入客户端都必须通过 TEE 式准入检查。令 $M_{\text{attest},k}\in\{0,1\}$ 表示证明报告是否有效。初始化期间，客户端调用设备唯一密钥并生成远程证明 quote，其中包含 PCR 链、代码段签名和运行配置等完整性测量。只有通过该检查的客户端才获得通信权限。本地训练期间，可信管理代理监测行为序列
 $\mathcal{X}_k=\{\Delta\text{grad},\Delta\text{loss},\text{instr\_dist}\}$。其熵 $H(\mathcal{X}_k)=-\sum_i p(x_i)\log p(x_i)$ 被映射为测量不确定性 $R_k^{(t)}=\exp(\lambda H(\mathcal{X}_k^{(t)}))$。直观地看，若某个客户端的本地训练突然呈现高熵状态，它未必已经恶意，但本轮证据的可信度应低于稳定执行下产生的证据。
 
-依据信息论滤波视角\cite{chen2017maximum}和多维信任评估方法\cite{li2026multidimensional}，信任估计按下式更新：
+依据最大相关熵鲁棒滤波思想\cite{chen2017maximum}和多维信任评估方法\cite{li2026multidimensional}，信任估计按下式更新：
 \begin{equation}
     \hat{T}_{k}^{(t)}=\hat{T}_{k}^{(t-1)}+K_k^{(t)}(Z_k^{(t)}-\hat{T}_{k}^{(t-1)}),\quad
     TrustScore_k=\hat{T}_{k}^{(t)}(1+P_k^{(t)})^{-1}.
@@ -322,7 +322,7 @@ t-SNE 可视化提供了补充视角。信任流介入前，恶意客户端和�
     \end{tabular*}
 \end{table}
 
-表~\ref{tab:ablation_summary} 中 FPR/TPR 采用最终封禁口径。若将 SUSPECT 计为可逆风险复核状态，则恶意客户端逐轮覆盖率为 88.33\%，正常客户端复核触发率为 14.79\%，且不构成永久误杀。
+表~\ref{tab:ablation_overhead} 中 FPR/TPR 采用最终封禁口径。若将 SUSPECT 计为可逆风险复核状态，则恶意客户端逐轮覆盖率为 88.33\%，正常客户端复核触发率为 14.79\%，且不构成永久误杀。
 
 图~\ref{fig:ablation_components} 和图~\ref{fig:alpha_sensitivity} 进一步分解了风险探针、权重重归一化和数据异构性的影响。干净参考结合浅层探针能够处理符号翻转和梯度缩放，但在梯度方向与良性更新共线时，干净标签后门仍较难识别。加入交叉熵与高层激活探针后，干净标签 ASR 降至 9.2\% 以下。重归一化同样重要：没有幸存者权重修正的分层门控会产生隐式学习率衰减，而完整 Trust Flow 能在 30 轮预算内收敛。在 Dirichlet $\alpha=0.1$ 下，Krum 与 FLTrust 明显退化，而 Trust Flow 仍保持接近 92\% 的准确率。
 
@@ -371,7 +371,7 @@ This work is supported by the National Natural Science Foundation of China under
     \bibitem{kairouz2021flsurvey} Kairouz, P., McMahan, H.B., Avent, B., et al.: Advances and open problems in federated learning. Foundations and Trends in Machine Learning 14(1--2), 1--210 (2021). \url{https://doi.org/10.1561/2200000083}
     \bibitem{mcmahan2017fedavg} McMahan, B., Moore, E., Ramage, D., Hampson, S., Aguera y Arcas, B.: Communication-efficient learning of deep networks from decentralized data. In: Proceedings of the 20th International Conference on Artificial Intelligence and Statistics, PMLR 54, pp. 1273--1282 (2017). \url{https://proceedings.mlr.press/v54/mcmahan17a.html}
     \bibitem{blanchard2017krum} Blanchard, P., El Mhamdi, E.M., Guerraoui, R., Stainer, J.: Machine learning with adversaries: Byzantine tolerant gradient descent. In: Advances in Neural Information Processing Systems 30 (2017). \href{https://papers.nips.cc/paper/6617-machine-learning-with-adversaries-byzantine-tolerant-gradient-descent}{NeurIPS paper page}
-    \bibitem{yin2018byzantine} Yin, D., Chen, Y., Kannan, R., Bartlett, P.: Byzantine-robust distributed learning: Towards optimal statistical rates. In: Proceedings of the 35th International Conference on Machine Learning, PMLR 80, pp. 5650--5659 (2018). \url{https://proceedings.mlr.press/v80/yin18a.html}
+    \bibitem{yin2018byzantine} Yin, D., Chen, Y., Ramchandran, K., Bartlett, P.: Byzantine-robust distributed learning: Towards optimal statistical rates. In: Proceedings of the 35th International Conference on Machine Learning, PMLR 80, pp. 5650--5659 (2018). \url{https://proceedings.mlr.press/v80/yin18a.html}
     \bibitem{cao2021fltrust} Cao, X., Fang, M., Liu, J., Gong, N.Z.: FLTrust: Byzantine-robust federated learning via trust bootstrapping. In: Proceedings 2021 Network and Distributed System Security Symposium (NDSS) (2021). \url{https://doi.org/10.14722/ndss.2021.24434}
     \bibitem{fung2020foolsgold} Fung, C., Yoon, C.J.M., Beschastnikh, I.: The limitations of federated learning in Sybil settings. In: 23rd International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2020), pp. 301--316. USENIX Association (2020). \url{https://www.usenix.org/conference/raid2020/presentation/fung}
     \bibitem{wang2025rasa} Wang, L., Huang, M., Zhang, Z., Li, M., Wang, J., Gai, K.: RaSA: Robust and adaptive secure aggregation for edge-assisted hierarchical federated learning. IEEE Transactions on Information Forensics and Security 20, 4280--4295 (2025). \url{https://doi.org/10.1109/TIFS.2025.3559411}

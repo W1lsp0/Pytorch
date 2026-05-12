@@ -205,11 +205,11 @@ positive rate on benign clients approaching zero.
 \end{table}
 
 \subsection{硬件准入与动态信任评估}
-客户端的准入机制不应局限于一次性的身份校验，而需建立一套反映本地训练持续可信度的追踪体系。为此，本研究将初始可信度解耦为“静态准入”与“动态评估”双层架构：前者依赖底层硬件判断执行环境的合法性；后者则利用信息理论学习（Information Theoretic Learning, ITL）的前沿范式\cite{chen2017maximum}，将训练过程中的瞬态行为波动转化为动态观测信号，借由滤波机制输出可持续传递的 $TrustScore$。
+客户端的准入机制不应局限于一次性的身份校验，而需建立一套反映本地训练持续可信度的追踪体系。为此，本研究将初始可信度解耦为“静态准入”与“动态评估”双层架构：前者依赖底层硬件判断执行环境的合法性；后者则借鉴最大相关熵卡尔曼滤波所体现的鲁棒滤波思想\cite{chen2017maximum}，将训练过程中的瞬态行为波动转化为动态观测信号，借由滤波机制输出可持续传递的 $TrustScore$。
 
 \begin{enumerate}
     \item \textbf{硬件静态门禁（Static Admission）}：在联邦计算初始化阶段，参与节点必须调用其内部隔离的硬件密钥（DUK），向中心服务器发起包含平台配置寄存器（PCRs）链值的远程证明（Attestation Quote）。服务器端通过校验内存代码段与运行态签名，对通过验证的节点授予初始通信权限（$M_{attest,k}=1$）。
-    \item \textbf{特征序列提取与熵分析（Entropy Analysis）}：在分布式系统的抗投毒信任评估框架中\cite{li2026multidimensional}，单一的静态测量难以捕获复杂的运行期突变。因此，客户端 TEE 内部被配置为持续监测训练周期的关键特征序列 $\mathcal{X}_k = \{ \Delta \text{grad}, \Delta \text{loss}, \text{instr\_dist} \}$。对该序列的信息熵 $H(\mathcal{X}_k)$ 进行量化计算：
+    \item \textbf{特征序列提取与熵分析（Entropy Analysis）}：已有移动群智感知中的多维信任评估研究表明，单一静态信任度量难以刻画不同任务场景下的可信差异\cite{li2026multidimensional}。受此启发，客户端 TEE 内部被配置为持续监测训练周期的关键特征序列 $\mathcal{X}_k = \{ \Delta \text{grad}, \Delta \text{loss}, \text{instr\_dist} \}$。对该序列的信息熵 $H(\mathcal{X}_k)$ 进行量化计算：
           \begin{equation}
               H(\mathcal{X}_k) = -\sum p(x_i) \log p(x_i)
           \end{equation}
@@ -735,7 +735,7 @@ $r_{grad}$ 衡量客户端更新 $\Delta W_k^{(t)}$ 与参考方向 $g_{root}^{(
     \bibitem{bagdasaryan2020backdoor} Bagdasaryan, E., Veit, A., Hua, Y., Estrin, D., Shmatikov, V.: How To Backdoor Federated Learning. In: Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics, PMLR 108, pp. 2938--2948 (2020). \url{https://proceedings.mlr.press/v108/bagdasaryan20a.html}
     \bibitem{wang2019neuralcleanse} Wang, B., Yao, Y., Shan, S., Li, H., Viswanath, B., Zheng, H., Zhao, B.Y.: Neural Cleanse: Identifying and mitigating backdoor attacks in neural networks. In: 2019 IEEE Symposium on Security and Privacy (SP), pp. 707--723 (2019). \url{https://doi.org/10.1109/SP.2019.00031}
     \bibitem{blanchard2017krum} Blanchard, P., El Mhamdi, E.M., Guerraoui, R., Stainer, J.: Machine learning with adversaries: Byzantine tolerant gradient descent. In: Advances in Neural Information Processing Systems 30 (2017). \href{https://papers.nips.cc/paper/6617-machine-learning-with-adversaries-byzantine-tolerant-gradient-descent}{NeurIPS paper page}
-    \bibitem{yin2018byzantine} Yin, D., Chen, Y., Kannan, R., Bartlett, P.: Byzantine-robust distributed learning: Towards optimal statistical rates. In: Proceedings of the 35th International Conference on Machine Learning, PMLR 80, pp. 5650--5659 (2018). \url{https://proceedings.mlr.press/v80/yin18a.html}
+    \bibitem{yin2018byzantine} Yin, D., Chen, Y., Ramchandran, K., Bartlett, P.: Byzantine-robust distributed learning: Towards optimal statistical rates. In: Proceedings of the 35th International Conference on Machine Learning, PMLR 80, pp. 5650--5659 (2018). \url{https://proceedings.mlr.press/v80/yin18a.html}
     \bibitem{cao2021fltrust} Cao, X., Fang, M., Liu, J., Gong, N.Z.: FLTrust: Byzantine-robust federated learning via trust bootstrapping. In: Proceedings 2021 Network and Distributed System Security Symposium (NDSS) (2021). \url{https://doi.org/10.14722/ndss.2021.24434}
     \bibitem{fung2020foolsgold} Fung, C., Yoon, C.J.M., Beschastnikh, I.: The limitations of federated learning in Sybil settings. In: 23rd International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2020), pp. 301--316. USENIX Association (2020). \url{https://www.usenix.org/conference/raid2020/presentation/fung}
     \bibitem{r9_clustered} Xu, Y., Tan, Y., Zhang, C., Sun, P., Zhang, Y., Ren, J., Jiang, H., Zhang, Y.: Towards privacy-enhanced and robust clustered federated learning. IEEE Transactions on Mobile Computing 24(8), 7171--7188 (2025). \url{https://doi.org/10.1109/TMC.2025.3547149}
