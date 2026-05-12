@@ -118,11 +118,11 @@ In the standard FL setting, the global optimization objective is to minimize the
 \end{equation}
 where $p_k = |\mathcal{D}_k| / \sum |\mathcal{D}_j|$ denotes the data-volume proportion. In round $t$, the server distributes the global model $W_{global}^{(t-1)}$. Client $k$ takes it as the initial model and runs SGD for $E$ local epochs with learning rate $\eta_l$, yielding the local update:
 \begin{equation}
-\begin{aligned}
-    \Delta W_{k}^{(t)} &= W_{k, E}^{(t)} - W_{global}^{(t-1)}, \\
-    W_{k, e}^{(t)} &= W_{k, e-1}^{(t)}
-    - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)] .
-\end{aligned}
+    \begin{aligned}
+        \Delta W_{k}^{(t)} & = W_{k, E}^{(t)} - W_{global}^{(t-1)}, \\
+        W_{k, e}^{(t)}     & = W_{k, e-1}^{(t)}
+        - \eta_l \nabla \mathbb{E}[\ell(W_{k, e-1}^{(t)}; x, y)] .
+    \end{aligned}
 \end{equation}
 Here, the expectation $\mathbb{E}[\cdot]$ denotes mini-batch sampling over the local dataset $\mathcal{D}_k$. The client then uploads its update, and the server applies a form of parameter aggregation: $W_{global}^{(t)} = W_{global}^{(t-1)} + \mathrm{Agg}(\{ \Delta W_{k}^{(t)} \}_{k\in\Phi})$.
 
@@ -258,15 +258,15 @@ The final reference direction $g_{root}$ is:
 \begin{equation}
     g_{root}=
     \begin{cases}
-        g_{root\_clean}, & \text{if server validation direction available}, \\
+        g_{root\_clean},                                                   & \text{if server validation direction available}, \\
         \frac{\sum_k \omega_{k}^{ref}\Delta W_k}{\sum_j \omega_{j}^{ref}}, & \text{otherwise}.
     \end{cases}
 \end{equation}
 
 After obtaining $g_{root}$, the server calculates a content quality score for each client update $\Delta W_k$. This score considers both global contribution, namely consistency with the reference direction, and group consistency, namely the degree of agreement with other high-reputation clients:
 \begin{align}
-    S_{contrib,k}    & = \max\left(0,\ \alpha_{1} + \alpha_{2} \cdot \cos(\Delta W_{k}, g_{root})\right),                                      \\
-    S_{consist,k}    & = \frac{\sum_{j\neq k} TrustScore_{j} \cdot \xi_{j,k}}{\sum_{j\neq k} TrustScore_{j} + \varepsilon},                         \\
+    S_{contrib,k}    & = \max\left(0,\ \alpha_{1} + \alpha_{2} \cdot \cos(\Delta W_{k}, g_{root})\right),                                                              \\
+    S_{consist,k}    & = \frac{\sum_{j\neq k} TrustScore_{j} \cdot \xi_{j,k}}{\sum_{j\neq k} TrustScore_{j} + \varepsilon},                                            \\
     ContentScore_{k} & = \frac{(1 + \beta_{fusion}^{2}) \cdot S_{consist,k} \cdot S_{contrib,k}}{\beta_{fusion}^{2}\cdot S_{consist,k} + S_{contrib,k} + \varepsilon}.
 \end{align}
 Here, $\xi_{j,k}=\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,\Delta W_j))$, and $\alpha_1+\alpha_2=1.0$ adjusts the cosine mapping interval. The parameter $\beta_{fusion}>1.0$, with default $\beta_{fusion}=2.0$, moderately increases the weight assigned to consistency with the clean direction, strengthening resistance to collusive drift. $ContentScore_k$ describes only the content quality of the current-round update and is not equivalent to permanent reputation. For legitimate long-tail nodes under strong Non-IID settings, a low single-round score may result from data skew rather than attack behavior. This score is therefore passed to the cross-round state evolution in phase three, where subsequent handling is jointly determined by the historical utility stream and the short-term risk stream.
@@ -322,11 +322,11 @@ Driven by the two streams, client states move among four states, as shown in Fig
 
 The server then combines hardware-level trust ($TrustScore$), current-round update quality ($ContentScore$), and long-term utility ($HistPerf$) into a base score. The short-term risk discount is applied on top of this score to obtain the final aggregation privilege $RawScore_k$:
 \begin{equation}
-\begin{split}
-    RawScore_{k}^{base} ={}&
-    (TrustScore_{k})^{\alpha}(ContentScore_{k})^{\beta}\\
-    &\times (HistPerf_{k}^{(t-1)})^{\gamma}.
-\end{split}
+    \begin{split}
+        RawScore_{k}^{base} ={}&
+        (TrustScore_{k})^{\alpha}(ContentScore_{k})^{\beta}\\
+        &\times (HistPerf_{k}^{(t-1)})^{\gamma}.
+    \end{split}
 \end{equation}
 \begin{equation}
     RawScore_{k} = RawScore_{k}^{base}(1 - RiskEMA_{k}^{(t-1)})^{p}.
@@ -388,11 +388,11 @@ Given $0 < \beta_h < 1$, short-term perturbations are smoothed as $\beta_h \to 1
 \textbf{Lemma 2 (Short-Term Response to Sleeper Poisoning)}
 Consider a backdoor node $m$ that uses long benign warm-up rounds followed by intermittent attack bursts. Even if it accumulates high $HistPerf$ early on, an attack round triggers an abnormal probe peak ($\exists r \in \{r_{grad}, r_{probe}, r_{trigger}\}, r \gg 1$). Because $Risk_k^{inst}$ takes the maximum over multiple probes and the EMA is monotone in its input, the RiskEMA trajectory satisfies the following lower bound:
 \begin{equation}
-\begin{aligned}
-    RiskEMA_m^{(t)} \ge
-    \max \big(&\beta_r \cdot RiskEMA_m^{(t-1)},\\
-    &\mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \big).
-\end{aligned}
+    \begin{aligned}
+        RiskEMA_m^{(t)} \ge
+        \max \big( & \beta_r \cdot RiskEMA_m^{(t-1)},                             \\
+                   & \mathcal{F}_{probe}(r_{grad}, r_{probe}, r_{trigger}) \big).
+    \end{aligned}
 \end{equation}
 When $\mathcal{F}_{probe}$ detects an anomalous change, the risk value rises quickly and can reach the isolation threshold within a few rounds.
 
@@ -659,24 +659,24 @@ To support reproducibility and transparency, this appendix gives the calculation
 \subsection{Gradient Direction and Amplitude Probe \texorpdfstring{($r_{grad}$)}{(r-grad)}}
 The $r_{grad}$ probe quantifies the geometric deviation of the client update $\Delta W_k^{(t)}$ relative to the reference direction $g_{root}^{(t)}$, with a particular focus on sign flipping and amplitude anomalies. This metric evaluates both directional deflection and scale mutation:
 \begin{equation}
-\begin{aligned}
-    r_{grad,k}^{(t)} ={}& \lambda_d \left(1-\frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{\|\Delta W_k^{(t)}\| \cdot \|g_{root}^{(t)}\|}\right)\\
-    + \lambda_m \max\left(0,\frac{\|\Delta W_k^{(t)}\|_2-\mu^{(t)}}{\sigma^{(t)}}\right).
-\end{aligned}
+    \begin{aligned}
+        r_{grad,k}^{(t)} ={} & \lambda_d \left(1-\frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{\|\Delta W_k^{(t)}\| \cdot \|g_{root}^{(t)}\|}\right) \\
+        + \lambda_m \max\left(0,\frac{\|\Delta W_k^{(t)}\|_2-\mu^{(t)}}{\sigma^{(t)}}\right).
+    \end{aligned}
 \end{equation}
 Here, $\lambda_d$ and $\lambda_m$ control the directional and amplitude terms, respectively, and are set to $0.5$ by default. The terms $\mu^{(t)}$ and $\sigma^{(t)}$ denote the mean and standard deviation of gradient L2 norms across admitted clients in round $t$.
 
 \subsection{Small-Sample Cross-Entropy Probe \texorpdfstring{($r_{probe}$)}{(r-probe)}}
 Distance statistics alone are insufficient for identifying targeted poisoning against minority classes. The $r_{probe}$ metric uses a small clean probe set on the server, denoted by $\mathcal{D}_{probe}$, and measures the cross-entropy loss surge before and after a client update is tentatively applied:
 \begin{equation}
-\begin{aligned}
-    r_{probe,k}^{(t)} = \operatorname{ReLU}\left(
-    \mathcal{L}_{CE}(W_{global}^{(t-1)}+\Delta W_k^{(t)};\mathcal{D}_{probe})
-    \right.\\
-    \left.
-    - \mathcal{L}_{CE}(W_{global}^{(t-1)};\mathcal{D}_{probe})
-    \right).
-\end{aligned}
+    \begin{aligned}
+        r_{probe,k}^{(t)} = \operatorname{ReLU}\left(
+        \mathcal{L}_{CE}(W_{global}^{(t-1)}+\Delta W_k^{(t)};\mathcal{D}_{probe})
+        \right. \\
+        \left.
+        - \mathcal{L}_{CE}(W_{global}^{(t-1)};\mathcal{D}_{probe})
+        \right).
+    \end{aligned}
 \end{equation}
 
 \subsection{Deep Neuron Backdoor Activation Probe \texorpdfstring{($r_{trigger}$)}{(r-trigger)}}

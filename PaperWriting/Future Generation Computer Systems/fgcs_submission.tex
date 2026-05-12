@@ -241,8 +241,8 @@ The final reference direction $g_{root}$ is:
 
 After obtaining $g_{root}$, the server calculates a content quality score for each client update $\Delta W_k$. This score considers both global contribution, namely consistency with the reference direction, and group consistency, namely the degree of agreement with other high-reputation clients:
 \begin{align}
-    S_{contrib,k}    & = \max\left(0,\ \alpha_{1} + \alpha_{2} \cdot \cos(\Delta W_{k}, g_{root})\right),                                      \\
-    S_{consist,k}    & = \frac{\sum_{j\neq k} TrustScore_{j} \cdot \xi_{j,k}}{\sum_{j\neq k} TrustScore_{j} + \varepsilon},                         \\
+    S_{contrib,k}    & = \max\left(0,\ \alpha_{1} + \alpha_{2} \cdot \cos(\Delta W_{k}, g_{root})\right),                                                              \\
+    S_{consist,k}    & = \frac{\sum_{j\neq k} TrustScore_{j} \cdot \xi_{j,k}}{\sum_{j\neq k} TrustScore_{j} + \varepsilon},                                            \\
     ContentScore_{k} & = \frac{(1 + \beta_{fusion}^{2}) \cdot S_{consist,k} \cdot S_{contrib,k}}{\beta_{fusion}^{2}\cdot S_{consist,k} + S_{contrib,k} + \varepsilon}.
 \end{align}
 Here, $\xi_{j,k}=\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,\Delta W_j))$, and $\alpha_1+\alpha_2=1.0$ adjusts the cosine mapping interval. The parameter $\beta_{fusion}>1.0$, with default $\beta_{fusion}=2.0$, moderately increases the weight assigned to consistency with the clean direction, strengthening resistance to collusive drift. $ContentScore_k$ describes only the content quality of the current-round update and is not equivalent to permanent reputation. For legitimate long-tail nodes under strong Non-IID settings, a low single-round score may result from data skew rather than attack behavior. This score is therefore passed to the cross-round state evolution in phase three, where subsequent handling is jointly determined by the historical utility stream and the instant risk stream.
