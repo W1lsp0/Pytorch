@@ -624,12 +624,12 @@ To substantiate that the system's exceptionally low false positive rate (FPR) st
     \label{tab:ablation_stream}
     \begin{tabular}{l c c c}
         \toprule
-        \textbf{Reputation Architecture}              & \textbf{Threshold Control} & \textbf{FPR}    & \textbf{TPR}     \\
+        \textbf{Reputation Architecture}              & \textbf{Threshold Control} & \textbf{FPR}    & \textbf{TPR}      \\
         \midrule
-        \multirow{2}{*}{Single-Stream EMA (Baseline)} & Aggressive (anti-poison)   & 18.25\%         & 95.12\%          \\
-                                                      & Conservative (anti-FP)     & 2.10\%          & 48.33\%          \\
+        \multirow{2}{*}{Single-Stream EMA (Baseline)} & Aggressive (anti-poison)   & 18.25\%         & 95.12\%           \\
+                                                      & Conservative (anti-FP)     & 2.10\%          & 48.33\%           \\
         \midrule
-        HistPerf-Only                                 & Dynamic adaptive           & 0.15\%          & 21.05\%          \\
+        HistPerf-Only                                 & Dynamic adaptive           & 0.15\%          & 21.05\%           \\
         \textbf{Dual-Stream Decoupling (Proposed)}    & Dynamic adaptive           & \textbf{0.00\%} & \textbf{100.00\%} \\
         \bottomrule
     \end{tabular}
