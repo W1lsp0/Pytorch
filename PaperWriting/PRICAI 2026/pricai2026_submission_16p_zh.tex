@@ -60,7 +60,7 @@
 
 联邦学习通过参数交换训练全局模型，并将数据保留在边缘设备本地\cite{kairouz2021flsurvey,mcmahan2017fedavg}。这一范式适合边缘智能场景，但当客户端身份、执行完整性和更新语义无法完全可信时，聚合阶段会变得脆弱。实际边缘网络还同时存在设备异构和强偏斜数据分布，因此鲁棒聚合必须区分恶意偏移和合法长尾更新。在复合攻击下，这一区分更加困难，因为攻击者可能提交投毒参数、注入定向后门，或利用跨轮伪装降低可见异常。
 
-已有工作从不同角度处理这一问题。Krum 和 Trimmed Mean 等几何或统计防御会剔除离群更新\cite{blanchard2017krum,yin2018byzantine}；FLTrust、FoolsGold、RaSA 与 FLDetector 则利用干净参考、时序相似性、自适应聚合或恶意客户端检测\cite{cao2021fltrust,fung2020foolsgold,wang2025rasa,fldetector2022}。面向后门的防御进一步考察深层行为、裁剪加噪、模型投毒或合谋模式\cite{deepsight2022,flame2022,crowdguard2024,flpurifier,roseagg,shieldfl}。这些机制仍面临两类反复出现的张力：静态软件检查不能保证本地执行确实真实；过强过滤又容易将 Non-IID 长尾更新误判为攻击。TEE 辅助联邦系统提供了硬件信任根\cite{zhang2025rppfl,r1_tee_integrity,r5_tee_mitigating,xu2021distributed,lu2025tmt}，但客户端准入之后，TEE 本身并不能判断真实训练产生的模型更新是否在语义上安全。
+已有工作从不同角度处理这一问题。Krum 和 Trimmed Mean 等几何或统计防御会剔除离群更新\cite{blanchard2017krum,yin2018byzantine}。FLTrust 和 FoolsGold 利用干净参考或时序相似性\cite{cao2021fltrust,fung2020foolsgold}；RaSA 与 FLDetector 则面向边缘辅助聚合和模型投毒检测\cite{wang2025rasa,fldetector2022}。面向后门的防御进一步考察深层行为、裁剪加噪或净化机制\cite{deepsight2022,flame2022,flpurifier}；相关工作也考虑联邦后门检测、定向合谋和隐私保护投毒防御\cite{crowdguard2024,roseagg,shieldfl}。这些机制仍面临两类反复出现的张力：静态软件检查不能保证本地执行确实真实；过强过滤又容易将 Non-IID 长尾更新误判为攻击。TEE 辅助联邦系统为训练完整性和 SGX 式分布式学习提供硬件信任根\cite{r1_tee_integrity,xu2021distributed}，近期工作进一步研究隐私保护 FL、攻击缓解和恶意参与者下的可信训练\cite{zhang2025rppfl,r5_tee_mitigating,lu2025tmt}。但客户端准入之后，TEE 本身并不能判断真实训练产生的模型更新是否在语义上安全。
 
 本文提出 \emph{Trust Flow}，一个面向边缘联邦学习的全流程可信聚合框架。其核心思想是让信任证据在准入、审查、时序状态演化和聚合之间持续流动，而不是把每一轮视作孤立的过滤决策。本文贡献如下：
 \begin{tightenumerate}
@@ -76,9 +76,9 @@
 
 \textbf{投毒与后门攻击。} FL 中的攻击主要包括无目标投毒和目标后门。符号翻转、梯度缩放等无目标投毒旨在破坏收敛；标签翻转、触发器后门、干净标签投毒和语义后门则试图保持主任务行为，同时植入定向误分类。后门攻击尤其棘手，因为恶意更新可在方向上接近正常更新，却改变隐藏特征\cite{bagdasaryan2020backdoor,wang2019neuralcleanse}。在多轮训练中，攻击者还可能先正常行为以积累信任，再注入低幅度或间歇式恶意更新。
 
-\textbf{主动防御及其局限。} 鲁棒聚合通常依赖几何距离、坐标级统计、干净锚点、时序相似性或自适应聚合。Krum 与 Trimmed Mean 拒绝或抑制离群更新\cite{blanchard2017krum,yin2018byzantine}；FLTrust 使用服务器端干净参考方向\cite{cao2021fltrust}；FoolsGold 和 FLDetector 利用历史或客户端行为识别恶意参与\cite{fung2020foolsgold,fldetector2022}；RaSA 在边缘辅助场景下调整安全聚合\cite{wang2025rasa}。DeepSight、FLAME、CrowdGuard、FLPurifier、RoseAgg 和 ShieldFL 等后门防御提高了对触发器、合谋或模型投毒模式的保护能力\cite{deepsight2022,flame2022,crowdguard2024,flpurifier,roseagg,shieldfl}。但这些防御对强 Non-IID 分布仍较敏感：阈值严格会增加良性误杀，阈值宽松则会放过隐蔽攻击。
+\textbf{主动防御及其局限。} 鲁棒聚合通常依赖几何距离、坐标级统计、干净锚点、时序相似性或自适应聚合。Krum 与 Trimmed Mean 拒绝或抑制离群更新\cite{blanchard2017krum,yin2018byzantine}；FLTrust 使用服务器端干净参考方向\cite{cao2021fltrust}；FoolsGold 和 FLDetector 利用历史或客户端行为识别恶意参与\cite{fung2020foolsgold,fldetector2022}；RaSA 在边缘辅助场景下调整安全聚合\cite{wang2025rasa}。后门防御方面，DeepSight 与 FLAME 检查隐藏行为或更新簇\cite{deepsight2022,flame2022}；CrowdGuard 与 RoseAgg 处理联邦后门检测和定向合谋\cite{crowdguard2024,roseagg}；FLPurifier 与 ShieldFL 则从净化或隐私保护防御角度缓解投毒\cite{flpurifier,shieldfl}。但这些防御对强 Non-IID 分布仍较敏感：阈值严格会增加良性误杀，阈值宽松则会放过隐蔽攻击。
 
-\textbf{TEE 辅助可信训练。} Intel SGX 和 ARM TrustZone 等可信执行环境可提供隔离执行与受保护密钥材料。已有研究展示了 TEE 在鲁棒隐私保护 FL、训练完整性、攻击缓解、SGX 分布式学习和可信模型训练中的价值\cite{zhang2025rppfl,r1_tee_integrity,r5_tee_mitigating,xu2021distributed,lu2025tmt}。不过，TEE 准入不能单独判断一个真实训练过程生成的模型更新是否语义安全。因此，Trust Flow 将硬件根准入与跨轮风险建模、分层鲁棒聚合结合起来。
+\textbf{TEE 辅助可信训练。} Intel SGX 和 ARM TrustZone 等可信执行环境可提供隔离执行与受保护密钥材料。已有研究展示了 TEE 在训练完整性和 SGX 分布式学习中的价值\cite{r1_tee_integrity,xu2021distributed}，也将其用于鲁棒隐私保护 FL 和攻击缓解\cite{zhang2025rppfl,r5_tee_mitigating}，以及恶意参与者下的可信模型训练\cite{lu2025tmt}。不过，TEE 准入不能单独判断一个真实训练过程生成的模型更新是否语义安全。因此，Trust Flow 将硬件根准入与跨轮风险建模、分层鲁棒聚合结合起来。
 
 \section{系统模型与威胁假设}
 
@@ -361,8 +361,8 @@ Trust Flow 将准入证据、内容审查、时序信誉和按层聚合整合为
 
 本文仍存在若干局限。由于多种新兴 TEE-FL 方法尚无公开可复现实现，本研究未能在相同实验设置下将其纳入直接基线。当前探针设计也主要针对视觉分类，尤其是 CIFAR-10 后门行为。后续工作将随最终稿发布源代码和实验脚本，以支持复现，评估更大规模边缘部署，并将多维风险探针扩展到 NLP 与联邦微调场景。
 
-\section*{Acknowledgments}
-This work is supported by the National Natural Science Foundation of China under Grant No.~62002261, and the Tianjin Natural Science Foundation under Grant No.~25JCQNJC00600.
+\section*{致谢}
+本研究得到国家自然科学基金项目（No.~62002261）和天津市自然科学基金项目（No.~25JCQNJC00600）的支持。
 
 \begingroup
 \small
@@ -374,10 +374,8 @@ This work is supported by the National Natural Science Foundation of China under
     \bibitem{yin2018byzantine} Yin, D., Chen, Y., Ramchandran, K., Bartlett, P.: Byzantine-robust distributed learning: Towards optimal statistical rates. In: Proceedings of the 35th International Conference on Machine Learning, PMLR 80, pp. 5650--5659 (2018). \url{https://proceedings.mlr.press/v80/yin18a.html}
     \bibitem{cao2021fltrust} Cao, X., Fang, M., Liu, J., Gong, N.Z.: FLTrust: Byzantine-robust federated learning via trust bootstrapping. In: Proceedings 2021 Network and Distributed System Security Symposium (NDSS) (2021). \url{https://doi.org/10.14722/ndss.2021.24434}
     \bibitem{fung2020foolsgold} Fung, C., Yoon, C.J.M., Beschastnikh, I.: The limitations of federated learning in Sybil settings. In: 23rd International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2020), pp. 301--316. USENIX Association (2020). \url{https://www.usenix.org/conference/raid2020/presentation/fung}
-    \bibitem{fldetector2022} Zhang, Z., Cao, X., Jia, J., Gong, N.Z.: FLDetector: Defending federated learning against model poisoning attacks via detecting malicious clients. In: Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, pp. 2545--2555 (2022). \url{https://doi.org/10.1145/3534678.3539231}
     \bibitem{wang2025rasa} Wang, L., Huang, M., Zhang, Z., Li, M., Wang, J., Gai, K.: RaSA: Robust and adaptive secure aggregation for edge-assisted hierarchical federated learning. IEEE Transactions on Information Forensics and Security 20, 4280--4295 (2025). \url{https://doi.org/10.1109/TIFS.2025.3559411}
-    \bibitem{bagdasaryan2020backdoor} Bagdasaryan, E., Veit, A., Hua, Y., Estrin, D., Shmatikov, V.: How To Backdoor Federated Learning. In: Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics, PMLR 108, pp. 2938--2948 (2020). \url{https://proceedings.mlr.press/v108/bagdasaryan20a.html}
-    \bibitem{wang2019neuralcleanse} Wang, B., Yao, Y., Shan, S., Li, H., Viswanath, B., Zheng, H., Zhao, B.Y.: Neural Cleanse: Identifying and mitigating backdoor attacks in neural networks. In: 2019 IEEE Symposium on Security and Privacy (SP), pp. 707--723 (2019). \url{https://doi.org/10.1109/SP.2019.00031}
+    \bibitem{fldetector2022} Zhang, Z., Cao, X., Jia, J., Gong, N.Z.: FLDetector: Defending federated learning against model poisoning attacks via detecting malicious clients. In: Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, pp. 2545--2555 (2022). \url{https://doi.org/10.1145/3534678.3539231}
     \bibitem{deepsight2022} Rieger, P., Nguyen, T.D., Miettinen, M., Sadeghi, A.R.: DeepSight: Mitigating backdoor attacks in federated learning through deep model inspection. In: Network and Distributed System Security Symposium (NDSS) (2022). \url{https://doi.org/10.14722/ndss.2022.23156}
     \bibitem{flame2022} Nguyen, T.D., Rieger, P., Chen, H., et al.: FLAME: Taming backdoors in federated learning. In: 31st USENIX Security Symposium, pp. 1415--1432 (2022). \url{https://www.usenix.org/conference/usenixsecurity22/presentation/nguyen}
     \bibitem{crowdguard2024} Rieger, P., Krau{\ss}, T., Miettinen, M., Dmitrienko, A., Sadeghi, A.R.: CrowdGuard: Federated backdoor detection in federated learning. In: Network and Distributed System Security Symposium (NDSS) (2024). \url{https://doi.org/10.14722/ndss.2024.23233}
@@ -389,6 +387,9 @@ This work is supported by the National Natural Science Foundation of China under
     \bibitem{r5_tee_mitigating} Queyrut, S., Schiavoni, V., Felber, P.: Mitigating adversarial attacks in federated learning with trusted execution environments. In: 2023 IEEE 43rd International Conference on Distributed Computing Systems (ICDCS), pp. 626--637 (2023). \url{https://doi.org/10.1109/ICDCS57875.2023.00069}
     \bibitem{xu2021distributed} Xu, T., Zhu, K., Andrzejak, A., Zhang, L.: Distributed learning in trusted execution environment: A case study of federated learning in SGX. In: 2021 7th IEEE International Conference on Network Intelligence and Digital Content (IC-NIDC), pp. 450--454 (2021). \url{https://doi.org/10.1109/IC-NIDC54101.2021.9660433}
     \bibitem{lu2025tmt} Lu, Z., Wang, L., Zhang, Z., Huang, M., Wang, J., Li, M.: TMT-FL: Enabling trustworthy model training of federated learning with malicious participants. IEEE Transactions on Dependable and Secure Computing 22(3), 2723--2740 (2025). \url{https://doi.org/10.1109/TDSC.2024.3521377}
+
+    \bibitem{bagdasaryan2020backdoor} Bagdasaryan, E., Veit, A., Hua, Y., Estrin, D., Shmatikov, V.: How To Backdoor Federated Learning. In: Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics, PMLR 108, pp. 2938--2948 (2020). \url{https://proceedings.mlr.press/v108/bagdasaryan20a.html}
+    \bibitem{wang2019neuralcleanse} Wang, B., Yao, Y., Shan, S., Li, H., Viswanath, B., Zheng, H., Zhao, B.Y.: Neural Cleanse: Identifying and mitigating backdoor attacks in neural networks. In: 2019 IEEE Symposium on Security and Privacy (SP), pp. 707--723 (2019). \url{https://doi.org/10.1109/SP.2019.00031}
 
 \end{thebibliography}
 \endgroup
