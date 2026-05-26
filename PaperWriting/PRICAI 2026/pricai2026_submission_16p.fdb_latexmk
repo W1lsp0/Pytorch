@@ -1,9 +1,9 @@
 # Fdb version 3
-["xdvipdfmx"] 1779780673 "pricai2026_submission_16p.xdv" "pricai2026_submission_16p.pdf" "pricai2026_submission_16p" 1779780673
-  "pricai2026_submission_16p.xdv" 1779780673 80064 2bc1791d583ee6ca576f7f09f603d843 "xelatex"
+["xdvipdfmx"] 1779785957 "pricai2026_submission_16p.xdv" "pricai2026_submission_16p.pdf" "pricai2026_submission_16p" 1779785957
+  "pricai2026_submission_16p.xdv" 1779785957 80452 f798dd26bdc07f425cc40bc3d0ceec3b "xelatex"
   (generated)
   "pricai2026_submission_16p.pdf"
-["xelatex"] 1779780673 "pricai2026_submission_16p.tex" "pricai2026_submission_16p.xdv" "pricai2026_submission_16p" 1779780673
+["xelatex"] 1779785957 "pricai2026_submission_16p.tex" "pricai2026_submission_16p.xdv" "pricai2026_submission_16p" 1779785957
   "..//fig10_ablation_renorm.pdf" 1778259837 24854 6d76eda2c47d0b485b75221468c075d6 ""
   "..//fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
   "..//fig1_system_arch.pdf" 1778248623 678376 e51e11bab50e77342f8b40e9b7f50eff ""
@@ -114,9 +114,9 @@
   "/usr/share/texmf/tex/latex/lm/t1lmtt.fd" 1256929440 2681 354015af3b61e7be30009f084986375a ""
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1774856661 5134474 66fc2af16408ea9157bac7f571fe474b ""
-  "pricai2026_submission_16p.aux" 1779780673 7212 5db969a406faf359c863a846bf6aa253 "xelatex"
-  "pricai2026_submission_16p.out" 1779780673 409 2c8bcbc717c757109b0385a6bcc120df "xelatex"
-  "pricai2026_submission_16p.tex" 1779780571 46459 642a0a7bb54b7cdc604307640abe2d7d ""
+  "pricai2026_submission_16p.aux" 1779785957 7212 d3ed4a0af8373159f8aecb3972a9d3b9 "xelatex"
+  "pricai2026_submission_16p.out" 1779785957 409 2c8bcbc717c757109b0385a6bcc120df "xelatex"
+  "pricai2026_submission_16p.tex" 1779785941 46750 ca01ff9d785bf4d0ac282bf319bc917b ""
   (generated)
   "pricai2026_submission_16p.aux"
   "pricai2026_submission_16p.log"
