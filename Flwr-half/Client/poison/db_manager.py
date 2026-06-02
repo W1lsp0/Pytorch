@@ -18,6 +18,7 @@ Schema 设计:
 ==============================================================================
 """
 
+import os
 import mysql.connector
 from mysql.connector import errorcode
 import json
@@ -34,21 +35,21 @@ class DBManager:
         - telemetry_logs: 动态运行时遥测
     """
 
-    def __init__(self, host="202.113.76.179", port=3306, user="root", password="root123456"):
+    def __init__(self, host=None, port=None, user=None, password=None):
         """
         初始化数据库管理器
         
         Args:
-            host (str): MySQL 主机地址 (默认 127.0.0.1)
-            port (int): MySQL 端口
-            user (str): 用户名
-            password (str): 密码
+            host (str): MySQL 主机地址 (env: MYSQL_HOST)
+            port (int): MySQL 端口 (env: MYSQL_PORT)
+            user (str): 用户名 (env: MYSQL_USER)
+            password (str): 密码 (env: MYSQL_PASSWORD)
         """
         self.config = {
-            'user': user,
-            'password': password,
-            'host': host,
-            'port': port,
+            'user': user or os.environ.get('MYSQL_USER', 'root'),
+            'password': password or os.environ.get('MYSQL_PASSWORD', ''),
+            'host': host or os.environ.get('MYSQL_HOST', '127.0.0.1'),
+            'port': port or int(os.environ.get('MYSQL_PORT', '3306')),
             'raise_on_warnings': False
         }
         self.db_name = "tmaa_simulation"
@@ -73,7 +74,7 @@ class DBManager:
             cursor = cnx.cursor()
 
             # 2. 创建 Database
-            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.db_name}")
+            cursor.execute("CREATE DATABASE IF NOT EXISTS `%s`" % self.db_name.replace('`', '``'))
             cnx.database = self.db_name
             
             _init_lines.append(f"│  ✅ 数据库 '{self.db_name}' 准备就绪{' '*26}│")
