@@ -123,7 +123,7 @@ def calc_backdoor_indicator(net: nn.Module,
                 features = net(images)
             else:
                 features = net(images)
-        except:
+        except Exception:
             features = net(images)
             
         features = features.cpu().numpy()

@@ -27,4 +27,5 @@ class StatusReporter:
                 }
                 self.db_manager.update_client_status(self.client_id, data)
             except Exception as e:
-                pass # 避免因数据库网络抖动导致训练中断
+                import logging
+                logging.getLogger("StatusReporter").warning(f"状态更新失败 (client {self.client_id}): {e}")

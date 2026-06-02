@@ -185,8 +185,7 @@ class DBManager:
             cursor.execute(sql, fields)
             cnx.commit()
         except Exception as e:
-            # print(f"DB Update Error: {e}")
-            pass
+            print(f"⚠️ [DBManager] 状态更新失败 (client {client_id}): {e}")
         finally:
             cursor.close()
             cnx.close()
@@ -205,7 +204,6 @@ class DBManager:
                 result[row['client_id']] = row
         except Exception as e:
             print(f"⚠️ [DBManager] Error fetching status: {e}")
-            pass
         finally:
             cursor.close()
             cnx.close()

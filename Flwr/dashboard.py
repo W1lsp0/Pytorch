@@ -37,8 +37,8 @@ def parse_server_log():
             matches = re.findall(r"\[ROUND (\d+)\]", content)
             if matches:
                 current_round = matches[-1]
-    except:
-        pass
+    except (OSError, ValueError) as e:
+        print(f"⚠️ [Dashboard] 解析 server.log 失败: {e}")
     return current_round
 
 def get_all_status_from_db():
@@ -88,7 +88,8 @@ def main():
             # 1. 获取数据 (单次)
             try:
                 _db_cache = get_all_status_from_db()
-            except:
+            except Exception as e:
+                print(f"⚠️ [Dashboard] 获取数据库状态失败: {e}")
                 _db_cache = {}
             
             server_round = parse_server_log()
@@ -115,7 +116,7 @@ def main():
                         stats[attack_type] = {'loss': 0.0, 'loc_b': 0.0, 'loc_c': 0.0, 'glo_b': 0.0, 'glo_c': 0.0, 'count': 0}
                     
                     try: stats[attack_type]['loss'] += float(data['loss'])
-                    except: pass
+                    except (ValueError, TypeError): pass
                     
                     # ASR 解析逻辑
                     def parse_bc(s):
@@ -125,7 +126,7 @@ def main():
                             for p in parts:
                                 if p.startswith('B'): b_val = float(p.replace('B','').replace('%',''))
                                 elif p.startswith('C'): c_val = float(p.replace('C','').replace('%',''))
-                        except: pass
+                        except (ValueError, TypeError, IndexError): pass
                         return b_val, c_val
 
                     if '|' in data['asr']:
@@ -198,7 +199,7 @@ def main():
             print("\n正在退出...")
             break
         except Exception as e:
-            # print(f"Error: {e}")
+            print(f"⚠️ [Dashboard] 渲染异常: {e}")
             time.sleep(5)
 
 if __name__ == "__main__":
