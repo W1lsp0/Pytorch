@@ -1,9 +1,9 @@
 # Fdb version 3
-["xdvipdfmx"] 1780557811 "main.xdv" "main.pdf" "main" 1780557811
-  "main.xdv" 1780557811 534972 60fcb1a599f3af99e67442a033573735 "xelatex"
+["xdvipdfmx"] 1780576259 "main.xdv" "main.pdf" "main" 1780576259
+  "main.xdv" 1780576259 535292 a4bc893fb32c3239f9806f4d459b661e "xelatex"
   (generated)
   "main.pdf"
-["xelatex"] 1780557810 "main.tex" "main.xdv" "main" 1780557811
+["xelatex"] 1780576258 "main.tex" "main.xdv" "main" 1780576259
   "..//fig10_ablation_renorm.pdf" 1778259837 24854 6d76eda2c47d0b485b75221468c075d6 ""
   "..//fig11_alpha_sensitivity.pdf" 1775058888 37717 7e0f7a73b316dac16ba8270e8c74dbb5 ""
   "..//fig1_system_arch.pdf" 1778248623 678376 e51e11bab50e77342f8b40e9b7f50eff ""
@@ -209,9 +209,9 @@
   "/usr/share/texmf/tex/latex/CJK/CJKfntef.sty" 1485503905 12851 a92a26031294f6fa88114f524b3b794a ""
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1774856661 5134474 66fc2af16408ea9157bac7f571fe474b ""
-  "main.aux" 1780557811 14611 48f16e6e25b79b2d042a7e101f57a2f1 "xelatex"
-  "main.out" 1780557811 7067 9dd4304d5cf5fbffe979b9db66daf2cf "xelatex"
-  "main.tex" 1780557791 86058 4ed38e67e0f37ab2c32857ea8431fe9c ""
+  "main.aux" 1780576259 14605 0d43a777331447925e6c410e4d5911df "xelatex"
+  "main.out" 1780576259 7067 9dd4304d5cf5fbffe979b9db66daf2cf "xelatex"
+  "main.tex" 1780576223 85719 b1bfd5b1522b261dc431431aadbb5e13 ""
   (generated)
   "main.aux"
   "main.log"

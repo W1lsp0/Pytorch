@@ -18,12 +18,7 @@
 \geometry{left=2.3cm, right=2.3cm, top=2.5cm, bottom=2.5cm}
 \hypersetup{colorlinks=true, linkcolor=black, citecolor=black, urlcolor=blue}
 
-% 兼容部分 pdflatex 环境中 CJK 粗体字体缺失问题
-\makeatletter
-\renewcommand{\bfdefault}{m}
-\makeatother
-
-\ctexset{ section={format=\Large\rmfamily}, subsection={format=\large\rmfamily}, subsubsection={format=\normalsize\rmfamily} }
+\ctexset{ section={format=\Large\bfseries\rmfamily}, subsection={format=\large\bfseries\rmfamily}, subsubsection={format=\normalsize\bfseries\rmfamily} }
 
 \begin{document}
 % 手工标题区：避免 \maketitle 默认粗体中文触发字体缺失
@@ -94,7 +89,7 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
 然而，具身智能网络中的联邦协同并非仅需降低通信成本。设备形态、传感器模态、任务场景和在线周期的差异会共同造成显著异构性，并使模型更新方向呈现长尾分散特征。已有研究通过簇式联邦（Clustered FL）\cite{r9_clustered}、自适应剪枝扩展（FedPE）\cite{fedpe} 和拆分式联邦（ParallelSFL）\cite{parallelsfl} 等方式缓解设备异构与通信瓶颈，但这些方法主要关注训练效率或模型适配性，对开放具身设备的可信准入、潜伏恶意行为和安全聚合联动控制关注不足。
 
 \subsection{具身设备伪装、模型投毒与隐蔽后门攻击}
-在开放具身智能网络中，服务器难以仅凭上传参数准确判断设备身份、执行环境和更新质量。攻击者可伪装为合法具身设备接入协同训练，也可控制已接入设备在本地训练阶段实施数据污染或参数篡改。典型攻击包括无目标投毒（Untargeted Poisoning）与目标后门攻击（Targeted Backdoor）：前者如 Sign-flipping 与 Gradient Scaling，旨在破坏全局收敛并造成服务退化；后者如标签翻转、干净标签污染和语义后门，可将隐蔽触发模式植入模型，使具身智能体在特定物理状态或感知输入下产生定向错误决策。与纯软件推理场景相比，具身智能中的后门风险具有更强现实危害，因为错误识别或错误控制可能直接作用于物理环境。
+在开放具身智能网络中，服务器难以仅凭上传参数准确判断设备身份、执行环境和更新质量。攻击者可伪装为合法具身设备接入协同训练，也可控制已接入设备在本地训练阶段实施数据污染或参数篡改。典型攻击包括无目标投毒（Untargeted Poisoning）与目标后门攻击（Targeted Backdoor）：前者如 Sign-flipping 与 Gradient Scaling，以破坏全局收敛并造成服务退化为目的；后者如标签翻转、干净标签污染和语义后门，可将隐蔽触发模式植入模型，使具身智能体在特定物理状态或感知输入下产生定向错误决策。与纯软件推理场景相比，具身智能中的后门风险具有更强现实危害，因为错误识别或错误控制可能直接作用于物理环境。
 
 \subsection{现有联邦防御机制及其场景适配局限}
 为应对模型投毒与拜占庭攻击，早期防御多依赖几何统计过滤，例如 Krum\cite{blanchard2017krum} 与 Trimmed Mean\cite{yin2018byzantine}。近期研究进一步引入时序信誉、信任锚点和自适应聚合思想，如 FLTrust\cite{cao2021fltrust}、FoolsGold\cite{fung2020foolsgold} 与 RaSA\cite{wang2025rasa}，并在恶意参与方检测\cite{dou2025toward}、可信训练框架\cite{lu2025tmt}、分级保护\cite{wang2024federated} 等方向持续扩展。针对后门与合谋攻击，也已有 FLPurifier\cite{flpurifier}、RoseAgg\cite{roseagg} 和 ShieldFL\cite{shieldfl} 等方案。
@@ -148,14 +143,14 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
 
 \section{本文方法：面向具身智能的信任流驱动可信联邦框架}
 
-针对上述威胁模型，本文提出面向具身智能边缘协同的信任流驱动可信联邦学习框架（见图~\ref{fig:framework}）。该框架并非仅在聚合阶段追加单点防御，而是围绕具身设备协同训练的生命周期建立多维度、多层次信任传递机制。从执行次序看，系统先在设备侧完成可信准入和运行监测，再在服务器侧完成当轮内容审查与跨轮信誉演化，最后进入聚合阶段的分层安全控制。由此，每一轮训练被划分为五个阶段：训练前准入、内容审查、状态演化、分层聚合和全局下发；进一步抽象后，可对应为“具身设备准入与监测、服务器审查与演化、聚合安全保障”三个层次。
+针对上述威胁模型，本文提出面向具身智能边缘协同的信任流驱动可信联邦学习框架（见图~\ref{fig:framework}）。该框架并非在传统聚合器上简单叠加异常检测模块，而是围绕具身设备协同训练的全生命周期建立多维度、多层次信任传递机制。具体而言，端侧可信维度刻画设备是否具备可信接入与可信执行基础，训练过程维度刻画设备在跨轮参与中的长期贡献和短时异常，聚合控制维度刻画不同网络层对风险输入的敏感程度及其安全处置方式。三类维度通过统一的信任流状态相互耦合，使系统能够从设备准入、过程审查到参数融合形成连续约束。
 
-该结构的核心在于信任状态的连续传递。阶段一输出 $TrustScore$，回答具身设备是否具备可信接入和可信执行基础；阶段二输出 $ContentScore$，判断本轮上传更新是否偏离纯净参考和群体协作方向；阶段三将当轮信号沉淀为 $HistPerf$ 与 $RiskEMA$，区分长期低贡献和短时高风险；阶段四再把三类信号融合为 $RawScore$，并按网络层执行差异化聚合。不同于单点防御，每一阶段产生的数据都会在后续阶段继续发挥约束作用，持续更新\textbf{信任流（Trust Flow）}并形成闭环控制。
+该框架的核心在于将离散的安全观测转化为可递推的信任状态。$TrustScore$ 用于表征具身设备执行环境与运行行为的端侧可信度，$ContentScore$ 用于衡量本轮更新相对于纯净参考方向和群体协作方向的内容质量，$HistPerf$ 与 $RiskEMA$ 分别用于表达长期贡献能力和短时风险强度。上述状态进一步融合为 $RawScore$，并驱动分层聚合中的准入门控、权重重归一化和动态裁剪。由此，信任流不再是单一信誉分，而是贯穿端侧、训练过程和聚合过程的状态化决策链条。
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{fig3_arch.pdf}
-    \caption{面向具身智能边缘协同的信任流驱动可信联邦学习五阶段防御闭环架构总览}
+    \caption{面向具身智能边缘协同的信任流驱动可信联邦学习多维防御闭环架构总览}
     \label{fig:framework}
 \end{figure}
 
@@ -475,17 +470,17 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
     \label{tab:hyperparams}
     \begin{tabular}{p{4cm} p{8.5cm} p{2cm}}
         \toprule
-        \textbf{模块架构归属}                              & \textbf{防御组件超参数含义与控制作用简述}                         & \textbf{实验组取值}  \\
+        \textbf{模块架构归属}                        & \textbf{防御组件超参数含义与控制作用简述}                         & \textbf{实验组取值}  \\
         \midrule
-        \multirow{2}{*}{\textbf{基础环境与演化轮次}}       & 强长尾异构通讯拓扑设备总量 ($K$)                                  & $20$ 设备            \\
-                                                           & 本地训练 SGD 优化起步参数 ($lr$, $Momentum$)                      & $0.001$, $0.9$       \\
+        \multirow{2}{*}{\textbf{基础环境与演化轮次}} & 强长尾异构通讯拓扑设备总量 ($K$)                                  & $20$ 设备            \\
+                                                     & 本地训练 SGD 优化起步参数 ($lr$, $Momentum$)                      & $0.001$, $0.9$       \\
         \midrule
-        \multirow{3}{*}{\textbf{双流信任演化}}             & TMAA 基准罚时陡峭度 $\lambda$，死区 $\tau$，衰减指数 $\rho$       & $5.0$, $0.1$, $2.0$  \\
-                                                           & 二维协同审查常量约束映射 $\alpha_1, \alpha_2$ 及 $\beta_{fusion}$ & $0.6$, $0.4$, $2.0$  \\
-                                                           & 历史留存平滑阈值 $\beta_h$ 与瞬发风险半衰期 $\beta_r$             & $0.9$, $0.85$        \\
+        \multirow{3}{*}{\textbf{双流信任演化}}       & TMAA 基准罚时陡峭度 $\lambda$，死区 $\tau$，衰减指数 $\rho$       & $5.0$, $0.1$, $2.0$  \\
+                                                     & 二维协同审查常量约束映射 $\alpha_1, \alpha_2$ 及 $\beta_{fusion}$ & $0.6$, $0.4$, $2.0$  \\
+                                                     & 历史留存平滑阈值 $\beta_h$ 与瞬发风险半衰期 $\beta_r$             & $0.9$, $0.85$        \\
         \midrule
-        \multirow{2}{*}{\textbf{分层风险裁剪}}             & 得分融合非线性指数调和阀 ($\alpha, \beta, \gamma, p$)             & $3.0, 1.0, 0.5, 1.0$ \\
-                                                           & 门槛拦截控制下界 $\mu_{base}$ 及惩戒放大基线 $\lambda_s$          & $0.4$, $1.2$         \\
+        \multirow{2}{*}{\textbf{分层风险裁剪}}       & 得分融合非线性指数调和阀 ($\alpha, \beta, \gamma, p$)             & $3.0, 1.0, 0.5, 1.0$ \\
+                                                     & 门槛拦截控制下界 $\mu_{base}$ 及惩戒放大基线 $\lambda_s$          & $0.4$, $1.2$         \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -527,13 +522,7 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
 
 
 \subsubsection{信任流追溯与恶意设备封禁剖析}
-信任流机制的关键在于及时暴露恶意设备并分级处置风险。图~\ref{fig:node_state} 为避免曲线混乱，仅展示 4 个代表性设备：Client 4（早期参数篡改）、Client 0（高频显性投毒）、Client 2（隐蔽潜伏后门）和合法长尾设备 Client 15。其判定过程如下：
-\begin{itemize}
-    \item \textbf{Client 0（Label Flip）与 Client 1（Backdoor）}：两者在 $r_{grad}$ 与 $r_{probe}$ 上持续高风险，至第 8 轮触发 $\texttt{risk\_ema\_above\_0.90\_for\_4\_rounds}$，进入黑名单。
-    \item \textbf{Client 3（Semantic）}：像素扰动不明显，但长期偏离纯净参考 $g_{root\_clean}$。其先进入软隔离，随后触发 $\texttt{risk\_soft\_isolation\_for\_8\_rounds}$，第 16 轮被移除。
-    \item \textbf{Client 2（Clean Label）}：本地 Loss 表面正常，但长期漂移特征被连击规则命中（$\texttt{c2\_drift\_combo\_for\_5\_rounds}$），第 24 轮完成识别与剔除。
-    \item \textbf{Client 4（Sign-Flipping）与 Client 5（Gradient Scaling）}：前者因方向反转导致 $S_{contrib}$ 迅速降为低值并触发硬封禁；后者因超大振幅命中分层 L2 门控后进入异常处置并被剔除。
-\end{itemize}
+信任流机制的关键在于及时暴露恶意设备并分级处置风险。图~\ref{fig:node_state} 为避免曲线混乱，仅展示 4 个代表性设备：Client 4（早期参数篡改）、Client 0（高频显性投毒）、Client 2（隐蔽潜伏后门）和合法长尾设备 Client 15。具体而言，Client 0（Label Flip）与 Client 1（Backdoor）在 $r_{grad}$ 与 $r_{probe}$ 上持续呈现高风险状态，并在第 8 轮满足连续 4 轮 $RiskEMA>0.90$ 的黑名单触发条件。Client 3（Semantic）的像素扰动并不显著，但其更新方向长期偏离纯净参考 $g_{root\_clean}$，因此先进入软隔离状态，并在软隔离持续 8 轮后于第 16 轮被移除。Client 2（Clean Label）的本地 Loss 表面正常，但其跨轮漂移特征连续 5 轮满足组合异常判定条件，最终在第 24 轮完成识别与剔除。Client 4（Sign-Flipping）因方向反转导致 $S_{contrib}$ 迅速降为低值并触发硬封禁；Client 5（Gradient Scaling）则因更新幅度异常触发分层 L2 门控，随后进入异常处置流程并被剔除。
 结果表明，双流解耦机制能够将场景异构导致的低分与真实攻击行为分开处理。在包含 6 个恶意设备的设置下，系统达到 \textbf{TPR=100\%}。
 
 \begin{figure}[htbp]
@@ -586,7 +575,7 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
         \begin{tablenotes}
             \small
             \item (*) \textit{注：FedAvg 与 Trimmed Mean 算法由于自身不具备任何设备“显式信任评估”或“永久拉黑剔除 (Ban)”机制，其对恶意设备的容忍表现为数值融合或截断计算，因此 FPR 指标不适用于此类算法，标记为 N/A。}
-            \item (**) \textit{注：正常设备误杀率（FPR）这一指标受确定性规则与固化数据样本异构度（Dirichlet分布）的强约束。在固定的数据集切分下，由于防御规则是确定性的，该类误杀裁决在各次重复实验中观测到方差极小，因此本列表仅呈报该指标稳定收敛的标量期望均值 $\mu$。同时，此处的 0.00 专指“永久封禁误杀”，部分处于瞬时可疑池中的轻度隔离由于具有触底恢复反弹特性，不计入模型不可挽回的实质性永久击溃错误。}
+            \item (**) \textit{注：正常设备误杀率（FPR）这一指标受确定性规则与固化数据样本异构度（Dirichlet分布）的强约束。在固定的数据集切分下，由于防御规则是确定性的，该类误杀裁决在各次重复实验中观测到方差极小，因此本列表仅呈报该指标稳定收敛的标量期望均值 $\mu$。同时，此处的 0.00 专指“永久封禁误杀”，部分处于瞬时可疑池中的轻度隔离由于具有触底恢复反弹特性，不计入系统的实质性永久误判。}
         \end{tablenotes}
     \end{threeparttable}
 \end{table}
@@ -597,7 +586,7 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
 针对现有联邦安全研究中常出现的“黑盒式”效能评估，本节摒弃了粗粒度的阶段级叠加测试，转而采用组件级剥离实验，深入探究框架中双流正交解耦、多维风险探针与分层动态归一化等核心模块对防御鲁棒性与系统可用性的独立贡献。
 
 \subsubsection{双流信誉解耦有效性分析}
-为了验证系统极低的误杀率（FPR）并非来源于保守的防御阈值，而是得益于历史效用与瞬发风险的正交解耦设计，我们构建了两种退化变体进行对比：单流指数移动平均（Single-Stream EMA）与仅历史效用模型（HistPerf-Only）。表~\ref{tab:ablation_stream} 呈现了不同机制在强 Non-IID 及 30\% 混合攻击压力下的精确查杀表现。
+为了验证系统极低的误杀率（FPR）并非来源于保守的防御阈值，而是得益于历史效用与瞬发风险的正交解耦设计，实验构建了两种退化变体进行对比：单流指数移动平均（Single-Stream EMA）与仅历史效用模型（HistPerf-Only）。表~\ref{tab:ablation_stream} 呈现了不同机制在强 Non-IID 及 30\% 混合攻击压力下的精确查杀表现。
 
 \begin{table}[htbp]
     \centering
@@ -616,7 +605,7 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
     \end{tabular}
 \end{table}
 
-实验数据显示，单流机制在处理异构数据引起的偏离与恶意投毒时存在不可调和的矛盾：收紧阈值会导致高达 18.25\% 的无辜长尾设备被误杀；而放宽阈值则使 TPR 骤降，无法有效捕捉潜伏攻击。单独依赖历史效用流虽然能极好地包容长尾特征（FPR 为 0.15\%），但由于缺乏对短时突变的敏锐捕捉，其对“潜伏-爆发”式攻击的拦截率仅有 21.05\%。相较之下，本文提出的双流机制将长时贡献积累与短时风险熔断隔离处理，在最终封禁口径下完成全部恶意设备清退，并避免正常设备永久误杀。表中 FPR/TPR 采用最终封禁口径。补充统计显示，SUSPECT 状态对恶意设备的逐轮覆盖率为 88.33\%，对正常设备的可逆复核触发率为 14.79\%；该状态只用于审查与降权，不构成永久误杀。
+实验数据显示，单流机制在处理异构数据引起的偏离与恶意投毒时存在不可调和的矛盾：收紧阈值会导致高达 18.25\% 的无辜长尾设备被误杀；而放宽阈值则使 TPR 骤降，无法有效捕捉潜伏攻击。单独依赖历史效用流虽然能极好地包容长尾特征（FPR 为 0.15\%），但由于缺乏对短时突变的敏锐捕捉，其对“潜伏-爆发”式攻击的拦截率仅有 21.05\%。相较之下，本文提出的双流机制将长时贡献积累与短时风险熔断隔离处理，在最终封禁口径下完成全部恶意设备的永久隔离，并避免正常设备永久误杀。表中 FPR/TPR 采用最终封禁口径。补充统计显示，SUSPECT 状态对恶意设备的逐轮覆盖率为 88.33\%，对正常设备的可逆复核触发率为 14.79\%；该状态只用于审查与降权，不构成永久误杀。
 
 \subsubsection{多维风险探针剥离分析}
 在验证防御渗透效果时，单纯依赖纯净参考集往往无法全面应对多维度的复合攻击。图~\ref{fig:ablation_probes} 对比了仅启用纯净参考（Vanilla Clean-Root）、叠加浅层统计探针（+ Shallow Probes）以及全维深层探针（+ Full Probes）在面对无目标翻转、梯度缩放与隐蔽干净标签后门（Clean-Label Backdoor）攻击时的 ASR 抑制效果。
@@ -640,7 +629,7 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
     \label{fig:ablation_renorm}
 \end{figure}
 
-折线趋势清晰表明，粗暴的全局 L2 裁剪由于过度干预浅层特征提取层的权重更新，严重削弱了模型的泛化能力，导致最终精度停滞在 85\% 左右。尽管引入分层门控能在一定程度上缓解该问题（提升至 89\%），但在剔除恶意设备后，由于当轮有效聚合权重未达到单位约束（即 $\sum \tilde{w} < 1$），引发了“隐性学习率衰减”，使得收敛曲线依然滞后。本文引入的约束投影与权重重归一化机制，通过动态补偿幸存者的话语权，不仅在 30 轮训练预算内实现了稳定收敛，更将模型精度恢复至接近无攻击环境下的状态（92.4\%），从而在保障极高安全性的同时，实现了系统可用性的完全保全。
+折线趋势清晰表明，无差别的全局 L2 裁剪由于过度干预浅层特征提取层的权重更新，显著削弱了模型的泛化能力，导致最终精度停滞在 85\% 左右。尽管引入分层门控能在一定程度上缓解该问题（提升至 89\%），但在剔除恶意设备后，由于当轮有效聚合权重未达到单位约束（即 $\sum \tilde{w} < 1$），引发了“隐性学习率衰减”，使得收敛曲线依然滞后。本文引入的约束投影与权重重归一化机制，通过动态补偿幸存设备的聚合权重，不仅在 30 轮训练预算内实现了稳定收敛，更将模型精度恢复至接近无攻击环境下的状态（92.4\%），从而在保障高安全性的同时充分保留系统可用性。
 
 \subsection{长尾异构数据分布极限压力测试 (Sensitivity on Data Heterogeneity)}
 许多鲁棒聚合方法对 IID 条件依赖较强。为评估本文框架在不同异构强度下的稳定性，本文在四组 Dirichlet 分布（$\alpha=100,1.0,\dots,0.1$）下测试全局准确率，结果见图~\ref{fig:alpha_sensitivity}。
@@ -690,7 +679,7 @@ Multi-endpoint simulations based on Flower and PyTorch demonstrate that, under e
 \subsection{A.1 梯度方向与幅度物理探针 ($r_{grad}$)}
 $r_{grad}$ 衡量具身设备更新 $\Delta W_k^{(t)}$ 与参考方向 $g_{root}^{(t)}$ 的几何偏离，用于检测符号翻转与幅度异常。该指标同时考虑方向偏离（余弦项）与尺度突变（L2 异常项）：
 \begin{equation}
-    r_{grad, k}^{(t)} = \lambda_{d} \left(1 - \frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{||\Delta W_k^{(t)}|| \cdot ||g_{root}^{(t)}||}\right) + \lambda_{m} \max\left(0, \frac{||\Delta W_k^{(t)}||_2 - \mu^{(t)}}{\sigma^{(t)}}\right)
+    r_{grad, k}^{(t)} = \lambda_{d} \left(1 - \frac{\Delta W_k^{(t)} \cdot g_{root}^{(t)}}{\|\Delta W_k^{(t)}\|_2 \cdot \|g_{root}^{(t)}\|_2}\right) + \lambda_{m} \max\left(0, \frac{\|\Delta W_k^{(t)}\|_2 - \mu^{(t)}}{\sigma^{(t)}}\right)
 \end{equation}
 其中，$\lambda_d$ 与 $\lambda_m$ 控制方向项和幅度项的权重（默认均为 $0.5$）；$\mu^{(t)}$ 与 $\sigma^{(t)}$ 分别为第 $t$ 轮入围设备梯度 L2 范数的均值与标准差。
 
