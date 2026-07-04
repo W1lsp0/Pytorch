@@ -1,0 +1,344 @@
+{
+  "run_status": "jobs_prepared",
+  "deck_name": "中期答辩PPT",
+  "selected_backend": "built-in image tool",
+  "sample_generation_method": {
+    "backend_used": "built-in image tool",
+    "tool_name": "image_gen",
+    "mode": "generate",
+    "prompt_source": "approved sample prompt for Slide 6 after revision with 中期答辩-段鑫.pptx header style",
+    "size": "16:9 landscape, built-in default resolution",
+    "quality": "built-in default",
+    "approved_sample_path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+    "input_context_preparation": "local template preview images were inspected with view_image before built-in image generation",
+    "handoff_rule": "Subagents must use this same built-in image tool in generate mode; return a blocker if unavailable."
+  },
+  "max_concurrent_slides": 6,
+  "slides": [
+    {
+      "slide_id": "slide_01",
+      "number": 1,
+      "title": "边缘计算中信任流驱动的可信联邦关键技术研究",
+      "job": "prompts/slide_01.json",
+      "out": "origin_image/slide_01.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_02",
+      "number": 2,
+      "title": "汇报目录",
+      "job": "prompts/slide_02.json",
+      "out": "origin_image/slide_02.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_03",
+      "number": 3,
+      "title": "研究背景与核心矛盾",
+      "job": "prompts/slide_03.json",
+      "out": "origin_image/slide_03.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig1_system_arch.png",
+          "role": "strict input asset; system interaction architecture figure",
+          "fidelity": "preserve the architecture content, node hierarchy, arrows and labels; do not redraw or change the relationships"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_04",
+      "number": 4,
+      "title": "威胁模型与研究目标",
+      "job": "prompts/slide_04.json",
+      "out": "origin_image/slide_04.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig2_threat_model.png",
+          "role": "strict input asset; composite poisoning threat model",
+          "fidelity": "preserve the threat model entities, attack labels, boundaries and arrows; do not redraw"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_05",
+      "number": 5,
+      "title": "总体方案：信任流驱动的五阶段闭环",
+      "job": "prompts/slide_05.json",
+      "out": "origin_image/slide_05.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig3_arch.png",
+          "role": "strict input asset; five-stage Trust-Flow defense architecture",
+          "fidelity": "preserve module names, arrows, stage structure and visual relationships; do not redraw"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_06",
+      "number": 6,
+      "title": "已完成工作一：TEE 锚定准入与内容审查",
+      "job": "prompts/slide_06.json",
+      "out": "origin_image/slide_06.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "accepted",
+      "dispatch": null,
+      "result": {
+        "final_image": "origin_image/slide_06.png",
+        "accepted_sample": true
+      },
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_07",
+      "number": 7,
+      "title": "已完成工作二：双流信誉演化与状态管理",
+      "job": "prompts/slide_07.json",
+      "out": "origin_image/slide_07.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig4_state.png",
+          "role": "strict input asset; client supervision state transition machine",
+          "fidelity": "preserve state names, transition arrows and relationships; do not redraw"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_08",
+      "number": 8,
+      "title": "已完成工作三：分层风险门控聚合",
+      "job": "prompts/slide_08.json",
+      "out": "origin_image/slide_08.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig5_layer.png",
+          "role": "strict input asset; layer-wise adaptive audit and clipping mechanism",
+          "fidelity": "preserve layers, gating relations, arrows and labels; do not redraw"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_09",
+      "number": 9,
+      "title": "实验平台与攻击配置",
+      "job": "prompts/slide_09.json",
+      "out": "origin_image/slide_09.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_10",
+      "number": 10,
+      "title": "阶段性结果一：收敛与攻击抑制",
+      "job": "prompts/slide_10.json",
+      "out": "origin_image/slide_10.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig6_convergence_asr.png",
+          "role": "strict input asset; Accuracy and ASR convergence curves",
+          "fidelity": "preserve all chart data, axes, legends, colors, labels and curve shapes; do not redraw or alter values"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_11",
+      "number": 11,
+      "title": "阶段性结果二：节点追踪与横向对比",
+      "job": "prompts/slide_11.json",
+      "out": "origin_image/slide_11.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig7_node_state_evolution.png",
+          "role": "strict input asset; node trust and risk state evolution curves",
+          "fidelity": "preserve curves, axes, labels and annotations; do not redraw"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig8_tsne_visualization.png",
+          "role": "strict input asset; t-SNE visualization before and after defense",
+          "fidelity": "preserve point clusters, colors, legends and panel structure; do not redraw"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_12",
+      "number": 12,
+      "title": "消融分析与参数敏感性",
+      "job": "prompts/slide_12.json",
+      "out": "origin_image/slide_12.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig9_ablation_probes.png",
+          "role": "strict input asset; probe ablation chart",
+          "fidelity": "preserve chart data, axes, labels, legends and values"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig10_ablation_renorm.png",
+          "role": "strict input asset; renormalization ablation chart",
+          "fidelity": "preserve chart data, axes, labels, legends and values"
+        },
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/assets/figures/fig11_alpha_sensitivity.png",
+          "role": "strict input asset; Dirichlet alpha sensitivity chart",
+          "fidelity": "preserve chart data, axes, labels, legends and values"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_13",
+      "number": 13,
+      "title": "中期进展总结与后续计划",
+      "job": "prompts/slide_13.json",
+      "out": "origin_image/slide_13.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    },
+    {
+      "slide_id": "slide_14",
+      "number": 14,
+      "title": "感谢各位老师批评指正",
+      "job": "prompts/slide_14.json",
+      "out": "origin_image/slide_14.png",
+      "input_images": [
+        {
+          "path": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_06.png",
+          "role": "approved sample slide style reference",
+          "fidelity": "match style only; do not copy layout or content unless the slide explicitly asks for a process layout"
+        }
+      ],
+      "requires_context_images": true,
+      "status": "pending",
+      "dispatch": null,
+      "result": null,
+      "blocker": null
+    }
+  ],
+  "updated_at": "2026-07-04T12:27:35Z"
+}
