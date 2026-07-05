@@ -58,7 +58,7 @@ Style reference: 使用开题报告模板的天津理工大学红白灰答辩风
 
 ## Slide 5: 总体方案：信任流驱动的五阶段闭环
 - Key points:
-  - 阶段一：TEE 硬件准入与运行监测。
+  - 阶段一：TEE 硬件准入、宿主遥测与运行监测。
   - 阶段二：纯净参考方向与内容一致性审查。
   - 阶段三：HistPerf 与 RiskEMA 双流信誉演化。
   - 阶段四：分层门控、重归一化与动态裁剪。
@@ -70,14 +70,14 @@ Style reference: 使用开题报告模板的天津理工大学红白灰答辩风
 
     ![trust-flow architecture](assets/figures/fig3_arch.png)
 
-## Slide 6: 已完成工作一：TEE 锚定准入与内容审查
+## Slide 6: 已完成工作一：TEE 锚定准入与宿主遥测
 - Key points:
-  - 远程证明确定客户端初始接入边界。
-  - TMAA 监测梯度、损失和指令分布等运行特征。
-  - 熵驱动卡尔曼滤波将运行波动转化为动态 TrustScore。
-  - 纯净参考方向用于提高合谋攻击下的内容审查稳定性。
-- Visual idea: 用“硬件门禁 -> 动态信任 -> 内容得分”的横向流程图表达。
-- Layout role and intent: method detail; 展示第一、二阶段的实现进展。
+  - 远程证明确定客户端初始接入边界，TMAA 扩展宿主侧运行观测。
+  - 进程树、命令行与模块哈希校验训练环境和依赖完整性。
+  - 文件/数据集清单、配置差异与标签变更率辅助识别标签或触发器篡改。
+  - 系统调用分布与网络流量特征并入运行观测，经熵分析/Kalman 更新 TrustScore。
+- Visual idea: 用“硬件门禁 -> 宿主遥测 -> 动态信任 -> 内容衔接”的横向流程图表达。
+- Layout role and intent: method detail; 展示阶段一的可信准入与运行观测扩展。
 - Required images: none.
 
 ## Slide 7: 已完成工作二：双流信誉演化与状态管理

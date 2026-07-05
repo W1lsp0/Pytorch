@@ -1,12 +1,42 @@
 {
-  "status": "jobs_prepared",
+  "status": "slides_recorded",
   "history": [
     {
       "from": "created",
       "to": "jobs_prepared",
       "at": "2026-07-04T12:27:35Z",
       "note": "prepared slide prompt jobs"
+    },
+    {
+      "from": "jobs_prepared",
+      "to": "slides_dispatched",
+      "at": "2026-07-04T12:53:46Z",
+      "note": "all slide jobs dispatched"
+    },
+    {
+      "from": "slides_dispatched",
+      "to": "slides_recorded",
+      "at": "2026-07-04T12:59:09Z",
+      "note": "all slide images recorded"
+    },
+    {
+      "from": "slides_recorded",
+      "to": "jobs_prepared",
+      "at": "2026-07-04T14:15:21Z",
+      "note": "prepared slide prompt jobs"
+    },
+    {
+      "from": "jobs_prepared",
+      "to": "slides_dispatched",
+      "at": "2026-07-04T14:17:17Z",
+      "note": "all slide jobs dispatched"
+    },
+    {
+      "from": "slides_dispatched",
+      "to": "slides_recorded",
+      "at": "2026-07-04T14:28:52Z",
+      "note": "all slide images recorded"
     }
   ],
-  "updated_at": "2026-07-04T12:27:35Z"
+  "updated_at": "2026-07-04T14:28:52Z"
 }

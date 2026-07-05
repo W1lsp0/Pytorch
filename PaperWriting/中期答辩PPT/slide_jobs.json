@@ -1,5 +1,5 @@
 {
-  "run_status": "jobs_prepared",
+  "run_status": "slides_recorded",
   "deck_name": "中期答辩PPT",
   "selected_backend": "built-in image tool",
   "sample_generation_method": {
@@ -29,9 +29,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_01",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_01.json",
+        "prompt_sha256": "ca27cc848805dd02d14dc8ecaab877e5093e0b990087ea417ebb114f9d2f62ca",
+        "dispatched_at": "2026-07-04T14:15:58Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_01",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_01.png",
+        "selected_source_sha256": "88428394a55417a83d20e58b46d7daa6ee6eeae862ec6415ded1d9bfa056bcfd",
+        "final_image": "origin_image/slide_01.png",
+        "final_image_sha256": "88428394a55417a83d20e58b46d7daa6ee6eeae862ec6415ded1d9bfa056bcfd",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:58Z"
+      },
       "blocker": null
     },
     {
@@ -48,9 +69,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_02",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_02.json",
+        "prompt_sha256": "500ac13f34ab2ae213564485ab1e6c8ca402a4356eb5e5f9e0679c8d79062e89",
+        "dispatched_at": "2026-07-04T14:15:58Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_02",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_02.png",
+        "selected_source_sha256": "5c5cb0815272aaf603f16cd3b3fb4ed6d53e2461e8076a3d783649c7c2706306",
+        "final_image": "origin_image/slide_02.png",
+        "final_image_sha256": "5c5cb0815272aaf603f16cd3b3fb4ed6d53e2461e8076a3d783649c7c2706306",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:59Z"
+      },
       "blocker": null
     },
     {
@@ -72,9 +114,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_03",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_03.json",
+        "prompt_sha256": "72df8a9d277f6a263142bd41a25ec8600d589c7ff6f4f7b76a66254829653b07",
+        "dispatched_at": "2026-07-04T14:15:59Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_03",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_03.png",
+        "selected_source_sha256": "b1d237aaf5cff428d29678a7ee98853d0ff18006ab64740e41e53a5abf16280c",
+        "final_image": "origin_image/slide_03.png",
+        "final_image_sha256": "b1d237aaf5cff428d29678a7ee98853d0ff18006ab64740e41e53a5abf16280c",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:59Z"
+      },
       "blocker": null
     },
     {
@@ -96,9 +159,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_04",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_04.json",
+        "prompt_sha256": "b6fb0a65764c6d3b5292a3003cc37ec6757c867b29026bb055c8573a82974448",
+        "dispatched_at": "2026-07-04T14:15:59Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_04",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_04.png",
+        "selected_source_sha256": "188edb7dbbac8b540e6fa48fe15f680228552b215525a0ce8820b5fa50bfc0b9",
+        "final_image": "origin_image/slide_04.png",
+        "final_image_sha256": "188edb7dbbac8b540e6fa48fe15f680228552b215525a0ce8820b5fa50bfc0b9",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:59Z"
+      },
       "blocker": null
     },
     {
@@ -120,15 +204,36 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "019f2d7d-6d79-7263-af8d-2a94ff5e013c",
+        "agent_nickname": "James",
+        "prompt": "prompts/slide_05.json",
+        "prompt_sha256": "5c82da1afe8f31a8b013ce5c6b2dd2a702a492031ca0f08c6a3c8175d3524c2e",
+        "dispatched_at": "2026-07-04T14:17:17Z"
+      },
+      "result": {
+        "agent_id": "019f2d7d-6d79-7263-af8d-2a94ff5e013c",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/.codex/generated_images/019f2d7d-6d79-7263-af8d-2a94ff5e013c/ig_003d67536d033317016a4916150ae8819bb5ebda297eaed2d4.png",
+        "selected_source_sha256": "9b96380c801b1e11429ebecb2926f48f1ca739c939d2192b789db2eee948239e",
+        "final_image": "origin_image/slide_05.png",
+        "final_image_sha256": "9b96380c801b1e11429ebecb2926f48f1ca739c939d2192b789db2eee948239e",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Architecture page regenerated; Stage 1 includes TMAA host telemetry wording; no external endpoint-security product names.",
+        "recorded_at": "2026-07-04T14:28:52Z"
+      },
       "blocker": null
     },
     {
       "slide_id": "slide_06",
       "number": 6,
-      "title": "已完成工作一：TEE 锚定准入与内容审查",
+      "title": "已完成工作一：TEE 锚定准入与宿主遥测",
       "job": "prompts/slide_06.json",
       "out": "origin_image/slide_06.png",
       "input_images": [
@@ -139,11 +244,29 @@
         }
       ],
       "requires_context_images": true,
-      "status": "accepted",
-      "dispatch": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "019f2d7d-6de2-7271-8ce6-8a5742397e18",
+        "agent_nickname": "Planck",
+        "prompt": "prompts/slide_06.json",
+        "prompt_sha256": "7765d9930646e39494ae6b4b86c11624aa65949a825456909493489d745b9e50",
+        "dispatched_at": "2026-07-04T14:17:17Z"
+      },
       "result": {
+        "agent_id": "019f2d7d-6de2-7271-8ce6-8a5742397e18",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/.codex/generated_images/019f2d7d-6de2-7271-8ce6-8a5742397e18/ig_0bdee655a743be12016a4916945fb0819494484719c3529e4a.png",
+        "selected_source_sha256": "87442982ff4194b5042d01c4354c41d1d245477be07d8b6bf0740cbb786dd88b",
         "final_image": "origin_image/slide_06.png",
-        "accepted_sample": true
+        "final_image_sha256": "87442982ff4194b5042d01c4354c41d1d245477be07d8b6bf0740cbb786dd88b",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Method page regenerated; host telemetry is implemented by TMAA; no HIDS/EDR wording appears.",
+        "recorded_at": "2026-07-04T14:28:52Z"
       },
       "blocker": null
     },
@@ -166,9 +289,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_07",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_07.json",
+        "prompt_sha256": "8c004997ba0ccc15649722729ad8e1c51c8ae94b1c9c1baf4dccbda4821405ea",
+        "dispatched_at": "2026-07-04T14:15:59Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_07",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_07.png",
+        "selected_source_sha256": "9a549daf04c3500dd4b2e9735a21c7715088b9f52fa3b589727d1d7ac1ccfbee",
+        "final_image": "origin_image/slide_07.png",
+        "final_image_sha256": "9a549daf04c3500dd4b2e9735a21c7715088b9f52fa3b589727d1d7ac1ccfbee",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:59Z"
+      },
       "blocker": null
     },
     {
@@ -190,9 +334,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_08",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_08.json",
+        "prompt_sha256": "740ac38c569dbc357a6e97e8c0b20f603b2d92015412d63c197b27fb99bb3519",
+        "dispatched_at": "2026-07-04T14:15:59Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_08",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_08.png",
+        "selected_source_sha256": "5557ed46dcb17beec5e9a4e5125e3cbe96a13a4c6cfae2b8b40011f578cc0d38",
+        "final_image": "origin_image/slide_08.png",
+        "final_image_sha256": "5557ed46dcb17beec5e9a4e5125e3cbe96a13a4c6cfae2b8b40011f578cc0d38",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:59Z"
+      },
       "blocker": null
     },
     {
@@ -209,9 +374,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_09",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_09.json",
+        "prompt_sha256": "74061e7e819cf76d3f121ebe8aa8cebe00e728abbc93f34b07b8895203a509cd",
+        "dispatched_at": "2026-07-04T14:15:59Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_09",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_09.png",
+        "selected_source_sha256": "f45ddb41ac87aa62d9c9187aeaef0a6e209232180b0f0735cbacd615b0d95fe3",
+        "final_image": "origin_image/slide_09.png",
+        "final_image_sha256": "f45ddb41ac87aa62d9c9187aeaef0a6e209232180b0f0735cbacd615b0d95fe3",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:59Z"
+      },
       "blocker": null
     },
     {
@@ -233,9 +419,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_10",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_10.json",
+        "prompt_sha256": "7910d6d6349c49f123e52f661cf3d845ba456192d6eba0889bff7dc47af5d915",
+        "dispatched_at": "2026-07-04T14:15:59Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_10",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_10.png",
+        "selected_source_sha256": "d45e91f185a09c3e93d783129f55e48f471dd9bf140302f86416b28db8a60259",
+        "final_image": "origin_image/slide_10.png",
+        "final_image_sha256": "d45e91f185a09c3e93d783129f55e48f471dd9bf140302f86416b28db8a60259",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:15:59Z"
+      },
       "blocker": null
     },
     {
@@ -262,9 +469,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_11",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_11.json",
+        "prompt_sha256": "c11c07964c8b13a1e1a6ceebfff0b5d4fd282b252c59b0b3e13574155f17da59",
+        "dispatched_at": "2026-07-04T14:15:59Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_11",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_11.png",
+        "selected_source_sha256": "d90346acb731808f9294c14cc100d18bce739f5c36aaa617246ba399e7c3ef6b",
+        "final_image": "origin_image/slide_11.png",
+        "final_image_sha256": "d90346acb731808f9294c14cc100d18bce739f5c36aaa617246ba399e7c3ef6b",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:16:00Z"
+      },
       "blocker": null
     },
     {
@@ -296,9 +524,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_12",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_12.json",
+        "prompt_sha256": "15a5c0521fd957c524b3b24997e144f91c34a6048b32e24b305c953d3c825d23",
+        "dispatched_at": "2026-07-04T14:16:00Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_12",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_12.png",
+        "selected_source_sha256": "fc9eafe0996ffa546fc14c9ffcc02badd8e4040dbb3a664e184a3a8be268ca8d",
+        "final_image": "origin_image/slide_12.png",
+        "final_image_sha256": "fc9eafe0996ffa546fc14c9ffcc02badd8e4040dbb3a664e184a3a8be268ca8d",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:16:00Z"
+      },
       "blocker": null
     },
     {
@@ -315,9 +564,30 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_13",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_13.json",
+        "prompt_sha256": "7718e673df0387d789d0dad5ede676e345535f8bcfc5ade9e03174b72c0ac7cb",
+        "dispatched_at": "2026-07-04T14:16:00Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_13",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_13.png",
+        "selected_source_sha256": "cd48fa4ef5b9e189394014af507646ddeb0399cfdfbe1509676d8ce611fceb3f",
+        "final_image": "origin_image/slide_13.png",
+        "final_image_sha256": "cd48fa4ef5b9e189394014af507646ddeb0399cfdfbe1509676d8ce611fceb3f",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:16:00Z"
+      },
       "blocker": null
     },
     {
@@ -334,11 +604,32 @@
         }
       ],
       "requires_context_images": true,
-      "status": "pending",
-      "dispatch": null,
-      "result": null,
+      "status": "recorded",
+      "dispatch": {
+        "agent_id": "reused-existing-slide_14",
+        "agent_nickname": "reused",
+        "prompt": "prompts/slide_14.json",
+        "prompt_sha256": "e5b7afea3c15f7998c51660dad33c5b516b84caa4e7a592fda635765446dfafb",
+        "dispatched_at": "2026-07-04T14:16:00Z"
+      },
+      "result": {
+        "agent_id": "reused-existing-slide_14",
+        "backend_used": "built-in image tool",
+        "selected_source": "/root/code/Pytorch/PaperWriting/中期答辩PPT/origin_image/slide_14.png",
+        "selected_source_sha256": "54d578b33749b87837e246b0e75ec66af37eb30eaa9357ce8a09a25e0ee078ef",
+        "final_image": "origin_image/slide_14.png",
+        "final_image_sha256": "54d578b33749b87837e246b0e75ec66af37eb30eaa9357ce8a09a25e0ee078ef",
+        "expected_backend": "built-in image tool",
+        "expected_backend_labels": [
+          "built-in image tool",
+          "image_gen"
+        ],
+        "sample_generation_method_matched": true,
+        "qa_note": "Reused existing built-in image backend slide because this slide content was unchanged.",
+        "recorded_at": "2026-07-04T14:16:00Z"
+      },
       "blocker": null
     }
   ],
-  "updated_at": "2026-07-04T12:27:35Z"
+  "updated_at": "2026-07-04T14:28:52Z"
 }

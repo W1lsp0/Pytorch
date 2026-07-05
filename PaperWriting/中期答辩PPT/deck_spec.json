@@ -36,6 +36,7 @@
       "边缘计算",
       "TEE",
       "TMAA",
+      "TrustReport",
       "TrustScore",
       "ContentScore",
       "HistPerf",
@@ -170,7 +171,7 @@
       "role": "architecture",
       "intent": "总览 Trust-Flow TFL 已完成的总体技术路线",
       "key_points": [
-        "阶段一：TEE 硬件准入与运行监测",
+        "阶段一：TEE 硬件准入、宿主遥测与运行监测",
         "阶段二：纯净参考方向与内容一致性审查",
         "阶段三：HistPerf 与 RiskEMA 双流信誉演化",
         "阶段四：分层门控、重归一化与动态裁剪",
@@ -200,27 +201,29 @@
     },
     {
       "number": 6,
-      "title": "已完成工作一：TEE 锚定准入与内容审查",
+      "title": "已完成工作一：TEE 锚定准入与宿主遥测",
       "role": "process",
-      "intent": "approved sample slide; demonstrates the deck style for a method page",
+      "intent": "展示阶段一的可信准入、宿主遥测与动态 TrustScore 更新",
       "key_points": [
-        "远程证明确认接入边界",
-        "运行监测覆盖梯度、损失与指令分布",
-        "动态信任由信息熵与 Kalman 更新驱动",
-        "内容审查结合纯净参考方向与一致性评分"
+        "远程证明确认接入边界，TMAA 扩展宿主侧运行观测",
+        "进程树、命令行与模块哈希校验训练环境和依赖完整性",
+        "文件/数据集清单、配置差异与标签变更率辅助识别标签或触发器篡改",
+        "系统调用分布与网络流量特征并入运行观测，经熵分析/Kalman 更新 TrustScore"
       ],
       "layout": {
-        "composition": "approved sample process slide with four cards and bottom summary band",
+        "composition": "four-card process slide following the approved sample style: hardware gate, process/file integrity, syscall behavior, network telemetry; bottom summary band shows TrustReport -> TrustScore",
         "content_zones": "header, four process cards, bottom summary band",
-        "spacing": "already approved by user"
+        "spacing": "keep the approved header style and present host telemetry as a small TMAA capability extension"
       },
       "visual_elements": {
-        "main_visual": "four-step process: 远程证明 -> 运行监测 -> 动态信任 -> 内容审查",
-        "supporting_elements": "red arrows, gray cards, bottom summary band"
+        "main_visual": "four-step process: 远程证明 -> 进程/文件完整性 -> 系统调用/网络遥测 -> TrustScore 更新",
+        "supporting_elements": "red arrows, gray cards, bottom summary band labelled TrustReport"
       },
-      "sample_approved": true,
       "constraints": [
-        "This slide is already generated and approved; do not regenerate in full-deck generation."
+        "Do not mention external endpoint-security product names on this slide.",
+        "Present these capabilities as implemented by TMAA, inspired by endpoint behavior telemetry.",
+        "Do not mention resource-usage/free-rider detection as a newly added host-telemetry point on this slide.",
+        "Use page number 06 at bottom-right."
       ]
     },
     {
