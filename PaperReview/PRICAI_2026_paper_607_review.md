@@ -1,85 +1,76 @@
-# PRICAI 2026 Paper 607 审稿报告
+# PRICAI 2026 Paper 607 审稿报告（PRICAI long-paper 校准版）
 
 ## Review setup
 
-- 检测轴：`conference / full-manuscript / ai-ml / standard`
-- 评估边界：基于提交的 16 页 PDF；未获得原始事件数据、代码、补充排名或足球分析师标注。
-- 中心主张：用 Transformer 预测完整射门回合的提供方 xG，并聚合最终射门 token 对此前事件的 attention，以构造可解释的事件级和球员级进攻贡献分数。
-- 可见证据：2025/2026 波兰 Ekstraklasa 306 场、8,441 个射门回合；match-level 的训练/验证划分；五个种子；特征消融、attention entropy、排名稳定性、uniform attention 控制和定性案例。
+- 检测轴：`PRICAI conference / long paper / full-manuscript / ai-ml / standard`
+- 会议校准：PRICAI 接受探索性 AI 应用和透明的负面/诊断结果；但 16 页 long paper 仍应证明所提指标比简单基线更有信息。若只做可行性展示，内容更接近 short paper。
+- 评估边界：基于提交的 16 页 PDF；未获得事件数据、代码、完整球员排名或分析师标注。
+- 中心主张：使用 Transformer 对完整射门回合拟合提供方 xG，再聚合 final-shot attention，形成事件级和球员级贡献分数及可视化。
+- 可见证据：单赛季 306 场、8,441 个射门回合、五个种子、特征消融、attention entropy、排名稳定性、uniform control 和定性案例。
 
-## Major rejection risks
+## 主要审稿问题
 
-1. **[Critical，Sec. 3.2] 核心代理任务包含作者已承认的目标泄漏，因而不能验证“球员贡献”。** 输入包含最终射门 token、位置、结果等可能直接决定提供方 xG 的信息，模型很可能重构提供方 xG，而不是学习此前 buildup 对机会质量的贡献。承认此限制是诚实的，但不能把致命有效性问题转化为已解决问题。至少应把主实验改为 pre-shot、masked-shot 和 full-shot 三个预注册设置，并以完全无最终射门信息的设置作为核心结论依据。
+1. **[Major，Sec. 3.2] 主任务包含作者已明确承认的 target-feature leakage。** final shot token 含有可能直接决定 provider xG 的位置、类型或结果，因此模型更像重构现有 xG，而不是学习此前 buildup 的价值。透明承认这一点值得肯定，但对于 long paper，至少应加入一个 `preceding events only` 设置并把它作为主要或并列实验；不必构建完整新 xG 系统。
 
-2. **[Critical，Sec. 3.4] attention mass 不是边际贡献，当前分数定义缺乏效度。** `Cp(S)` 只是属于球员 p 的 token attention 之和，永远非负、每个序列总和固定为 1，并随事件次数和 tokenization 改变。它不能表达一次动作降低机会质量，也不等价于删除该球员/动作后的 xG 变化。最终射手也被包含在聚合中。应与 action-value 的反事实定义对齐，使用遮挡、leave-one-action-out、Integrated Gradients/SHAP 或状态价值增量，并检验与 VAEP/xT/OBV 的一致和互补部分。
+2. **[Major，Sec. 3.4] attention sum 不能直接等同于球员边际贡献。** 当前分数始终非负、每个序列总量固定为 1，并随球员事件次数增长，也可能包含最终射手。建议把术语统一为 `attention-based involvement/reliance score`。如果继续使用 contribution，需要增加一个简单的 leave-one-event-out 或 occlusion 对照，证明高 attention 事件确实更影响预测。
 
-3. **[Major，Sec. 3.5、Sec. 5] 缺少任何强预测或归因基线。** 论文只比较特征删除和 uniform attention，自身也承认没有 gradient boosting、RNN、occlusion、IG、SHAP、VAEP/xT/OBV。对会议完整论文而言，这意味着无法判断 Transformer 是否必要、attention 是否比简单参与次数更有信息、以及新指标是否优于现有行动价值方法。未来工作列表中的这些基线应成为当前主实验。
+3. **[Major，Table 2] uniform attention 与 learned attention 的排名几乎相同。** uniform control 的 Spearman 为 0.9970，说明排名可能主要由参与次数、序列长度和 xG 权重驱动。论文目前将 top-10 变化解释为 learned attention 有效，但没有展示相对 involvement count 的增量价值。应直接比较 count、uniform 和 learned attention，并报告控制 sequence count 后的相关或排名变化。
 
-4. **[Major，Table 2] uniform control 与 learned attention 得到几乎相同的全局排名，实际削弱而非支持核心方法。** uniform attention 的 Spearman 为 0.9970，Jaccard@10 为 0.8545；各消融 Spearman 也都在 0.995 以上。这表明排名可能主要由参与频率、序列长度和 xG 权重驱动，而不是学习到的 attention 结构。论文把 top-10 变化解释为 learned attention 有用，但没有检验相对 involvement count 的增量解释力。应做残差化、分层匹配和 permutation test，并报告排名相对简单计数基线的增益。
+4. **[Major，Sec. 3.5] 缺少独立测试集和最小预测基线。** validation 用于 early stopping 后又报告最终 MSE、排名和案例，存在选择偏差。PRICAI 不要求大规模跨联赛实验，但应保留一个 match-level test split，并加入 mean predictor、线性/GBDT aggregated features 或 GRU 中至少一个简单基线。
 
-5. **[Major，Sec. 3.5、Table 1] 没有独立测试集。** validation set 用于 early stopping、选择最低 MSE epoch，并用于最终 MSE、entropy、排名和案例分析。五个随机种子不能消除这种模型选择偏差。应增加未参与选择的 test matches；更合理的是按时间训练、后续比赛测试，并在另一赛季或联赛外部验证。
+5. **[Major，Sec. 4.3] 外部效度主要依赖少数成功案例。** top scorer、Player of the Season 等例子有直观吸引力，但 `xG-weighted contribution` 本身乘了 provider xG，与攻击数据自然相关。建议对全部达到最小参与阈值的球员报告与 minutes、G+A、xG+xA 或一种行动价值指标的相关，并控制出场次数。无需为 PRICAI 强制开展大规模专家盲评。
 
-6. **[Major，Sec. 4.3] 排名的“外部验证”是选择性轶事且存在循环。** 论文只举 top scorer、Player of the Season 和 assist leader 等少数成功案例，没有对全部球员计算与 G+A、minutes、xG+xA、VAEP 等指标的相关、增量效度或预测效度。`xG-weighted contribution` 又直接乘以提供方 xG，因此它与 xG/进球表现相关并不意外。应预先定义外部标准，覆盖所有合格球员，控制出场时间、位置、球队实力和射门回合数量，并报告 bootstrap 区间。
+6. **[Major，Sec. 3.4] attention 的 faithfulness 仍未测试。** 平均最后两层/多头会忽略 residual 和 FFN 路径，entropy 与跨消融稳定性也不等于解释忠实度。一个基础的 top-attention deletion 与 random deletion 对比已经足以显著增强稿件。
 
-7. **[Major，Sec. 3.4] attention extraction 不足以支持模型解释。** 只平均最后两层和多头的 final-token attention，忽略 residual path、FFN 和跨层信息传播；不同 attention 分布可产生相同输出。attention entropy 与跨消融排名稳定性不是 faithfulness。应加入 attention rollout、梯度/遮挡 faithfulness、attention randomization 和 model parameter randomization tests。
+7. **[Major，Sec. 3.1] 数据构造细节不足。** 需要明确供应商/数据版本、possession 定义、事件 outcome、射门字段、缺失值、坐标方向和被截断序列比例。单赛季单联赛对 PRICAI 探索性应用可以接受，但结论必须限定在该赛季和联赛。
 
-8. **[Major，Sec. 3.1] 数据与特征构造不够可复现。** “event structures consistent with StatsBomb”不能确定数据供应商、许可、比赛覆盖、possession 规则、事件 outcome 枚举、射门特征、缺失值和坐标方向。长序列截断为最近 20 个事件可能系统性忽略早期组织者，也没有报告被截断比例。应给出数据来源、版本、构造伪代码、特征字典和描述统计，并公开可复现脚本。
-
-9. **[Critical，末页 Acknowledgements] 双盲匿名性被直接破坏。** 稿件明确写出研究合作方 “Adam Mickiewicz University in Poznan” 和 “KKS Lech Poznan”。在匿名投稿中，这足以显著缩小作者身份范围，可能触发程序性拒稿。审稿版应删除或匿名化致谢、机构、项目和可追踪合作信息。
+8. **[Critical，Acknowledgements] 双盲匿名性被致谢直接破坏。** 稿件列出 Adam Mickiewicz University 和 KKS Lech Poznan，可能触发程序性问题。审稿版必须匿名化；这项修改简单但优先级最高。
 
 ## Technical review
 
 ### Scope
 
-体育事件序列建模、可解释 AI 和决策支持符合 AI 会议应用范围。文章把工作明确定位为 exploratory case study，边界意识优于常见的 attention-as-explanation 论文。但完整研究轨的证据门槛仍要求无泄漏任务、强基线和外部效度；“探索性”不能替代这些核心验证。
+体育事件序列、可解释 AI 和决策支持符合 PRICAI 应用范围。文章对 attention 非因果和 leakage 风险的讨论诚实、清楚，具有一定方法论价值。
 
 ### Novelty
 
-从 final-shot attention 聚合球员分数的想法直观，但技术上较轻量：标准 Transformer 加简单 attention sum，再乘 xG。与 attention-based event valuation、sequence attribution 和现有 action-value 的差异主要是应用组合，尚未证明方法层面的显著新颖性。需要明确最近邻方法表，并展示新分数捕获了现有指标没有捕获的、可验证的信息。
+标准 Transformer 加 final-token attention aggregation 的算法创新有限，但把可解释性审计、排名稳定性和足球应用结合起来，作为 PRICAI 应用研究具有一定新意。long paper 需要再证明 learned attention 超过简单参与统计；否则更适合作为 short paper。
 
 ### Validity
 
-- baseline 中 `no_player` 的 validation MSE 反而低于完整模型，说明 player identity 对预测无益或造成过拟合；论文却用其造成的排名变化讨论身份的重要性，这更可能是指标定义的结构效应。
-- 用 source xG `yi` 而不是模型预测 `yhat_i` 加权 attention，使最终排名混合了外部模型的价值判断和本模型 attention；贡献来源应明确分解。
-- 排名跨种子的计算方式不清：是否每个消融种子和同编号 baseline 配对，缺失球员如何处理，排名 ties 如何处理。
-- MSE 没有与常数均值、仅射门位置模型或提供方 xG 复制基线比较，因此 0.0123 缺乏可解释尺度。
+`no_player` 的 validation MSE 优于完整模型，说明身份信息可能造成过拟合；该结果应正面讨论。`xG-weighted contribution` 混合外部 xG 与本模型 attention，需要清楚分解，不应全部归功于 Transformer。
 
 ### Data and experiments
 
-- 单赛季单联赛不足以评估转会、教练变化、赛季节奏和联赛风格下的稳定性。
-- 应按 position、minutes 和 team possession 分层，防止前锋和强队球员天然拥有更多射门回合。
-- Table 3 没有 minimum involvement threshold，也没有任何不确定性区间，尽管正文正确指出此问题。
-- 需要检验不同 max sequence length、不同 attention 层/头聚合、仅 pre-shot token、是否含 shooter 等敏感性。
-- 应报告目标 xG 分布、序列长度分布、球员参与次数长尾和被截断比例。
+数据规模和五次运行足以支持探索性研究，主要不足是没有独立 test 和简单基线。跨赛季/跨联赛验证属于增强项，不是 PRICAI 当前稿件的必要条件。建议增加最小参与阈值和 bootstrap 区间，但无需构建完整职业球探验证体系。
 
 ### Clarity
 
-文章对 target-feature relationship、因果边界和局限的表述非常清楚，方法定义也相对易懂，这是稿件最强部分。但正文仍在 Sec. 4.3 使用“successfully identify and value”等强表述，与后文“hypothesis-generating signal”不一致。全文应采用后者的保守口径。
+问题、边界、公式和限制写得较清楚，是本文优势。Sec. 4 中的 `successfully identify and value` 应改成 `highlight potentially influential involvement`，与结论的保守定位一致。
 
 ### Compliance
 
-匿名致谢是明确合规风险。参考文献中的 URL 以青色边框显示，正文交叉引用出现红/绿框，影响成稿观感；应配置 `hyperref` 隐藏打印边框。还应说明事件数据的使用许可和可共享范围。
+匿名致谢是明确问题。还应说明事件数据许可。正文和参考文献的彩色 hyperlink 边框需要隐藏。
 
 ### Advancement
 
-论文对 attention 解释风险的透明讨论有教育价值，但当前实证结果主要说明“可以生成一个排名”，没有证明该排名有效、忠实或优于简单统计。按现有版本，技术推进不足以支撑完整会议论文。
+本文更像透明、可复查的可行性研究，而不是已验证的球员评级系统。对于 PRICAI，若增加无泄漏设置、简单基线和 attention 增量证据，可以形成可接受的应用贡献。
 
 ## Presentation and first impression
 
-- **Figures/tables：** Fig. 1 的散点关系高度近线性，恰好显示分数受总 xG/参与量支配，却未量化该混杂。Fig. 2 热图分辨率和字体偏低，颜色含义与单位不够清楚。Fig. 3 单案例路径较清晰，但文本标签小，且不能作为总体效度证据。
-- **Formatting/notation：** Table 3 的 `Total`、`Mean`、`xG-wtd.` 单位和归一化方式应在表注中完整定义。彩色 hyperlink 边框在正文和参考文献中大量出现，不符合干净的出版版式。
-- **Writing：** 英文整体清楚、克制，但 16 页中局限讨论占比很高，反映核心验证尚处于研究设计阶段。可压缩重复免责声明，把版面用于真正的对照实验。
+- **Figures/tables：** Fig. 2 热图字体和分辨率偏低；Fig. 3 案例直观但标签小。Fig. 1 的高度线性关系应明确解释为参与量/xG 混杂证据。
+- **Formatting/notation：** Table 3 的 `Total`、`Mean`、`xG-wtd.` 应定义单位；彩色链接边框影响 LNAI 成稿观感。
+- **Writing：** 英文整体清楚，免责声明略重复，可压缩后腾出版面给无泄漏实验和基线。
 
 ## Actionable revision plan
 
-1. 删除/匿名化致谢和所有可追踪合作信息，先消除双盲违规。
-2. 以 pre-shot 无泄漏任务为主，full-shot 仅作为诊断；建立独立、时间后移的测试集。
-3. 加入 mean/linear/GBDT/RNN/Transformer 预测基线，以及 count/uniform/occlusion/IG/VAEP/xT/OBV 归因基线。
-4. 重新定义或验证贡献：允许正负边际影响，控制事件次数、出场时间、位置和球队强度。
-5. 用 faithfulness、randomization、反事实删除和足球分析师盲评验证解释。
-6. 对全部符合阈值的球员报告外部效度、bootstrap 区间和跨赛季/跨联赛稳定性。
-7. 公布数据构造与特征细节，修复图表字号、热图单位和 hyperlink 边框。
+1. 立即匿名化致谢和合作机构信息。
+2. 增加 `preceding events only` 主实验和独立 match-level test split。
+3. 加入 count/uniform 及一个简单预测基线，量化 learned attention 的增量价值。
+4. 将 `contribution` 收窄为 `attention-based involvement`，或增加一个 occlusion faithfulness 测试。
+5. 对满足参与阈值的全部球员报告一种整体外部相关，而不是只列成功案例。
+6. 补全数据构造，修复热图、字号和 hyperlink 边框。
 
 ## Likely decision posture
 
-按当前版本，倾向 **拒稿**。作者准确识别了目标泄漏、attention 非因果和弱基线，但这些正是核心结论尚未成立的原因；此外匿名致谢可能单独触发程序性问题。若完成无泄漏任务、强基线和外部效度验证，工作可形成更扎实的后续投稿。该判断不代表程序委员会最终决定。
+按 PRICAI 2026 long-paper 标准，当前倾向 **弱拒稿**，而不是明确拒稿。稿件的透明边界意识和应用价值值得肯定，但主任务 leakage、uniform control 几乎复现排名、缺少独立 test，使 16 页 long paper 的核心证据不足。若改投 short paper，或补上无泄漏设置、简单基线和匿名修复，接收可能性会明显提高。该判断不代表程序委员会最终决定。
