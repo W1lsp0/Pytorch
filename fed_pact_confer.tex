@@ -1,0 +1,621 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\newcommand{\figplaceholder}[2][]{%
+\IfFileExists{#2}{%
+\includegraphics[#1]{#2}%
+}{%
+\fbox{\parbox[c][1.12in][c]{0.92\linewidth}{\centering Missing figure file: #2}}%
+}%
+}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+
+\title{Data-Aware Tucker Alignment for Rank-Irregular Tensor Updates in Edge Federated Learning}
+
+\author{
+    \IEEEauthorblockN{Xinyu Liu, Chao Bu*, Zeri Zhang, Jiakai Zhou, Shuo Zhang}
+    \IEEEauthorblockA{
+        \textit{School of Computer Science and Engineering} \\
+        \textit{Tianjin University of Technology}\\
+        Tianjin, China \\
+        eieroxleon@163.com}
+}
+\maketitle
+
+
+%% Abstract
+\begin{abstract}
+    Federated learning on edge devices is constrained not only by limited bandwidth, but also by a structural mismatch between high-order model tensors and matrix-centric communication protocols. Convolutional kernels are naturally multi-order tensors, whereas existing compression methods often flatten them into matrices or apply data-agnostic low-rank truncation. This can disrupt tensor topology and remove locally discriminative channels under non-independent and identically distributed data. Moreover, data-aware tensor compression produces client-specific ranks and independently rotated factor spaces, making direct aggregation of compressed factors invalid. We propose Fed-PACT, a communication-efficient personalized federated learning framework for rank-irregular tensor updates on edge devices. Fed-PACT performs covariance-weighted Tucker decomposition to preserve activation-sensitive tensor modes, applies post-training INT8 quantization to reduce uplink payload, and introduces lazy decomposition to avoid redundant high-order tensor computation. On the server, Fed-PACT aligns heterogeneous tensor factors by orthogonal Procrustes analysis, pads them to the maximum rank of the current round, and applies masked aggregation to avoid averaging over artificial zeros. Experiments on a 40-class ImageNet-1k subset with Dirichlet splits show that Fed-PACT reduces total uplink payload from 3355.79 MB to 45.52 MB, achieving a 73.7$\times$ communication reduction over FedAvg while maintaining 89.30 percent personalized accuracy.
+\end{abstract}
+
+%% Keywords
+\begin{IEEEkeywords}
+    Federated learning, edge computing, edge networking, tensor decomposition, Tucker decomposition, personalized federated learning, communication efficiency.
+\end{IEEEkeywords}
+
+
+
+\section{Introduction}
+Federated learning (FL) enables distributed edge devices to collaboratively train a model without sharing raw data \cite{mcmahan2017fedavg}. However, realistic edge FL is limited by both communication bandwidth and statistical heterogeneity. Modern convolutional neural networks (CNNs), such as ResNet-50, contain tens of millions of parameters. Repeated transmission of full-precision model weights over narrowband wireless links can introduce large delay and energy consumption. At the same time, edge data are typically non-independent and identically distributed (Non-IID), which causes client drift and weakens local personalization performance \cite{karimireddy2020scaffold}.
+This paper argues that communication-efficient edge FL also suffers from a structural mismatch. CNN convolutional kernels are naturally high-order tensors, but many compression methods treat updates as vectors or matrices. Flattening a convolutional tensor destroys the mode-wise topology among output channels, input channels, and spatial dimensions. Although low-rank matrix compression can reduce payload, it does not explicitly preserve the tensor structure that governs convolutional feature extraction.
+The problem becomes more severe under heterogeneous edge data. Since each client observes a different local distribution, the activation-sensitive tensor subspaces are client-dependent. A data-aware tensor decomposition may therefore generate different truncation ranks and independently rotated factor bases across clients. The resulting compressed updates are rank-irregular tensor factors rather than shape-consistent matrices. Directly averaging such factors is mathematically invalid because the same factor column may represent different local bases on different clients.
+To address this edge-native tensor irregularity, we propose Fed-PACT, a personalized FL framework that compresses, aligns, and aggregates high-order tensor updates without adding trainable modules or modifying the local training pipeline. Fed-PACT uses local activation covariance to guide Tucker decomposition, thereby preserving discriminative tensor modes under Non-IID data. To aggregate heterogeneous tensor factors, the server performs orthogonal Procrustes alignment, zero-padding into a unified hyperspace, and masked averaging. A lazy update mechanism and INT8 post-training quantization further reduce computation and transmission overhead on edge devices.
+The contributions of this paper are summarized as follows:
+\begin{itemize}
+    \item We formulate edge federated model compression as a rank-irregular tensor update problem, where non-matrixized convolutional kernels, client-specific truncation ranks, and basis mismatch jointly hinder efficient aggregation.
+    \item We propose a covariance-weighted Tucker compression scheme that preserves locally discriminative channels while avoiding matrixization-induced topology collapse.
+    \item We design a Procrustes-based tensor factor alignment and masked aggregation mechanism to aggregate heterogeneous Tucker factors with different ranks and rotations.
+    \item We integrate lazy decomposition and INT8 post-training quantization to reduce both edge computation and uplink payload. Experiments show a 73.7$\times$ communication reduction over FedAvg with less than two percentage points of personalized accuracy loss.
+\end{itemize}
+
+
+\section{Related Work}
+\subsection{Communication-Efficient Federated Learning}
+FedAvg \cite{mcmahan2017fedavg} is the canonical FL algorithm, and FedProx \cite{li2020fedprox} improves robustness under heterogeneous clients by adding a proximal regularizer. However, both methods transmit full model parameters, which is expensive for edge networks. Quantization and sparsification reduce communication by sending low-bit values or selected coordinates \cite{alistarh2017qsgd,mao2022adaptivequant}. Recent quantized FL methods improve communication efficiency, but aggressive quantization may amplify Non-IID noise or damage important channels \cite{chen2024mixedprecision}.
+
+\subsection{Personalized Federated Learning}
+Personalized FL (pFL) methods address client heterogeneity by decoupling global and local components, fine-tuning local heads, or exchanging compact representations \cite{tan2022pfl}. FedRep learns a shared representation and personalized classifier \cite{collins2021fedrep}. FedProto communicates class prototypes instead of full model weights \cite{tan2022fedproto}. Fed-LoRA exchanges low-rank adapters and freezes most of the backbone \cite{cho2023fedlora}. These methods can reduce payload, but they do not directly aggregate the complete convolutional tensor topology in the same way as high-order tensor compression.
+
+\subsection{Tensor Decomposition in FL}
+Tensor decomposition provides a natural tool for compressing high-order model parameters. Tucker decomposition and higher-order singular value decomposition preserve multi-mode structure better than matrix flattening \cite{kolda2009tensor}. Recent FL studies apply tensor decomposition to power systems, medical learning, and industrial sensing \cite{zhang2026multi,wang2025knowledge,han2026tdpfed}. However, most existing methods either use fixed ranks or do not explicitly handle the rank irregularity and basis mismatch caused by client-specific data-aware decomposition.
+
+\section{Problem Formulation}
+Consider a federated system with $K$ edge clients. Client $i$ owns private data $D_i$ drawn from a local distribution that may differ from other clients. For a convolutional layer, the weight parameter is a fourth-order tensor
+\begin{equation}
+    W \in \mathbb{R}^{C_{out} \times C_{in} \times K_h \times K_w},
+\end{equation}
+where $C_{out}$ and $C_{in}$ denote output and input channels, and $K_h$, $K_w$ denote spatial kernel size.
+The goal is to minimize local empirical risk under a communication budget:
+\begin{equation}
+    \min_{\{\Theta_i\}_{i=1}^{K}} \sum_{i=1}^{K} L_i(\hat{W}_i;D_i),
+    \quad
+    \text{s.t.}
+    \quad
+    \hat{W}_i=\mathrm{Tucker}^{-1}(\Theta_i),
+    \quad
+    |\Theta_i|\leq B_i,
+    \label{eq:problem}
+\end{equation}
+where $\Theta_i$ is the compressed tensor payload and $B_i$ is the edge bandwidth budget.
+Unlike regular matrix updates, $\Theta_i$ contains a Tucker core tensor and factor matrices:
+\begin{equation}
+    \Theta_i = \{G_i,U_{i,1},U_{i,2},U_{i,3},U_{i,4}\}.
+\end{equation}
+Because each client has different data statistics, its truncation ranks
+$r_{i,n}$ can differ across both clients and tensor modes. Therefore, the server receives rank-irregular updates:
+\begin{equation}
+    G_i \in \mathbb{R}^{r_{i,1}\times r_{i,2}\times r_{i,3}\times r_{i,4}},
+    \quad
+    U_{i,n}\in \mathbb{R}^{I_n\times r_{i,n}}.
+\end{equation}
+The aggregation challenge is to align and fuse these heterogeneous factors without destroying tensor topology or diluting valid low-rank components.
+
+\subsection{Structural Issues in Edge Tensor Updates}
+The above formulation exposes three native defects that are often hidden when model updates are treated as vectors. The first defect is \emph{matrixization-induced topology collapse}. A convolutional kernel is not an arbitrary parameter block, but a structured mapping among output channels, input channels, and local spatial neighborhoods. Flattening $W$ into a matrix mixes these modes and makes the compression objective depend on the chosen unfolding order. Consequently, two tensor elements that are adjacent in the spatial kernel may become far apart in the flattened representation, while elements from different channels may become artificially adjacent. This destroys the inductive bias encoded by convolution and may remove feature channels that are weak in Frobenius energy but important for local recognition.
+The second defect is \emph{rank irregularity}. Under Non-IID data, different clients activate different subsets of filters. A client that mainly observes fine-grained object classes may need more channel components in deeper layers, while another client with simpler local samples may be well represented by a smaller rank. Therefore, a single global rank is either wasteful for simple clients or insufficient for complex clients. Data-aware rank selection is necessary, but it naturally produces heterogeneous tensor shapes across clients:
+\begin{equation}
+    r_{i,n} \neq r_{j,n}, \quad i\neq j.
+\end{equation}
+This makes the aggregation problem fundamentally different from standard FedAvg, where all clients upload tensors with identical shapes.
+The third defect is \emph{basis mismatch}. Even if two clients select the same Tucker rank, their factor matrices are not guaranteed to share a common coordinate system. Singular vectors are invariant to sign flips and rotations within near-degenerate subspaces. Therefore, the $d$-th factor column of client $i$ does not necessarily correspond to the $d$-th factor column of client $j$. Direct averaging can cancel meaningful components or merge unrelated local bases. Fed-PACT explicitly addresses this issue by aligning factor matrices before aggregation.
+These issues suggest that edge FL compression is not only a byte-reduction problem. A valid compressed update must preserve tensor topology, allow client-specific ranks, and provide a common basis for aggregation. Fed-PACT is designed around these requirements.
+
+\section{Method}
+\subsection{Personalized Synchronization and Payload Construction}
+
+Fed-PACT follows a decoupled personalized FL protocol. Each client keeps its classifier head and normalization statistics local, while the shared convolutional feature extractor is synchronized and aggregated through compressed tensor updates. Let the local model of client $i$ be divided into a personalized part $W_i^{p}$ and a shared tensorized part $W_i^{s}$. At the beginning of round $t$, the server broadcasts $W_{global}^{s,t-1}$, and client $i$ updates only the shared feature extractor:
+\begin{equation}
+    W_i^{s,t-1}\leftarrow W_{global}^{s,t-1},
+    \quad
+    W_i^{p,t-1}\leftarrow W_i^{p,t-1}.
+\end{equation}
+This synchronization rule prevents the global aggregation step from overwriting client-specific decision boundaries and local feature statistics.
+
+During local optimization, Fed-PACT can be combined with a proximal regularizer to reduce excessive client drift under Non-IID data:
+\begin{equation}
+    \mathcal{L}_i
+    =
+    \mathcal{L}_{ce}(W_i^{s},W_i^{p};D_i)
+    +
+    \frac{\mu}{2}
+    \|W_i^{s}-W_{global}^{s}\|_2^2.
+\end{equation}
+After local training, only selected convolutional tensors in $W_i^{s}$ are compressed. For layer $l$, the uploaded payload is
+\begin{equation}
+    \mathcal{P}_{i}^{(l)}
+    =
+    \left\{
+    Q(G_i^{(l)}),
+    Q(U_{i,1}^{(l)}),\ldots,Q(U_{i,4}^{(l)}),
+    \mathbf{r}_i^{(l)}, \mathbf{s}_i^{(l)}, \mathbf{z}_i^{(l)}
+    \right\},
+\end{equation}
+where $Q(\cdot)$ denotes INT8 quantization, $\mathbf{r}_i^{(l)}$ stores the selected Tucker ranks, and $\mathbf{s}_i^{(l)}$, $\mathbf{z}_i^{(l)}$ store quantization scales and zero points. This payload explicitly preserves the rank-irregular tensor structure required by server-side alignment.
+
+\subsection{Covariance-Weighted Tucker Compression}
+Standard Tucker decomposition minimizes reconstruction error in weight space:
+\begin{equation}
+    \min_{\hat{W}}\|W-\hat{W}\|_F^2.
+\end{equation}
+However, this objective does not consider how compression error affects activations. For an input feature tensor $X$, the actual activation distortion can be written as
+\begin{equation}
+    E_{act}=
+    \mathbb{E}_{X}\left[
+        \|(W-\hat{W})*X\|_F^2
+        \right].
+    \label{eq:actdist}
+\end{equation}
+Let $X_{(c)}$ denote the input feature matrix unfolded along the channel dimension. The local input covariance is
+\begin{equation}
+    C_i=\mathbb{E}\left[X_{(c)}X_{(c)}^{T}\right].
+\end{equation}
+Fed-PACT estimates $C_i$ through a gradient-free local forward pass and updates it by exponential moving average:
+\begin{equation}
+    C_i^{(t)}=(1-\alpha_t)C_i^{(t-1)}+\alpha_t C_{batch}.
+    \label{eq:ema}
+\end{equation}
+Since small local batches may produce rank-deficient covariance matrices, we add adaptive ridge regularization:
+\begin{equation}
+    \tilde{C}_i=C_i+\lambda_i I,
+    \quad
+    \lambda_i=\epsilon\frac{\mathrm{Tr}(C_i)}{\mathrm{dim}(C_i)}.
+    \label{eq:ridge}
+\end{equation}
+Let $R_i=\tilde{C}_i^{1/2}$. Because $R_i$ is derived from the input-channel covariance, it is injected into the input-channel mode:
+\begin{equation}
+    \tilde{W}_i = W_i \times_2 R_i.
+    \label{eq:weightedtensor}
+\end{equation}
+Tucker decomposition is then performed on $\tilde{W}_i$ rather than the original weight tensor:
+\begin{equation}
+    \tilde{W}_i \approx
+    G_i \times_1 U_{i,1}\times_2 U_{i,2}\times_3 U_{i,3}\times_4 U_{i,4}.
+    \label{eq:tucker}
+\end{equation}
+For each mode $n$, Fed-PACT selects the smallest rank $r_{i,n}$ satisfying the energy criterion:
+\begin{equation}
+    \frac{\sum_{j=1}^{r_{i,n}}\sigma_{j}^{2}}
+    {\sum_{j=1}^{I_n}\sigma_{j}^{2}}
+    \geq \eta.
+    \label{eq:rank}
+\end{equation}
+To avoid feature-space collapse under aggressive compression, a rank floor is enforced:
+\begin{equation}
+    r_{i,n}\leftarrow \max(2,\lfloor 0.05 I_n \rfloor).
+    \label{eq:rankfloor}
+\end{equation}
+
+\subsection{INT8 Quantization and Lazy Decomposition}
+After Tucker decomposition, the core tensor and factor matrices are quantized using post-training INT8 affine mapping:
+\begin{equation}
+    Q(x)=\mathrm{clip}\left(
+    \mathrm{round}\left(\frac{x}{s}\right)+z,-128,127
+    \right),
+    \label{eq:int8}
+\end{equation}
+where $s$ and $z$ are the scale and zero point. Since the data-aware Tucker step removes low-energy components before quantization, the remaining low-rank structure is more robust to low-bit representation.
+High-order decomposition can be expensive for edge devices. Fed-PACT therefore monitors relative weight change:
+\begin{equation}
+    \Delta W_i^{(t)}=\frac{\|W_i^{(t)}-W_i^{(t-1)}\|_F}
+    {\|W_i^{(t-1)}\|_F+\epsilon}.
+    \label{eq:lazy}
+\end{equation}
+If $\Delta W_i^{(t)}<\tau_{lazy}$, the client reuses the previous tensor cache instead of recomputing Tucker factors. This mechanism reduces local computation and acts as a temporal filter that avoids repeatedly uploading small Non-IID-induced fluctuations.
+
+\subsection{Procrustes Alignment for Rank-Irregular Factors}
+Because clients decompose tensors independently, their factor bases may differ by rotations, signs, or permutations. We use orthogonal Procrustes alignment \cite{gower1975procrustes} to correct this basis mismatch. 
+The server first selects a reference factor $U_{ref,n}$ for each mode. Since client ranks may differ, alignment is performed on the common rank
+\begin{equation}
+    h_{i,n}=\min(r_{i,n},r_{ref,n}).
+\end{equation}
+Let $U_{i,n}^{h}$ and $U_{ref,n}^{h}$ denote the first $h_{i,n}$ columns of the client and reference factors, respectively. The orthogonal rotation is obtained by
+\begin{equation}
+    R_{i,n}^{*}=
+    \arg\min_{R^TR=I}
+    \|U_{ref,n}^{h}-U_{i,n}^{h}R\|_F^2.
+    \label{eq:procrustes}
+\end{equation}
+Let
+\begin{equation}
+    M_{i,n}=(U_{i,n}^{h})^{T}U_{ref,n}^{h}=P\Sigma Q^T.
+\end{equation}
+The closed-form Procrustes solution is
+\begin{equation}
+    R_{i,n}^{*}=PQ^T.
+    \label{eq:rotation}
+\end{equation}
+The aligned factor is obtained by rotating the overlapping subspace, while columns outside the overlap are kept in their local order before padding:
+\begin{equation}
+    U_{i,n}^{aligned}[:,1:h_{i,n}]=U_{i,n}^{h}R_{i,n}^{*}.
+\end{equation}
+The corresponding core slice is rotated consistently:
+\begin{equation}
+    G_i^{aligned}=G_i\times_n \bar{R}_{i,n}^{T},
+    \label{eq:align}
+\end{equation}
+where $\bar{R}_{i,n}$ is an identity matrix except that its leading $h_{i,n}\times h_{i,n}$ block is replaced by $R_{i,n}^{*}$.
+
+\subsection{Masked Aggregation in a Unified Hyperspace}
+After alignment, clients may still have different ranks. The server computes the maximum rank for each mode:
+\begin{equation}
+    R_{max,n}=\max_i r_{i,n}.
+\end{equation}
+Each factor and core tensor is zero-padded to this round-wise maximum rank. To prevent padded zeros from diluting valid dimensions, Fed-PACT uses masked aggregation. For factor column $d$ in mode $n$,
+\begin{equation}
+    U_{global,n}[:,d]=\frac{\sum_{i=1}^{K} m_{i,d} \cdot \mathrm{Pad}(U_{i,n}^{aligned})[:,d]}{\sum_{i=1}^{K}m_{i,d}+\epsilon},
+    \label{eq:maskfactor}
+\end{equation}
+where $m_{i,d}=1$ if client $i$ has a valid column $d$, and $m_{i,d}=0$ otherwise. The core tensor is aggregated as
+\begin{equation}
+    G_{global}=\frac{1}{K}\sum_{i=1}^{K}\mathrm{Pad}(G_i^{aligned}).
+    \label{eq:coreagg}
+\end{equation}
+The global tensor is reconstructed by inverse Tucker decomposition and used as a pseudo-gradient target for server momentum update.
+\subsection{Dequantization and Server Momentum Update}
+
+After receiving client payloads, the server first dequantizes each tensor component by
+\begin{equation}
+    \hat{x}=s\cdot(Q(x)-z),
+\end{equation}
+where $s$ and $z$ are transmitted with the corresponding tensor block. The aligned and aggregated Tucker components are then reconstructed into a dense convolutional tensor:
+\begin{equation}
+    \hat{W}^{(t)}=G_{global}^{(t)}
+    \times_1 U_{global,1}^{(t)}
+    \times_2 U_{global,2}^{(t)}
+    \times_3 U_{global,3}^{(t)}
+    \times_4 U_{global,4}^{(t)}.
+\end{equation}
+
+Instead of directly replacing the previous global tensor with $\hat{W}^{(t)}$, Fed-PACT treats their difference as a pseudo-gradient:
+\begin{equation}
+    g^{(t)}=W_{global}^{(t-1)}-\hat{W}^{(t)}.
+\end{equation}
+The server applies momentum smoothing:
+\begin{equation}
+    v^{(t)}=\beta_s v^{(t-1)}+(1-\beta_s)g^{(t)},
+\end{equation}
+and updates the global tensor by
+\begin{equation}
+    W_{global}^{(t)}=W_{global}^{(t-1)}-\eta_s v^{(t)}.
+\end{equation}
+This update avoids abrupt replacement by a single round of rank-irregular reconstruction and improves stability when client ranks vary across rounds.
+\begin{table*}[t]
+    \caption{Fed-PACT Training and Aggregation Procedure}
+    \label{tab:algorithm}
+    \centering
+    \begin{tabular}{p{0.96\textwidth}}
+        \toprule
+        \textbf{Input:} clients $K$, communication rounds $T$, local epochs $E$, energy threshold $\eta$, lazy threshold $\tau_{lazy}$.                                                            \\
+        \midrule
+        1. Server initializes global model $W_{global}^{(0)}$ and broadcasts the trainable feature extractor to clients.                                                                           \\
+        2. Each client synchronizes the shared extractor, keeps its personalized classifier and normalization states, and performs local training.                                                 \\
+        3. Each client estimates local activation covariance by a gradient-free forward pass and updates the covariance using exponential moving average.                                          \\
+        4. If the relative weight change is smaller than $\tau_{lazy}$, the client reuses its previous Tucker cache; otherwise, it performs covariance-weighted Tucker decomposition.              \\
+        5. Each client applies INT8 post-training quantization to the Tucker core and factor matrices, compresses the payload, and uploads it to the server.                                       \\
+        6. The server dequantizes all payloads, performs Procrustes alignment for factor matrices, rotates the corresponding core tensors, and pads all factors into a maximum-rank hyperspace.    \\
+        7. The server performs masked aggregation for factor matrices and average aggregation for core tensors, reconstructs the global tensor, and updates the global model with server momentum. \\
+        8. The final global feature extractor is combined with client-specific heads for personalized evaluation.                                                                                  \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+\section{Theoretical and System Analysis}
+\subsection{Activation-Space Preservation}
+The key difference between standard Tucker compression and Fed-PACT lies in the optimization space. Standard low-rank approximation minimizes the parameter reconstruction error $\|W-\hat{W}\|_F^2$. However, in neural networks, the effect of compression is measured after the weight tensor interacts with input activations. Let $E=W-\hat{W}$ denote the tensor reconstruction error. For a convolutional layer, the activation distortion can be approximated by
+\begin{equation}
+    \mathbb{E}_{X}\left[\|E*X\|_F^2\right].
+\end{equation}
+When the input feature covariance is $C_i$, the distortion is no longer isotropic. Errors along frequently activated input directions are amplified, while errors along rarely activated directions have weaker influence. By injecting $R_i=\tilde{C}_i^{1/2}$ into the input-channel mode, Fed-PACT transforms the low-rank objective from uniform weight reconstruction to activation-weighted reconstruction:
+\begin{equation}
+    \| (W-\hat{W})\times_2 R_i \|_F^2.
+\end{equation}
+Thus, the decomposition favors tensor components that are important for the local data distribution. This property is particularly important in personalized FL, where preserving local discriminative channels can be more valuable than minimizing global average reconstruction error.
+
+The adaptive ridge term in \eqref{eq:ridge} improves numerical stability. Since edge clients often use small local batches, the estimated covariance matrix may be low-rank or ill-conditioned. Adding $\lambda_i I$ ensures positive definiteness and bounds the condition number:
+\begin{equation}
+    \kappa(\tilde{C}_i)
+    =
+    \frac{\lambda_{\max}(C_i)+\lambda_i}
+    {\lambda_{\min}(C_i)+\lambda_i}
+    \leq
+    \frac{\lambda_{\max}(C_i)+\lambda_i}{\lambda_i}.
+\end{equation}
+This prevents the square-root mapping from over-amplifying noisy covariance directions.
+
+\subsection{Necessity of Procrustes Alignment}
+The Tucker decomposition of each client is independently computed, so the factor matrices are only identifiable up to orthogonal transformations. Suppose two clients have factor matrices $U_a$ and $U_b$ spanning similar subspaces but represented in different coordinates. Direct averaging gives
+\begin{equation}
+    \bar{U}=\frac{1}{2}(U_a+U_b).
+\end{equation}
+If $U_b=U_aR$ for an orthogonal rotation $R$, then $\bar{U}$ may no longer be orthogonal or representative of either client subspace. In the extreme case of sign inconsistency, one component may be canceled even though both clients encode the same feature direction.
+
+Procrustes alignment solves this coordinate inconsistency before averaging. The objective in \eqref{eq:procrustes} searches for the closest orthogonal rotation between a client basis and the reference basis. Since the rotation is orthogonal, it preserves inner products and does not change the energy of the local low-rank representation:
+\begin{equation}
+    \|U_{i,n}R_{i,n}^{*}\|_F=\|U_{i,n}\|_F.
+\end{equation}
+The corresponding inverse rotation applied to the core tensor in \eqref{eq:align} keeps the reconstructed tensor unchanged before aggregation:
+\begin{equation}
+    G_i\times_n U_{i,n}=\left(G_i\times_n (R_{i,n}^{*})^T\right)\times_n\left(U_{i,n}R_{i,n}^{*}\right).
+\end{equation}
+Therefore, alignment changes only the coordinate representation, not the local model content. This makes it suitable for server-side aggregation without requiring additional client training.
+
+\subsection{Masked Aggregation and Rank Validity}
+Zero padding is necessary for placing heterogeneous factors into a common tensor space, but naive averaging over padded dimensions introduces bias. Consider a factor column $d$ that exists for only one client. A standard average over $K$ clients would scale this valid component by $1/K$, even though the remaining $K-1$ entries are artificial zeros rather than real observations. This would dilute high-rank components and discourage the global model from retaining specialized features.
+
+The mask in \eqref{eq:maskfactor} corrects this bias by averaging only over valid contributors. For a dimension with valid client set $\mathcal{V}_d$, the aggregation becomes
+\begin{equation}
+    U_{global,n}[:,d]=\frac{1}{|\mathcal{V}_d|}\sum_{i\in \mathcal{V}_d}U_{i,n}^{aligned}[:,d].
+\end{equation}
+This preserves the magnitude of high-rank features while still allowing clients with smaller ranks to participate in lower-dimensional shared components. In this sense, masked aggregation separates two roles: low-rank dimensions capture common knowledge across many clients, while higher-rank dimensions preserve specialized knowledge from clients that require richer tensor subspaces.
+
+\subsection{Stability Under Rank-Irregular Aggregation}
+Rank-irregular aggregation introduces an additional stability challenge compared with standard FedAvg. In FedAvg, all clients upload parameters in the same coordinate system, so averaging is performed directly in the original weight space. In Fed-PACT, each client first projects the weight tensor into a local low-rank subspace. Without alignment, the reconstructed global tensor may contain mixed bases that do not correspond to any valid client representation, leading to oscillatory updates under severe Non-IID label skew.
+Fed-PACT improves stability by combining alignment, masking, and momentum. Procrustes alignment reduces coordinate inconsistency before averaging, while masked aggregation prevents zero-padded dimensions from being treated as real observations. The server momentum update further smooths the reconstructed tensor trajectory across rounds. As a result, the global model does not abruptly jump to a reconstruction dominated by one round's rank configuration.
+
+\subsection{Communication and Computation Complexity}
+For a fourth-order convolutional tensor
+$W\in \mathbb{R}^{I_1\times I_2\times I_3\times I_4}$,
+full-precision FL uploads
+\begin{equation}
+    |\Theta_{full}|=4\prod_{n=1}^{4}I_n
+\end{equation}
+bytes under FP32 representation. After Tucker decomposition and INT8 quantization, Fed-PACT uploads approximately
+\begin{equation}
+    |\Theta_{PACT}|=\prod_{n=1}^{4}r_n+\sum_{n=1}^{4}I_nr_n
+\end{equation}
+bytes, excluding small quantization metadata. The corresponding compression ratio is approximately
+\begin{equation}
+    \rho=\frac{|\Theta_{PACT}|}{|\Theta_{full}|}=\frac{\prod_{n=1}^{4}r_n+\sum_{n=1}^{4}I_nr_n}{4\prod_{n=1}^{4}I_n}.
+\end{equation}
+When $r_n\ll I_n$, the payload is dominated by factor matrices and is much smaller than full-weight transmission.
+
+For a multi-layer CNN, the total communication cost is the sum of the compressed payloads over all selected convolutional layers. Let $\mathcal{L}$ denote the set of layers compressed and uploaded by Fed-PACT. For layer $l$, the original convolutional tensor has shape
+$I_1^{(l)}\times I_2^{(l)}\times I_3^{(l)}\times I_4^{(l)}$, and client $i$ selects rank vector
+$\mathbf{r}_i^{(l)}=(r_{i,1}^{(l)},r_{i,2}^{(l)},r_{i,3}^{(l)},r_{i,4}^{(l)})$.
+The total INT8 Tucker payload of client $i$ can be approximated as
+\begin{equation}
+    |\Theta_i|=\sum_{l\in \mathcal{L}}
+    \left(
+    \prod_{n=1}^{4} r_{i,n}^{(l)}+\sum_{n=1}^{4} I_{n}^{(l)} r_{i,n}^{(l)}
+    \right)+|\Omega_i|,
+    \label{eq:multilayer_payload}
+\end{equation}
+where the first term is the core tensor size, the second term is the total factor-matrix size, and $|\Omega_i|$ denotes small metadata, including rank vectors, quantization scales, zero points, and layer identifiers. Since $|\Omega_i|$ is negligible compared with tensor factors in large convolutional layers, the payload is mainly controlled by the selected ranks.
+
+This expression provides a natural layer-wise budget allocation mechanism. Given a client-side communication budget $B_i$, rank selection across layers can be viewed as
+\begin{equation}
+    \min_{\{\mathbf{r}_i^{(l)}\}_{l\in\mathcal{L}}}
+    \sum_{l\in\mathcal{L}}
+    \mathcal{D}_i^{(l)}(\mathbf{r}_i^{(l)})
+    \quad\text{s.t.}\quad
+    |\Theta_i|\leq B_i,
+    \label{eq:layer_budget}
+\end{equation}
+where $\mathcal{D}_i^{(l)}(\cdot)$ denotes the activation-space distortion introduced by truncating layer $l$. In practice, Fed-PACT implements this budget control through the energy threshold $\eta$ and rank floor in \eqref{eq:rank}--\eqref{eq:rankfloor}. Layers whose singular energy decays rapidly automatically receive smaller ranks, while layers with slower decay retain more components.
+
+The layer-wise form is important because CNN layers are not equally sensitive to compression. Early layers usually encode generic edge, texture, and color patterns and often have small spatial kernels. Their feature distributions are relatively shared across clients, so aggressive personalization is less necessary. Middle and deep layers contain more semantic channels and are more affected by Non-IID label skew. For these layers, preserving larger channel ranks can prevent the loss of client-specific discriminative features. Therefore, Fed-PACT can allocate communication capacity according to both tensor redundancy and data-dependent sensitivity, instead of enforcing a uniform rank ratio across the whole network.
+
+The multi-layer payload formula also clarifies the role of lazy updates. Let $a_i^{(l,t)}\in\{0,1\}$ indicate whether layer $l$ of client $i$ performs a fresh decomposition at round $t$. When the lazy condition is triggered, $a_i^{(l,t)}=0$ and the cached factors are reused. If version-controlled cache transmission is enabled, the effective payload in round $t$ can be written as
+\begin{equation}
+    |\Theta_i^{(t)}|=
+    \sum_{l\in \mathcal{L}}a_i^{(l,t)}
+    \left(
+    \prod_{n=1}^{4} r_{i,n}^{(l,t)}
+    +
+    \sum_{n=1}^{4} I_{n}^{(l)} r_{i,n}^{(l,t)}
+    \right)
+    +
+    |\Omega_i^{(t)}|.
+    \label{eq:lazy_multilayer_payload}
+\end{equation}
+If the system still retransmits cached factors, the same expression describes the fresh-decomposition payload, while the main saving comes from computation. Thus, lazy updating always reduces decomposition cost and can also reduce communication when combined with versioned cache reuse.
+
+The main additional client-side computation comes from covariance estimation and Tucker decomposition. Covariance estimation is performed by forward hooks without backpropagation, so it is cheaper than local training. Tucker decomposition is more expensive, but the lazy update mechanism avoids repeated decomposition when the local tensor changes only slightly. If the lazy condition is triggered for a fraction $p$ of communication rounds, the expected decomposition cost is reduced by approximately $p$:
+\begin{equation}
+    \mathbb{E}[C_{decomp}]=(1-p)C_{full\_decomp}.
+\end{equation}
+This property is important for edge devices because the model usually changes rapidly in early rounds but enters a stable region later. Fed-PACT therefore spends more computation when structural updates are necessary and reuses cached decompositions when the tensor manifold is stable.
+
+\section{Experiments and Results}
+\subsection{Experimental Setup}
+We evaluate Fed-PACT on a 40-class subset of ImageNet-1k. Data are partitioned across four clients using a Dirichlet distribution with $\alpha=0.5$, which creates severe label skew and simulates heterogeneous edge observations. All methods use ResNet-50 pretrained on ImageNet as the backbone and run for 40 communication rounds. Each client performs one local epoch per round.
+Fed-PACT uses the energy threshold $\eta=0.97$ unless otherwise specified. The lazy threshold is set to $\tau_{lazy}=0.05$ in the multi-round experiments. The server applies orthogonal Procrustes alignment, masked aggregation, momentum-based update, and cosine annealing. We compare against FedAvg \cite{mcmahan2017fedavg}, FedLC \cite{zhang2022fedlc}, FedBABU \cite{oh2022fedbabu}, Fed-LoRA \cite{cho2023fedlora}, FedProto \cite{tan2022fedproto}, and FedRoLA \cite{yan2024fedrola}. The main metrics are personalized top-1 accuracy and cumulative uplink payload.
+
+\subsection{Single-Round Tensor Compression}
+Table~\ref{tab:single} reports the single-round compression and reconstruction accuracy of Fed-PACT under different Tucker energy thresholds. Even when $\eta=1.00$, Tucker-INT8 compression reduces the payload from the full ResNet-50 scale to 15.21 MB. Lowering the threshold to $\eta=0.97$ further reduces the payload to 10.67 MB while maintaining 77.01 percent top-1 accuracy and 93.51 percent top-5 accuracy.
+\begin{table}[t]
+    \caption{Single-Round Compression and Reconstruction Accuracy}
+    \label{tab:single}
+    \centering
+    \resizebox{\columnwidth}{!}{
+        \begin{tabular}{ccccc}
+            \toprule
+            $\eta$ & Top-1 Acc. & Top-5 Acc. & Payload  & Comp. Ratio \\
+            \midrule
+            0.90   & 67.78\%    & 88.56\%    & 10.07 MB & 9.7$\times$ \\
+            0.95   & 75.28\%    & 92.75\%    & 10.42 MB & 9.4$\times$ \\
+            0.97   & 77.01\%    & 93.51\%    & 10.67 MB & 9.2$\times$ \\
+            0.99   & 77.80\%    & 93.79\%    & 11.07 MB & 8.8$\times$ \\
+            1.00   & 80.00\%    & 94.97\%    & 15.21 MB & 6.4$\times$ \\
+            \bottomrule
+        \end{tabular}
+    }
+\end{table}
+\begin{figure}[t]
+    \centering
+    \figplaceholder[width=\columnwidth]{pic2.png}
+    \caption{Single-round accuracy and communication payload under different Tucker energy thresholds.}
+    \label{fig:tradeoff}
+\end{figure}
+The results show a clear trade-off between tensor rank and feature preservation. When the threshold decreases below 0.95, the payload reduction becomes marginal but accuracy drops sharply. This indicates that overly aggressive rank truncation can trigger feature-space collapse. We therefore use $\eta=0.97$ as the default setting in the full federated experiments.
+
+\subsection{Personalized Federated Performance}
+Table~\ref{tab:main} compares final personalized accuracy and total uplink payload after 40 communication rounds. FedAvg achieves 90.90 percent accuracy but requires 3355.79 MB upload per client. Fed-PACT reduces the total payload to 45.52 MB, corresponding to a 73.7$\times$ reduction, while maintaining 89.30 percent personalized accuracy. The accuracy drop is only 1.6 percentage points compared with uncompressed FedAvg.
+\begin{table}[t]
+    \caption{Forty-Round Personalized FL Performance}
+    \label{tab:main}
+    \centering
+    \resizebox{\columnwidth}{!}{
+        \begin{tabular}{lcccc}
+            \toprule
+            Method   & Final Acc. & Payload    & Ratio         & Topology        \\
+            \midrule
+            FedAvg   & 90.90\%    & 3355.79 MB & 1.0$\times$   & Full parameters \\
+            FedLC    & 89.75\%    & 3355.79 MB & 1.0$\times$   & Full parameters \\
+            FedBABU  & 85.35\%    & 3344.26 MB & 1.0$\times$   & Body only       \\
+            Fed-LoRA & 91.25\%    & 20.79 MB   & 161.4$\times$ & Adapters        \\
+            FedProto & 92.15\%    & 10.12 MB   & 331.5$\times$ & Prototypes      \\
+            FedRoLA  & 57.30\%    & 47.72 MB   & 70.3$\times$  & Random layers   \\
+            Fed-PACT & 89.30\%    & 45.52 MB   & 73.7$\times$  & Tucker tensors  \\
+            \bottomrule
+        \end{tabular}
+    }
+\end{table}
+\begin{figure}[t]
+    \centering
+    \figplaceholder[width=\columnwidth]{pic3.png}
+    \caption{Accuracy and cumulative payload evolution during 40-round personalized federated learning.}
+    \label{fig:evolution}
+\end{figure}
+FedProto and Fed-LoRA achieve smaller payloads by exchanging prototypes or adapter parameters, but they do not directly aggregate the complete convolutional tensor topology. Fed-PACT instead compresses and aligns deep convolutional tensors, preserving the collaborative evolution of the feature extractor. FedRoLA has a similar payload scale to Fed-PACT but suffers from a large accuracy degradation, suggesting that random layer interaction may damage convergence under severe Non-IID data.
+
+\subsection{Effect of Lazy Tensor Updates}
+Fed-PACT's per-round payload decreases as training proceeds. This is caused by the lazy decomposition mechanism: once the deep feature extractor enters a stable region, small local variations are filtered by the relative-change criterion. The mechanism reduces high-order decomposition calls and suppresses redundant transmission of high-frequency local fluctuations. Under fixed wireless power and bandwidth, transmission energy is approximately proportional to payload size:
+
+\begin{equation}
+    E_{comm} \propto |\Theta|.
+\end{equation}
+Thus, replacing full-precision model transmission with INT8 Tucker factors directly reduces communication delay and edge energy consumption.
+
+\subsection{Visual Interpretation}
+\begin{figure}[t]
+    \centering
+    \figplaceholder[width=\columnwidth]{pic4.png}
+    \caption{Grad-CAM comparison among compressed personalized FL methods.}
+    \label{fig:gradcam}
+\end{figure}
+Grad-CAM visualizations in Fig.~\ref{fig:gradcam} show that Fed-PACT preserves more concentrated activation regions on target objects under extreme compression. This suggests that covariance-weighted Tucker decomposition retains activation-sensitive channels for local data. In contrast, methods that communicate only prototypes or lightweight adapters may obtain lower payloads but can show weaker localization in cluttered scenes because the underlying convolutional tensor topology is not jointly aggregated.
+
+\subsection{Discussion and Limitations}
+
+The results indicate that Fed-PACT is not a replacement for prototype- or adapter-based pFL methods, but a different choice when the convolutional feature extractor needs to remain jointly trained. FedProto and Fed-LoRA communicate smaller objects, such as class prototypes or adapter weights. Fed-PACT instead communicates compressed Tucker factors of convolutional tensors, which keeps the shared backbone involved in the federated update.
+
+The method has three main limitations. First, Tucker decomposition may introduce memory overhead on compact networks where convolutional tensors have weak low-rank structure. Second, covariance estimation requires extra forward passes, which may be unsuitable for very small edge devices. Third, the energy threshold and lazy threshold are fixed in the current implementation. Adaptive thresholds may be needed when the model changes rapidly in early rounds or when client data distributions drift over time.
+\section{Conclusion}
+This paper presented Fed-PACT, a communication-efficient personalized federated learning framework for rank-irregular tensor updates on edge devices. Fed-PACT addresses three structural bottlenecks: matrixization-induced topology collapse, client-specific rank irregularity, and factor basis mismatch. By combining covariance-weighted Tucker decomposition, INT8 quantization, lazy updates, Procrustes alignment, and masked aggregation, Fed-PACT reduces total uplink communication from 3355.79 MB to 45.52 MB on a 40-class ImageNet-1k subset, achieving a 73.7$\times$ reduction over FedAvg while keeping personalized accuracy within two percentage points of the uncompressed baseline. 
+These results show that rank-aware tensor compression and alignment can reduce edge FL communication while preserving most of the personalized accuracy.
+
+\begin{thebibliography}{00}
+    
+    \bibitem{mcmahan2017fedavg}
+    McMahan, B., Moore, E., Ramage, D., Hampson, S., y Arcas, B. A. (2017, April). Communication-efficient learning of deep networks from decentralized data. In Artificial intelligence and statistics (pp. 1273-1282). Pmlr.
+    
+    \bibitem{karimireddy2020scaffold}
+    Karimireddy, S. P., Kale, S., Mohri, M., Reddi, S., Stich, S., Suresh, A. T. (2020, November). Scaffold: Stochastic controlled averaging for federated learning. In International conference on machine learning (pp. 5132-5143). PMLR.
+    
+    \bibitem{li2020fedprox}
+    Li, T., Sahu, A. K., Zaheer, M., Sanjabi, M., Talwalkar, A., Smith, V. (2020). Federated optimization in heterogeneous networks. Proceedings of Machine learning and systems, 2, 429-450.
+    
+    \bibitem{alistarh2017qsgd}
+    Alistarh, D., Grubic, D., Li, J., Tomioka, R., Vojnovic, M. (2017). QSGD: Communication-efficient SGD via gradient quantization and encoding. Advances in neural information processing systems, 30.
+    
+    \bibitem{mao2022adaptivequant}
+    Yuzhu Mao, Zihao Zhao, Guangfeng Yan, Yang Liu, Tian Lan, Linqi Song, and Wenbo Ding. 2022. ``Communication-Efficient Federated Learning with Adaptive Quantization.'' ACM Trans. Intell. Syst. Technol. 13, 4, Article 67 (August 2022), 26 pages. https://doi.org/10.1145/3510587
+    
+    \bibitem{chen2024mixedprecision}
+    H. Chen and H. Vikalo, ``Mixed-Precision Quantization for Federated Learning on Resource-Constrained Heterogeneous Devices," 2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Seattle, WA, USA, 2024, pp. 6138-6148, doi: 10.1109/CVPR52733.2024.00587.
+    
+    \bibitem{tan2022pfl}
+    Tan, A. Z., Yu, H., Cui, L., Yang, Q. (2022). Towards personalized federated learning. IEEE transactions on neural networks and learning systems, 34(12), 9587-9603.
+    
+    \bibitem{collins2021fedrep}
+    Collins, L., Hassani, H., Mokhtari, A., Shakkottai, S. (2021, July). Exploiting shared representations for personalized federated learning. In International conference on machine learning (pp. 2089-2099). PMLR.
+    
+    \bibitem{tan2022fedproto}
+    Tan, Y., Long, G., Liu, L., Zhou, T., Lu, Q., Jiang, J., Zhang, C. (2022, June). Fedproto: Federated prototype learning across heterogeneous clients. In Proceedings of the AAAI conference on artificial intelligence (Vol. 36, No. 8, pp. 8432-8440).
+    
+    \bibitem{cho2023fedlora}
+    Y. Cho, A. Manoel, and G. Joshi, ``Federated low-rank adaptation of large language models,'' arXiv preprint arXiv:2310.03452, 2023.
+    
+    \bibitem{kolda2009tensor}
+    Kolda, T. G., Bader, B. W. (2009). Tensor decompositions and applications. SIAM review, 51(3), 455-500.
+    
+    \bibitem{han2026tdpfed}
+    Y. Han, M. Cui, G. Luo, Q. Wang, J. Zhang and S. Bu, "A Tensor Decomposition Personalized Federated Learning Method for Distribution System State Estimation Considering Dynamic Impacts of Transmission Network," in IEEE Transactions on Smart Grid, vol. 17, no. 3, pp. 2555-2569, May 2026, doi: 10.1109/TSG.2026.3650953.
+    
+    \bibitem{zhang2026multi}
+    Chaojun Zhang, Jing Yang, Yuan Gao, Xiangli Yang, Shaojun Zou, Jieming Yang, Multi-site brain disease identification based on tensor decomposition and personalized federated learning, Neural Networks, https://doi.org/10.1016/j.neunet.2025.107987.
+    
+    \bibitem{wang2025knowledge}
+    Wang, Y., Mu, J., Yao, Z., Wang, J., Ouyang, W., Zhou, Q., ... Chen, H. H. (2025). Knowledge Distillation and Tensor Decomposition Based Privacy-Preserving Federated Learning for Industrial IoT Radar Sensing Systems. IEEE Internet of Things Journal.
+    
+    \bibitem{gower1975procrustes}
+    Gower, J. C. (1975). Generalized procrustes analysis. Psychometrika, 40(1), 33-51.
+    
+    \bibitem{zhang2022fedlc}
+    Zhang, J., Li, Z., Li, B., Xu, J., Wu, S., Ding, S., Wu, C. (2022, June). Federated learning with label distribution skew via logits calibration. In International Conference on Machine Learning (pp. 26311-26329). PMLR.
+    
+    \bibitem{oh2022fedbabu}
+    Oh, J., Kim, S., Yun, S. Y. (2021). Fedbabu: Towards enhanced representation for federated image classification. arXiv preprint arXiv:2106.06042.
+    
+    \bibitem{yan2024fedrola}
+    Yan, G., Wang, H., Yuan, X., Li, J. (2024, August). FedRoLA: Robust federated learning against model poisoning via layer-based aggregation. In Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (pp. 3667-3678).
+    
+    
+    % \bibitem{ying2024communication}
+    % Ying, Zhuansun et al. ``Communication-Efficient Federated Learning with Adaptive Compression under Dynamic Bandwidth.” ArXiv abs/2405.03248 (2024): n. pag.
+    
+    % \bibitem{ghosh2024tackling}
+    % S. Ghosh, A. Kushwaha and D. Singh, "Tackling Data Heterogeneity in Federated Learning through Global Density Estimation," 2024 IEEE International Conference on Big Data (BigData), Washington, DC, USA, 2024, pp. 7764-7773, doi: 10.1109/BigData62323.2024.10825347.
+    
+    % \bibitem{oh2022communication}
+    % Y. Oh, N. Lee, Y. -S. Jeon and H. V. Poor, ``Communication-Efficient Federated Learning via Quantized Compressed Sensing," in IEEE Transactions on Wireless Communications, vol. 22, no. 2, pp. 1087-1100, Feb. 2023, doi: 10.1109/TWC.2022.3201207.
+    
+    % \bibitem{fang2025efficient}
+    % X. Fang, L. Chen, H. Yin, X. Chen and W. Wang, "Communication Efficient Federated Learning With Quantization-Aware Training Design," in IEEE Transactions on Machine Learning in Communications and Networking, vol. 4, pp. 45-59, 2026, doi: 10.1109/TMLCN.2025.3635050.
+    
+    % \bibitem{wang2025svdllm}
+    % Wang, X., Zheng, Y., Wan, Z., Zhang, M. (2025, May). Svd-llm: Truncation-aware singular value decomposition for large language model compression. In International Conference on Learning Representations (Vol. 2025, pp. 19299-19319).
+    
+    % \bibitem{yuan2023asvd}
+    % Yuan, Z., Shang, Y., Song, Y., Yang, D., Wu, Q., Yan, Y., Sun, G. (2023). Asvd: Activation-aware singular value decomposition for compressing large language models. arXiv preprint arXiv:2312.05821.
+    
+    
+    % \bibitem{han2024random}
+    % Han, Y., Li, X., Lin, S., Zhang, Z. (2024). A random projection approach to personalized federated learning: enhancing communication efficiency, robustness, and fairness. Journal of Machine Learning Research, 25(380), 1-88.
+    
+    
+    % \bibitem{hsu2019measuring}
+    % Hsu, T. M. H., Qi, H., Brown, M. (2019). Measuring the effects of non-identical data distribution for federated visual classification. arXiv preprint arXiv:1909.06335.
+    
+    % \bibitem{selvaraju2017grad}
+    % Selvaraju, R. R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., Batra, D. (2020). Grad-CAM: visual explanations from deep networks via gradient-based localization. International journal of computer vision, 128(2), 336-359.
+    
+    % \bibitem{qu2025fedqclip}
+    % Z. Qu, N. Jia, B. Ye, S. Hu and S. Guo, "FedQClip: Accelerating Federated Learning via Quantized Clipped SGD," in IEEE Transactions on Computers, vol. 74, no. 2, pp. 717-730, Feb. 2025, doi: 10.1109/TC.2024.3477972.
+    
+    % \bibitem{lyu2024low}
+    % G. -H. Lyu, B. A. Saputra, S. Rini, C. -H. Sun and S. -C. Lin, "Low-Rate Universal Vector Quantization for Federated Learning," 2024 IEEE International Conference on Communications Workshops (ICC Workshops), Denver, CO, USA, 2024, pp. 1407-1412, doi: 10.1109/ICCWorkshops59551.2024.10615475.
+    
+    
+    % \bibitem{konecny2016federated}
+    % Konečný, J., McMahan, H. B., Yu, F. X., Richtárik, P., Suresh, A. T., Bacon, D. (2016). Federated learning: Strategies for improving communication efficiency. arXiv preprint arXiv:1610.05492.
+    
+    
+\end{thebibliography}
+
+\end{document}
+
+\endinput

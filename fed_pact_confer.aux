@@ -1,0 +1,98 @@
+\relax 
+\citation{mcmahan2017fedavg}
+\citation{karimireddy2020scaffold}
+\citation{mcmahan2017fedavg}
+\citation{li2020fedprox}
+\citation{alistarh2017qsgd,mao2022adaptivequant}
+\citation{chen2024mixedprecision}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
+\citation{tan2022pfl}
+\citation{collins2021fedrep}
+\citation{tan2022fedproto}
+\citation{cho2023fedlora}
+\citation{kolda2009tensor}
+\citation{zhang2026multi,wang2025knowledge,han2026tdpfed}
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Communication-Efficient Federated Learning}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Personalized Federated Learning}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Tensor Decomposition in FL}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}Problem Formulation}{2}{}\protected@file@percent }
+\newlabel{eq:problem}{{2}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Structural Issues in Edge Tensor Updates}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Method}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Personalized Synchronization and Payload Construction}{2}{}\protected@file@percent }
+\citation{gower1975procrustes}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Covariance-Weighted Tucker Compression}{3}{}\protected@file@percent }
+\newlabel{eq:actdist}{{10}{3}}
+\newlabel{eq:ema}{{12}{3}}
+\newlabel{eq:ridge}{{13}{3}}
+\newlabel{eq:weightedtensor}{{14}{3}}
+\newlabel{eq:tucker}{{15}{3}}
+\newlabel{eq:rank}{{16}{3}}
+\newlabel{eq:rankfloor}{{17}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}INT8 Quantization and Lazy Decomposition}{3}{}\protected@file@percent }
+\newlabel{eq:int8}{{18}{3}}
+\newlabel{eq:lazy}{{19}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-D}}Procrustes Alignment for Rank-Irregular Factors}{3}{}\protected@file@percent }
+\newlabel{eq:procrustes}{{21}{3}}
+\newlabel{eq:rotation}{{23}{3}}
+\newlabel{eq:align}{{25}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-E}}Masked Aggregation in a Unified Hyperspace}{4}{}\protected@file@percent }
+\newlabel{eq:maskfactor}{{27}{4}}
+\newlabel{eq:coreagg}{{28}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-F}}Dequantization and Server Momentum Update}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Theoretical and System Analysis}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Activation-Space Preservation}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Necessity of Procrustes Alignment}{4}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Fed-PACT Training and Aggregation Procedure}}{5}{}\protected@file@percent }
+\newlabel{tab:algorithm}{{I}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Masked Aggregation and Rank Validity}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Stability Under Rank-Irregular Aggregation}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Communication and Computation Complexity}{5}{}\protected@file@percent }
+\citation{mcmahan2017fedavg}
+\citation{zhang2022fedlc}
+\citation{oh2022fedbabu}
+\citation{cho2023fedlora}
+\citation{tan2022fedproto}
+\citation{yan2024fedrola}
+\newlabel{eq:multilayer_payload}{{44}{6}}
+\newlabel{eq:layer_budget}{{45}{6}}
+\newlabel{eq:lazy_multilayer_payload}{{46}{6}}
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Single-Round Compression and Reconstruction Accuracy}}{6}{}\protected@file@percent }
+\newlabel{tab:single}{{II}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Experiments and Results}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Experimental Setup}{6}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Single-Round Tensor Compression}{6}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Single-round accuracy and communication payload under different Tucker energy thresholds.}}{7}{}\protected@file@percent }
+\newlabel{fig:tradeoff}{{1}{7}}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Forty-Round Personalized FL Performance}}{7}{}\protected@file@percent }
+\newlabel{tab:main}{{III}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Personalized Federated Performance}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Effect of Lazy Tensor Updates}{7}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Accuracy and cumulative payload evolution during 40-round personalized federated learning.}}{7}{}\protected@file@percent }
+\newlabel{fig:evolution}{{2}{7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Grad-CAM comparison among compressed personalized FL methods.}}{7}{}\protected@file@percent }
+\newlabel{fig:gradcam}{{3}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Visual Interpretation}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-F}}Discussion and Limitations}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{7}{}\protected@file@percent }
+\bibcite{mcmahan2017fedavg}{1}
+\bibcite{karimireddy2020scaffold}{2}
+\bibcite{li2020fedprox}{3}
+\bibcite{alistarh2017qsgd}{4}
+\bibcite{mao2022adaptivequant}{5}
+\bibcite{chen2024mixedprecision}{6}
+\bibcite{tan2022pfl}{7}
+\bibcite{collins2021fedrep}{8}
+\bibcite{tan2022fedproto}{9}
+\bibcite{cho2023fedlora}{10}
+\bibcite{kolda2009tensor}{11}
+\bibcite{han2026tdpfed}{12}
+\bibcite{zhang2026multi}{13}
+\bibcite{wang2025knowledge}{14}
+\bibcite{gower1975procrustes}{15}
+\bibcite{zhang2022fedlc}{16}
+\bibcite{oh2022fedbabu}{17}
+\bibcite{yan2024fedrola}{18}
+\@writefile{toc}{\contentsline {section}{References}{8}{}\protected@file@percent }
+\gdef \@abspage@last{8}
