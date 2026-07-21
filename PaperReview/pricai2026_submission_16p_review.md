@@ -81,3 +81,29 @@ Kalman trust、Beta/EMA reputation、reference similarity、clipping 和 re-norm
 ## Likely decision posture
 
 按 PRICAI 2026 long-paper 标准，当前倾向 **弱拒稿至边缘接收**。实验规模和组合创新基本达到会议范围，不需要以缺少完整工业 TEE 或多数据集直接否决；但 threat model、ASR 和 FPR 三处影响主结论的自洽性，仍需在录用前解释或修正。如果攻击路径本来就有明确实现、作者能按统一指标重排现有结果并补 1--2 个强基线，判断可以上调到弱接收。该判断不代表程序委员会最终决定。
+
+## Final PRICAI / EasyChair Review
+
+### Overall evaluation
+
+borderline paper
+
+### Reviewer confidence
+
+medium
+
+### Review text for authors
+
+This paper proposes TTFL, a trusted-flow framework for defending federated learning against mixed poisoning and backdoor attacks under Non-IID data. The topic is relevant to PRICAI, and the paper addresses a real problem: distinguishing benign Non-IID drift from malicious client behavior. The idea of combining admission, runtime monitoring, long-term utility, short-term risk, and layer-wise gated aggregation is coherent. The paper also includes several useful experiments, including mixed attacks, Non-IID sweeps, component ablations, and comparisons with FedAvg, Krum, Trimmed Mean, and FLTrust.
+
+My recommendation is borderline because the system idea is potentially useful, but several self-consistency issues currently prevent me from trusting the main conclusions. The first issue concerns the TEE framing. The title and method description discuss device keys, PCR chains, quotes, and runtime instruction distribution, but the experiments appear to be centralized Flower/PyTorch simulations without a real SGX/TrustZone implementation, quote verification, or enclave overhead measurement. For PRICAI, a full industrial TEE deployment is not mandatory, but the paper should clearly present the system as TEE-style or simulated attestation unless a minimal real proof-of-concept is provided.
+
+The second, more serious issue is the threat model. If the enclave fixes training code and signs client outputs, it is unclear how an admitted client can execute sign flipping or 100x gradient scaling. If these attacks happen outside the enclave, the server must explain why it accepts updates that are no longer protected by the attestation path. Data and label poisoning remain plausible under TEE, but output manipulation requires a different route. The paper should provide an attack-by-attack table specifying whether the adversary controls data, code, or post-enclave communication, and the experiments should be aligned with that model.
+
+The metrics also need revision. A single ASR value mixes attacks with different semantics. Trigger, clean-label, and semantic backdoor attacks can use targeted ASR, but sign flipping, gradient scaling, and generic label flipping should be evaluated with clean accuracy, loss/convergence degradation, and detection time. Similarly, the permanent FPR used for TTFL is not comparable to baseline false rejection or selection behavior, especially because TTFL also has SUSPECT, QUARANTINE, and review-trigger states. The paper should report common metrics such as per-round benign rejection, participation loss, quarantine duration, and recovery rate.
+
+Finally, the baseline set is somewhat dated for backdoor defense, and the clean reference pool is under-described. Adding one or two relevant defenses such as FLAME/DeepSight or a temporal detector, clarifying the 5,000-image pool, and providing a full algorithm and hyperparameter table would make the contribution much clearer. The paper is promising, but it needs these clarifications before its claims about trusted federated defense can be accepted.
+
+### Confidential remarks for the PC
+
+I did not see this submission in the current EasyChair assigned-review list for this account, but this text follows the same PRICAI/EasyChair review format. If it is considered in the same batch, I would treat it as borderline: the idea fits PRICAI, but acceptance should depend on resolving the threat-model, ASR, and FPR inconsistencies.

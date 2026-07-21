@@ -76,3 +76,29 @@
 ## Likely decision posture
 
 按 PRICAI 2026 long-paper 标准，当前仍倾向 **拒稿至弱拒稿**。原因不是模块组合不够新，也不是缺少顶会规模实验，而是 PD 时间切分和 SPR 标签/测试边界没有定义，直接影响全部主结果。若作者能证明当前实验已经 borrower-disjoint、out-of-time，且 adaptation 与 test 完全分离，则论文可上调到边缘接收区间。该判断不代表程序委员会最终决定。
+
+## Final PRICAI / EasyChair Review
+
+### Overall evaluation
+
+reject
+
+### Reviewer confidence
+
+medium
+
+### Review text for authors
+
+This paper presents FinRiskNet, a multi-modal framework for probability-of-default prediction using static attributes, temporal records, transaction graph information, and text signals. The topic is relevant to PRICAI, and the paper addresses an important applied AI problem. I appreciate the attempt to combine predictive performance, attribution, calibration-like regularization, and adaptation to distribution shift. The use of a large proprietary dataset, public reference datasets, multiple runs, component ablations, and a subsequent-quarter experiment are also useful elements.
+
+The main reason I cannot recommend acceptance is that the temporal and entity-level evaluation protocol is not sufficiently specified. For credit default prediction, the split must be borrower-disjoint and out-of-time, with clear observation windows, performance windows, and label maturation periods. The paper reports a 60/20/20 split, but it is not clear whether records from the same borrower can appear across train, validation, and test, or whether future information can influence past predictions. Without this information, the main performance results may reflect record-level leakage rather than generalization to future borrowers or future economic conditions.
+
+The SPR adaptation component is also under-specified. The method fine-tunes on recent data, but 12-month default labels are only available after the performance window. The paper does not clearly separate drift detection, adaptation, and evaluation data. If the same subsequent period is used both for adaptation and for testing, the improvement would not be a valid test-time adaptation result. The paper should include a timeline showing which data are available at each stage and whether SPR is supervised periodic recalibration or truly label-free adaptation.
+
+There are additional reproducibility and fairness issues. The proprietary multi-modal dataset is not described in enough detail: the number of distinct borrowers, records per borrower, graph construction, text source, missingness, timestamps, and privacy handling are needed for reviewers to assess the risk of leakage. It is also unclear whether all baselines receive the same modalities. If FinRiskNet has access to graph and text features while XGBoost or FT-Transformer only receive tabular inputs, the comparison does not isolate the model contribution. The dynamic focal loss, macroeconomic prior, and SPR hyperparameters also need complete formulas and default values.
+
+For a PRICAI long paper, the idea could be appropriate, but the current evidence does not establish the central claims. I recommend rejection unless the authors can provide a borrower-disjoint out-of-time protocol, separate adaptation from test data, add a same-modality fusion baseline, report a direct calibration metric such as Brier score or ECE if calibration is claimed, and substantially improve the data card and reproducibility details.
+
+### Confidential remarks for the PC
+
+The paper is topical and potentially useful, but the current uncertainty around time/entity leakage is fundamental. If the authors can prove that the current experiments are already borrower-disjoint and out-of-time, and that SPR does not use test labels, the paper would become much more competitive.

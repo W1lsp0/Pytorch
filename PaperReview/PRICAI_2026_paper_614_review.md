@@ -76,3 +76,29 @@ InfoNCE、cross-correlation penalty 和 uncertainty-inspired gate 都不是新�
 ## Likely decision posture
 
 按 PRICAI 2026 long-paper 标准，当前倾向 **边缘接收至弱接收**。论文的增量创新、三数据集结果和消融覆盖基本匹配会议；主要问题集中在术语过度解释、统计波动和比较协议，而非核心实验无效。若作者在 camera-ready/rebuttal 中收窄 uncertainty/independence/interpretability 主张并补最小统计证据，接收判断较合理。该判断不代表程序委员会最终决定。
+
+## Final PRICAI / EasyChair Review
+
+### Overall evaluation
+
+weak accept
+
+### Reviewer confidence
+
+medium
+
+### Review text for authors
+
+This paper proposes DUKAN, an extension of KAN-MCP for multimodal sentiment analysis that combines shared/specific subspace regularization with a lightweight modality gate based on VIB posterior scale. The paper is relevant to PRICAI, and I found the submission comparatively complete. It evaluates on MOSI, MOSEI, and CH-SIMS v2, compares against several prior methods and KAN-MCP, and includes component ablations, gate variants, hyperparameter analysis, feature-dropout robustness, efficiency measurements, and representation visualizations. The writing is generally clear, and the method is easy to follow.
+
+My overall recommendation is weak accept, mainly because the paper offers a coherent incremental contribution with a reasonably broad empirical evaluation. That said, several claims should be narrowed or better supported. The most important issue is the interpretation of posterior standard deviation as aleatoric uncertainty. In a VIB-style latent posterior, the scale is learned through task loss, KL regularization, and reparameterization; it does not automatically correspond to input noise or irreducible modality uncertainty. The stop-gradient design prevents a particular feedback path but does not make the scale a pure uncertainty estimate. I recommend renaming it as a posterior-dispersion or reliability proxy and adding a direct check against unimodal error or corruption strength.
+
+Relatedly, the strong negative correlation between gate weights and uncertainty in Fig. 2 is partly implied by the formula `g = softmax(-u/T)`, so it should not be presented as independent evidence that the uncertainty estimate is valid. The feature-dropout experiment is useful, but it would be more convincing to report how dispersion and gate weights change before and after corruption, and to compare relative performance drops against the clean setting.
+
+The empirical comparison also needs some clarification. The SOTA tables appear to mix values reproduced by the authors with values reported in prior papers, possibly under different features or protocols. PRICAI does not require rerunning every historical baseline, but the paper should clearly mark which results are reproduced and should at least report mean+/-std for DUKAN, KAN-MCP, and the strongest nearest baseline. Some gains, especially on MOSI, may be within run-to-run variation without this information.
+
+Finally, the paper should avoid overstating independence and interpretability. Zero cross-correlation supports decorrelation, not statistical independence, and the current figures do not actually show KAN edge-function interpretability. These are fixable presentation and evidence issues rather than fatal flaws. With more conservative wording, minimal statistical evidence, and clearer comparison notes, the paper would make a solid PRICAI contribution.
+
+### Confidential remarks for the PC
+
+I lean weak accept because the empirical package is substantially stronger than the other assigned papers, and the main issues are over-interpretation and reporting clarity rather than invalid core experiments. Acceptance would be more comfortable if the authors can provide variance for the main comparisons and soften the uncertainty/independence/interpretability claims.

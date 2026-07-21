@@ -74,3 +74,29 @@
 ## Likely decision posture
 
 按 PRICAI 2026 long-paper 标准，当前倾向 **弱拒稿**，而不是明确拒稿。稿件的透明边界意识和应用价值值得肯定，但主任务 leakage、uniform control 几乎复现排名、缺少独立 test，使 16 页 long paper 的核心证据不足。若改投 short paper，或补上无泄漏设置、简单基线和匿名修复，接收可能性会明显提高。该判断不代表程序委员会最终决定。
+
+## Final PRICAI / EasyChair Review
+
+### Overall evaluation
+
+weak reject
+
+### Reviewer confidence
+
+medium
+
+### Review text for authors
+
+This paper studies the use of Transformer attention to quantify player involvement in football event sequences. The topic is within the PRICAI application scope, and the paper has several strengths. The problem is clearly motivated, the authors are unusually transparent about the limitations of attention-based explanations, and the analysis includes seed variation, entropy, ranking stability, a uniform-attention control, and qualitative examples. The paper is readable and could be valuable as an exploratory study of how sequence models behave in sports analytics.
+
+My main concern is that the current evidence is not yet strong enough for a 16-page long paper. The prediction target is provider xG for a shot possession, but the final shot token appears to contain information such as shot location/type/outcome that may largely determine the provider xG. The authors acknowledge this target-feature leakage, which is good practice, but the main experiment still evaluates a task that is closer to reconstructing an existing xG model than measuring the value of preceding buildup events. A `preceding events only` setting should be added and treated as a main or at least parallel experiment.
+
+A second major issue is that attention mass is interpreted too strongly as player contribution. The proposed score is always non-negative, sums over event attention, increases with event involvement, and may include the final shooter. This makes it closer to an attention-based involvement or reliance score than a marginal contribution measure. This concern is reinforced by the uniform attention control: a Spearman correlation of 0.9970 between uniform and learned attention rankings suggests that the ranking may be driven mostly by participation counts, sequence length, and xG weighting rather than learned attention. The authors should compare learned attention directly with count/uniform baselines and report the incremental value after controlling for involvement.
+
+The paper also lacks a clean final test protocol and simple prediction baselines. Validation is used for early stopping and then for final MSE/ranking/case analysis, which can introduce selection bias. A held-out match-level test split and at least one simple baseline such as a mean predictor, aggregated-feature linear/GBDT model, or GRU would substantially improve the validity of the claims. External validity currently relies on selected successful examples; a correlation over all players above a participation threshold would be more convincing.
+
+Finally, the acknowledgements reveal institutional/team information, which appears to violate double-blind review. This should be fixed immediately. Overall, I weakly recommend rejection in the current form, but I see a plausible path to acceptance as a shorter paper or as a revised long paper with an anonymous version, a leakage-free task, simple baselines, and more conservative terminology around contribution.
+
+### Confidential remarks for the PC
+
+Please note the apparent double-blind violation in the acknowledgements. The scientific weaknesses are mostly fixable, and the paper is more borderline than a clear reject if the anonymity issue is handled and the authors can add a leakage-free experiment.

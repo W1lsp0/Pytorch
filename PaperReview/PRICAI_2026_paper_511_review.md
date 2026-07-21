@@ -74,3 +74,29 @@ ROI-gated tokenization 与交替 CNN-ViT cross-attention 的组合具有中等�
 ## Likely decision posture
 
 按 PRICAI 2026 long-paper 标准，当前倾向 **弱拒稿至拒稿**。方法与实验规模本身基本匹配会议，决定性问题是患者级泄漏风险和临床样本复用，而不是缺少顶会级实验。若划分本来就是患者互斥且作者能提供证据、并删除无效的临床全集评估，则判断可明显上调。该判断不代表程序委员会最终决定。
+
+## Final PRICAI / EasyChair Review
+
+### Overall evaluation
+
+reject
+
+### Reviewer confidence
+
+medium
+
+### Review text for authors
+
+This paper proposes IIEViT-ROI, an ROI-guided CNN-Transformer architecture for multi-class chest X-ray disease classification. The application is relevant to PRICAI, and the paper has several positive aspects: the motivation for low-resource medical screening is clear, the architecture combines ROI gating with multi-scale CNN and Transformer features in a coherent way, and the paper reports experiments on several public datasets plus a small local clinical subset. The efficiency measurements and ablation table also make the intended contribution easy to understand.
+
+However, I cannot recommend acceptance in the current form because the main empirical evidence is not sufficiently reliable. The most serious issue is the evaluation protocol. The public datasets appear to use an 80/20 train-validation split, with the validation set also used for early stopping and final reporting. There is no clearly held-out test set, no patient-level split, and no evidence that duplicate or near-duplicate images across the merged sources were removed. In medical imaging, image-level random splitting and cross-dataset duplication can substantially inflate performance, so the reported accuracy improvements cannot yet be interpreted as robust generalization.
+
+A second serious concern is the local clinical evaluation. The paper appears to fine-tune on the local clinical subset and then report performance on all 110 clinical images. If fine-tuning samples are included in the reported test set, this result cannot be used as evidence of external clinical adaptability. The authors should report only held-out clinical samples, or use a clearly separated cross-validation protocol that keeps model selection and final evaluation distinct.
+
+Several claims are also stronger than the evidence supports. The chi-square and Fisher tests do not compare this model against X-Vision on paired predictions; a paired test such as McNemar or a bootstrap confidence interval would be more appropriate. The ROI and interpretability claims also need stronger support: the U-Net segmentation quality is not reported, and the attention visualizations remain qualitative. If these experiments cannot be added, the claims should be narrowed to ROI-guided visualization rather than clinically meaningful explanation.
+
+To make the paper competitive for PRICAI, I recommend that the authors rebuild the evaluation around a patient-level, deduplicated, independent test protocol; remove the invalid clinical full-set metric; add at least one strong reproducible CNN/ViT baseline under the same split; report run-to-run variance; and provide ethical approval or exemption information for the institutional clinical data. The method may be promising, but the current evidence has too high a leakage and reuse risk for acceptance.
+
+### Confidential remarks for the PC
+
+The rejection is mainly due to evaluation validity, not lack of topic relevance. If the authors can show that the existing split is already patient-disjoint and that the clinical fine-tuning/test sets are separated, the score could be reconsidered upward. The missing IRB/exemption information should also be checked.
