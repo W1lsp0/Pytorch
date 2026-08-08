@@ -118,8 +118,10 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'Client'))
 try:
     from model import get_resnet18
-except ImportError:
-    pass
+except ImportError as e:
+    raise ImportError(
+        f"无法导入 get_resnet18: {e}。请确保 Client/model.py 位于正确路径。"
+    ) from e
 
 # 借用 Client 端一模一样的 ResNet-18 结构以匹配 [64,3,3,3] 的 conv1_weight
 base_net = get_resnet18()

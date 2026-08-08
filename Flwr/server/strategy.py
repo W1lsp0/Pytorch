@@ -42,7 +42,9 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'Client'))
 try:
     from model import get_resnet18
 except ImportError:
-    pass
+    get_resnet18 = None
+    import logging
+    logging.getLogger("Strategy").warning("无法导入 get_resnet18，服务端模型初始化将依赖客户端上报")
 
 
 class TMAA_FedAvg(fl.server.strategy.FedAvg):

@@ -48,8 +48,8 @@ class SystemMonitor:
             from poison.db_manager import DBManager
             try:
                 self.db_manager = DBManager()
-            except:
-                print("⚠️ [Monitor] DB Connection failed, fallback to real monitor")
+            except Exception as e:
+                print(f"⚠️ [Monitor] DB Connection failed ({e}), fallback to real monitor")
                 self.use_simulation = False
 
         self.metrics_history = {
@@ -160,7 +160,7 @@ class SystemMonitor:
             return 0.0
         try:
             return statistics.variance(data)
-        except:
+        except (statistics.StatisticsError, ValueError):
             return 0.0
 
     def calculate_volatility(self) -> float:
