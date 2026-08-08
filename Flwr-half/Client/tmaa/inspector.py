@@ -157,7 +157,7 @@ def calc_uniqueness(images: torch.Tensor) -> float:
     3. 唯一性比例 (Uniqueness Ratio) —— 检测懒惰复制
     
     检测是否存在大量完全重复的图片 (简单的复制粘贴)。
-    使用 MD5 哈希进行快速比对。
+    使用 SHA-256 哈希进行快速比对。
     
     Args:
         images: 图像 Tensor
@@ -171,7 +171,7 @@ def calc_uniqueness(images: torch.Tensor) -> float:
     for img in images:
         # 将 tensor 转为 bytes 进行哈希
         img_bytes = img.cpu().numpy().tobytes()
-        img_hash = hashlib.md5(img_bytes).hexdigest()
+        img_hash = hashlib.sha256(img_bytes).hexdigest()
         hashes.append(img_hash)
         
     if not hashes:

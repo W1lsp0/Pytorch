@@ -54,6 +54,7 @@ echo "   - 日志目录: ./log/"
 echo "-------------------------------------------"
 echo "🚮 正在清空 tmaa_server 历史数据库..."
 if ! "$PYTHON_BIN" - <<'PY'
+import os
 import sys
 
 try:
@@ -64,10 +65,10 @@ except Exception as exc:
 
 try:
     cnx = mysql.connector.connect(
-        host="202.113.76.179",
-        port=3306,
-        user="root",
-        password="root123456",
+        host=os.environ.get('MYSQL_HOST', '127.0.0.1'),
+        port=int(os.environ.get('MYSQL_PORT', '3306')),
+        user=os.environ.get('MYSQL_USER', 'root'),
+        password=os.environ.get('MYSQL_PASSWORD', ''),
     )
     cursor = cnx.cursor()
     cursor.execute("DROP DATABASE IF EXISTS tmaa_server;")

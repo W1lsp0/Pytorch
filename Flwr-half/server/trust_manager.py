@@ -17,6 +17,7 @@
 ==============================================================================
 """
 import math
+import os
 import numpy as np
 import mysql.connector
 from typing import Dict, Tuple, Optional
@@ -45,11 +46,11 @@ class TrustScoreManager:
 
         # ---- 历史信誉持久化存储 (MySQL) ----
         self.db_config = {
-            'host': "202.113.76.179",
-            'port': 3306,
-            'user': "root",
-            'password': "root123456",
-            'database': "tmaa_server",
+            'host': os.environ.get('MYSQL_HOST', '127.0.0.1'),
+            'port': int(os.environ.get('MYSQL_PORT', '3306')),
+            'user': os.environ.get('MYSQL_USER', 'root'),
+            'password': os.environ.get('MYSQL_PASSWORD', ''),
+            'database': os.environ.get('MYSQL_DATABASE', 'tmaa_server'),
             'raise_on_warnings': False
         }
         # 结构: { client_id: {"ema_score": float, "risk_ema": float, "rounds": int} }
@@ -245,7 +246,7 @@ class TrustScoreManager:
             del init_cfg['database']
             cnx = mysql.connector.connect(**init_cfg)
             cursor = cnx.cursor()
-            cursor.execute(f"CREATE DATABASE IF NOT EXISTS {self.db_config['database']}")
+            cursor.execute("CREATE DATABASE IF NOT EXISTS `%s`" % self.db_config['database'].replace('`', '``'))
             cursor.close()
             cnx.close()
             
