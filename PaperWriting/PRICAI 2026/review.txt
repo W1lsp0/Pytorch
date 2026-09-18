@@ -1,0 +1,107 @@
+Dear Jiakai Zhou,
+
+Thank you for submitting your paper 46:
+
+TTFL: Trust-Flow-Driven Trusted Federated Learning for Edge Computing
+
+to the 23rd Pacific Rim International Conference on Artificial Intelligence (PRICAI 2026), to be held in Guangzhou, China.
+
+This year, we received a record number of 1,825 valid submissions. Among them, 542 were accepted as regular papers and 230 as short papers. We tried our best to ensure each paper go through a rigorous review process. As a result, 99.7% papers received at least 3 reviews, and most of them received 4 or more. Thanks to all the reviewers. Additional discussions among the chairs were conducted to resolve disagreements or complement insufficient reviews, ensuring the decisions are made based on reasonable evaluations.
+
+Given the limited number of slots, we regret to inform you that your paper was not accepted for publication in the PRICAI 2026 proceedings.
+
+That said, we would like to suggest an alternative. Many PRICAI 2026 workshops are currently open for submissions. You are welcome to consider resubmitting your paper to a suitable workshop — it would be a good opportunity to share your work with the community, receive feedback, and refine it further. You can find the workshop list here:
+
+https://2026.pricai.org/program/workshops
+
+If you decide to participate in PRICAI 2026 or its workshops, registration details will be posted on the official website.
+
+Thank you again for your contribution to PRICAI 2026. We hope to see you at the conference!
+
+Sincerely,
+
+Yuncheng Jiang, South China Normal University (China)
+Aswani Kumar Cherukuri, Vellore Institute of Technology (India)
+Patricia Anthony, Lincoln University (New Zealand)
+
+PRICAI 2026 Program Co-Chairs
+
+SUBMISSION: 46
+TITLE: TTFL: Trust-Flow-Driven Trusted Federated Learning for Edge Computing
+
+----------------------- REVIEW 1 ---------------------
+
+SUBMISSION: 46
+TITLE: TTFL: Trust-Flow-Driven Trusted Federated Learning for Edge Computing
+
+----------- Overall evaluation -----------
+SCORE: 0 (borderline paper)
+----- TEXT:
+This paper addresses an important and practical problem in federated learning security: how to simultaneously defend against malicious clients and avoid misclassifying long-tail benign clients under strong Non-IID conditions. The proposed Trust-Flow framework transforms the single-round filtering problem into a state management problem through TEE-based admission control, content auditing, dual-stream states of long-term contribution and short-term risk, and risk-gated hierarchical aggregation. This design has certain practical engineering value, and the experimental results also demonstrate a good accuracy/ASR trade-off.
+However, the novelty of the proposed method is not sufficiently prominent, as multiple components are relatively close to existing robust FL and reputation-based FL defenses. The assumptions of TEE and clean reference are strong but insufficiently discussed. Meanwhile, the paper does not discuss the defense effectiveness during the system cold-start phase, and the detection capability of malicious nodes in the first round is not explained. It is recommended that the authors further verify the tolerance of the proposed method to data shifts within the same distribution family. If the authors can strengthen the distinction from existing methods and supplement more comprehensive experiments and threat model analysis, this work will be more convincing.
+The authors need to pay attention to removing project information during the blind review period and respect the blind review principles.
+In Figures 1-5 used by the authors, the text in the figures is too small and dense, affecting the reading experience.
+
+
+----------------------- REVIEW 2 ---------------------
+
+SUBMISSION: 46
+TITLE: TTFL: Trust-Flow-Driven Trusted Federated Learning for Edge Computing
+
+----------- Overall evaluation -----------
+SCORE: -1 (weak reject)
+----- TEXT:
+This paper proposes TTFL, a trust-flow-driven federated learning framework that integrates TEE-based client admission, runtime trust assessment, dual-stream reputation modelling, and risk-aware layer-wise aggregation. The paper addresses an important problem: distinguishing malicious model updates from legitimate deviations caused by strongly Non-IID client data. However, the current version has several substantial limitations.
+
+First, the motivation of the proposed framework is not sufficiently focused. The paper simultaneously considers untrusted execution, model poisoning, Non-IID client drift, temporal reputation, and layer-wise attack sensitivity, but it does not clearly establish why these issues must be addressed within one unified framework.
+
+Second, the experimental baselines are substantially outdated and insufficiently aligned with the claimed contributions. The main comparison only includes FedAvg, Krum, Trimmed Mean, and FLTrust, most of which were proposed between 2017 and 2021 and primarily address generic Byzantine aggregation rather than temporal reputation modelling, mixed backdoor attacks, or TEE-assisted trusted federated learning.
+
+
+----------------------- REVIEW 3 ---------------------
+
+SUBMISSION: 46
+TITLE: TTFL: Trust-Flow-Driven Trusted Federated Learning for Edge Computing
+
+----------- Overall evaluation -----------
+SCORE: -1 (weak reject)
+----- TEXT:
+TTFL combines attestation-based admission, two reputation streams, server-side risk probes, and layer-wise filtering for federated learning with Non-IID clients. The main experiment uses 20 CIFAR-10 clients, six of them malicious, and reports 92.31% clean accuracy, 10.21% attack success rate (ASR), and no permanent false bans. Separating long-term contribution history from short-term attack evidence is a sensible design choice, and the paper does attempt to test mixed attacks, data heterogeneity, component removal, and server overhead.
+
+    The reported results cannot be assessed reliably from the current manuscript for the following reasons.
+
+    1. The aggregation rule is not fully defined. Equation (2) omits the observation model, Kalman gain, covariance update, noise terms, and initialization. The Beta-reputation parameters are never given explicit update equations, and the manuscript switches between \(\lambda_h\) and \(\beta_h\). The layer score \(S_{\mathrm{total}}^{(l)}\) is described in prose but its terms, ranges, and weights are absent. The thresholds and transitions for NORMAL, SUSPECT, QUARANTINE, and BLACKLIST are also unspecified. These omissions affect the actual client weights and exclusion decisions, so the method cannot be reproduced from the paper. There is also a timing conflict: Equation (6) uses the previous round's RiskEMA although the text says a current spike blocks the current update. Equation (7) then drops the data-size weights introduced in Equation (1), leaving the relation to the stated global objective unclear.
+
+    2. The TEE assumption is inconsistent with the simulated attacks. The experiments run in Flower/PyTorch on a GPU server; no SGX, TrustZone, or other TEE is implemented. Quote verification, freshness, protected monitoring, update signing, trusted-code boundaries, enclave memory, and attestation latency are not measured. More importantly, if the attested code covers local training and update generation, an admitted client should not be able to sign-flip or multiply its gradient by 100 after training. If such manipulation remains possible under valid attestation, the paper must state which part of the update path lies outside the trusted boundary. Data poisoning is compatible with attested execution, but host compromise, post-training update tampering, and poisoned training data are currently treated as if they were the same threat.
+
+    3. The server probes rely on an unexplained clean-data advantage. The setup assigns a shared balanced pool of 5,000 CIFAR-10 samples while the remaining 50,000 images are distributed across clients. The paper does not say whether the shared pool is held by the server, included in client training data, or supplied to every client, nor whether the baselines receive the same data. The activation-histogram reference, evaluated layers, calibration of the KL score, and trigger assumptions are also missing. Since every candidate update is tested on this pool, these choices can materially reduce both the Non-IID difficulty and the backdoor difficulty.
+
+    4. The headline ASR is not a well-defined metric for the stated attack mixture. Six clients perform label flipping, sign flipping, gradient scaling, trigger backdoors, clean-label poisoning, and semantic backdoors. Some are targeted attacks and some are not, yet Table 2 reports one ASR. The target labels, trigger patterns, poisoning rates, clean-label budget, semantic construction, client schedule, and rule for combining attack outcomes are not specified. A single value of 10.21% therefore cannot be interpreted. The paper needs separate clean accuracy and attack-specific metrics for each attack, followed by a clearly defined simultaneous-attack test.
+
+    5. Table 2 uses baselines and metrics that are not comparable. Krum and Trimmed Mean are outlier/Byzantine aggregators, not adequate representatives of the backdoor defenses discussed in the related-work section. FoolsGold, FLDetector, DeepSight, FLAME, CrowdGuard, and RoseAgg are not evaluated. The “permanent-ban FPR” column is more serious: Krum and FLTrust do not implement TTFL's permanent-blacklist state machine, so their entries require a new definition that the paper never provides. Krum's FPR is 64.20, exactly equal to its reported accuracy, which looks like either a copied value or a mislabeled metric. The zero-FPR claim is not meaningful until the metric is defined consistently for every method.
+
+    6. Several experimental statements conflict with one another. The threat model assumes fewer than 50% malicious clients, but the additional experiment uses exactly 10 of 20 clients and is described as evidence near a theoretical boundary, although no relevant guarantee is proved. The setup specifies 30 training rounds, while Figure 7(b) extends to 50. The proposed method's standard deviations, 0.09 accuracy points and 0.05 ASR points, are unusually small relative to the baselines under strong Non-IID sampling, but individual runs and seed handling are not shown. These discrepancies are not cosmetic because they concern the claimed robustness limit and the stability of the main result.
+
+    The empirical scope is also too narrow for the “edge-deployable” claim: one dataset, one unspecified lightweight CNN, 20 clients, and no end-to-end attestation measurement. The reported increase from 2.10 s to 4.85 s covers server aggregation and auditing, not client attestation, enclave transitions, protected monitoring, communication, or memory. The term “secure aggregation” is particularly confusing because the server inspects every individual update and report.
+
+
+----------------------- REVIEW 4 ---------------------
+
+SUBMISSION: 46
+TITLE: TTFL: Trust-Flow-Driven Trusted Federated Learning for Edge Computing
+
+----------- Overall evaluation -----------
+SCORE: -1 (weak reject)
+----- TEXT:
+Summary:
+
+The paper proposes TTFL, a trusted federated learning framework for edge computing. It combines Trusted Execution Environment (TEE) admission with a dual-stream reputation model (historical utility vs. short-term risk) and risk-gated layer-wise aggregation to defend against mixed poisoning and backdoor attacks under Non-IID settings.
+
+Strengths:
+
+* The dual-stream reputation mechanism is a practical approach to decouple legitimate long-tail Non-IID data drift from short-term malicious attacks, effectively reducing permanent false-positive bans.
+
+Weaknesses:
+
+* Incremental algorithmic novelty: The proposed framework is heavily engineered, chaining together existing mechanisms (TEE hardware, Kalman filtering, exponential moving averages, and L2 clipping) without introducing a fundamentally new theoretical defense paradigm.
+* Unrealistic system assumptions: The content auditing phase relies heavily on the availability of a clean validation gradient or clean probe set on the server. This assumption is often impractical in strict cross-silo or cross-device FL deployments where the server lacks domain-specific clean data.
