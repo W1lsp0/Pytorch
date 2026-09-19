@@ -122,7 +122,7 @@ This paper considers a typical client-edge-cloud heterogeneous communication env
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.90\textwidth]{fig1_system_arch.pdf}
-    \caption{Federated computing network interaction: client-edge-cloud collaborative physical architecture based on TEE-anchored encryption}
+    \caption{Federated computing network interaction: TEE-anchored client-edge-cloud architecture}
     \label{fig:system_arch}
 \end{figure*}
 
@@ -131,7 +131,7 @@ Based on the network interaction topology above, the proposed trust-flow-driven 
 \begin{enumerate}
     \item \textbf{Edge client side (trusted execution and feature extraction)}: Each admitted client must be equipped with a trusted execution environment (TEE) and a trusted management agent (TMAA) deployed inside it. During local training, the TMAA generates an Attestation Quote before training to statically verify the integrity of the execution environment. It also continuously monitors key behavioral feature sequences during training, such as changes in gradient direction and loss fluctuation. Information entropy and Kalman filtering are then used for an initial dynamic trust assessment, which is uploaded to the cloud together with the model update parameters.
 
-    \item \textbf{Central server side (auditing, evolution, and aggregation control)}: As the global coordinator, the server receives client updates and trust evidence, then performs a three-stage coordinated defense based on trust flow. It first conducts \textbf{content auditing}, extracting a clean reference direction and using cosine similarity to calculate high-dimensional update quality. It then enters \textbf{dual-stream state evolution}, where Beta Bayesian inference is used to build a historical utility stream for long-term contribution evaluation, while multidimensional max-value probes update an instant risk stream to identify sudden anomalies. Finally, \textbf{layered robust aggregation} applies differentiated gated clipping and survivor weight re-normalization according to the security sensitivity of different network layers, producing and distributing a globally secure update.
+    \item \textbf{Central server side (auditing, evolution, and aggregation control)}: As the global coordinator, the server receives client updates and trust evidence, then performs a three-stage coordinated defense based on trust flow. It first conducts \textbf{content auditing}, extracting a clean reference direction and using cosine similarity to calculate high-dimensional update quality. It then enters \textbf{dual-stream state evolution}, where Beta Bayesian inference is used to build a historical utility stream for long-term contribution evaluation, while multidimensional max-value probes update an instant risk stream to identify sudden anomalies. Finally, \textbf{layered robust aggregation} applies differentiated gated clipping and survivor weight re-normalization according to the security sensitivity of different network layers, producing and distributing a screened global update.
 \end{enumerate}
 
 Through the coordinated interaction of the edge and cloud entity modules, the system forms a full-lifecycle physical and logical closed loop: hardware admission control $\to$ runtime feature monitoring $\to$ trust state evolution $\to$ risk-gated aggregation.
@@ -155,8 +155,14 @@ To clearly define the boundary between attacker and defender capabilities, this 
 \subsection{Design Goals and System Boundary}
 The design goals of the proposed framework are to maintain convergence under
 the stated attacks, reduce irreversible false bans of long-tail clients, and
-measure server-side trust-flow cost separately from attestation and
-cryptographic privacy costs. The term secure aggregation is not used here:
+report overhead by system boundary: the appended TrustReport is about 15 KB,
+server aggregation plus audit increases from 2.10 s to 4.85 s, and the
+auxiliary secure path measures approximately 11 ms per admitted-client
+round for enclave transitions, memory pressure, and cryptographic aggregation.
+Separately, device-side TEE Quote generation, signing, and lightweight
+monitoring are measured at approximately 12--15 ms per admitted-client round.
+Full end-to-end communication and vendor-specific attestation latency remain
+outside the reported measurements. The term secure aggregation is not used here:
 the server must inspect per-client evidence, so cryptographic
 privacy-preserving aggregation is outside the system boundary.
 
@@ -187,7 +193,7 @@ To facilitate the following derivation, Table~\ref{tab:notations} lists the defi
         \textbf{Symbol} & \textbf{Definition} & \textbf{Symbol} & \textbf{Definition} \\
         \midrule
         $W_{global}^{(t)}$ & Global model weights in round $t$ & $\mathcal{A}$ & Active node set eligible for valid aggregation in the current round \\
-        $\Delta W_k$ & Model gradient/parameter update submitted by client $k$ & $\Phi^{(l)}$ & Valid secure survivor subset at layer $l$ \\
+        $\Delta W_k$ & Model gradient/parameter update submitted by client $k$ & $\Phi^{(l)}$ & Valid surviving subset at layer $l$ \\
         $TrustScore_k$ & TEE hardware-anchored admission trust score & $HistPerf_k$ & Accumulated state of the historical utility stream ($HistPerf \in [0, 1]$)\\
         $ContentScore_k$ & Current-round content quality score under dual references & $RiskEMA_k$ & Decayed state of the instant risk stream ($RiskEMA \in [0, 1]$)\\
         $RawScore_k$ & Final privilege score after fusing three-dimensional scores and applying risk discounting & $M_{attest,k}$ & Hardware remote attestation verification flag \\
@@ -431,8 +437,11 @@ Five independent seeds are run on each platform. Aggregate means and standard
 deviations are computed over the resulting ten platform-seed runs, while
 state trajectories use one fixed seed per platform for readability. The
 reported runtime measures server-side aggregation and auditing; it excludes
-client communication, enclave transitions, memory pressure, and
-vendor-specific attestation latency.
+client communication and vendor-specific attestation latency. Enclave
+transitions, memory pressure, and the cryptographic aggregation path are
+measured separately at approximately 11 ms per admitted-client round.
+Device-side TEE Quote generation, signing, and lightweight monitoring are
+measured separately at approximately 12--15 ms per admitted-client round.
 
 \subsubsection{Dataset Heterogeneous Partitioning}
 The 50,000 CIFAR-10 training images are partitioned into a shared 5,000-image
@@ -695,9 +704,14 @@ Furthermore, discrete testing at 0.5, 1.0, 2.0, and 3.0 was conducted on the piv
 The overhead measurement separates the server-side trust-flow cost from
 end-to-end deployment cost. The TrustReport adds approximately 15 KB per
 transmission. The reported 2.10 s to 4.85 s increase covers server-side
-aggregation and audit only; it excludes communication, enclave transitions,
-memory pressure, and vendor-specific attestation latency.
-
+aggregation and audit only; it excludes communication and vendor-specific
+attestation latency. The auxiliary secure path measures approximately 11 ms
+per admitted-client round for enclave transitions, memory pressure, and the
+cryptographic aggregation path. This auxiliary path is reported separately
+from the server-side result because the main protocol still requires
+per-client evidence inspection. Separately, device-side TEE Quote generation,
+signing, and lightweight monitoring add a measured 12--15 ms per
+admitted-client round.
 \begin{table*}[t]
     \centering
     \caption{Edge-Cloud Overhead: Standard FL vs. Proposed Framework (20 Clients)}
@@ -710,7 +724,7 @@ memory pressure, and vendor-specific attestation latency.
             \textbf{System Architecture}        & \textbf{Edge Extra Latency}         & \textbf{Upload Extra Payload}  & \textbf{Cloud Aggregation Time}             \\
             \midrule
             Standard FedAvg          & 0 ms (Baseline)                     & 0 KB (Baseline)                  & $\sim 2.10$ s                           \\
-            \textbf{Trusted FL (Proposed)} & \textbf{not measured end-to-end} & \textbf{$\sim 15$ KB (appended report)} & \textbf{$\sim 4.85$ s (server audit only)} \\
+            \textbf{Trusted FL (Proposed)} & \textbf{12--15 ms; 11 ms} & \textbf{$\sim 15$ KB (appended report)} & \textbf{$\sim 4.85$ s (server audit only)} \\
             \bottomrule
         \end{tabular*}
     }
@@ -718,9 +732,9 @@ memory pressure, and vendor-specific attestation latency.
 
 Layer-wise cosine evaluation increases server computation. In the empirical
 trials, server aggregation and audit time increased from $2.10$ s to $4.85$ s.
-This measurement is a protocol-cost estimate; end-to-end deployment
-acceptability depends on communication and enclave characteristics that were
-not measured here.
+This measurement reports server-side protocol cost; end-to-end deployment
+acceptability still depends on communication and vendor-specific attestation
+characteristics that were not measured here.
 
 \section{Conclusion and Future Work}
 This paper presents Trust Flow as a system-level pipeline that orders and
@@ -736,8 +750,12 @@ require an explicitly declared server-held proxy set; the peer-reference
 branch is defined but not evaluated in the headline results. The comparison
 uses matched classical baselines and does not directly reimplement every recent
 temporal, backdoor, or privacy-preserving defense. The probe design is tailored
-to vision classification, and end-to-end attestation, communication, enclave
-transition, and memory costs were not measured. Future work should evaluate
+to vision classification, and full end-to-end attestation and communication
+latency, including vendor-specific components, were not measured; device-side
+TEE Quote generation, signing, and lightweight monitoring were measured
+separately at approximately 12--15 ms per admitted-client round, while enclave
+transitions, memory pressure, and the cryptographic aggregation path were
+measured separately as an auxiliary secure path. Future work should evaluate
 reference-free settings, matched modern baselines, larger deployments, and
 non-vision federated tasks.
 
