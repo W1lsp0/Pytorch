@@ -1,0 +1,29 @@
+{
+  "protocol": {
+    "clients": 4,
+    "rounds": 6,
+    "local_epochs": 1,
+    "seed": 20240925,
+    "method": "single_stream",
+    "attack_start_round": 3,
+    "backdoor_poison_rate": 1.0,
+    "known_trigger_probe": true,
+    "heavy_probe_rotate_mod": 1,
+    "use_client_report_for_decisions": false
+  },
+  "round_metrics": {
+    "accuracy": [0.2252, 0.3008, 0.1366, 0.3476, 0.3618, 0.3866],
+    "asr_backdoor": [0.2239, 0.0426, 0.9087, 0.1784, 0.1705, 0.0907],
+    "asr_clean_label": [0.2307, 0.0435, 0.9227, 0.1828, 0.1741, 0.0929]
+  },
+  "state_audit": {
+    "round_3_client_1": "NORMAL",
+    "round_4_client_1": "SUSPECT",
+    "round_5_client_1": "SUSPECT",
+    "round_6_client_1": "SUSPECT",
+    "round_5_client_1_included_layers": 0,
+    "round_6_client_1_included_layers": 0
+  },
+  "interpretation": "Single-Stream also suppresses the strong known-trigger attack under the same every-round probe. This paired run does not establish a meaningful dual-stream advantage; further scenarios must test normal-client protection and delayed/weak evidence tradeoffs.",
+  "wall_time_seconds": 235.77
+}

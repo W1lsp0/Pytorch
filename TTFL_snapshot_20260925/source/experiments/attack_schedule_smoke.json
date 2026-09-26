@@ -1,0 +1,30 @@
+{
+  "protocol": {
+    "clients": 4,
+    "rounds": 2,
+    "local_epochs": 1,
+    "method": "ttfl",
+    "seed": 20240925,
+    "known_trigger_probe": false,
+    "use_client_report_for_decisions": false
+  },
+  "persistent_backdoor": {
+    "attack_start_round": 1,
+    "round_metrics": {
+      "accuracy": [0.2131, 0.2976],
+      "asr_backdoor": [0.3257, 0.1191],
+      "asr_clean_label": [0.3396, 0.1199]
+    },
+    "log_dir": "results/smoke_ttfl_backdoor_4c_2r"
+  },
+  "delayed_backdoor": {
+    "attack_start_round": 2,
+    "round_metrics": {
+      "accuracy": [0.2223, 0.2993],
+      "asr_backdoor": [0.2106, 0.14],
+      "asr_clean_label": [0.2173, 0.1474]
+    },
+    "log_dir": "results/smoke_ttfl_delayed_backdoor_4c_2r"
+  },
+  "interpretation": "Smoke validation only. The delayed schedule completes and produces separate round metrics; this is not evidence of final method superiority."
+}

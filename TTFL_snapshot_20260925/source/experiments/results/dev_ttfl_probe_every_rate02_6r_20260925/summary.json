@@ -1,0 +1,28 @@
+{
+  "protocol": {
+    "clients": 4,
+    "rounds": 6,
+    "local_epochs": 1,
+    "seed": 20240925,
+    "method": "ttfl",
+    "attack_start_round": 3,
+    "backdoor_poison_rate": 0.2,
+    "known_trigger_probe": true,
+    "heavy_probe_rotate_mod": 1,
+    "use_client_report_for_decisions": false
+  },
+  "round_metrics": {
+    "accuracy": [0.2259, 0.2993, 0.3353, 0.3426, 0.3462, 0.3826],
+    "asr_backdoor": [0.1986, 0.0584, 0.1498, 0.2394, 0.2205, 0.1202],
+    "asr_clean_label": [0.2075, 0.0603, 0.1544, 0.244, 0.2241, 0.1201]
+  },
+  "state_audit": {
+    "round_6_client_1": "SUSPECT",
+    "round_6_client_1_included_layers": 122,
+    "round_6_client_0_included_layers": 122,
+    "round_6_client_2_included_layers": 122,
+    "round_6_client_3_included_layers": 122
+  },
+  "interpretation": "At poison_rate=0.2, the attack signal is weak: C1 reaches SUSPECT only by round 6, but remains included in all 122 layers. This is useful for normal-client/weak-evidence analysis, but it does not show complete attack suppression.",
+  "wall_time_seconds": 235.62
+}

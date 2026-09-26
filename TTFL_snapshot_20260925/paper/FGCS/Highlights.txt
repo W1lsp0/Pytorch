@@ -1,0 +1,8 @@
+Highlights
+
+Title: Towards Trusted Federated Learning via Adaptive Trust-Flow in Edge Computing: A Study on Key Technologies
+
+- A TEE-anchored admission mechanism is designed for trusted edge clients.
+- A dual-stream reputation model separates historical utility from instant risk.
+- Layer-wise risk gating preserves Non-IID contributions while suppressing attacks.
+- Flower-based experiments validate the framework under six mixed attack types.

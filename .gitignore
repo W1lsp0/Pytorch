@@ -18,6 +18,6 @@ __pycache__/
 *-batch*
 MNIST/
 cifar-*/
-
+cifar-*
 # 日志文件
 *.log

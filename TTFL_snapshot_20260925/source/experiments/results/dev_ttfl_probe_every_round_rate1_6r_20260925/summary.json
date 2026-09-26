@@ -1,0 +1,31 @@
+{
+  "protocol": {
+    "clients": 4,
+    "rounds": 6,
+    "local_epochs": 1,
+    "seed": 20240925,
+    "method": "ttfl",
+    "attack_start_round": 3,
+    "backdoor_poison_rate": 1.0,
+    "known_trigger_probe": true,
+    "heavy_probe_rotate_mod": 1,
+    "use_client_report_for_decisions": false
+  },
+  "round_metrics": {
+    "accuracy": [0.2283, 0.304, 0.1415, 0.2562, 0.3602, 0.381],
+    "asr_backdoor": [0.1987, 0.0445, 0.8976, 0.5114, 0.1643, 0.0858],
+    "asr_clean_label": [0.2065, 0.0465, 0.9123, 0.5287, 0.168, 0.0879]
+  },
+  "state_audit": {
+    "round_3_client_1": "NORMAL",
+    "round_4_client_1": "SUSPECT",
+    "round_5_client_1": "SUSPECT",
+    "round_6_client_1": "SUSPECT",
+    "round_5_client_1_included_layers": 0,
+    "round_6_client_1_included_layers": 0,
+    "round_3_trigger_br_score": 1.0,
+    "round_4_trigger_br_score": 0.9996
+  },
+  "interpretation": "With known trigger probes evaluated every round, the attack is exposed at round 3, C1 becomes SUSPECT by round 4, and all 122 layers are excluded from rounds 5-6. ASR falls from 89.76% at activation to 8.58% by round 6. This supports a conditional claim requiring known trigger knowledge and probe cadence; it does not establish unknown-trigger generalization.",
+  "wall_time_seconds": 237.91
+}

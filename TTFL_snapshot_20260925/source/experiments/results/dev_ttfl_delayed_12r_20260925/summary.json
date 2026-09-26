@@ -1,0 +1,31 @@
+{
+  "protocol": {
+    "clients": 4,
+    "rounds": 12,
+    "local_epochs": 1,
+    "seed": 20240925,
+    "method": "ttfl",
+    "scenario": "delayed_backdoor",
+    "attack_start_round": 11,
+    "attacked_client": 1,
+    "poison_rate": 0.2,
+    "known_trigger_probe": false,
+    "use_client_report_for_decisions": false
+  },
+  "round_metrics": {
+    "accuracy": [0.2271, 0.2991, 0.3376, 0.3606, 0.3629, 0.3934, 0.397, 0.4167, 0.442, 0.4423, 0.4374, 0.4561],
+    "asr_backdoor": [0.2022, 0.0483, 0.1044, 0.1818, 0.1627, 0.0839, 0.1777, 0.1191, 0.0904, 0.1079, 0.1177, 0.1523],
+    "asr_clean_label": [0.2099, 0.0485, 0.1097, 0.187, 0.1656, 0.0874, 0.1797, 0.1225, 0.093, 0.1116, 0.1213, 0.1555]
+  },
+  "attack_activation_audit": {
+    "round_10_attack_active": false,
+    "round_11_attack_active": true,
+    "round_12_attack_active": true,
+    "client_1_state_round_11": "NORMAL",
+    "client_1_state_round_12": "NORMAL",
+    "client_1_included_layers_round_11": 122,
+    "client_1_included_layers_round_12": 122,
+    "interpretation": "The schedule activated at the configured round, but this short post-activation window did not produce a clear ASR increase or isolation event. The attack strength/protocol needs calibration before this can test delayed-attack defense."
+  },
+  "wall_time_seconds": 465.77
+}

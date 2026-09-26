@@ -1,0 +1,22 @@
+{
+  "protocol": {
+    "clients": 4,
+    "rounds": 2,
+    "local_epochs": 1,
+    "seed": 20240925,
+    "scenario": "delayed_backdoor",
+    "attack_start_round": 11,
+    "attacked_client": 1,
+    "poison_rate": 0.2,
+    "known_trigger_probe": false,
+    "use_client_report_for_decisions": false,
+    "shared_client_pool_size": 0
+  },
+  "runs": {
+    "fedavg": {"wall_time_seconds": 66.32, "accuracy": [0.2314, 0.2872], "asr_backdoor": [0.1999, 0.0292], "asr_clean_label": [0.2055, 0.0295]},
+    "fltrust": {"wall_time_seconds": 84.89, "accuracy": [0.2221, 0.2977], "asr_backdoor": [0.176, 0.0463], "asr_clean_label": [0.1835, 0.0476]},
+    "single_stream": {"wall_time_seconds": 79.78, "accuracy": [0.2273, 0.3049], "asr_backdoor": [0.2197, 0.0476], "asr_clean_label": [0.2268, 0.0491]},
+    "ttfl": {"wall_time_seconds": 87.54, "accuracy": [0.2277, 0.2989], "asr_backdoor": [0.2271, 0.0444], "asr_clean_label": [0.2344, 0.047]}
+  },
+  "interpretation": "This two-round smoke run intentionally ends before attack_start_round=11, so it validates the no-activation path only. It does not test delayed attack response."
+}
