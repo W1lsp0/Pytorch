@@ -1,0 +1,17 @@
+{
+  "PYTHON_BIN": "/data1/anaconda3/envs/W1lsp0/bin/python",
+  "CLIENTS": "20",
+  "ROUNDS": "30",
+  "LOCAL_EPOCHS": "1",
+  "SEED_LIST": "20240925 20240926",
+  "SCENARIO_LIST": "recovery_backdoor",
+  "METHOD_LIST": "fedavg fltrust single_stream ttfl",
+  "ATTACK_START_ROUND": "3",
+  "ATTACK_STOP_ROUND": "10",
+  "BACKDOOR_POISON_RATE": "1.0",
+  "RESULT_ROOT": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v2_30r_recovery_s2_20260927",
+  "MAX_PARALLEL": "4",
+  "GPU_VISIBLE_LIST": "0,1,2,3,4",
+  "PORT_BASE": "20800",
+  "RUN_TIMEOUT_SECONDS": "7200"
+}

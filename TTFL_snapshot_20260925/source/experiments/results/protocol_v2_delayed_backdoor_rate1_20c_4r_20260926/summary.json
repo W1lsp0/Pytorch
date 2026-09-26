@@ -1,0 +1,297 @@
+{
+  "protocol": {
+    "dataset": "CIFAR10_LOCAL",
+    "clients": 20,
+    "rounds": 4,
+    "local_epochs": 1,
+    "shared_client_pool_size": 0,
+    "server_proxy_size": 500,
+    "known_trigger_probe": false,
+    "seed": 20240925,
+    "purpose": "development matrix; interpret only with the run manifests"
+  },
+  "runs": [
+    {
+      "run_id": "1_fedavg_delayed_backdoor_seed20240925",
+      "status": "success",
+      "error": null,
+      "method": "fedavg",
+      "scenario": "delayed_backdoor",
+      "seed": 20240925,
+      "clients": 20,
+      "rounds": 4,
+      "clean_accuracy": [
+        0.17449999999999996,
+        0.2244,
+        0.223,
+        0.2768
+      ],
+      "backdoor_asr": [
+        0.15788888888888897,
+        0.16588888888888897,
+        0.379888888888889,
+        0.25922222222222213
+      ],
+      "clean_label_asr": [
+        0.15911111111111104,
+        0.16644444444444448,
+        0.38844444444444437,
+        0.2604444444444445
+      ],
+      "fit_results": [
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        }
+      ],
+      "audit_available": false,
+      "malicious_client_ids": [
+        1
+      ]
+    },
+    {
+      "run_id": "2_fltrust_delayed_backdoor_seed20240925",
+      "status": "success",
+      "error": null,
+      "method": "fltrust",
+      "scenario": "delayed_backdoor",
+      "seed": 20240925,
+      "clients": 20,
+      "rounds": 4,
+      "clean_accuracy": [
+        0.1983,
+        0.2716,
+        0.2768,
+        0.3085
+      ],
+      "backdoor_asr": [
+        0.1064444444444445,
+        0.08955555555555551,
+        0.282,
+        0.19988888888888898
+      ],
+      "clean_label_asr": [
+        0.10411111111111107,
+        0.08766666666666666,
+        0.2835555555555555,
+        0.19611111111111101
+      ],
+      "fit_results": [
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        }
+      ],
+      "audit_available": false,
+      "malicious_client_ids": [
+        1
+      ]
+    },
+    {
+      "run_id": "3_single_stream_delayed_backdoor_seed20240925",
+      "status": "success",
+      "error": null,
+      "method": "single_stream",
+      "scenario": "delayed_backdoor",
+      "seed": 20240925,
+      "clients": 20,
+      "rounds": 4,
+      "clean_accuracy": [
+        0.1702,
+        0.2426,
+        0.2278,
+        0.3074
+      ],
+      "backdoor_asr": [
+        0.13088888888888894,
+        0.1615555555555555,
+        0.40022222222222203,
+        0.13088888888888894
+      ],
+      "clean_label_asr": [
+        0.1315555555555555,
+        0.16433333333333328,
+        0.4094444444444444,
+        0.13
+      ],
+      "fit_results": [
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        }
+      ],
+      "audit_available": true,
+      "malicious_client_ids": [
+        1
+      ],
+      "active_aggregation_clients": [
+        20,
+        19,
+        18,
+        16
+      ],
+      "isolated_clients": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "state_counts": [
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 17,
+          "QUARANTINE": 0,
+          "SUSPECT": 3
+        },
+        {
+          "NORMAL": 16,
+          "QUARANTINE": 0,
+          "SUSPECT": 4
+        }
+      ],
+      "normal_client_count": 19,
+      "normal_client_exclusion_rate": [
+        0.0,
+        0.05263157894736842,
+        0.10526315789473684,
+        0.21052631578947367
+      ]
+    },
+    {
+      "run_id": "4_ttfl_delayed_backdoor_seed20240925",
+      "status": "success",
+      "error": null,
+      "method": "ttfl",
+      "scenario": "delayed_backdoor",
+      "seed": 20240925,
+      "clients": 20,
+      "rounds": 4,
+      "clean_accuracy": [
+        0.1689,
+        0.2339,
+        0.2336,
+        0.2929
+      ],
+      "backdoor_asr": [
+        0.12788888888888894,
+        0.11922222222222224,
+        0.380222222222222,
+        0.23688888888888898
+      ],
+      "clean_label_asr": [
+        0.1285555555555555,
+        0.1203333333333333,
+        0.3893333333333333,
+        0.23755555555555552
+      ],
+      "fit_results": [
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        }
+      ],
+      "audit_available": true,
+      "malicious_client_ids": [
+        1
+      ],
+      "active_aggregation_clients": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "isolated_clients": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "state_counts": [
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 17,
+          "QUARANTINE": 0,
+          "SUSPECT": 3
+        },
+        {
+          "NORMAL": 15,
+          "QUARANTINE": 0,
+          "SUSPECT": 5
+        }
+      ],
+      "normal_client_count": 19,
+      "normal_client_exclusion_rate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

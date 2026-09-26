@@ -1,0 +1,104 @@
+{
+  "protocol": {
+    "dataset": "CIFAR10_LOCAL",
+    "clients": 20,
+    "rounds": 4,
+    "local_epochs": 1,
+    "shared_client_pool_size": 0,
+    "server_proxy_size": 500,
+    "known_trigger_probe": false,
+    "seed": 20240926,
+    "purpose": "development matrix; interpret only with the run manifests"
+  },
+  "runs": [
+    {
+      "run_id": "1_single_stream_delayed_backdoor_seed20240926",
+      "method": "single_stream",
+      "scenario": "delayed_backdoor",
+      "seed": 20240926,
+      "clients": 20,
+      "rounds": 4,
+      "clean_accuracy": [
+        0.2175,
+        0.2635,
+        0.272,
+        0.2829
+      ],
+      "backdoor_asr": [
+        0.1835555555555555,
+        0.1915555555555555,
+        0.26933333333333337,
+        0.31855555555555554
+      ],
+      "clean_label_asr": [
+        0.18911111111111104,
+        0.1914444444444445,
+        0.2724444444444445,
+        0.318
+      ],
+      "fit_results": [
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        }
+      ],
+      "audit_available": true,
+      "malicious_client_ids": [
+        1
+      ],
+      "active_aggregation_clients": [
+        20,
+        20,
+        17,
+        15
+      ],
+      "isolated_clients": [
+        0,
+        0,
+        3,
+        5
+      ],
+      "state_counts": [
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 14,
+          "QUARANTINE": 0,
+          "SUSPECT": 6
+        },
+        {
+          "NORMAL": 14,
+          "QUARANTINE": 0,
+          "SUSPECT": 6
+        }
+      ],
+      "normal_client_count": 19,
+      "normal_client_exclusion_rate": [
+        0.0,
+        0.0,
+        0.1578947368421053,
+        0.26315789473684215
+      ]
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "matrix": "experiments/results/protocol_v2_persistent_backdoor_20c_4r_20260926",
+  "run_count": 4,
+  "failed_runs": [],
+  "runs": [
+    {
+      "run_id": "1_fedavg_backdoor_seed20240925",
+      "method": "fedavg",
+      "scenario": "backdoor",
+      "ok": true,
+      "rounds": 4,
+      "fit": [
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "audit_rounds": 0
+    },
+    {
+      "run_id": "2_fltrust_backdoor_seed20240925",
+      "method": "fltrust",
+      "scenario": "backdoor",
+      "ok": true,
+      "rounds": 4,
+      "fit": [
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "audit_rounds": 0
+    },
+    {
+      "run_id": "3_single_stream_backdoor_seed20240925",
+      "method": "single_stream",
+      "scenario": "backdoor",
+      "ok": true,
+      "rounds": 4,
+      "fit": [
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "audit_rounds": 4
+    },
+    {
+      "run_id": "4_ttfl_backdoor_seed20240925",
+      "method": "ttfl",
+      "scenario": "backdoor",
+      "ok": true,
+      "rounds": 4,
+      "fit": [
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ],
+        [
+          20,
+          0
+        ]
+      ],
+      "audit_rounds": 4
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "protocol_version": 2,
+  "method": "fedavg",
+  "scenario": "backdoor",
+  "seed": 20240926,
+  "clients": 20,
+  "rounds": 4,
+  "local_epochs": 1,
+  "attack_start_round": 1,
+  "attack_stop_round": 0,
+  "malicious_client_ids": [
+    1
+  ],
+  "poison_rate": 1.0,
+  "dataset": "CIFAR10_LOCAL",
+  "shared_client_pool_size": 0,
+  "server_proxy_size": 500,
+  "known_trigger_probe": false,
+  "heavy_probe_rotate_mod": 5,
+  "asr_excludes_target_label": true,
+  "code_sha256": "b709cddc26313b999870486f8368e491fb1d5700f46f87fc634b2f77eb2f0db5",
+  "python": "/data1/anaconda3/envs/W1lsp0/bin/python",
+  "server_address": "127.0.0.1:20301",
+  "gpu_visible_list": "0,1,2,3,4"
+}

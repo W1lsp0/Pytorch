@@ -1,0 +1,7 @@
+{
+  "status": "success",
+  "recovered_after_parent_exit": true,
+  "fit_rounds": 30,
+  "evaluation_rounds": 30,
+  "elapsed_seconds": null
+}
