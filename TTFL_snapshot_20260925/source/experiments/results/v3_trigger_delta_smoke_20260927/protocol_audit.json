@@ -1,0 +1,29 @@
+{
+  "matrix": "experiments/results/v3_trigger_delta_smoke_20260927",
+  "run_count": 1,
+  "failed_runs": [],
+  "runs": [
+    {
+      "run_id": "1_ttfl_none_seed20240925",
+      "method": "ttfl",
+      "scenario": "none",
+      "ok": true,
+      "rounds": 1,
+      "fit": [
+        [
+          20,
+          0
+        ]
+      ],
+      "evaluate": [
+        [
+          20,
+          0
+        ]
+      ],
+      "audit_rounds": 1,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
+    }
+  ]
+}

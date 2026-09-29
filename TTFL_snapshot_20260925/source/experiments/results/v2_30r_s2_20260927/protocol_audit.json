@@ -505,7 +505,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "12_ttfl_delayed_backdoor_seed20240925",
@@ -757,7 +759,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "13_fedavg_none_seed20240926",
@@ -1513,7 +1517,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "16_ttfl_none_seed20240926",
@@ -1765,7 +1771,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "17_fedavg_backdoor_seed20240926",
@@ -2521,7 +2529,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "1_fedavg_none_seed20240925",
@@ -3025,7 +3035,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "21_fedavg_delayed_backdoor_seed20240926",
@@ -3781,7 +3793,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "24_ttfl_delayed_backdoor_seed20240926",
@@ -4033,7 +4047,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "2_fltrust_none_seed20240925",
@@ -4537,7 +4553,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "4_ttfl_none_seed20240925",
@@ -4789,7 +4807,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "5_fedavg_backdoor_seed20240925",
@@ -5545,7 +5565,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "8_ttfl_backdoor_seed20240925",
@@ -5797,7 +5819,9 @@
           0
         ]
       ],
-      "audit_rounds": 30
+      "audit_rounds": 30,
+      "unresolved_client_audit_rounds": [],
+      "recovered_blacklist_records": 0
     },
     {
       "run_id": "9_fedavg_delayed_backdoor_seed20240925",

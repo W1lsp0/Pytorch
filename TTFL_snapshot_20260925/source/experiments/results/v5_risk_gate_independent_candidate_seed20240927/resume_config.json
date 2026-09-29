@@ -1,0 +1,22 @@
+{
+  "RESULT_ROOT": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v5_risk_gate_independent_candidate_seed20240927",
+  "CLIENTS": "20",
+  "ROUNDS": "30",
+  "LOCAL_EPOCHS": "1",
+  "SEED_LIST": "20240927",
+  "SCENARIO_LIST": "none backdoor delayed_backdoor",
+  "METHOD_LIST": "ttfl",
+  "BACKDOOR_POISON_RATE": "1.0",
+  "ATTACK_START_ROUND": "11",
+  "ATTACK_STOP_ROUND": "0",
+  "KNOWN_TRIGGER_PROBE": "1",
+  "HEAVY_PROBE_ROTATE_MOD": "1",
+  "TRIGGER_SCORE_MODE": "clean_delta",
+  "RISK_RAW_ATTENUATION_POWER": "0.0",
+  "GPU_VISIBLE_LIST": "0,1,2,3,4",
+  "MAX_PARALLEL": "2",
+  "RUN_TIMEOUT_SECONDS": "7200",
+  "PORT_BASE": "22400",
+  "TTFL_SHARED_TMP_ROOT": "/data1/lab409/W1lsp0/.ttfl_tmp",
+  "REFERENCE_MATRIX": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v5_risk_gate_independent_baseline_seed20240927"
+}

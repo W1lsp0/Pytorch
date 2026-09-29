@@ -1,0 +1,24 @@
+{
+  "status": "complete",
+  "completed_at": 1790538985.605687,
+  "runs": 6,
+  "rounds": 30,
+  "seed": 20240927,
+  "validated_pairs": 3,
+  "validated_attack_schedules": 4,
+  "validated_score_records": 3600,
+  "recovered_shutdown_failures": 0,
+  "unresolved_client_audit_rounds": 0,
+  "active_training_processes": [],
+  "candidate_adopted": false,
+  "conclusion": "Independent seed does not reproduce a large reduction in honest-client exclusion: both conditions exclude 138/1740 honest client-rounds. Candidate delayed-attack window ASR increases and first attacker exclusion is later. This power ablation changes both layer admission and normalized weights.",
+  "reports": [
+    "risk_gate_independent_report.md",
+    "risk_gate_independent_report.json",
+    "risk_gate_independent_curves.csv",
+    "risk_gate_independent_curves.png",
+    "risk_gate_independent_curves.pdf",
+    "exclusion_paths.md",
+    "paired_study_done.json"
+  ]
+}

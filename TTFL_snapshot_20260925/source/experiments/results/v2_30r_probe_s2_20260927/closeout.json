@@ -1,0 +1,16 @@
+{
+  "status": "complete",
+  "completed_at": 1790492851.3928654,
+  "runs": 12,
+  "rounds": 30,
+  "recovered_shutdown_failures": 3,
+  "validated_attack_schedules": 8,
+  "validated_pairs": 12,
+  "unresolved_client_audit_rounds": 0,
+  "reports": [
+    "probe_report.md",
+    "probe_condition_comparison.md",
+    "probe_condition_curves.png",
+    "probe_condition_curves.pdf"
+  ]
+}

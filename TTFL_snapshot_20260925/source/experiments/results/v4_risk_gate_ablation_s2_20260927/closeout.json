@@ -1,0 +1,21 @@
+{
+  "status": "complete",
+  "completed_at": 1790530514.8309107,
+  "runs": 6,
+  "rounds": 30,
+  "recovered_shutdown_failures": 0,
+  "validated_pairs": 6,
+  "unresolved_client_audit_rounds": 0,
+  "candidate_adopted": false,
+  "monitor_verified_complete": true,
+  "conclusion": "Removing risk attenuation from layer gating reduced honest-client exclusion and improved clean accuracy in this development matrix; delayed-backdoor ASR increased, so the change is not adopted as a final method.",
+  "reports": [
+    "risk_gate_ablation_report.md",
+    "risk_gate_ablation_report.json",
+    "exclusion_paths.md",
+    "exclusion_paths.json",
+    "protocol_audit.json",
+    "monitor_status.json",
+    "monitor_events.jsonl"
+  ]
+}

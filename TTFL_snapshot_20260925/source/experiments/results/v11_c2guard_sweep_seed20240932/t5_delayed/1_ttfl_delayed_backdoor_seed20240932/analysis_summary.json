@@ -1,0 +1,386 @@
+{
+  "run_dir": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v11_c2guard_sweep_seed20240932/t5_delayed/1_ttfl_delayed_backdoor_seed20240932/work/log",
+  "audit_available": true,
+  "rounds": 30,
+  "probe_policy": {
+    "known_trigger_probe": true,
+    "heavy_probe_rotate_mod": 1
+  },
+  "probe_coverage": {
+    "min": 19,
+    "max": 20,
+    "per_round": [
+      {
+        "round": 1,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 2,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 3,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 4,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 5,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 6,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 7,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 8,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 9,
+        "heavy_probed_count": 20
+      },
+      {
+        "round": 10,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 11,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 12,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 13,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 14,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 15,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 16,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 17,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 18,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 19,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 20,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 21,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 22,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 23,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 24,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 25,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 26,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 27,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 28,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 29,
+        "heavy_probed_count": 19
+      },
+      {
+        "round": 30,
+        "heavy_probed_count": 19
+      }
+    ]
+  },
+  "aggregation": {
+    "min_active_clients": 18,
+    "max_isolated_clients": 1
+  },
+  "state_count_changes": [
+    {
+      "round": 1,
+      "state": "NORMAL",
+      "count": 20
+    },
+    {
+      "round": 1,
+      "state": "QUARANTINE",
+      "count": 0
+    },
+    {
+      "round": 1,
+      "state": "SUSPECT",
+      "count": 0
+    },
+    {
+      "round": 3,
+      "state": "NORMAL",
+      "count": 17
+    },
+    {
+      "round": 3,
+      "state": "SUSPECT",
+      "count": 3
+    },
+    {
+      "round": 4,
+      "state": "NORMAL",
+      "count": 14
+    },
+    {
+      "round": 4,
+      "state": "SUSPECT",
+      "count": 6
+    },
+    {
+      "round": 5,
+      "state": "NORMAL",
+      "count": 13
+    },
+    {
+      "round": 5,
+      "state": "SUSPECT",
+      "count": 7
+    },
+    {
+      "round": 6,
+      "state": "NORMAL",
+      "count": 10
+    },
+    {
+      "round": 6,
+      "state": "SUSPECT",
+      "count": 10
+    },
+    {
+      "round": 7,
+      "state": "NORMAL",
+      "count": 13
+    },
+    {
+      "round": 7,
+      "state": "SUSPECT",
+      "count": 7
+    },
+    {
+      "round": 8,
+      "state": "NORMAL",
+      "count": 12
+    },
+    {
+      "round": 8,
+      "state": "SUSPECT",
+      "count": 8
+    },
+    {
+      "round": 9,
+      "state": "NORMAL",
+      "count": 9
+    },
+    {
+      "round": 9,
+      "state": "QUARANTINE",
+      "count": 3
+    },
+    {
+      "round": 10,
+      "state": "NORMAL",
+      "count": 13
+    },
+    {
+      "round": 10,
+      "state": "SUSPECT",
+      "count": 3
+    },
+    {
+      "round": 11,
+      "state": "NORMAL",
+      "count": 14
+    },
+    {
+      "round": 11,
+      "state": "SUSPECT",
+      "count": 2
+    },
+    {
+      "round": 12,
+      "state": "NORMAL",
+      "count": 13
+    },
+    {
+      "round": 12,
+      "state": "QUARANTINE",
+      "count": 4
+    },
+    {
+      "round": 13,
+      "state": "NORMAL",
+      "count": 11
+    },
+    {
+      "round": 13,
+      "state": "SUSPECT",
+      "count": 4
+    },
+    {
+      "round": 14,
+      "state": "QUARANTINE",
+      "count": 2
+    },
+    {
+      "round": 14,
+      "state": "SUSPECT",
+      "count": 6
+    },
+    {
+      "round": 15,
+      "state": "NORMAL",
+      "count": 13
+    },
+    {
+      "round": 15,
+      "state": "QUARANTINE",
+      "count": 3
+    },
+    {
+      "round": 15,
+      "state": "SUSPECT",
+      "count": 3
+    },
+    {
+      "round": 16,
+      "state": "NORMAL",
+      "count": 12
+    },
+    {
+      "round": 16,
+      "state": "SUSPECT",
+      "count": 4
+    },
+    {
+      "round": 18,
+      "state": "NORMAL",
+      "count": 15
+    },
+    {
+      "round": 18,
+      "state": "QUARANTINE",
+      "count": 2
+    },
+    {
+      "round": 18,
+      "state": "SUSPECT",
+      "count": 2
+    },
+    {
+      "round": 20,
+      "state": "NORMAL",
+      "count": 16
+    },
+    {
+      "round": 20,
+      "state": "SUSPECT",
+      "count": 1
+    },
+    {
+      "round": 22,
+      "state": "QUARANTINE",
+      "count": 1
+    },
+    {
+      "round": 22,
+      "state": "SUSPECT",
+      "count": 2
+    },
+    {
+      "round": 23,
+      "state": "NORMAL",
+      "count": 15
+    },
+    {
+      "round": 23,
+      "state": "SUSPECT",
+      "count": 3
+    },
+    {
+      "round": 24,
+      "state": "NORMAL",
+      "count": 18
+    },
+    {
+      "round": 24,
+      "state": "SUSPECT",
+      "count": 0
+    },
+    {
+      "round": 27,
+      "state": "NORMAL",
+      "count": 17
+    },
+    {
+      "round": 27,
+      "state": "SUSPECT",
+      "count": 1
+    },
+    {
+      "round": 28,
+      "state": "NORMAL",
+      "count": 18
+    },
+    {
+      "round": 28,
+      "state": "SUSPECT",
+      "count": 0
+    },
+    {
+      "round": 29,
+      "state": "NORMAL",
+      "count": 17
+    },
+    {
+      "round": 29,
+      "state": "SUSPECT",
+      "count": 1
+    }
+  ]
+}

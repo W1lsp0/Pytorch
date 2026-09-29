@@ -1,0 +1,103 @@
+{
+  "complete": true,
+  "validated_pairs": 6,
+  "pairs": [
+    {
+      "run": "3_ttfl_delayed_backdoor_seed20240925",
+      "baseline": {
+        "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+        "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+        "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+      },
+      "candidate": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+        "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+      },
+      "changed_training_files": [
+        "server/strategy.py"
+      ]
+    },
+    {
+      "run": "1_ttfl_none_seed20240925",
+      "baseline": {
+        "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+        "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+        "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+      },
+      "candidate": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+        "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+      },
+      "changed_training_files": [
+        "server/strategy.py"
+      ]
+    },
+    {
+      "run": "4_ttfl_none_seed20240926",
+      "baseline": {
+        "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+        "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+        "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+      },
+      "candidate": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+        "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+      },
+      "changed_training_files": [
+        "server/strategy.py"
+      ]
+    },
+    {
+      "run": "5_ttfl_backdoor_seed20240926",
+      "baseline": {
+        "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+        "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+        "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+      },
+      "candidate": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+        "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+      },
+      "changed_training_files": [
+        "server/strategy.py"
+      ]
+    },
+    {
+      "run": "6_ttfl_delayed_backdoor_seed20240926",
+      "baseline": {
+        "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+        "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+        "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+      },
+      "candidate": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+        "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+      },
+      "changed_training_files": [
+        "server/strategy.py"
+      ]
+    },
+    {
+      "run": "2_ttfl_backdoor_seed20240925",
+      "baseline": {
+        "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+        "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+        "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+      },
+      "candidate": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+        "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+      },
+      "changed_training_files": [
+        "server/strategy.py"
+      ]
+    }
+  ],
+  "scope": "Retrospective verification of data, initialization and frozen source; power affects BOTH admission and normalized aggregation weights."
+}

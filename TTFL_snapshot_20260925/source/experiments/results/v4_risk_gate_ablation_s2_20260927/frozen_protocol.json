@@ -1,0 +1,43 @@
+{
+  "frozen_at": 1790524146.5407588,
+  "purpose": "single-factor ablation of risk EMA attenuation in layer gating",
+  "config": {
+    "RESULT_ROOT": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v4_risk_gate_ablation_s2_20260927",
+    "CLIENTS": "20",
+    "ROUNDS": "30",
+    "LOCAL_EPOCHS": "1",
+    "SEED_LIST": "20240925 20240926",
+    "SCENARIO_LIST": "none backdoor delayed_backdoor",
+    "METHOD_LIST": "ttfl",
+    "BACKDOOR_POISON_RATE": "1.0",
+    "ATTACK_START_ROUND": "11",
+    "ATTACK_STOP_ROUND": "0",
+    "KNOWN_TRIGGER_PROBE": "1",
+    "HEAVY_PROBE_ROTATE_MOD": "1",
+    "TRIGGER_SCORE_MODE": "clean_delta",
+    "RISK_RAW_ATTENUATION_POWER": "0",
+    "GPU_VISIBLE_LIST": "0,1,2,3,4",
+    "MAX_PARALLEL": "4",
+    "RUN_TIMEOUT_SECONDS": "7200",
+    "PORT_BASE": "22100",
+    "TTFL_SHARED_TMP_ROOT": "/data1/lab409/W1lsp0/.ttfl_tmp",
+    "REPORT_KIND": "risk_gate_ablation",
+    "REFERENCE_MATRIX": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v3_trigger_delta_s2_20260927"
+  },
+  "reference_matrix": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v3_trigger_delta_s2_20260927",
+  "source_files": {
+    "server/strategy.py": "b82c45da5b8b547adfe0580792743e3e8365ac9020910785911d2d9aabf9fce9",
+    "server/probe_scoring.py": "90e8a7bfcff021e602665cbc9e005501d21e2ebe513697b755d35d9f826b72c4",
+    "server/trust_manager.py": "0e5dfe547b8a2a75af23d3650432f01c0b70e8f07c053eb99a570b6dca0cc269"
+  },
+  "preserved": [
+    "clean_delta scoring",
+    "risk calculation",
+    "isolation and blacklist rules",
+    "SVD feature source",
+    "data partitions",
+    "initialization",
+    "local budget"
+  ],
+  "changed_mechanism": "RISK_RAW_ATTENUATION_POWER=0.0; risk EMA remains in isolation logic"
+}

@@ -1,0 +1,183 @@
+{
+  "ok": true,
+  "run_count": 24,
+  "initial_model_hashes": {
+    "20240925": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+    "20240926": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4"
+  },
+  "partition_hashes": {
+    "20240925": "7675c6f604dfab459d1dcb2b01985594a7f207f40d905bfb530837d77bb07af0",
+    "20240926": "2df0488624235a52b5fca1134c8900df5108ad63137935c7091eba84b43f7174"
+  },
+  "training_code_sha256": "93cf81411b5b7b01b8c3c33019347588c88fb023379208c81bffc7cf519d4044",
+  "runs": [
+    {
+      "run_id": "10_fltrust_delayed_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "11_single_stream_delayed_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "12_ttfl_delayed_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "13_fedavg_none_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "14_fltrust_none_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "15_single_stream_none_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "16_ttfl_none_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "17_fedavg_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "18_fltrust_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "19_single_stream_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "1_fedavg_none_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "20_ttfl_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "21_fedavg_delayed_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "22_fltrust_delayed_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "23_single_stream_delayed_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "24_ttfl_delayed_backdoor_seed20240926",
+      "seed": 20240926,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "2_fltrust_none_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "3_single_stream_none_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "4_ttfl_none_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "5_fedavg_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "6_fltrust_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "7_single_stream_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "8_ttfl_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    },
+    {
+      "run_id": "9_fedavg_delayed_backdoor_seed20240925",
+      "seed": 20240925,
+      "client_samples": 49500,
+      "proxy_samples": 500,
+      "overlap": 0
+    }
+  ]
+}

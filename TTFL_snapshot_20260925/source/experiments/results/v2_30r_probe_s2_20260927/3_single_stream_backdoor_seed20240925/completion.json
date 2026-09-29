@@ -1,0 +1,14 @@
+{
+  "status": "success",
+  "recovered_after_parent_exit": false,
+  "recovered_after_launcher_exit": true,
+  "completion_basis": "validated_server_history_after_client_shutdown_timeout",
+  "original_completion": {
+    "status": "failure",
+    "started_at": 1790479360.4967265,
+    "error": "launcher exited 1",
+    "elapsed_seconds": 3635.5525720119476
+  },
+  "child_exit_codes_available": false,
+  "validation": "all fit/evaluate rounds complete with zero failures"
+}

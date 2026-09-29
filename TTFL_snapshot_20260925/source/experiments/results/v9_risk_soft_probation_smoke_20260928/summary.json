@@ -1,0 +1,74 @@
+{
+  "protocol": {
+    "dataset": "CIFAR10_LOCAL",
+    "clients": 20,
+    "rounds": 2,
+    "local_epochs": 1,
+    "shared_client_pool_size": 0,
+    "server_proxy_size": 500,
+    "known_trigger_probe": true,
+    "seed": 20240930,
+    "purpose": "development matrix; interpret only with the run manifests"
+  },
+  "runs": [
+    {
+      "run_id": "1_ttfl_none_seed20240930",
+      "status": "success",
+      "error": null,
+      "method": "ttfl",
+      "scenario": "none",
+      "seed": 20240930,
+      "clients": 20,
+      "rounds": 2,
+      "clean_accuracy": [
+        0.1932,
+        0.2578
+      ],
+      "backdoor_asr": [
+        0.18877777777777782,
+        0.1934444444444445
+      ],
+      "clean_label_asr": [
+        0.1905555555555555,
+        0.192
+      ],
+      "fit_results": [
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        }
+      ],
+      "audit_available": true,
+      "malicious_client_ids": [],
+      "active_aggregation_clients": [
+        20,
+        20
+      ],
+      "isolated_clients": [
+        0,
+        0
+      ],
+      "state_counts": [
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        }
+      ],
+      "normal_client_count": 20,
+      "normal_client_exclusion_rate": [
+        0.0,
+        0.0
+      ]
+    }
+  ]
+}

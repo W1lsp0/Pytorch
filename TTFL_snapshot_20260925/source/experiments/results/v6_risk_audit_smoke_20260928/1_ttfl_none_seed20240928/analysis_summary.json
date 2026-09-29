@@ -1,0 +1,40 @@
+{
+  "run_dir": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v6_risk_audit_smoke_20260928/1_ttfl_none_seed20240928/work/log",
+  "audit_available": true,
+  "rounds": 1,
+  "probe_policy": {
+    "known_trigger_probe": true,
+    "heavy_probe_rotate_mod": 5
+  },
+  "probe_coverage": {
+    "min": 4,
+    "max": 4,
+    "per_round": [
+      {
+        "round": 1,
+        "heavy_probed_count": 4
+      }
+    ]
+  },
+  "aggregation": {
+    "min_active_clients": 20,
+    "max_isolated_clients": 0
+  },
+  "state_count_changes": [
+    {
+      "round": 1,
+      "state": "NORMAL",
+      "count": 20
+    },
+    {
+      "round": 1,
+      "state": "QUARANTINE",
+      "count": 0
+    },
+    {
+      "round": 1,
+      "state": "SUSPECT",
+      "count": 0
+    }
+  ]
+}

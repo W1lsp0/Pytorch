@@ -1,0 +1,36 @@
+{
+  "complete": false,
+  "checked_at": 1790536521.0178182,
+  "paired_runs": 3,
+  "expected_pairs": 3,
+  "runs": [
+    {
+      "run": "1_ttfl_none_seed20240927",
+      "artifacts": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "f947626015f6dd6791a90f92da30f1cb345f245a5e3b4c18c6d28c62cb17b68d",
+        "partition_sha256": "e82d7d00ff9f67669472e9f04579cc1d6eaca41358daf4f92c5ea761706ee260"
+      },
+      "validated_scores": 1200
+    },
+    {
+      "run": "2_ttfl_backdoor_seed20240927",
+      "artifacts": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "f947626015f6dd6791a90f92da30f1cb345f245a5e3b4c18c6d28c62cb17b68d",
+        "partition_sha256": "e82d7d00ff9f67669472e9f04579cc1d6eaca41358daf4f92c5ea761706ee260"
+      },
+      "validated_scores": 1200
+    },
+    {
+      "run": "3_ttfl_delayed_backdoor_seed20240927",
+      "artifacts": {
+        "training_sha256": "3290a9cf58060d5b893cc18b6e658c991272d0cdaca8b4d6cb8d00d84a464e8f",
+        "initial_sha256": "f947626015f6dd6791a90f92da30f1cb345f245a5e3b4c18c6d28c62cb17b68d",
+        "partition_sha256": "e82d7d00ff9f67669472e9f04579cc1d6eaca41358daf4f92c5ea761706ee260"
+      },
+      "validated_scores": 40
+    }
+  ],
+  "note": "Complete snapshot coverage; live scoring audit only, not final outcomes. Power controls both admission and normalized weights."
+}

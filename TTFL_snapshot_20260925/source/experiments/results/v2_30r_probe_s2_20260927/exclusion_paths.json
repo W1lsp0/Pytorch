@@ -1,0 +1,4713 @@
+{
+  "runs": [
+    {
+      "run": "10_ttfl_backdoor_seed20240926",
+      "scenario": "backdoor",
+      "seed": 20240926,
+      "counts": {
+        "honest_rounds": 570,
+        "blacklist": 23,
+        "isolation": 48,
+        "layer_gate": 8
+      },
+      "records": [
+        {
+          "round": 3,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 6,
+          "client_id": 11,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 6,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 7,
+          "client_id": 11,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 7,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 8,
+          "client_id": 11,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 8,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 9,
+          "client_id": 11,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 9,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 15,
+          "reason": "blacklist"
+        }
+      ],
+      "source_sha256": "02bf59e60948a3df74c9c4f3f3bf6f2efe15e087a10d59bc03e4b447e7473651",
+      "audit_provenance": {
+        "blacklist_records_recovered": [
+          {
+            "round": 6,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 7,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 8,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 8,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          }
+        ],
+        "source_sha256": {
+          "round_metrics.jsonl": "0fe46fc4d6ecfa31ce36296fcfbae56f04767eb7e5cac2e8e21c2c2c78a4d7f3",
+          "server.log": "02bf59e60948a3df74c9c4f3f3bf6f2efe15e087a10d59bc03e4b447e7473651"
+        }
+      }
+    },
+    {
+      "run": "12_ttfl_delayed_backdoor_seed20240926",
+      "scenario": "delayed_backdoor",
+      "seed": 20240926,
+      "counts": {
+        "honest_rounds": 570,
+        "blacklist": 23,
+        "isolation": 47,
+        "layer_gate": 6
+      },
+      "records": [
+        {
+          "round": 3,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 6,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 7,
+          "client_id": 14,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 7,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 8,
+          "client_id": 14,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 8,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 9,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 15,
+          "reason": "blacklist"
+        }
+      ],
+      "source_sha256": "1f5a3009e794584c00bab78b5646a0e9fee602a4d15d611708b56fee05b5b9f9",
+      "audit_provenance": {
+        "blacklist_records_recovered": [
+          {
+            "round": 8,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          }
+        ],
+        "source_sha256": {
+          "round_metrics.jsonl": "2682d10f36ce27fedd76659c26a4f60841adc831585c60e6dba3981663d3c306",
+          "server.log": "1f5a3009e794584c00bab78b5646a0e9fee602a4d15d611708b56fee05b5b9f9"
+        }
+      }
+    },
+    {
+      "run": "2_ttfl_none_seed20240925",
+      "scenario": "none",
+      "seed": 20240925,
+      "counts": {
+        "honest_rounds": 600,
+        "blacklist": 69,
+        "isolation": 35,
+        "layer_gate": 10
+      },
+      "records": [
+        {
+          "round": 2,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 3,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 3,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 6,
+          "client_id": 11,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 6,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 6,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 7,
+          "client_id": 11,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 7,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 7,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 8,
+          "client_id": 11,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 8,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 8,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 9,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 9,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 9,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 11,
+          "reason": "blacklist"
+        }
+      ],
+      "source_sha256": "8f7cb34dbb3d021b3cf738d4172dd46c9bf76e08b6c7fce66967ef0112eb2593",
+      "audit_provenance": {
+        "blacklist_records_recovered": [
+          {
+            "round": 5,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 6,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 7,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 8,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 12,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 11,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          }
+        ],
+        "source_sha256": {
+          "round_metrics.jsonl": "601839157984e587bcd93347caae2ddeafbcc988535a5d3c7257017964d86770",
+          "server.log": "8f7cb34dbb3d021b3cf738d4172dd46c9bf76e08b6c7fce66967ef0112eb2593"
+        }
+      }
+    },
+    {
+      "run": "4_ttfl_backdoor_seed20240925",
+      "scenario": "backdoor",
+      "seed": 20240925,
+      "counts": {
+        "honest_rounds": 570,
+        "blacklist": 63,
+        "isolation": 57,
+        "layer_gate": 6
+      },
+      "records": [
+        {
+          "round": 2,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 3,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 3,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 6,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 6,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 7,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 7,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 8,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 8,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 9,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 11,
+          "reason": "blacklist"
+        }
+      ],
+      "source_sha256": "b22142e8fc248ca63c97b9e051a40d28eeecbb949ec6031721122749388df988",
+      "audit_provenance": {
+        "blacklist_records_recovered": [
+          {
+            "round": 5,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 6,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 6,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 7,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 7,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 8,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 8,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          }
+        ],
+        "source_sha256": {
+          "round_metrics.jsonl": "ff44d2ed4d0f17aba4b5b9c26921bf878def2e4fdc75d9222a08e09f9b66d39d",
+          "server.log": "b22142e8fc248ca63c97b9e051a40d28eeecbb949ec6031721122749388df988"
+        }
+      }
+    },
+    {
+      "run": "6_ttfl_delayed_backdoor_seed20240925",
+      "scenario": "delayed_backdoor",
+      "seed": 20240925,
+      "counts": {
+        "honest_rounds": 570,
+        "blacklist": 60,
+        "isolation": 37,
+        "layer_gate": 6
+      },
+      "records": [
+        {
+          "round": 2,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 3,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 3,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 17,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 12,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 6,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 6,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 7,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 7,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 8,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 8,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 9,
+          "client_id": 12,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 19,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 11,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 13,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 17,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 15,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 11,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 12,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 17,
+          "reason": "blacklist"
+        }
+      ],
+      "source_sha256": "044a80cc4dffd4ed68c43bd648d1e40cd00df4f7e31a85b4663793c3f76cc7a8",
+      "audit_provenance": {
+        "blacklist_records_recovered": [
+          {
+            "round": 5,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 6,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 7,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 8,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 11,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 12,
+            "reason": "risk_soft_isolation_for_8_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 1,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 17,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          }
+        ],
+        "source_sha256": {
+          "round_metrics.jsonl": "de63e1982e64a01f189eaaee2aa89773da27f1c5095fc525ea7e1d09dd3e9738",
+          "server.log": "044a80cc4dffd4ed68c43bd648d1e40cd00df4f7e31a85b4663793c3f76cc7a8"
+        }
+      }
+    },
+    {
+      "run": "8_ttfl_none_seed20240926",
+      "scenario": "none",
+      "seed": 20240926,
+      "counts": {
+        "honest_rounds": 600,
+        "blacklist": 25,
+        "isolation": 44,
+        "layer_gate": 3
+      },
+      "records": [
+        {
+          "round": 3,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 4,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 5,
+          "client_id": 15,
+          "reason": "layer_gate"
+        },
+        {
+          "round": 6,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 7,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 8,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 9,
+          "client_id": 14,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 9,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 10,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 10,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 11,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 11,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 12,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 12,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 13,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 13,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 14,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 14,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 15,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 15,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 16,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 16,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 17,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 17,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 18,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 18,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 19,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 19,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 20,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 20,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 21,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 21,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 22,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 22,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 23,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 23,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 24,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 24,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 25,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 25,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 26,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 26,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 27,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 27,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 28,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 28,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 29,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 29,
+          "client_id": 15,
+          "reason": "blacklist"
+        },
+        {
+          "round": 30,
+          "client_id": 10,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 16,
+          "reason": "isolation"
+        },
+        {
+          "round": 30,
+          "client_id": 15,
+          "reason": "blacklist"
+        }
+      ],
+      "source_sha256": "7d7ca4bd9f329f04ef24264bb60fb0e75d4d08c151224d039a366c5ef6e4ec3b",
+      "audit_provenance": {
+        "blacklist_records_recovered": [
+          {
+            "round": 6,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 7,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 8,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 9,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 10,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 11,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 12,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 13,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 14,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 15,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 16,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 17,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 18,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 19,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 20,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 21,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 22,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 23,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 24,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 25,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 26,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 27,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 28,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 29,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          },
+          {
+            "round": 30,
+            "client_id": 15,
+            "reason": "risk_ema_above_0.90_for_4_rounds"
+          }
+        ],
+        "source_sha256": {
+          "round_metrics.jsonl": "d1bd11b2e59401dd6a5ac103226c83ee7068aad78434372b9b4ad6ee00a3d3e3",
+          "server.log": "7d7ca4bd9f329f04ef24264bb60fb0e75d4d08c151224d039a366c5ef6e4ec3b"
+        }
+      }
+    }
+  ],
+  "totals": {
+    "honest_rounds": 3480,
+    "blacklist": 263,
+    "isolation": 268,
+    "layer_gate": 39
+  },
+  "limitation": "Layer-gate attribution is an observed exclusion path; old logs do not store raw scores and cannot prove risk attenuation is the sole cause."
+}

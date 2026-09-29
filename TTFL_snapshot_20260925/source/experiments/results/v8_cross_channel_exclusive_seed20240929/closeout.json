@@ -1,0 +1,6 @@
+{
+  "status": "complete",
+  "verified_runs": 6,
+  "report": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v8_cross_channel_exclusive_seed20240929/candidate/cross_channel_guard_report.md",
+  "decision": "Independent result requires interpretation; guard remains off by default."
+}

@@ -1,0 +1,29 @@
+{
+  "protocol_version": 2,
+  "method": "ttfl",
+  "scenario": "delayed_backdoor",
+  "seed": 20240930,
+  "clients": 20,
+  "rounds": 30,
+  "local_epochs": 1,
+  "attack_start_round": 11,
+  "attack_stop_round": 0,
+  "malicious_client_ids": [
+    1
+  ],
+  "poison_rate": 1.0,
+  "dataset": "CIFAR10_LOCAL",
+  "shared_client_pool_size": 0,
+  "server_proxy_size": 500,
+  "known_trigger_probe": true,
+  "heavy_probe_rotate_mod": 1,
+  "trigger_score_mode": "clean_delta",
+  "risk_raw_attenuation_power": 1.0,
+  "risk_cross_channel_guard": false,
+  "risk_soft_probation": false,
+  "asr_excludes_target_label": true,
+  "code_sha256": "91e799e1dc7f0fabdc3882432978b385ebabefc3eead0732d82d4ac9794c3843",
+  "python": "/data1/anaconda3/bin/python",
+  "server_address": "127.0.0.1:24203",
+  "gpu_visible_list": "2"
+}

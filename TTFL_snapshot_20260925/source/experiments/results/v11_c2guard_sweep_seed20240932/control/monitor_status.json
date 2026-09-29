@@ -1,0 +1,148 @@
+{
+  "checked_at": 1790622603.0826185,
+  "host": "local",
+  "gpu_memory_mib": {
+    "0": 23,
+    "1": 23,
+    "2": 23,
+    "3": 23,
+    "4": 23
+  },
+  "runs": [
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t3_none",
+      "gpu": "0",
+      "adopted": true
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "base_none",
+      "gpu": "0",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "ref_none",
+      "gpu": "0",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t3_backdoor",
+      "gpu": "1",
+      "adopted": true
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "base_backdoor",
+      "gpu": "1",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "ref_backdoor",
+      "gpu": "1",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t3_delayed",
+      "gpu": "2",
+      "adopted": true
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "base_delayed",
+      "gpu": "2",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "ref_delayed",
+      "gpu": "2",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t4_none",
+      "gpu": "3",
+      "adopted": true
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t5_none",
+      "gpu": "3",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t5_delayed",
+      "gpu": "3",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t4_backdoor",
+      "gpu": "4",
+      "adopted": true
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t5_backdoor",
+      "gpu": "4",
+      "adopted": false
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "t4_delayed",
+      "gpu": "4",
+      "adopted": false
+    }
+  ]
+}

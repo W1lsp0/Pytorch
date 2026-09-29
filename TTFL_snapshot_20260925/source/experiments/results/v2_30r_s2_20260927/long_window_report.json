@@ -262,6 +262,13 @@
         0.06288888888888888,
         0.05466666666666667
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "f833063a84eae37ae5ae77613c6f38d452f0726997e32f1abbf2d22e42d09345",
+          "server.log": "cb6eb6fa0c2c010f705f4ff8ed3d0ac615c3e580755d5d8bca67b885d11a65e5"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.05,
@@ -325,7 +332,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "4_ttfl_none_seed20240925",
@@ -411,6 +541,13 @@
         0.04966666666666666,
         0.04822222222222224
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "0546efe45019fda524f43e5c88b1bb48ee174cca375c4dd22bc29868f49b6144",
+          "server.log": "77bd2f825c0a43caff8863b3032dad983169071451c92d612adabd0406104048"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -474,7 +611,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "5_fedavg_backdoor_seed20240925",
@@ -673,7 +933,8 @@
           "first_excluded_round_after_start": 14,
           "exclusion_delay_rounds": 13,
           "status": "observed",
-          "observed_attack_rounds": 30
+          "observed_attack_rounds": 30,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -740,6 +1001,13 @@
         0.09433333333333334,
         0.07911111111111112
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "5ca57b14ad2e0205330db2e48b369cd28f4e2bd8028796b7684dda6840d20405",
+          "server.log": "523f3428d9d59c45a05f603639365cda3e8bb9ae1d9f544c7b2720bd9fc5aaee"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.05263157894736842,
@@ -803,7 +1071,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "8_ttfl_backdoor_seed20240925",
@@ -830,7 +1221,8 @@
           "first_excluded_round_after_start": null,
           "exclusion_delay_rounds": null,
           "status": "not_observed",
-          "observed_attack_rounds": 30
+          "observed_attack_rounds": 30,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -897,6 +1289,13 @@
         0.09222222222222225,
         0.08722222222222224
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "9613b337d5b126a5998459dc7489ab90d425c54e75dfe34b14dda7578e21bbd8",
+          "server.log": "82b4186cbf4a7881258a5a281f9b8c463d542c17cb4d6896cd3e4b48f261f75c"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -960,7 +1359,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "9_fedavg_delayed_backdoor_seed20240925",
@@ -1169,7 +1691,8 @@
           "first_excluded_round_after_start": 15,
           "exclusion_delay_rounds": 4,
           "status": "observed",
-          "observed_attack_rounds": 20
+          "observed_attack_rounds": 20,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -1236,6 +1759,13 @@
         0.05766666666666666,
         0.12155555555555551
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "04946951eeb26a894694b7583015089be4f885f84340c699e6953bad51da2159",
+          "server.log": "c9384a93059c1c862105dffd2f79ec74e6e352745d0009c180e941bc77fc681c"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.05263157894736842,
@@ -1299,7 +1829,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "12_ttfl_delayed_backdoor_seed20240925",
@@ -1328,7 +1981,8 @@
           "first_excluded_round_after_start": null,
           "exclusion_delay_rounds": null,
           "status": "not_observed",
-          "observed_attack_rounds": 20
+          "observed_attack_rounds": 20,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -1395,6 +2049,13 @@
         0.08544444444444449,
         0.08066666666666664
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "120314111171db6941663a7fd41f01627dcfc7f8430eba1aa6c5b3e5336ec831",
+          "server.log": "cca9f2c8e794cdf13bff86b554a00977f0747151270d17cb459503a37dd2dbdc"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -1458,7 +2119,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "13_fedavg_none_seed20240926",
@@ -1712,6 +2496,13 @@
         0.04088888888888888,
         0.03944444444444444
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "1b1fcc92faba8265a7f3999cfea8a5cd5405951141f4aa5e0ff5a8319b548fc5",
+          "server.log": "1970798745ca97c4093c3f0044c78f43992e501a8cd9cdc984dfc834e037f45a"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -1775,7 +2566,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "16_ttfl_none_seed20240926",
@@ -1861,6 +2775,13 @@
         0.04988888888888888,
         0.03811111111111112
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "4f50f99d688e509f884d142bcbcb0a3a0fafd225e9f0202aa5b8214f26caa961",
+          "server.log": "9a9003a09069d695d62ea9eeca9849ba7e99663a189dee1b0f548da30b13bfac"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -1924,7 +2845,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "17_fedavg_backdoor_seed20240926",
@@ -2126,7 +3170,8 @@
           "first_excluded_round_after_start": 3,
           "exclusion_delay_rounds": 2,
           "status": "observed",
-          "observed_attack_rounds": 30
+          "observed_attack_rounds": 30,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -2193,6 +3238,13 @@
         0.11133333333333334,
         0.02766666666666667
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "9c2f81738c74724211b0a4d2796f2c38cf4d4af47aa42335b1ab2840b484504f",
+          "server.log": "93668babb6294deb89284297c81f9c7fb19b1597bd5ee7012c4a0fb26964f5e0"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -2256,7 +3308,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "20_ttfl_backdoor_seed20240926",
@@ -2284,7 +3459,8 @@
           "first_excluded_round_after_start": null,
           "exclusion_delay_rounds": null,
           "status": "not_observed",
-          "observed_attack_rounds": 30
+          "observed_attack_rounds": 30,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -2351,6 +3527,13 @@
         0.07966666666666664,
         0.06288888888888888
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "72cf94cca0bd14c36dd3363ee58e5c7b34f72a62baab40871f0c09decc54c590",
+          "server.log": "4fabf20e8a835ab5c854700606a7000534b0e100fc375b299a1da79ce268f69f"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -2414,7 +3597,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "21_fedavg_delayed_backdoor_seed20240926",
@@ -2620,7 +3926,8 @@
           "first_excluded_round_after_start": 20,
           "exclusion_delay_rounds": 9,
           "status": "observed",
-          "observed_attack_rounds": 20
+          "observed_attack_rounds": 20,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -2687,6 +3994,13 @@
         0.037,
         0.093
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "dd720662268b5dd979a8ea95bc171e20fe01657bd7cd842a030eaef718fb01b0",
+          "server.log": "442643d5d282f091c31cc2123650365a4242d929ad6b37957561673e0d5aa513"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -2750,7 +4064,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     },
     {
       "run_id": "24_ttfl_delayed_backdoor_seed20240926",
@@ -2779,7 +4216,8 @@
           "first_excluded_round_after_start": null,
           "exclusion_delay_rounds": null,
           "status": "not_observed",
-          "observed_attack_rounds": 20
+          "observed_attack_rounds": 20,
+          "missing_rounds": []
         }
       },
       "clean_accuracy": [
@@ -2846,6 +4284,13 @@
         0.06077777777777776,
         0.04433333333333333
       ],
+      "audit_provenance": {
+        "blacklist_records_recovered": [],
+        "source_sha256": {
+          "round_metrics.jsonl": "6a784a7f902b4ef80ab2b3239115ce684eceedd790eb4bf0eee9ad8092b54f45",
+          "server.log": "805f1db6dc0f95a24837ed10cce08c56e994a7bd44db8c2d3d86f66983c17eaa"
+        }
+      },
       "normal_exclusion_by_round": [
         0.0,
         0.0,
@@ -2909,7 +4354,130 @@
         0.0,
         0.0,
         0.0
-      ]
+      ],
+      "audit_missing_client_ids_by_round": [
+        {
+          "round": 1,
+          "client_ids": []
+        },
+        {
+          "round": 2,
+          "client_ids": []
+        },
+        {
+          "round": 3,
+          "client_ids": []
+        },
+        {
+          "round": 4,
+          "client_ids": []
+        },
+        {
+          "round": 5,
+          "client_ids": []
+        },
+        {
+          "round": 6,
+          "client_ids": []
+        },
+        {
+          "round": 7,
+          "client_ids": []
+        },
+        {
+          "round": 8,
+          "client_ids": []
+        },
+        {
+          "round": 9,
+          "client_ids": []
+        },
+        {
+          "round": 10,
+          "client_ids": []
+        },
+        {
+          "round": 11,
+          "client_ids": []
+        },
+        {
+          "round": 12,
+          "client_ids": []
+        },
+        {
+          "round": 13,
+          "client_ids": []
+        },
+        {
+          "round": 14,
+          "client_ids": []
+        },
+        {
+          "round": 15,
+          "client_ids": []
+        },
+        {
+          "round": 16,
+          "client_ids": []
+        },
+        {
+          "round": 17,
+          "client_ids": []
+        },
+        {
+          "round": 18,
+          "client_ids": []
+        },
+        {
+          "round": 19,
+          "client_ids": []
+        },
+        {
+          "round": 20,
+          "client_ids": []
+        },
+        {
+          "round": 21,
+          "client_ids": []
+        },
+        {
+          "round": 22,
+          "client_ids": []
+        },
+        {
+          "round": 23,
+          "client_ids": []
+        },
+        {
+          "round": 24,
+          "client_ids": []
+        },
+        {
+          "round": 25,
+          "client_ids": []
+        },
+        {
+          "round": 26,
+          "client_ids": []
+        },
+        {
+          "round": 27,
+          "client_ids": []
+        },
+        {
+          "round": 28,
+          "client_ids": []
+        },
+        {
+          "round": 29,
+          "client_ids": []
+        },
+        {
+          "round": 30,
+          "client_ids": []
+        }
+      ],
+      "audit_missing_rounds": []
     }
   ],
   "groups": [

@@ -1,0 +1,6 @@
+{
+  "valid_for_comparison": false,
+  "recorded_at": 1790556856.7255106,
+  "reason": "Initial overlapping GPU assignment caused OOM; unaffected remaining runs were interrupted.",
+  "raw_logs_preserved": true
+}

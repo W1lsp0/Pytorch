@@ -1,0 +1,67 @@
+{
+  "checked_at": "2026-09-27T16:58:51+08:00",
+  "expected_runs": 6,
+  "created_runs": 6,
+  "successful_runs": 6,
+  "pending_runs": 0,
+  "controller_alive": false,
+  "watcher_alive": false,
+  "verified_complete": true,
+  "warnings": [],
+  "runs": [
+    {
+      "run": "1_ttfl_none_seed20240925",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "unexpected_returns": [],
+      "error": null,
+      "server_log_idle_seconds": 2366
+    },
+    {
+      "run": "2_ttfl_backdoor_seed20240925",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "unexpected_returns": [],
+      "error": null,
+      "server_log_idle_seconds": 2291
+    },
+    {
+      "run": "3_ttfl_delayed_backdoor_seed20240925",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "unexpected_returns": [],
+      "error": null,
+      "server_log_idle_seconds": 2440
+    },
+    {
+      "run": "4_ttfl_none_seed20240926",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "unexpected_returns": [],
+      "error": null,
+      "server_log_idle_seconds": 2387
+    },
+    {
+      "run": "5_ttfl_backdoor_seed20240926",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "unexpected_returns": [],
+      "error": null,
+      "server_log_idle_seconds": 54
+    },
+    {
+      "run": "6_ttfl_delayed_backdoor_seed20240926",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "unexpected_returns": [],
+      "error": null,
+      "server_log_idle_seconds": 54
+    }
+  ]
+}

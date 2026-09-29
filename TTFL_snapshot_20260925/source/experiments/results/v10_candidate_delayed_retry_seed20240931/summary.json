@@ -1,0 +1,14 @@
+{
+  "protocol": {
+    "dataset": "CIFAR-10 local",
+    "clients": null,
+    "rounds": null,
+    "local_epochs": null,
+    "shared_client_pool_size": 0,
+    "server_proxy_size": 500,
+    "known_trigger_probe": false,
+    "seed": null,
+    "purpose": "development matrix; interpret only with the run manifests"
+  },
+  "runs": []
+}

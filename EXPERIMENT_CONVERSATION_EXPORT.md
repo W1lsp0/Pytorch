@@ -314,3 +314,60 @@
 4. 固定探针假设后，运行 20 客户端、多种子开发矩阵。
 5. 再补正式基线、第二数据集和系统开销实验。
 6. 最后重写论文摘要、方法、实验、图表和限制。
+
+
+## 2026-09-28 续跑入口更新
+
+最新详细记录见 `TTFL_snapshot_20260925/实验协议修复与论文重构计划.md` 第十九至二十二节。下面是当前后台批次的交接信息；前面的待办与历史结论不能替代新记录。
+
+
+### 独立种子有效批次与持续监控交接（2026-09-28）
+
+当前唯一有效的 v8 批次：`source/experiments/results/v8_cross_channel_exclusive_seed20240929`，监督器 PID 317684，使用 `/data1/anaconda3/envs/W1lsp0/bin/python`。基线三个场景独占 GPU 0/1/2，候选 none/backdoor 独占 GPU 3/4，候选 delayed_backdoor 在队列中等待首张释放的卡；共 6 项、最多 5 项并行，每项 30 轮。不要重复启动监督器，也不要将已作废的原始或 _retry 目录日志作为本批状态。
+
+后台监督器每 30 秒写 `monitor_status.json` 和 `monitor_events.jsonl`；所有运行完成后自动汇总、协议审计、隔离诊断和配对报告。以 `closeout.json` 与 `monitor_status.json` 的 verified_complete 判断最终审计是否完成。候选仍默认关闭；运行中不修改训练代码。
+
+本次交接快照时间：2026-09-28T09:03:16.008501+08:00；警告：[]。
+- baseline / none: running，fit=2，evaluate=2，audit_round=2。
+- baseline / backdoor: running，fit=2，evaluate=2，audit_round=2。
+- baseline / delayed_backdoor: running，fit=2，evaluate=2，audit_round=2。
+- candidate / none: running，fit=2，evaluate=2，audit_round=2。
+- candidate / backdoor: running，fit=2，evaluate=2，audit_round=2。
+- candidate / delayed_backdoor: queued，fit=0，evaluate=0，audit_round=0。
+
+
+## 2026-09-28 v8 独立种子收尾
+
+
+## 二十三、跨通道候选独立种子收尾（2026-09-28，已完成）
+
+独占 GPU 批次 `source/experiments/results/v8_cross_channel_exclusive_seed20240929` 已完成 6/6 项：基线 none/backdoor/delayed_backdoor 与候选 none/backdoor/delayed_backdoor，各 30 轮、20 客户端、1 epoch、种子 20240929。每项 fit/evaluate 为 20 个结果、0 failures；两套协议审计 `run_count=3` 且无失败。监督器自动完成隔离诊断与配对报告，收尾状态为 `closeout.json: complete`，训练进程已退出，GPU 已释放。
+
+候选开关仍是两个干预点：soft gate 的额外证据要求（soft_strong 绕过保留）和 C2 quarantine hit 要求；额外通道没有统计独立性证明。因此这是有明确范围的配对开发验证，不是严格单因素机制消融。
+
+独立种子 20240929 的基线 → 候选结果：
+
+- 无攻击：最终准确率 56.70% → 57.11%，最终 ASR 8.28% → 6.71%；正常客户端完全排除 46/600 → 21/600，明确风险隔离 46 → 5。
+- 持续后门：最终准确率 54.46% → 53.72%，最终 ASR 13.09% → 14.00%，攻击窗口平均 ASR 20.69% → 21.05%；正常客户端完全排除 45/570 → 26/570，明确风险隔离 45 → 3；恶意客户端两边均未明确隔离。
+- 延迟后门：最终准确率 54.44% → 54.91%，最终 ASR 10.82% → 12.64%，攻击窗口平均 ASR 14.61% → 15.21%；正常客户端完全排除 75/570 → 18/570，明确风险隔离 53 → 3；基线恶意客户端在第 16、30 轮隔离，候选在 30 轮内未隔离。
+
+该独立种子支持候选明显降低正常客户端误排除，但代价是持续/延迟后门攻击窗口 ASR 和最终 ASR 上升，且延迟攻击的恶意隔离能力消失。因此候选不采用为默认方案；`RISK_CROSS_CHANNEL_GUARD` 保持默认关闭。完整校验与数值见候选目录 `cross_channel_guard_report.md/json`、两套 `protocol_audit.json`、`closeout.json`。后续应优先改进风险证据设计并重新进行独立验证，不应把本批结果表述为全面安全改进。
+
+
+## v9 风险观察期候选监测交接（2026-09-28）
+
+有效批次：`source/experiments/results/v9_risk_soft_probation_matrix_seed20240930_retry`。监督器 PID 386420，使用 `/data1/anaconda3/envs/W1lsp0/bin/python`，每 30 秒持续更新状态。原不带 `_retry` 的批次因误用系统 Python 缺少 flwr 而启动失败，已作废保留。
+
+候选 `RISK_SOFT_PROBATION=1` 保留软风险状态及风险降权，改变参考集合和聚合集合的风险排除规则；黑名单/C2 隔离、Hist 隔离和层门槛仍存在，不能表述为只有黑名单/C2 才能阻断，也不能把 risk_isolated 或监控 isolated_now 等同于实际阻断。两套均固定 clean_delta、guard=0、衰减幂1，种子20240930是开发种子。
+
+本次仅修正离线报告，未改运行中的训练源码。报告新增逐恶意客户端完全排除轮次、攻击窗口内首次排除和攻击前排除标记，同时呈现风险标记；2项语义测试通过。6个训练快照与冻结哈希一致，3组配对的训练源码、初始化、完整分片和协议一致，证据为 paired_preflight.json，complete=false 表示训练尚未完成。所有已观察的训练/评估聚合记录均为20个结果、0 failures。
+
+最新监测：2026-09-28T18:41:09.912679+08:00，警告 []。
+- baseline / none：success，fit/evaluate/audit=30/30/30，GPU 0。
+- baseline / backdoor：success，fit/evaluate/audit=30/30/30，GPU 1。
+- baseline / delayed_backdoor：success，fit/evaluate/audit=30/30/30，GPU 2。
+- candidate / none：success，fit/evaluate/audit=30/30/30，GPU 3。
+- candidate / backdoor：success，fit/evaluate/audit=30/30/30，GPU 4。
+- candidate / delayed_backdoor：running，fit/evaluate/audit=21/21/21，GPU 3。
+
+监督器在全部运行结束后自动汇总、协议审计并运行 report_risk_soft_probation.py，生成 candidate/risk_soft_probation_report.md/json 和 closeout.json。随后必须解读正常完全排除、攻击窗口平均/峰值ASR、准确率和实际恶意阻断，未达标继续找方法；不能把新候选已启动等同于实验目的完成。

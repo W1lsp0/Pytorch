@@ -1,0 +1,4 @@
+{
+  "invalidated_at": "2026-09-28T16:24:06.388927+08:00",
+  "reason": "operator launched supervisor with system python; snapshots failed with ModuleNotFoundError: flwr; no training result used"
+}

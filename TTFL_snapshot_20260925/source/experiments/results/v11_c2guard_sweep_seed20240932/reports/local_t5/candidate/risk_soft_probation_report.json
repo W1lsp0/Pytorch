@@ -1,0 +1,257 @@
+{
+  "complete": true,
+  "baseline_root": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v11_c2guard_sweep_seed20240932/reports/local_t5/baseline",
+  "candidate_root": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v11_c2guard_sweep_seed20240932/reports/local_t5/candidate",
+  "scenarios": {
+    "backdoor": {
+      "validation": {
+        "baseline": {
+          "training_sha256": "9262aed2a5722ff99a801377675c7e20762dbb0c938f4b06b64a792346e85366",
+          "initial_sha256": "e17cade9b5e0ea1b56dea44448b22b75ae689fc48fddc7fff421fc3d43f95c00",
+          "partition_sha256": "0e30a2ec9665bf6eb623430d83447d0e62d04e0a2f2c5a53ff78cb362b133da7"
+        },
+        "candidate": {
+          "training_sha256": "9262aed2a5722ff99a801377675c7e20762dbb0c938f4b06b64a792346e85366",
+          "initial_sha256": "e17cade9b5e0ea1b56dea44448b22b75ae689fc48fddc7fff421fc3d43f95c00",
+          "partition_sha256": "0e30a2ec9665bf6eb623430d83447d0e62d04e0a2f2c5a53ff78cb362b133da7"
+        }
+      },
+      "baseline": {
+        "scenario": "backdoor",
+        "seed": 20240932,
+        "probation": false,
+        "attack_window_rounds": [
+          1,
+          30
+        ],
+        "final_accuracy": 0.5453,
+        "final_asr": 0.0988888888888889,
+        "attack_window_mean_asr": 0.1873925925925926,
+        "attack_window_peak_asr": 0.508888888888889,
+        "normal_excluded_total": 67,
+        "normal_client_rounds": 570,
+        "normal_exclusion_rate": 0.11754385964912281,
+        "normal_explicit_isolation_total": 61,
+        "malicious_isolated_rounds": [],
+        "malicious_fully_excluded_rounds_by_client": {
+          "1": []
+        },
+        "first_malicious_exclusion_after_start_by_client": {
+          "1": null
+        },
+        "malicious_excluded_before_attack_by_client": {
+          "1": false
+        },
+        "first_malicious_isolation_round": null,
+        "reason_counts": {
+          "normal:risk_soft_streak": 35,
+          "normal:c2_quarantine": 9,
+          "normal:c2_drift_combo_for_5_rounds": 17
+        }
+      },
+      "candidate": {
+        "scenario": "backdoor",
+        "seed": 20240932,
+        "probation": true,
+        "attack_window_rounds": [
+          1,
+          30
+        ],
+        "final_accuracy": 0.5319,
+        "final_asr": 0.11033333333333334,
+        "attack_window_mean_asr": 0.19207037037037036,
+        "attack_window_peak_asr": 0.504777777777778,
+        "normal_excluded_total": 24,
+        "normal_client_rounds": 570,
+        "normal_exclusion_rate": 0.042105263157894736,
+        "normal_explicit_isolation_total": 70,
+        "malicious_isolated_rounds": [],
+        "malicious_fully_excluded_rounds_by_client": {
+          "1": []
+        },
+        "first_malicious_exclusion_after_start_by_client": {
+          "1": null
+        },
+        "malicious_excluded_before_attack_by_client": {
+          "1": false
+        },
+        "first_malicious_isolation_round": null,
+        "reason_counts": {
+          "normal:risk_soft_streak": 48,
+          "normal:risk_ema_above_0.90_for_4_rounds": 22
+        }
+      },
+      "delta": {
+        "final_accuracy": -0.013399999999999967,
+        "final_asr": 0.011444444444444438,
+        "normal_excluded_total": -43,
+        "normal_exclusion_rate": -0.07543859649122808,
+        "normal_explicit_isolation_total": 9
+      },
+      "attack_window_mean_asr_delta": 0.004677777777777753
+    },
+    "delayed_backdoor": {
+      "validation": {
+        "baseline": {
+          "training_sha256": "9262aed2a5722ff99a801377675c7e20762dbb0c938f4b06b64a792346e85366",
+          "initial_sha256": "e17cade9b5e0ea1b56dea44448b22b75ae689fc48fddc7fff421fc3d43f95c00",
+          "partition_sha256": "0e30a2ec9665bf6eb623430d83447d0e62d04e0a2f2c5a53ff78cb362b133da7"
+        },
+        "candidate": {
+          "training_sha256": "9262aed2a5722ff99a801377675c7e20762dbb0c938f4b06b64a792346e85366",
+          "initial_sha256": "e17cade9b5e0ea1b56dea44448b22b75ae689fc48fddc7fff421fc3d43f95c00",
+          "partition_sha256": "0e30a2ec9665bf6eb623430d83447d0e62d04e0a2f2c5a53ff78cb362b133da7"
+        }
+      },
+      "baseline": {
+        "scenario": "delayed_backdoor",
+        "seed": 20240932,
+        "probation": false,
+        "attack_window_rounds": [
+          11,
+          30
+        ],
+        "final_accuracy": 0.5423,
+        "final_asr": 0.105,
+        "attack_window_mean_asr": 0.13673888888888888,
+        "attack_window_peak_asr": 0.34377777777777796,
+        "normal_excluded_total": 58,
+        "normal_client_rounds": 570,
+        "normal_exclusion_rate": 0.10175438596491228,
+        "normal_explicit_isolation_total": 58,
+        "malicious_isolated_rounds": [],
+        "malicious_fully_excluded_rounds_by_client": {
+          "1": [
+            19
+          ]
+        },
+        "first_malicious_exclusion_after_start_by_client": {
+          "1": 19
+        },
+        "malicious_excluded_before_attack_by_client": {
+          "1": false
+        },
+        "first_malicious_isolation_round": null,
+        "reason_counts": {
+          "normal:risk_soft_streak": 37,
+          "normal:c2_drift_combo_for_5_rounds": 21
+        }
+      },
+      "candidate": {
+        "scenario": "delayed_backdoor",
+        "seed": 20240932,
+        "probation": true,
+        "attack_window_rounds": [
+          11,
+          30
+        ],
+        "final_accuracy": 0.5393,
+        "final_asr": 0.11811111111111106,
+        "attack_window_mean_asr": 0.13899444444444448,
+        "attack_window_peak_asr": 0.335111111111111,
+        "normal_excluded_total": 27,
+        "normal_client_rounds": 570,
+        "normal_exclusion_rate": 0.04736842105263158,
+        "normal_explicit_isolation_total": 67,
+        "malicious_isolated_rounds": [],
+        "malicious_fully_excluded_rounds_by_client": {
+          "1": [
+            19
+          ]
+        },
+        "first_malicious_exclusion_after_start_by_client": {
+          "1": 19
+        },
+        "malicious_excluded_before_attack_by_client": {
+          "1": false
+        },
+        "first_malicious_isolation_round": null,
+        "reason_counts": {
+          "normal:risk_soft_streak": 42,
+          "normal:risk_ema_above_0.90_for_4_rounds": 22,
+          "normal:c2_quarantine": 3
+        }
+      },
+      "delta": {
+        "final_accuracy": -0.0030000000000000027,
+        "final_asr": 0.01311111111111106,
+        "normal_excluded_total": -31,
+        "normal_exclusion_rate": -0.0543859649122807,
+        "normal_explicit_isolation_total": 9
+      },
+      "attack_window_mean_asr_delta": 0.002255555555555594
+    },
+    "none": {
+      "validation": {
+        "baseline": {
+          "training_sha256": "9262aed2a5722ff99a801377675c7e20762dbb0c938f4b06b64a792346e85366",
+          "initial_sha256": "e17cade9b5e0ea1b56dea44448b22b75ae689fc48fddc7fff421fc3d43f95c00",
+          "partition_sha256": "0e30a2ec9665bf6eb623430d83447d0e62d04e0a2f2c5a53ff78cb362b133da7"
+        },
+        "candidate": {
+          "training_sha256": "9262aed2a5722ff99a801377675c7e20762dbb0c938f4b06b64a792346e85366",
+          "initial_sha256": "e17cade9b5e0ea1b56dea44448b22b75ae689fc48fddc7fff421fc3d43f95c00",
+          "partition_sha256": "0e30a2ec9665bf6eb623430d83447d0e62d04e0a2f2c5a53ff78cb362b133da7"
+        }
+      },
+      "baseline": {
+        "scenario": "none",
+        "seed": 20240932,
+        "probation": false,
+        "attack_window_rounds": null,
+        "final_accuracy": 0.5561,
+        "final_asr": 0.06644444444444447,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_excluded_total": 77,
+        "normal_client_rounds": 600,
+        "normal_exclusion_rate": 0.12833333333333333,
+        "normal_explicit_isolation_total": 78,
+        "malicious_isolated_rounds": [],
+        "malicious_fully_excluded_rounds_by_client": {},
+        "first_malicious_exclusion_after_start_by_client": {},
+        "malicious_excluded_before_attack_by_client": {},
+        "first_malicious_isolation_round": null,
+        "reason_counts": {
+          "normal:risk_soft_streak": 48,
+          "normal:c2_quarantine": 13,
+          "normal:c2_drift_combo_for_5_rounds": 17
+        }
+      },
+      "candidate": {
+        "scenario": "none",
+        "seed": 20240932,
+        "probation": true,
+        "attack_window_rounds": null,
+        "final_accuracy": 0.5533,
+        "final_asr": 0.07033333333333334,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_excluded_total": 50,
+        "normal_client_rounds": 600,
+        "normal_exclusion_rate": 0.08333333333333333,
+        "normal_explicit_isolation_total": 91,
+        "malicious_isolated_rounds": [],
+        "malicious_fully_excluded_rounds_by_client": {},
+        "first_malicious_exclusion_after_start_by_client": {},
+        "malicious_excluded_before_attack_by_client": {},
+        "first_malicious_isolation_round": null,
+        "reason_counts": {
+          "normal:risk_soft_streak": 45,
+          "normal:risk_ema_above_0.90_for_4_rounds": 22,
+          "normal:risk_soft_isolation_for_8_rounds": 19,
+          "normal:c2_quarantine": 5
+        }
+      },
+      "delta": {
+        "final_accuracy": -0.0028000000000000247,
+        "final_asr": 0.0038888888888888723,
+        "normal_excluded_total": -27,
+        "normal_exclusion_rate": -0.045,
+        "normal_explicit_isolation_total": 13
+      },
+      "attack_window_mean_asr_delta": null
+    }
+  },
+  "scope": "Candidate keeps soft-risk clients in final aggregation during probation while excluding them from the g_root reference set; blacklist and C2 quarantine retain aggregation exclusion. Known-trigger clean_delta, one development seed."
+}

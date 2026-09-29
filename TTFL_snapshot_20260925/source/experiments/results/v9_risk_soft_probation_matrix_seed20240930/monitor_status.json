@@ -1,0 +1,74 @@
+{
+  "checked_at": "2026-09-28T16:22:02.278555+08:00",
+  "verified_complete": false,
+  "warnings": [
+    "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930/baseline/1_ttfl_none_seed20240930: failure or unexpected returns",
+    "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930/baseline/2_ttfl_backdoor_seed20240930: failure or unexpected returns",
+    "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930/baseline/3_ttfl_delayed_backdoor_seed20240930: failure or unexpected returns",
+    "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930/candidate/4_ttfl_none_seed20240930: failure or unexpected returns",
+    "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930/candidate/5_ttfl_backdoor_seed20240930: failure or unexpected returns",
+    "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930/candidate/6_ttfl_delayed_backdoor_seed20240930: failure or unexpected returns"
+  ],
+  "runs": [
+    {
+      "variant": "baseline",
+      "scenario": "none",
+      "status": "failure",
+      "fit": 0,
+      "evaluate": 0,
+      "audit_round": 0,
+      "isolated_now": [],
+      "gpu": "0"
+    },
+    {
+      "variant": "baseline",
+      "scenario": "backdoor",
+      "status": "failure",
+      "fit": 0,
+      "evaluate": 0,
+      "audit_round": 0,
+      "isolated_now": [],
+      "gpu": "1"
+    },
+    {
+      "variant": "baseline",
+      "scenario": "delayed_backdoor",
+      "status": "failure",
+      "fit": 0,
+      "evaluate": 0,
+      "audit_round": 0,
+      "isolated_now": [],
+      "gpu": "2"
+    },
+    {
+      "variant": "candidate",
+      "scenario": "none",
+      "status": "failure",
+      "fit": 0,
+      "evaluate": 0,
+      "audit_round": 0,
+      "isolated_now": [],
+      "gpu": "3"
+    },
+    {
+      "variant": "candidate",
+      "scenario": "backdoor",
+      "status": "failure",
+      "fit": 0,
+      "evaluate": 0,
+      "audit_round": 0,
+      "isolated_now": [],
+      "gpu": "4"
+    },
+    {
+      "variant": "candidate",
+      "scenario": "delayed_backdoor",
+      "status": "failure",
+      "fit": 0,
+      "evaluate": 0,
+      "audit_round": 0,
+      "isolated_now": [],
+      "gpu": "1"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "result_root": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930_retry/baseline",
+  "runs": [
+    {
+      "run_id": "1_ttfl_none_seed20240930",
+      "scenario": "none",
+      "seed": 20240930,
+      "rounds_read": 30,
+      "isolation_reason_counts": {
+        "c2_quarantine": 1,
+        "risk_soft_streak": 1,
+        "c2_drift_combo_for_5_rounds": 1
+      },
+      "identity_reason_counts": {
+        "normal:c2_drift_combo_for_5_rounds": 1,
+        "normal:c2_quarantine": 1,
+        "normal:risk_soft_streak": 1
+      },
+      "isolated_records": 3,
+      "average_channels_on_isolated_records": {
+        "risk_new": 0.6004128202865743,
+        "probe_risk": 0.5939955323247421,
+        "grad_risk": 0.3990140074850827,
+        "trigger_risk": 0.0,
+        "pixel_risk": 0.0,
+        "peer_effective": 0.4572114952091237,
+        "soft_hit_count": 2.6666666666666665
+      },
+      "first_isolation": [
+        13,
+        "11",
+        "normal",
+        "c2_quarantine"
+      ]
+    },
+    {
+      "run_id": "2_ttfl_backdoor_seed20240930",
+      "scenario": "backdoor",
+      "seed": 20240930,
+      "rounds_read": 30,
+      "isolation_reason_counts": {
+        "c2_quarantine": 4,
+        "risk_soft_streak": 3,
+        "c2_drift_combo_for_5_rounds": 1
+      },
+      "identity_reason_counts": {
+        "normal:c2_drift_combo_for_5_rounds": 1,
+        "normal:c2_quarantine": 4,
+        "normal:risk_soft_streak": 3
+      },
+      "isolated_records": 8,
+      "average_channels_on_isolated_records": {
+        "risk_new": 0.5697645277332809,
+        "probe_risk": 0.3208288855007978,
+        "grad_risk": 0.3855420449574094,
+        "trigger_risk": 0.0,
+        "pixel_risk": 0.0,
+        "peer_effective": 0.39451895642670226,
+        "soft_hit_count": 2.125
+      },
+      "first_isolation": [
+        9,
+        "11",
+        "normal",
+        "c2_quarantine"
+      ]
+    },
+    {
+      "run_id": "3_ttfl_delayed_backdoor_seed20240930",
+      "scenario": "delayed_backdoor",
+      "seed": 20240930,
+      "rounds_read": 30,
+      "isolation_reason_counts": {
+        "risk_soft_streak": 5,
+        "c2_quarantine": 16
+      },
+      "identity_reason_counts": {
+        "normal:c2_quarantine": 16,
+        "normal:risk_soft_streak": 5
+      },
+      "isolated_records": 21,
+      "average_channels_on_isolated_records": {
+        "risk_new": 0.6371646194882424,
+        "probe_risk": 0.4793300844566251,
+        "grad_risk": 0.3055250201980783,
+        "trigger_risk": 0.0,
+        "pixel_risk": 0.0,
+        "peer_effective": 0.3215108847422351,
+        "soft_hit_count": 1.7142857142857142
+      },
+      "first_isolation": [
+        10,
+        "16",
+        "normal",
+        "risk_soft_streak"
+      ]
+    }
+  ]
+}

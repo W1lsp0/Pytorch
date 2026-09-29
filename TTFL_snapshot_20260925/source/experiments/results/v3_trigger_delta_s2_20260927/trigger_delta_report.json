@@ -1,0 +1,5817 @@
+{
+  "complete": true,
+  "pairs": [
+    {
+      "scenario": "backdoor",
+      "seed": 20240925,
+      "baseline": {
+        "run_id": "4_ttfl_backdoor_seed20240925",
+        "method": "ttfl",
+        "scenario": "backdoor",
+        "seed": 20240925,
+        "rounds": 30,
+        "final_accuracy": 0.537,
+        "final_asr": 0.01922222222222222,
+        "attack_window_mean_asr": 0.048081481481481475,
+        "attack_window_peak_asr": 0.325,
+        "attack_start_round": 1,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.2631578947368421,
+        "normal_mean_exclusion": 0.22105263157894736,
+        "normal_ever_excluded_ids": [
+          10,
+          11,
+          12,
+          13,
+          15,
+          17
+        ],
+        "normal_ever_excluded_rate": 0.3157894736842105,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30
+            ],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": 3,
+            "exclusion_delay_rounds": 2,
+            "status": "observed",
+            "observed_attack_rounds": 30,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.1746,
+          0.2175,
+          0.2747,
+          0.3054,
+          0.3295,
+          0.3425000000000001,
+          0.3609,
+          0.3769,
+          0.3862,
+          0.3978,
+          0.3968999999999999,
+          0.4115,
+          0.4103,
+          0.4344,
+          0.4443,
+          0.4322,
+          0.4328,
+          0.4481,
+          0.47,
+          0.4661,
+          0.4944,
+          0.4815,
+          0.4941,
+          0.5002,
+          0.5183,
+          0.5097,
+          0.5229,
+          0.5364,
+          0.541,
+          0.537
+        ],
+        "backdoor_asr": [
+          0.325,
+          0.19766666666666663,
+          0.017666666666666664,
+          0.03766666666666668,
+          0.05333333333333334,
+          0.047,
+          0.04677777777777776,
+          0.05233333333333334,
+          0.027555555555555562,
+          0.021222222222222222,
+          0.03411111111111112,
+          0.03433333333333333,
+          0.025888888888888878,
+          0.030111111111111123,
+          0.03577777777777776,
+          0.027555555555555562,
+          0.032333333333333325,
+          0.01988888888888888,
+          0.03577777777777776,
+          0.02066666666666666,
+          0.033222222222222236,
+          0.031222222222222235,
+          0.03088888888888888,
+          0.03877777777777776,
+          0.049777777777777754,
+          0.025222222222222226,
+          0.03366666666666667,
+          0.03388888888888888,
+          0.023888888888888876,
+          0.01922222222222222
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [
+            {
+              "round": 5,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 6,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 6,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 7,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 7,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 8,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 8,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            }
+          ],
+          "source_sha256": {
+            "round_metrics.jsonl": "ff44d2ed4d0f17aba4b5b9c26921bf878def2e4fdc75d9222a08e09f9b66d39d",
+            "server.log": "b22142e8fc248ca63c97b9e051a40d28eeecbb949ec6031721122749388df988"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.21052631578947367,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.3157894736842105,
+          0.3157894736842105,
+          0.3157894736842105,
+          0.3157894736842105,
+          0.3157894736842105,
+          0.3157894736842105,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.0,
+          0.0,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [
+          11,
+          12,
+          17
+        ],
+        "normal_blacklist_intercepted_rate": 0.15789473684210525,
+        "elapsed_seconds": 3755.567534685135,
+        "recovered_after_launcher_exit": true
+      },
+      "candidate": {
+        "run_id": "2_ttfl_backdoor_seed20240925",
+        "method": "ttfl",
+        "scenario": "backdoor",
+        "seed": 20240925,
+        "rounds": 30,
+        "final_accuracy": 0.5037,
+        "final_asr": 0.12688888888888894,
+        "attack_window_mean_asr": 0.17620740740740742,
+        "attack_window_peak_asr": 0.329,
+        "attack_start_round": 1,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.631578947368421,
+        "normal_mean_exclusion": 0.2649122807017544,
+        "normal_ever_excluded_ids": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          15
+        ],
+        "normal_ever_excluded_rate": 0.631578947368421,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [
+              17,
+              19,
+              21,
+              23,
+              26,
+              28
+            ],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": 17,
+            "exclusion_delay_rounds": 16,
+            "status": "observed",
+            "observed_attack_rounds": 30,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.175,
+          0.2088,
+          0.2505,
+          0.2867,
+          0.2844,
+          0.3078,
+          0.334,
+          0.3477,
+          0.3562,
+          0.3771,
+          0.3798000000000001,
+          0.387,
+          0.4,
+          0.4111,
+          0.3948999999999999,
+          0.4179,
+          0.4337,
+          0.4535,
+          0.4703,
+          0.4472,
+          0.4792,
+          0.4312,
+          0.4839,
+          0.4623,
+          0.4794,
+          0.5074,
+          0.4963,
+          0.4942,
+          0.4985,
+          0.5037
+        ],
+        "backdoor_asr": [
+          0.329,
+          0.2887777777777779,
+          0.285,
+          0.24411111111111103,
+          0.277,
+          0.2485555555555555,
+          0.247,
+          0.22777777777777786,
+          0.20677777777777784,
+          0.17655555555555552,
+          0.1834444444444445,
+          0.18133333333333332,
+          0.1523333333333333,
+          0.14522222222222225,
+          0.19066666666666668,
+          0.165,
+          0.07888888888888888,
+          0.1426666666666667,
+          0.07833333333333335,
+          0.17933333333333332,
+          0.05988888888888888,
+          0.2443333333333334,
+          0.048666666666666664,
+          0.21833333333333332,
+          0.16411111111111107,
+          0.03588888888888887,
+          0.145,
+          0.05555555555555554,
+          0.15977777777777777,
+          0.12688888888888894
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [],
+          "source_sha256": {
+            "round_metrics.jsonl": "cc475c8aa951512958ccb60bb5a145ec81376e7ad049e7c1a37662c2790f1310",
+            "server.log": "604d16bf112659f7062807827d75948c5fee5a5b84f33e530085d94f68e069dc"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.2631578947368421,
+          0.21052631578947367,
+          0.2631578947368421,
+          0.21052631578947367,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.3684210526315789,
+          0.3684210526315789,
+          0.5789473684210527,
+          0.42105263157894735,
+          0.42105263157894735,
+          0.5263157894736842,
+          0.5789473684210527,
+          0.5789473684210527,
+          0.5789473684210527,
+          0.631578947368421,
+          0.631578947368421
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.2631578947368421,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.3684210526315789,
+          0.3684210526315789,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.10526315789473684,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [],
+        "normal_blacklist_intercepted_rate": 0.0,
+        "elapsed_seconds": 3818.6463329792023,
+        "recovered_after_launcher_exit": false,
+        "additional_clean_forwards": 600
+      },
+      "delta_percentage_points": {
+        "final_accuracy": -3.3299999999999996,
+        "final_asr": 10.766666666666671,
+        "attack_window_mean_asr": 12.812592592592594,
+        "normal_mean_exclusion": 4.385964912280701,
+        "normal_ever_excluded_rate": 31.57894736842105
+      },
+      "fairness": {
+        "reference": {
+          "training_sha256": "6f3d6f0e0ee2e489d8c58f6984300ea2b78820f508c269d84c1f6d86c0103d10",
+          "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+          "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+        },
+        "candidate": {
+          "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+          "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+          "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+        },
+        "planned_training_changes": [
+          "server/probe_scoring.py",
+          "server/strategy.py"
+        ]
+      }
+    },
+    {
+      "scenario": "backdoor",
+      "seed": 20240926,
+      "baseline": {
+        "run_id": "10_ttfl_backdoor_seed20240926",
+        "method": "ttfl",
+        "scenario": "backdoor",
+        "seed": 20240926,
+        "rounds": 30,
+        "final_accuracy": 0.5733,
+        "final_asr": 0.03511111111111113,
+        "attack_window_mean_asr": 0.06343333333333334,
+        "attack_window_peak_asr": 0.471,
+        "attack_start_round": 1,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.15789473684210525,
+        "normal_mean_exclusion": 0.13859649122807016,
+        "normal_ever_excluded_ids": [
+          10,
+          11,
+          14,
+          15,
+          16
+        ],
+        "normal_ever_excluded_rate": 0.2631578947368421,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30
+            ],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": 3,
+            "exclusion_delay_rounds": 2,
+            "status": "observed",
+            "observed_attack_rounds": 30,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.1882,
+          0.2363,
+          0.2901,
+          0.3238,
+          0.3504,
+          0.3744,
+          0.3865,
+          0.4028,
+          0.3973999999999999,
+          0.4256,
+          0.4433,
+          0.4452,
+          0.4477,
+          0.4573,
+          0.4739,
+          0.4728,
+          0.4886,
+          0.4976,
+          0.5032,
+          0.5105,
+          0.524,
+          0.5232,
+          0.5292,
+          0.5392,
+          0.5469,
+          0.5436,
+          0.5529,
+          0.5593,
+          0.5729,
+          0.5733
+        ],
+        "backdoor_asr": [
+          0.471,
+          0.35077777777777797,
+          0.00677777777777778,
+          0.05233333333333334,
+          0.03766666666666668,
+          0.03811111111111112,
+          0.04466666666666667,
+          0.04488888888888888,
+          0.023555555555555562,
+          0.030333333333333327,
+          0.03622222222222224,
+          0.03922222222222224,
+          0.03466666666666667,
+          0.042222222222222244,
+          0.053888888888888875,
+          0.04266666666666668,
+          0.04077777777777777,
+          0.04077777777777777,
+          0.04533333333333333,
+          0.03588888888888887,
+          0.04055555555555556,
+          0.03844444444444444,
+          0.04366666666666667,
+          0.04233333333333332,
+          0.04033333333333332,
+          0.03466666666666667,
+          0.03944444444444444,
+          0.037,
+          0.039666666666666676,
+          0.03511111111111113
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [
+            {
+              "round": 6,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 7,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 8,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 8,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            }
+          ],
+          "source_sha256": {
+            "round_metrics.jsonl": "0fe46fc4d6ecfa31ce36296fcfbae56f04767eb7e5cac2e8e21c2c2c78a4d7f3",
+            "server.log": "02bf59e60948a3df74c9c4f3f3bf6f2efe15e087a10d59bc03e4b447e7473651"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [
+          15
+        ],
+        "normal_blacklist_intercepted_rate": 0.05263157894736842,
+        "elapsed_seconds": 3560.546516418457,
+        "recovered_after_launcher_exit": false
+      },
+      "candidate": {
+        "run_id": "5_ttfl_backdoor_seed20240926",
+        "method": "ttfl",
+        "scenario": "backdoor",
+        "seed": 20240926,
+        "rounds": 30,
+        "final_accuracy": 0.5604,
+        "final_asr": 0.06655555555555553,
+        "attack_window_mean_asr": 0.14635185185185184,
+        "attack_window_peak_asr": 0.4734444444444442,
+        "attack_start_round": 1,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.05263157894736842,
+        "normal_mean_exclusion": 0.03859649122807017,
+        "normal_ever_excluded_ids": [
+          10,
+          15
+        ],
+        "normal_ever_excluded_rate": 0.10526315789473684,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": null,
+            "exclusion_delay_rounds": null,
+            "status": "not_observed",
+            "observed_attack_rounds": 30,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.18840000000000004,
+          0.2352,
+          0.2731,
+          0.2967,
+          0.3412,
+          0.363,
+          0.3669,
+          0.3896,
+          0.3972,
+          0.4193,
+          0.4267,
+          0.4344,
+          0.442,
+          0.4488,
+          0.4612,
+          0.4713,
+          0.4811,
+          0.4855,
+          0.4995,
+          0.5045,
+          0.5113,
+          0.5191,
+          0.5182,
+          0.5265,
+          0.5302,
+          0.5358,
+          0.54,
+          0.546,
+          0.5572,
+          0.5604
+        ],
+        "backdoor_asr": [
+          0.4734444444444442,
+          0.35344444444444445,
+          0.2567777777777779,
+          0.26322222222222214,
+          0.17277777777777778,
+          0.17922222222222223,
+          0.18066666666666667,
+          0.1774444444444445,
+          0.14511111111111105,
+          0.1115555555555555,
+          0.156,
+          0.1585555555555555,
+          0.1285555555555555,
+          0.13277777777777774,
+          0.1383333333333333,
+          0.119,
+          0.09666666666666666,
+          0.10533333333333332,
+          0.09388888888888891,
+          0.09622222222222225,
+          0.10144444444444449,
+          0.08455555555555551,
+          0.0965555555555555,
+          0.09222222222222225,
+          0.09444444444444448,
+          0.076,
+          0.08022222222222225,
+          0.07633333333333336,
+          0.08322222222222224,
+          0.06655555555555553
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [],
+          "source_sha256": {
+            "round_metrics.jsonl": "60b48f62c6b6efd6f01880cffef6df29700eb0febb66033c2db2c75f856b9b54",
+            "server.log": "32930e294c2d86b681e5fb91af8158cef2bc3b28b47a482c5ff5dd7dc832d53b"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.0,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [],
+        "normal_blacklist_intercepted_rate": 0.0,
+        "elapsed_seconds": 2387.3885776996613,
+        "recovered_after_launcher_exit": false,
+        "additional_clean_forwards": 600
+      },
+      "delta_percentage_points": {
+        "final_accuracy": -1.2900000000000023,
+        "final_asr": 3.144444444444441,
+        "attack_window_mean_asr": 8.29185185185185,
+        "normal_mean_exclusion": -10.0,
+        "normal_ever_excluded_rate": -15.789473684210526
+      },
+      "fairness": {
+        "reference": {
+          "training_sha256": "6f3d6f0e0ee2e489d8c58f6984300ea2b78820f508c269d84c1f6d86c0103d10",
+          "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+          "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+        },
+        "candidate": {
+          "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+          "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+          "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+        },
+        "planned_training_changes": [
+          "server/probe_scoring.py",
+          "server/strategy.py"
+        ]
+      }
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "seed": 20240925,
+      "baseline": {
+        "run_id": "6_ttfl_delayed_backdoor_seed20240925",
+        "method": "ttfl",
+        "scenario": "delayed_backdoor",
+        "seed": 20240925,
+        "rounds": 30,
+        "final_accuracy": 0.552,
+        "final_asr": 0.022777777777777775,
+        "attack_window_mean_asr": 0.038627777777777775,
+        "attack_window_peak_asr": 0.1533333333333333,
+        "attack_start_round": 11,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.21052631578947367,
+        "normal_mean_exclusion": 0.1807017543859649,
+        "normal_ever_excluded_ids": [
+          10,
+          11,
+          12,
+          13,
+          15,
+          17,
+          19
+        ],
+        "normal_ever_excluded_rate": 0.3684210526315789,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30
+            ],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": 12,
+            "exclusion_delay_rounds": 1,
+            "status": "observed",
+            "observed_attack_rounds": 20,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.1721,
+          0.2443,
+          0.2743,
+          0.3138,
+          0.3326,
+          0.3533,
+          0.3651,
+          0.3852,
+          0.3914000000000001,
+          0.4009,
+          0.3874,
+          0.4194,
+          0.4203,
+          0.4344,
+          0.46,
+          0.4578,
+          0.4536,
+          0.4691,
+          0.4843,
+          0.481,
+          0.5063,
+          0.5028,
+          0.5071,
+          0.5197,
+          0.5291,
+          0.5228,
+          0.5412,
+          0.546,
+          0.5537,
+          0.552
+        ],
+        "backdoor_asr": [
+          0.13122222222222224,
+          0.04433333333333333,
+          0.024333333333333332,
+          0.036,
+          0.06533333333333334,
+          0.05033333333333333,
+          0.04022222222222224,
+          0.04911111111111112,
+          0.03744444444444444,
+          0.02444444444444444,
+          0.1533333333333333,
+          0.031222222222222235,
+          0.02844444444444444,
+          0.019666666666666662,
+          0.038666666666666676,
+          0.044,
+          0.039,
+          0.023,
+          0.037555555555555564,
+          0.029777777777777764,
+          0.028888888888888877,
+          0.029666666666666675,
+          0.03288888888888888,
+          0.04677777777777776,
+          0.042444444444444444,
+          0.024,
+          0.037555555555555564,
+          0.037555555555555564,
+          0.02533333333333333,
+          0.022777777777777775
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [
+            {
+              "round": 5,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 6,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 7,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 8,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 11,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 12,
+              "reason": "risk_soft_isolation_for_8_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            }
+          ],
+          "source_sha256": {
+            "round_metrics.jsonl": "de63e1982e64a01f189eaaee2aa89773da27f1c5095fc525ea7e1d09dd3e9738",
+            "server.log": "044a80cc4dffd4ed68c43bd648d1e40cd00df4f7e31a85b4663793c3f76cc7a8"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.2631578947368421,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.2631578947368421,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [
+          11,
+          12,
+          17
+        ],
+        "normal_blacklist_intercepted_rate": 0.15789473684210525,
+        "elapsed_seconds": 3456.53085064888,
+        "recovered_after_launcher_exit": false
+      },
+      "candidate": {
+        "run_id": "3_ttfl_delayed_backdoor_seed20240925",
+        "method": "ttfl",
+        "scenario": "delayed_backdoor",
+        "seed": 20240925,
+        "rounds": 30,
+        "final_accuracy": 0.517,
+        "final_asr": 0.09955555555555551,
+        "attack_window_mean_asr": 0.1146611111111111,
+        "attack_window_peak_asr": 0.21133333333333335,
+        "attack_start_round": 11,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.631578947368421,
+        "normal_mean_exclusion": 0.24736842105263157,
+        "normal_ever_excluded_ids": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          13,
+          15
+        ],
+        "normal_ever_excluded_rate": 0.6842105263157895,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30
+            ],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": 16,
+            "exclusion_delay_rounds": 5,
+            "status": "observed",
+            "observed_attack_rounds": 20,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.167,
+          0.2337,
+          0.288,
+          0.3192,
+          0.3301,
+          0.3536000000000001,
+          0.3747,
+          0.3805,
+          0.3942,
+          0.4013,
+          0.3814,
+          0.4069999999999999,
+          0.4016,
+          0.4196,
+          0.4173,
+          0.439,
+          0.437,
+          0.4601,
+          0.4551,
+          0.4815,
+          0.4805,
+          0.4768,
+          0.4878,
+          0.487,
+          0.4953,
+          0.5047,
+          0.5166,
+          0.5044,
+          0.5115,
+          0.517
+        ],
+        "backdoor_asr": [
+          0.12177777777777775,
+          0.12611111111111106,
+          0.08144444444444449,
+          0.07611111111111112,
+          0.10466666666666669,
+          0.0911111111111111,
+          0.08055555555555553,
+          0.0898888888888889,
+          0.054111111111111124,
+          0.06388888888888888,
+          0.21133333333333335,
+          0.16311111111111107,
+          0.16744444444444448,
+          0.152,
+          0.17633333333333331,
+          0.09133333333333334,
+          0.10277777777777776,
+          0.10988888888888892,
+          0.12311111111111106,
+          0.08277777777777776,
+          0.105,
+          0.11777777777777776,
+          0.08833333333333333,
+          0.11177777777777775,
+          0.10811111111111107,
+          0.06866666666666665,
+          0.06755555555555554,
+          0.09488888888888891,
+          0.05144444444444446,
+          0.09955555555555551
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [],
+          "source_sha256": {
+            "round_metrics.jsonl": "b26710656ab07cbef8a7b1a47c820d005a22b3e77dd3044c733ba8f8febab80e",
+            "server.log": "787fae6dbb8841fe78157bdf2b6c78a18ac1bc253c2a300f23bd98c40749fb59"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.2631578947368421,
+          0.3157894736842105,
+          0.42105263157894735,
+          0.5263157894736842,
+          0.5263157894736842,
+          0.5263157894736842,
+          0.47368421052631576,
+          0.5789473684210527,
+          0.5263157894736842,
+          0.5789473684210527,
+          0.631578947368421,
+          0.5789473684210527,
+          0.631578947368421
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.21052631578947367,
+          0.3157894736842105,
+          0.2631578947368421,
+          0.3157894736842105,
+          0.2631578947368421,
+          0.2631578947368421,
+          0.3157894736842105,
+          0.2631578947368421,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.05263157894736842,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [],
+        "normal_blacklist_intercepted_rate": 0.0,
+        "elapsed_seconds": 3668.6182210445404,
+        "recovered_after_launcher_exit": false,
+        "additional_clean_forwards": 600
+      },
+      "delta_percentage_points": {
+        "final_accuracy": -3.500000000000003,
+        "final_asr": 7.677777777777774,
+        "attack_window_mean_asr": 7.603333333333333,
+        "normal_mean_exclusion": 6.666666666666668,
+        "normal_ever_excluded_rate": 31.578947368421055
+      },
+      "fairness": {
+        "reference": {
+          "training_sha256": "6f3d6f0e0ee2e489d8c58f6984300ea2b78820f508c269d84c1f6d86c0103d10",
+          "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+          "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+        },
+        "candidate": {
+          "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+          "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+          "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+        },
+        "planned_training_changes": [
+          "server/probe_scoring.py",
+          "server/strategy.py"
+        ]
+      }
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "seed": 20240926,
+      "baseline": {
+        "run_id": "12_ttfl_delayed_backdoor_seed20240926",
+        "method": "ttfl",
+        "scenario": "delayed_backdoor",
+        "seed": 20240926,
+        "rounds": 30,
+        "final_accuracy": 0.5704,
+        "final_asr": 0.02866666666666667,
+        "attack_window_mean_asr": 0.04674444444444445,
+        "attack_window_peak_asr": 0.18122222222222223,
+        "attack_start_round": 11,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.10526315789473684,
+        "normal_mean_exclusion": 0.13333333333333333,
+        "normal_ever_excluded_ids": [
+          10,
+          14,
+          15,
+          16
+        ],
+        "normal_ever_excluded_rate": 0.21052631578947367,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25,
+              26,
+              27,
+              28,
+              29,
+              30
+            ],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": 13,
+            "exclusion_delay_rounds": 2,
+            "status": "observed",
+            "observed_attack_rounds": 20,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.2244,
+          0.2684,
+          0.2946,
+          0.3378,
+          0.3552,
+          0.3815,
+          0.3849,
+          0.4096,
+          0.4015000000000001,
+          0.4285,
+          0.4223,
+          0.4426,
+          0.4327,
+          0.452,
+          0.4714,
+          0.4652,
+          0.4825,
+          0.5027,
+          0.5108,
+          0.5194,
+          0.525,
+          0.5279,
+          0.5321,
+          0.5377,
+          0.5463,
+          0.5535,
+          0.5573,
+          0.5659,
+          0.5747,
+          0.5704
+        ],
+        "backdoor_asr": [
+          0.163,
+          0.176,
+          0.013888888888888885,
+          0.07877777777777775,
+          0.049222222222222244,
+          0.061,
+          0.04544444444444444,
+          0.06077777777777776,
+          0.031888888888888876,
+          0.038,
+          0.18122222222222223,
+          0.10422222222222224,
+          0.024777777777777774,
+          0.02922222222222223,
+          0.04622222222222225,
+          0.03422222222222224,
+          0.02955555555555556,
+          0.042444444444444444,
+          0.041,
+          0.03377777777777777,
+          0.03944444444444444,
+          0.03644444444444444,
+          0.041777777777777754,
+          0.04022222222222224,
+          0.039888888888888877,
+          0.03277777777777777,
+          0.03566666666666667,
+          0.03366666666666667,
+          0.039666666666666676,
+          0.02866666666666667
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [
+            {
+              "round": 8,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 1,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            }
+          ],
+          "source_sha256": {
+            "round_metrics.jsonl": "2682d10f36ce27fedd76659c26a4f60841adc831585c60e6dba3981663d3c306",
+            "server.log": "1f5a3009e794584c00bab78b5646a0e9fee602a4d15d611708b56fee05b5b9f9"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.21052631578947367,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.15789473684210525,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [
+          15
+        ],
+        "normal_blacklist_intercepted_rate": 0.05263157894736842,
+        "elapsed_seconds": 3426.5142171382904,
+        "recovered_after_launcher_exit": false
+      },
+      "candidate": {
+        "run_id": "6_ttfl_delayed_backdoor_seed20240926",
+        "method": "ttfl",
+        "scenario": "delayed_backdoor",
+        "seed": 20240926,
+        "rounds": 30,
+        "final_accuracy": 0.5667,
+        "final_asr": 0.06577777777777775,
+        "attack_window_mean_asr": 0.09441666666666666,
+        "attack_window_peak_asr": 0.2265555555555555,
+        "attack_start_round": 11,
+        "recovery_status": "not_measured_no_attack_stop",
+        "normal_final_exclusion": 0.05263157894736842,
+        "normal_mean_exclusion": 0.0543859649122807,
+        "normal_ever_excluded_ids": [
+          10,
+          11,
+          14,
+          16
+        ],
+        "normal_ever_excluded_rate": 0.21052631578947367,
+        "attacker_exclusion": {
+          "1": {
+            "excluded_rounds": [
+              19
+            ],
+            "excluded_before_attack": false,
+            "first_excluded_round_after_start": 19,
+            "exclusion_delay_rounds": 8,
+            "status": "observed",
+            "observed_attack_rounds": 20,
+            "missing_rounds": []
+          }
+        },
+        "clean_accuracy": [
+          0.2185,
+          0.2651,
+          0.2978,
+          0.3203,
+          0.3483,
+          0.3776,
+          0.3822,
+          0.4091,
+          0.4017,
+          0.4301,
+          0.4060000000000001,
+          0.4349,
+          0.4499,
+          0.4607,
+          0.4672,
+          0.474,
+          0.4894,
+          0.4965,
+          0.5068,
+          0.5083,
+          0.5194,
+          0.5194,
+          0.5239,
+          0.5337,
+          0.5342,
+          0.5394,
+          0.547,
+          0.5514,
+          0.5623,
+          0.5667
+        ],
+        "backdoor_asr": [
+          0.17933333333333332,
+          0.190111111111111,
+          0.05944444444444447,
+          0.1274444444444445,
+          0.07433333333333335,
+          0.07144444444444448,
+          0.08255555555555551,
+          0.08033333333333335,
+          0.051777777777777756,
+          0.06644444444444447,
+          0.2265555555555555,
+          0.1573333333333333,
+          0.12222222222222225,
+          0.11677777777777776,
+          0.11711111111111105,
+          0.0898888888888889,
+          0.06855555555555552,
+          0.05288888888888888,
+          0.053,
+          0.06677777777777776,
+          0.084,
+          0.08722222222222224,
+          0.0988888888888889,
+          0.08533333333333336,
+          0.0911111111111111,
+          0.06788888888888887,
+          0.07888888888888888,
+          0.07222222222222224,
+          0.08588888888888889,
+          0.06577777777777775
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [],
+          "source_sha256": {
+            "round_metrics.jsonl": "0d9631d041e1a1594f325e10c4692e52eba643f70e7815ebec592fc5320a548d",
+            "server.log": "9e88b29a69d4d7374a8166da1742e924210f3dd7e1bac51bbdc967c283091425"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.15789473684210525,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.15789473684210525,
+          0.10526315789473684,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.05263157894736842,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [],
+        "normal_blacklist_intercepted_rate": 0.0,
+        "elapsed_seconds": 2331.3717997074127,
+        "recovered_after_launcher_exit": false,
+        "additional_clean_forwards": 600
+      },
+      "delta_percentage_points": {
+        "final_accuracy": -0.37000000000000366,
+        "final_asr": 3.711111111111108,
+        "attack_window_mean_asr": 4.767222222222221,
+        "normal_mean_exclusion": -7.894736842105263,
+        "normal_ever_excluded_rate": 0.0
+      },
+      "fairness": {
+        "reference": {
+          "training_sha256": "6f3d6f0e0ee2e489d8c58f6984300ea2b78820f508c269d84c1f6d86c0103d10",
+          "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+          "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+        },
+        "candidate": {
+          "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+          "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+          "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+        },
+        "planned_training_changes": [
+          "server/probe_scoring.py",
+          "server/strategy.py"
+        ]
+      }
+    },
+    {
+      "scenario": "none",
+      "seed": 20240925,
+      "baseline": {
+        "run_id": "2_ttfl_none_seed20240925",
+        "method": "ttfl",
+        "scenario": "none",
+        "seed": 20240925,
+        "rounds": 30,
+        "final_accuracy": 0.5552,
+        "final_asr": 0.019111111111111117,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "attack_start_round": null,
+        "recovery_status": "not_applicable",
+        "normal_final_exclusion": 0.2,
+        "normal_mean_exclusion": 0.19,
+        "normal_ever_excluded_ids": [
+          11,
+          12,
+          13,
+          15,
+          17
+        ],
+        "normal_ever_excluded_rate": 0.25,
+        "attacker_exclusion": {},
+        "clean_accuracy": [
+          0.1688,
+          0.2443,
+          0.2766,
+          0.3122,
+          0.3316,
+          0.3535,
+          0.3661,
+          0.3871,
+          0.3961,
+          0.4019,
+          0.4106,
+          0.4235,
+          0.4206,
+          0.4421,
+          0.4585,
+          0.4513,
+          0.4533,
+          0.4675,
+          0.4863,
+          0.4945,
+          0.5123,
+          0.5084,
+          0.5159,
+          0.5197,
+          0.5343,
+          0.536,
+          0.5418,
+          0.5469,
+          0.5576,
+          0.5552
+        ],
+        "backdoor_asr": [
+          0.12677777777777777,
+          0.043555555555555556,
+          0.02655555555555556,
+          0.03488888888888887,
+          0.057444444444444465,
+          0.030444444444444437,
+          0.030777777777777765,
+          0.038888888888888876,
+          0.02766666666666667,
+          0.025,
+          0.04411111111111112,
+          0.04533333333333333,
+          0.032111111111111125,
+          0.02533333333333333,
+          0.04122222222222224,
+          0.035,
+          0.04122222222222224,
+          0.02766666666666667,
+          0.04622222222222225,
+          0.03377777777777777,
+          0.037555555555555564,
+          0.03055555555555556,
+          0.04022222222222224,
+          0.04122222222222224,
+          0.04311111111111112,
+          0.029888888888888878,
+          0.03955555555555556,
+          0.05033333333333333,
+          0.02444444444444444,
+          0.019111111111111117
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [
+            {
+              "round": 5,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 6,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 7,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 8,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 17,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 12,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 11,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            }
+          ],
+          "source_sha256": {
+            "round_metrics.jsonl": "601839157984e587bcd93347caae2ddeafbcc988535a5d3c7257017964d86770",
+            "server.log": "8f7cb34dbb3d021b3cf738d4172dd46c9bf76e08b6c7fce66967ef0112eb2593"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.05,
+          0.1,
+          0.1,
+          0.1,
+          0.15,
+          0.15,
+          0.15,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.2,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.2,
+          0.2
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.15,
+          0.1,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [
+          11,
+          12,
+          17
+        ],
+        "normal_blacklist_intercepted_rate": 0.15,
+        "elapsed_seconds": 3897.6339156627655,
+        "recovered_after_launcher_exit": false
+      },
+      "candidate": {
+        "run_id": "1_ttfl_none_seed20240925",
+        "method": "ttfl",
+        "scenario": "none",
+        "seed": 20240925,
+        "rounds": 30,
+        "final_accuracy": 0.5136,
+        "final_asr": 0.08955555555555551,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "attack_start_round": null,
+        "recovery_status": "not_applicable",
+        "normal_final_exclusion": 0.7,
+        "normal_mean_exclusion": 0.25833333333333336,
+        "normal_ever_excluded_ids": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          13,
+          15
+        ],
+        "normal_ever_excluded_rate": 0.7,
+        "attacker_exclusion": {},
+        "clean_accuracy": [
+          0.1688,
+          0.23,
+          0.2853,
+          0.3151,
+          0.3307,
+          0.3543,
+          0.3721999999999999,
+          0.386,
+          0.3973,
+          0.4081,
+          0.4125,
+          0.4204,
+          0.428,
+          0.4374,
+          0.427,
+          0.4426,
+          0.4347,
+          0.4499,
+          0.4581,
+          0.4834,
+          0.4913,
+          0.4793,
+          0.4854,
+          0.4928,
+          0.5083,
+          0.52,
+          0.5184,
+          0.4926,
+          0.51,
+          0.5136
+        ],
+        "backdoor_asr": [
+          0.1265555555555555,
+          0.12366666666666667,
+          0.07922222222222225,
+          0.07411111111111113,
+          0.11222222222222225,
+          0.089,
+          0.08366666666666664,
+          0.08422222222222224,
+          0.05466666666666667,
+          0.04788888888888888,
+          0.07733333333333335,
+          0.08111111111111112,
+          0.06933333333333334,
+          0.1018888888888889,
+          0.12433333333333332,
+          0.10522222222222224,
+          0.11222222222222225,
+          0.14622222222222225,
+          0.1284444444444445,
+          0.09933333333333332,
+          0.08644444444444449,
+          0.12111111111111106,
+          0.09122222222222225,
+          0.1001111111111111,
+          0.06622222222222224,
+          0.05555555555555554,
+          0.04477777777777776,
+          0.11577777777777776,
+          0.06966666666666665,
+          0.08955555555555551
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [],
+          "source_sha256": {
+            "round_metrics.jsonl": "c7339d4156c219bb9ccc0b70a1733c257da2e1f2bb22a9639f57dbbcf9be595d",
+            "server.log": "227fffe7f873fcec67b595cb4be53543b5614a221acfad6dd6bbcc57ff0debca"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.1,
+          0.1,
+          0.1,
+          0.15,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.3,
+          0.3,
+          0.35,
+          0.5,
+          0.55,
+          0.55,
+          0.5,
+          0.5,
+          0.5,
+          0.65,
+          0.7,
+          0.7,
+          0.7
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.05,
+          0.15,
+          0.1,
+          0.0,
+          0.0,
+          0.1,
+          0.05,
+          0.1,
+          0.2,
+          0.4,
+          0.3,
+          0.4,
+          0.25,
+          0.4,
+          0.35,
+          0.2,
+          0.15,
+          0.15,
+          0.2,
+          0.15,
+          0.15,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [],
+        "normal_blacklist_intercepted_rate": 0.0,
+        "elapsed_seconds": 3743.638561964035,
+        "recovered_after_launcher_exit": false,
+        "additional_clean_forwards": 600
+      },
+      "delta_percentage_points": {
+        "final_accuracy": -4.160000000000008,
+        "final_asr": 7.044444444444439,
+        "attack_window_mean_asr": null,
+        "normal_mean_exclusion": 6.833333333333336,
+        "normal_ever_excluded_rate": 44.99999999999999
+      },
+      "fairness": {
+        "reference": {
+          "training_sha256": "6f3d6f0e0ee2e489d8c58f6984300ea2b78820f508c269d84c1f6d86c0103d10",
+          "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+          "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+        },
+        "candidate": {
+          "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+          "initial_sha256": "761be885701d258372885ac25d953688352b8734197f34492731b9173a9b3eca",
+          "partition_sha256": "16e98c0c3ceefd7bc4611be373476549fe63439db277754baf233726a48b5c93"
+        },
+        "planned_training_changes": [
+          "server/probe_scoring.py",
+          "server/strategy.py"
+        ]
+      }
+    },
+    {
+      "scenario": "none",
+      "seed": 20240926,
+      "baseline": {
+        "run_id": "8_ttfl_none_seed20240926",
+        "method": "ttfl",
+        "scenario": "none",
+        "seed": 20240926,
+        "rounds": 30,
+        "final_accuracy": 0.5747,
+        "final_asr": 0.03466666666666667,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "attack_start_round": null,
+        "recovery_status": "not_applicable",
+        "normal_final_exclusion": 0.15,
+        "normal_mean_exclusion": 0.12,
+        "normal_ever_excluded_ids": [
+          10,
+          14,
+          15,
+          16
+        ],
+        "normal_ever_excluded_rate": 0.2,
+        "attacker_exclusion": {},
+        "clean_accuracy": [
+          0.2219,
+          0.2674,
+          0.2942,
+          0.3399,
+          0.3569,
+          0.3807,
+          0.3891,
+          0.4158,
+          0.3957,
+          0.4324,
+          0.4463,
+          0.4501,
+          0.447,
+          0.4663,
+          0.4799,
+          0.479,
+          0.4921,
+          0.5008,
+          0.513,
+          0.5134,
+          0.5302,
+          0.527,
+          0.528,
+          0.5441,
+          0.5489,
+          0.5488,
+          0.5555,
+          0.5628,
+          0.5716,
+          0.5747
+        ],
+        "backdoor_asr": [
+          0.17199999999999996,
+          0.1832222222222222,
+          0.01144444444444444,
+          0.06755555555555554,
+          0.04066666666666668,
+          0.05544444444444446,
+          0.05377777777777776,
+          0.060666666666666653,
+          0.032333333333333325,
+          0.03977777777777776,
+          0.04133333333333332,
+          0.05111111111111112,
+          0.04122222222222224,
+          0.044222222222222246,
+          0.06,
+          0.04788888888888888,
+          0.039333333333333324,
+          0.04188888888888888,
+          0.04433333333333333,
+          0.03633333333333333,
+          0.04077777777777777,
+          0.03288888888888888,
+          0.03644444444444444,
+          0.03711111111111112,
+          0.04,
+          0.03355555555555556,
+          0.03522222222222224,
+          0.031333333333333324,
+          0.041,
+          0.03466666666666667
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [
+            {
+              "round": 6,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 7,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 8,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 9,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 10,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 11,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 12,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 13,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 14,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 15,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 16,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 17,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 18,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 19,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 20,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 21,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 22,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 23,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 24,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 25,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 26,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 27,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 28,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 29,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            },
+            {
+              "round": 30,
+              "client_id": 15,
+              "reason": "risk_ema_above_0.90_for_4_rounds"
+            }
+          ],
+          "source_sha256": {
+            "round_metrics.jsonl": "d1bd11b2e59401dd6a5ac103226c83ee7068aad78434372b9b4ad6ee00a3d3e3",
+            "server.log": "7d7ca4bd9f329f04ef24264bb60fb0e75d4d08c151224d039a366c5ef6e4ec3b"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15,
+          0.15
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.15,
+          0.15,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [
+          15
+        ],
+        "normal_blacklist_intercepted_rate": 0.05,
+        "elapsed_seconds": 3607.5343492031097,
+        "recovered_after_launcher_exit": false
+      },
+      "candidate": {
+        "run_id": "4_ttfl_none_seed20240926",
+        "method": "ttfl",
+        "scenario": "none",
+        "seed": 20240926,
+        "rounds": 30,
+        "final_accuracy": 0.5712,
+        "final_asr": 0.03777777777777776,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "attack_start_round": null,
+        "recovery_status": "not_applicable",
+        "normal_final_exclusion": 0.05,
+        "normal_mean_exclusion": 0.05333333333333334,
+        "normal_ever_excluded_ids": [
+          10,
+          14,
+          16
+        ],
+        "normal_ever_excluded_rate": 0.15,
+        "attacker_exclusion": {},
+        "clean_accuracy": [
+          0.2209,
+          0.2609,
+          0.2977,
+          0.3232,
+          0.3492,
+          0.3716999999999999,
+          0.3832,
+          0.4088,
+          0.4016,
+          0.4225,
+          0.4353,
+          0.4497,
+          0.4457,
+          0.4597,
+          0.4772,
+          0.4784,
+          0.4896,
+          0.4983,
+          0.5085,
+          0.5148,
+          0.5229,
+          0.5323,
+          0.531,
+          0.5392,
+          0.547,
+          0.5456,
+          0.5517,
+          0.5609,
+          0.5712,
+          0.5712
+        ],
+        "backdoor_asr": [
+          0.176,
+          0.20044444444444448,
+          0.06933333333333334,
+          0.1266666666666667,
+          0.07944444444444448,
+          0.09022222222222225,
+          0.08922222222222224,
+          0.08877777777777776,
+          0.05866666666666665,
+          0.055,
+          0.06433333333333335,
+          0.07066666666666666,
+          0.057,
+          0.06311111111111112,
+          0.07666666666666665,
+          0.06133333333333334,
+          0.05522222222222224,
+          0.05688888888888888,
+          0.05888888888888888,
+          0.05088888888888888,
+          0.05344444444444446,
+          0.04577777777777776,
+          0.05277777777777776,
+          0.05366666666666666,
+          0.05466666666666667,
+          0.041555555555555554,
+          0.04311111111111112,
+          0.041444444444444443,
+          0.04933333333333333,
+          0.03777777777777776
+        ],
+        "audit_provenance": {
+          "blacklist_records_recovered": [],
+          "source_sha256": {
+            "round_metrics.jsonl": "15e3659a708459f7ac8b978f810ecc5838983505e921bc2c2613e501ca8b3f60",
+            "server.log": "3801452d58c710e774e3db2cf62e267b6e690e71fa65a850c1b955142096332c"
+          }
+        },
+        "normal_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.15,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.05
+        ],
+        "normal_partial_exclusion_by_round": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.15,
+          0.2,
+          0.15,
+          0.0,
+          0.05,
+          0.05,
+          0.05,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.05,
+          0.05,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "audit_missing_client_ids_by_round": [
+          {
+            "round": 1,
+            "client_ids": []
+          },
+          {
+            "round": 2,
+            "client_ids": []
+          },
+          {
+            "round": 3,
+            "client_ids": []
+          },
+          {
+            "round": 4,
+            "client_ids": []
+          },
+          {
+            "round": 5,
+            "client_ids": []
+          },
+          {
+            "round": 6,
+            "client_ids": []
+          },
+          {
+            "round": 7,
+            "client_ids": []
+          },
+          {
+            "round": 8,
+            "client_ids": []
+          },
+          {
+            "round": 9,
+            "client_ids": []
+          },
+          {
+            "round": 10,
+            "client_ids": []
+          },
+          {
+            "round": 11,
+            "client_ids": []
+          },
+          {
+            "round": 12,
+            "client_ids": []
+          },
+          {
+            "round": 13,
+            "client_ids": []
+          },
+          {
+            "round": 14,
+            "client_ids": []
+          },
+          {
+            "round": 15,
+            "client_ids": []
+          },
+          {
+            "round": 16,
+            "client_ids": []
+          },
+          {
+            "round": 17,
+            "client_ids": []
+          },
+          {
+            "round": 18,
+            "client_ids": []
+          },
+          {
+            "round": 19,
+            "client_ids": []
+          },
+          {
+            "round": 20,
+            "client_ids": []
+          },
+          {
+            "round": 21,
+            "client_ids": []
+          },
+          {
+            "round": 22,
+            "client_ids": []
+          },
+          {
+            "round": 23,
+            "client_ids": []
+          },
+          {
+            "round": 24,
+            "client_ids": []
+          },
+          {
+            "round": 25,
+            "client_ids": []
+          },
+          {
+            "round": 26,
+            "client_ids": []
+          },
+          {
+            "round": 27,
+            "client_ids": []
+          },
+          {
+            "round": 28,
+            "client_ids": []
+          },
+          {
+            "round": 29,
+            "client_ids": []
+          },
+          {
+            "round": 30,
+            "client_ids": []
+          }
+        ],
+        "audit_missing_rounds": [],
+        "normal_blacklist_intercepted_ids": [],
+        "normal_blacklist_intercepted_rate": 0.0,
+        "elapsed_seconds": 3723.643872499466,
+        "recovered_after_launcher_exit": false,
+        "additional_clean_forwards": 600
+      },
+      "delta_percentage_points": {
+        "final_accuracy": -0.34999999999999476,
+        "final_asr": 0.31111111111110856,
+        "attack_window_mean_asr": null,
+        "normal_mean_exclusion": -6.666666666666665,
+        "normal_ever_excluded_rate": -5.000000000000002
+      },
+      "fairness": {
+        "reference": {
+          "training_sha256": "6f3d6f0e0ee2e489d8c58f6984300ea2b78820f508c269d84c1f6d86c0103d10",
+          "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+          "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+        },
+        "candidate": {
+          "training_sha256": "6db6e4e8c7d207ddeef19abfee852c158265464afb2e67307b383af585eb7755",
+          "initial_sha256": "b490eed73fa650dc8f3d4e59e7ebf724063a2f361c0e118f91f22d5f84d6dfa4",
+          "partition_sha256": "a7a16c583e47a5baf8847880ed2041721a9a013c01727c30cc2b4dbf5377b433"
+        },
+        "planned_training_changes": [
+          "server/probe_scoring.py",
+          "server/strategy.py"
+        ]
+      }
+    }
+  ],
+  "groups": [
+    {
+      "scenario": "none",
+      "n": 2,
+      "baseline": {
+        "final_accuracy": {
+          "mean": 0.5649500000000001,
+          "sd": 0.01378858223313765
+        },
+        "final_asr": {
+          "mean": 0.026888888888888893,
+          "sd": 0.010999438818457406
+        },
+        "attack_window_mean_asr": null,
+        "normal_mean_exclusion": {
+          "mean": 0.155,
+          "sd": 0.04949747468305833
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 0.225,
+          "sd": 0.03535533905932737
+        },
+        "attack_window_peak_asr": null,
+        "normal_blacklist_intercepted_rate": {
+          "mean": 0.1,
+          "sd": 0.07071067811865475
+        }
+      },
+      "candidate": {
+        "final_accuracy": {
+          "mean": 0.5424,
+          "sd": 0.04072935059634521
+        },
+        "final_asr": {
+          "mean": 0.06366666666666664,
+          "sd": 0.03661241778143678
+        },
+        "attack_window_mean_asr": null,
+        "normal_mean_exclusion": {
+          "mean": 0.15583333333333335,
+          "sd": 0.14495689014324226
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 0.425,
+          "sd": 0.3889087296526011
+        },
+        "attack_window_peak_asr": null,
+        "normal_blacklist_intercepted_rate": {
+          "mean": 0.0,
+          "sd": 0.0
+        }
+      },
+      "delta_percentage_points": {
+        "final_accuracy": {
+          "mean": -2.2550000000000017,
+          "sd": 2.6940768363207557
+        },
+        "final_asr": {
+          "mean": 3.6777777777777736,
+          "sd": 4.761185659989418
+        },
+        "attack_window_mean_asr": null,
+        "normal_mean_exclusion": {
+          "mean": 0.08333333333333526,
+          "sd": 9.545941546018392
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 19.999999999999996,
+          "sd": 35.35533905932737
+        }
+      }
+    },
+    {
+      "scenario": "backdoor",
+      "n": 2,
+      "baseline": {
+        "final_accuracy": {
+          "mean": 0.55515,
+          "sd": 0.025667976157071674
+        },
+        "final_asr": {
+          "mean": 0.027166666666666672,
+          "sd": 0.011235141078852935
+        },
+        "attack_window_mean_asr": {
+          "mean": 0.05575740740740741,
+          "sd": 0.010855398548215713
+        },
+        "normal_mean_exclusion": {
+          "mean": 0.17982456140350878,
+          "sd": 0.058305295992574974
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 0.2894736842105263,
+          "sd": 0.03721614637823934
+        },
+        "attack_window_peak_asr": {
+          "mean": 0.398,
+          "sd": 0.1032375900532359
+        },
+        "normal_blacklist_intercepted_rate": {
+          "mean": 0.10526315789473684,
+          "sd": 0.07443229275647868
+        }
+      },
+      "candidate": {
+        "final_accuracy": {
+          "mean": 0.53205,
+          "sd": 0.040092954493277225
+        },
+        "final_asr": {
+          "mean": 0.09672222222222224,
+          "sd": 0.04266210913158842
+        },
+        "attack_window_mean_asr": {
+          "mean": 0.16127962962962963,
+          "sd": 0.02111106578942505
+        },
+        "normal_mean_exclusion": {
+          "mean": 0.15175438596491228,
+          "sd": 0.16002942942642917
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 0.3684210526315789,
+          "sd": 0.3721614637823934
+        },
+        "attack_window_peak_asr": {
+          "mean": 0.40122222222222215,
+          "sd": 0.10213764617139003
+        },
+        "normal_blacklist_intercepted_rate": {
+          "mean": 0.0,
+          "sd": 0.0
+        }
+      },
+      "delta_percentage_points": {
+        "final_accuracy": {
+          "mean": -2.310000000000001,
+          "sd": 1.4424978336205552
+        },
+        "final_asr": {
+          "mean": 6.955555555555556,
+          "sd": 5.389725021044135
+        },
+        "attack_window_mean_asr": {
+          "mean": 10.552222222222223,
+          "sd": 3.1966464337640756
+        },
+        "normal_mean_exclusion": {
+          "mean": -2.8070175438596494,
+          "sd": 10.17241334338542
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 7.894736842105263,
+          "sd": 33.494531740415404
+        }
+      }
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "n": 2,
+      "baseline": {
+        "final_accuracy": {
+          "mean": 0.5612,
+          "sd": 0.013010764773832454
+        },
+        "final_asr": {
+          "mean": 0.025722222222222223,
+          "sd": 0.004164073266987451
+        },
+        "attack_window_mean_asr": {
+          "mean": 0.04268611111111111,
+          "sd": 0.005739350040630816
+        },
+        "normal_mean_exclusion": {
+          "mean": 0.1570175438596491,
+          "sd": 0.0334945317404154
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 0.2894736842105263,
+          "sd": 0.11164843913471803
+        },
+        "attack_window_peak_asr": {
+          "mean": 0.16727777777777775,
+          "sd": 0.019720422453091524
+        },
+        "normal_blacklist_intercepted_rate": {
+          "mean": 0.10526315789473684,
+          "sd": 0.07443229275647868
+        }
+      },
+      "candidate": {
+        "final_accuracy": {
+          "mean": 0.5418499999999999,
+          "sd": 0.03514320702497139
+        },
+        "final_asr": {
+          "mean": 0.08266666666666664,
+          "sd": 0.023884495720078922
+        },
+        "attack_window_mean_asr": {
+          "mean": 0.10453888888888888,
+          "sd": 0.014314983948020993
+        },
+        "normal_mean_exclusion": {
+          "mean": 0.15087719298245614,
+          "sd": 0.1364592033868776
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 0.4473684210526316,
+          "sd": 0.3349453174041541
+        },
+        "attack_window_peak_asr": {
+          "mean": 0.21894444444444444,
+          "sd": 0.01076373655806185
+        },
+        "normal_blacklist_intercepted_rate": {
+          "mean": 0.0,
+          "sd": 0.0
+        }
+      },
+      "delta_percentage_points": {
+        "final_accuracy": {
+          "mean": -1.9350000000000034,
+          "sd": 2.2132442251138933
+        },
+        "final_asr": {
+          "mean": 5.694444444444441,
+          "sd": 2.8048568987066376
+        },
+        "attack_window_mean_asr": {
+          "mean": 6.185277777777777,
+          "sd": 2.005433398865181
+        },
+        "normal_mean_exclusion": {
+          "mean": -0.6140350877192975,
+          "sd": 10.296467164646218
+        },
+        "normal_ever_excluded_rate": {
+          "mean": 15.789473684210527,
+          "sd": 22.32968782694361
+        }
+      }
+    }
+  ],
+  "definition": "clean_delta = max(0, patched target affinity - clean target affinity); other risk thresholds unchanged",
+  "limitations": "development seeds and known trigger only; requires one additional clean forward per probed client; legacy SVD source retained"
+}

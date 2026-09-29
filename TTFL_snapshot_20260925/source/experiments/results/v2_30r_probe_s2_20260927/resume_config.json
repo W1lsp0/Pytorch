@@ -1,0 +1,20 @@
+{
+  "RESULT_ROOT": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v2_30r_probe_s2_20260927",
+  "CLIENTS": "20",
+  "ROUNDS": "30",
+  "LOCAL_EPOCHS": "1",
+  "SEED_LIST": "20240925 20240926",
+  "SCENARIO_LIST": "none backdoor delayed_backdoor",
+  "METHOD_LIST": "single_stream ttfl",
+  "BACKDOOR_POISON_RATE": "1.0",
+  "ATTACK_START_ROUND": "11",
+  "ATTACK_STOP_ROUND": "0",
+  "KNOWN_TRIGGER_PROBE": "1",
+  "HEAVY_PROBE_ROTATE_MOD": "1",
+  "GPU_VISIBLE_LIST": "0,1,2,3,4",
+  "MAX_PARALLEL": "4",
+  "RUN_TIMEOUT_SECONDS": "7200",
+  "PORT_BASE": "19800",
+  "TTFL_SHARED_TMP_ROOT": "/data1/lab409/W1lsp0/.ttfl_tmp",
+  "REPORT_KIND": "probe"
+}

@@ -1,0 +1,76 @@
+{
+  "checked_at": "2026-09-28T11:37:17.768823+08:00",
+  "verified_complete": true,
+  "warnings": [],
+  "runs": [
+    {
+      "variant": "baseline",
+      "scenario": "none",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "audit_round": 30,
+      "isolated_now": [
+        "16"
+      ],
+      "gpu": "0"
+    },
+    {
+      "variant": "baseline",
+      "scenario": "backdoor",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "audit_round": 30,
+      "isolated_now": [
+        "16",
+        "19"
+      ],
+      "gpu": "1"
+    },
+    {
+      "variant": "baseline",
+      "scenario": "delayed_backdoor",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "audit_round": 30,
+      "isolated_now": [
+        "1",
+        "16",
+        "19"
+      ],
+      "gpu": "2"
+    },
+    {
+      "variant": "candidate",
+      "scenario": "none",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "audit_round": 30,
+      "isolated_now": [],
+      "gpu": "3"
+    },
+    {
+      "variant": "candidate",
+      "scenario": "backdoor",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "audit_round": 30,
+      "isolated_now": [],
+      "gpu": "4"
+    },
+    {
+      "variant": "candidate",
+      "scenario": "delayed_backdoor",
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "audit_round": 30,
+      "isolated_now": [],
+      "gpu": "4"
+    }
+  ]
+}
