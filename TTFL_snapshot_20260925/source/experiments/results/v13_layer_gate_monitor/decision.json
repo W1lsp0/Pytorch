@@ -1,0 +1,43 @@
+{
+  "status": "not_met",
+  "regressions": [
+    {
+      "pair": "local_backdoor_s20240934",
+      "metric": "final_asr",
+      "delta": 0.005222222222222232
+    },
+    {
+      "pair": "local_backdoor_s20240934",
+      "metric": "final_accuracy",
+      "delta": -0.0025000000000000577
+    },
+    {
+      "pair": "local_delayed_backdoor_s20240934",
+      "metric": "final_asr",
+      "delta": 0.006222222222222247
+    },
+    {
+      "pair": "local_delayed_backdoor_s20240934",
+      "metric": "attack_window_peak_asr",
+      "delta": 0.01777777777777756
+    },
+    {
+      "pair": "remote_none_s20240935",
+      "metric": "final_accuracy",
+      "delta": -0.0022999999999999687
+    },
+    {
+      "pair": "remote_backdoor_s20240935",
+      "metric": "final_accuracy",
+      "delta": -0.006400000000000072
+    },
+    {
+      "pair": "remote_backdoor_s20240935",
+      "metric": "normal_mean_exclusion",
+      "delta": 0.0
+    }
+  ],
+  "goal_achieved": false,
+  "next_action": "Review mechanisms and choose next candidate",
+  "scope": "Zero-tolerance descriptive screening of this ablation; not statistical significance or validation of the full research objective."
+}

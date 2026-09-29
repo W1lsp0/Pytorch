@@ -1,0 +1,6 @@
+{
+  "hypothesis": "Lower low-entropy threshold from .15 to .01 to target extreme collapse and reduce honest low-entropy quarantine; all other guarded settings fixed.",
+  "scope": "Exploratory development on same seeds as V15; threshold chosen after inspecting development logs. Requires independent-seed validation before any generalization claim.",
+  "source": "Frozen V15 source on each host. Original and guarded V15 baselines reused on same host/seed.",
+  "goal_achieved": false
+}

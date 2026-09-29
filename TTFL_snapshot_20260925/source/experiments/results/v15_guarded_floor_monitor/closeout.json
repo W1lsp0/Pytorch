@@ -1,0 +1,139 @@
+{
+  "batch": "v15_guarded_floor",
+  "completed_at": 1790704256.1572716,
+  "validation_complete": true,
+  "goal_achieved": false,
+  "report": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v15_guarded_floor_monitor/matched_report.json",
+  "decision": {
+    "status": "not_met",
+    "regressions": [
+      {
+        "pair": "local_none_original_guarded_s20240936",
+        "metric": "final_asr",
+        "delta": 0.003555555555555562
+      },
+      {
+        "pair": "local_none_floor_guarded_s20240936",
+        "metric": "final_accuracy",
+        "delta": -0.0012000000000000899
+      },
+      {
+        "pair": "local_none_floor_guarded_s20240936",
+        "metric": "normal_mean_exclusion",
+        "delta": 0.003333333333333334
+      },
+      {
+        "pair": "local_backdoor_floor_guarded_s20240936",
+        "metric": "final_accuracy",
+        "delta": -0.0010000000000000009
+      },
+      {
+        "pair": "local_backdoor_floor_guarded_s20240936",
+        "metric": "final_asr",
+        "delta": 0.006666666666666633
+      },
+      {
+        "pair": "local_backdoor_floor_guarded_s20240936",
+        "metric": "attack_window_peak_asr",
+        "delta": 0.015222222222222359
+      },
+      {
+        "pair": "local_backdoor_floor_guarded_s20240936",
+        "metric": "normal_mean_exclusion",
+        "delta": 0.0912280701754386
+      },
+      {
+        "pair": "local_delayed_backdoor_original_guarded_s20240936",
+        "metric": "attack_window_peak_asr",
+        "delta": 0.05466666666666661
+      },
+      {
+        "pair": "local_delayed_backdoor_floor_guarded_s20240936",
+        "metric": "final_accuracy",
+        "delta": -0.018000000000000016
+      },
+      {
+        "pair": "local_delayed_backdoor_floor_guarded_s20240936",
+        "metric": "final_asr",
+        "delta": 0.0028888888888888783
+      },
+      {
+        "pair": "local_delayed_backdoor_floor_guarded_s20240936",
+        "metric": "attack_window_mean_asr",
+        "delta": 0.015416666666666662
+      },
+      {
+        "pair": "local_delayed_backdoor_floor_guarded_s20240936",
+        "metric": "attack_window_peak_asr",
+        "delta": 0.07211111111111107
+      },
+      {
+        "pair": "local_delayed_backdoor_floor_guarded_s20240936",
+        "metric": "normal_mean_exclusion",
+        "delta": 0.042105263157894736
+      },
+      {
+        "pair": "remote_none_original_guarded_s20240937",
+        "metric": "final_accuracy",
+        "delta": -0.0042999999999999705
+      },
+      {
+        "pair": "remote_none_original_guarded_s20240937",
+        "metric": "final_asr",
+        "delta": 0.0049999999999999975
+      },
+      {
+        "pair": "remote_none_floor_guarded_s20240937",
+        "metric": "final_accuracy",
+        "delta": -0.009899999999999909
+      },
+      {
+        "pair": "remote_none_floor_guarded_s20240937",
+        "metric": "final_asr",
+        "delta": 0.006444444444444489
+      },
+      {
+        "pair": "remote_none_floor_guarded_s20240937",
+        "metric": "normal_mean_exclusion",
+        "delta": 0.02166666666666667
+      },
+      {
+        "pair": "remote_backdoor_floor_guarded_s20240937",
+        "metric": "final_asr",
+        "delta": 0.003999999999999997
+      },
+      {
+        "pair": "remote_backdoor_floor_guarded_s20240937",
+        "metric": "attack_window_mean_asr",
+        "delta": 0.003455555555555552
+      },
+      {
+        "pair": "remote_backdoor_floor_guarded_s20240937",
+        "metric": "attack_window_peak_asr",
+        "delta": 0.004555555555555368
+      },
+      {
+        "pair": "remote_backdoor_floor_guarded_s20240937",
+        "metric": "normal_mean_exclusion",
+        "delta": 0.015789473684210527
+      },
+      {
+        "pair": "remote_delayed_backdoor_floor_guarded_s20240937",
+        "metric": "final_accuracy",
+        "delta": -0.005499999999999949
+      },
+      {
+        "pair": "remote_delayed_backdoor_floor_guarded_s20240937",
+        "metric": "final_asr",
+        "delta": 0.003111111111111113
+      },
+      {
+        "pair": "remote_delayed_backdoor_floor_guarded_s20240937",
+        "metric": "normal_mean_exclusion",
+        "delta": 0.0
+      }
+    ],
+    "goal_achieved": false,
+    "next_action": "review V15 guarded floor"
+  }
+}

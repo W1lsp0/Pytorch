@@ -1,0 +1,79 @@
+{
+  "host": "remote",
+  "result_root": "/mnt/data/zjk/TTFL/results/v17_floor10_seed20240937",
+  "source": "/mnt/data/zjk/TTFL/v15_guarded_floor_monitor/source",
+  "environment": {
+    "CLIENTS": "20",
+    "ROUNDS": "30",
+    "LOCAL_EPOCHS": "1",
+    "METHOD_LIST": "ttfl",
+    "ATTACK_START_ROUND": "11",
+    "ATTACK_STOP_ROUND": "0",
+    "BACKDOOR_POISON_RATE": "1.0",
+    "KNOWN_TRIGGER_PROBE": "1",
+    "HEAVY_PROBE_ROTATE_MOD": "1",
+    "TRIGGER_SCORE_MODE": "clean_delta",
+    "RISK_RAW_ATTENUATION_POWER": "1.0",
+    "RISK_CROSS_CHANNEL_GUARD": "0",
+    "RISK_SOFT_PROBATION_C2_STREAK": "3",
+    "RISK_LOW_ENTROPY_PROBE_H": "0.01",
+    "RISK_LOW_ENTROPY_PROBE_ACC": "0.10",
+    "RISK_LOW_ENTROPY_PROBE_STREAK": "2",
+    "MAX_PARALLEL": "1",
+    "CLIENT_START_DELAY": "5",
+    "RUN_TIMEOUT_SECONDS": "14400",
+    "TTFL_DISABLE_DB": "1",
+    "USE_SIMULATION": "0",
+    "TTFL_DOWNLOAD_DATA": "0",
+    "TTFL_ALLOWED_ROOT": "/mnt/data/zjk",
+    "TTFL_SHARED_TMP_ROOT": "/mnt/data/zjk/.tmp",
+    "TTFL_LAYER_GATE_LAMBDA": "0.15"
+  },
+  "jobs": [
+    {
+      "name": "v17_floor10_none_s20240937",
+      "environment": {
+        "SCENARIO_LIST": "none",
+        "SEED_LIST": "20240937",
+        "PORT_BASE": "27800",
+        "RISK_PROBATION_WEIGHT_FLOOR": ".10",
+        "RISK_PROBATION_FLOOR_GUARD": "1",
+        "RISK_SOFT_PROBATION": "1",
+        "RISK_SOFT_PROBATION_REFERENCE_EXCLUDE": "1",
+        "RISK_SOFT_PROBATION_C2_EXCLUDE": "1",
+        "RISK_LOW_ENTROPY_PROBE_GUARD": "1"
+      },
+      "required_free_mib": 21000
+    },
+    {
+      "name": "v17_floor10_backdoor_s20240937",
+      "environment": {
+        "SCENARIO_LIST": "backdoor",
+        "SEED_LIST": "20240937",
+        "PORT_BASE": "27810",
+        "RISK_PROBATION_WEIGHT_FLOOR": ".10",
+        "RISK_PROBATION_FLOOR_GUARD": "1",
+        "RISK_SOFT_PROBATION": "1",
+        "RISK_SOFT_PROBATION_REFERENCE_EXCLUDE": "1",
+        "RISK_SOFT_PROBATION_C2_EXCLUDE": "1",
+        "RISK_LOW_ENTROPY_PROBE_GUARD": "1"
+      },
+      "required_free_mib": 21000
+    },
+    {
+      "name": "v17_floor10_delayed_backdoor_s20240937",
+      "environment": {
+        "SCENARIO_LIST": "delayed_backdoor",
+        "SEED_LIST": "20240937",
+        "PORT_BASE": "27820",
+        "RISK_PROBATION_WEIGHT_FLOOR": ".10",
+        "RISK_PROBATION_FLOOR_GUARD": "1",
+        "RISK_SOFT_PROBATION": "1",
+        "RISK_SOFT_PROBATION_REFERENCE_EXCLUDE": "1",
+        "RISK_SOFT_PROBATION_C2_EXCLUDE": "1",
+        "RISK_LOW_ENTROPY_PROBE_GUARD": "1"
+      },
+      "required_free_mib": 21000
+    }
+  ]
+}

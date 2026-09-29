@@ -1,0 +1,659 @@
+<!DOCTYPE html><html lang="en"><head><title translate="no">IEEE Demo Template for Computer Society Conferences - Overleaf, Online LaTeX Editor</title><meta name="twitter:title" content="IEEE Demo Template for Computer Society Conferences"><meta name="og:title" content="IEEE Demo Template for Computer Society Conferences"><meta name="description" content="This is a skeleton file demonstrating the use of IEEEtran.cls (requires IEEEtran.cls version 1.8b or later) with an IEEE Computer
+Society conference paper.
+
+..."><meta itemprop="description" content="This is a skeleton file demonstrating the use of IEEEtran.cls (requires IEEEtran.cls version 1.8b or later) with an IEEE Computer
+Society conference paper.
+
+..."><meta itemprop="image" content="https://writelatex.s3.amazonaws.com/published_ver/8216.jpeg"><meta name="image" content="https://writelatex.s3.amazonaws.com/published_ver/8216.jpeg"><meta itemprop="name" content="Overleaf, the Online LaTeX Editor"><meta name="twitter:card" content="summary"><meta name="twitter:site" content="@overleaf"><meta name="twitter:description" content="An online LaTeX editor that’s easy to use. No installation, real-time collaboration, version control, hundreds of LaTeX templates, and more."><meta name="twitter:image" content="https://cdn.overleaf.com/img/ol-brand/overleaf_og_logo.png"><meta property="fb:app_id" content="400474170024644"><meta property="og:description" content="An online LaTeX editor that’s easy to use. No installation, real-time collaboration, version control, hundreds of LaTeX templates, and more."><meta property="og:image" content="https://cdn.overleaf.com/img/ol-brand/overleaf_og_logo.png"><meta property="og:type" content="website"><meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes"><link rel="icon" sizes="32x32" href="https://cdn.overleaf.com/favicon-32x32.png"><link rel="icon" sizes="16x16" href="https://cdn.overleaf.com/favicon-16x16.png"><link rel="icon" href="https://cdn.overleaf.com/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="https://cdn.overleaf.com/apple-touch-icon.png"><link rel="mask-icon" href="https://cdn.overleaf.com/mask-favicon.svg" color="#046530"><link rel="canonical" href="https://www.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky"><link rel="manifest" href="/web.sitemanifest.json"><link rel="stylesheet" href="https://cdn.overleaf.com/stylesheets/main-style-ddbd58a4912335b16587.css" id="main-stylesheet"><link rel="alternate" href="https://www.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="en"><link rel="alternate" href="https://cs.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="cs"><link rel="alternate" href="https://es.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="es"><link rel="alternate" href="https://pt.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="pt"><link rel="alternate" href="https://fr.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="fr"><link rel="alternate" href="https://de.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="de"><link rel="alternate" href="https://sv.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="sv"><link rel="alternate" href="https://tr.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="tr"><link rel="alternate" href="https://it.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="it"><link rel="alternate" href="https://cn.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="zh-CN"><link rel="alternate" href="https://no.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="no"><link rel="alternate" href="https://ru.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="ru"><link rel="alternate" href="https://da.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="da"><link rel="alternate" href="https://ko.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="ko"><link rel="alternate" href="https://ja.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" hreflang="ja"><link rel="preload" href="https://cdn.overleaf.com/js/en-json-cc962bca9aa55d09601c.js" as="script" nonce="/IdZ5WRWWgibrwMsF06wPA==" crossorigin="anonymous"><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" id="ga-loader" data-ga-token="UA-112092690-1" data-ga-token-v4="G-RV4YBCCCWJ" data-cookie-domain=".overleaf.com" data-session-analytics-id="55d25a75-0ccf-4482-9c01-d6322f4a6972">var gaSettings = document.querySelector('#ga-loader').dataset;
+var gaid = gaSettings.gaTokenV4;
+var gaToken = gaSettings.gaToken;
+var cookieDomain = gaSettings.cookieDomain;
+var sessionAnalyticsId = gaSettings.sessionAnalyticsId;
+if(gaid) {
+    var additionalGaConfig = sessionAnalyticsId ? { 'user_id': sessionAnalyticsId } : {};
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', gaid, { 'anonymize_ip': true, ...additionalGaConfig });
+}
+if (gaToken) {
+    window.ga = window.ga || function () {
+        (window.ga.q = window.ga.q || []).push(arguments);
+    }, window.ga.l = 1 * new Date();
+}
+var loadGA = window.olLoadGA = function() {
+    if (gaid) {
+        var s = document.createElement('script');
+        s.setAttribute('async', 'async');
+        s.setAttribute('src', 'https://www.googletagmanager.com/gtag/js?id=' + gaid);
+        document.querySelector('head').append(s);
+    } 
+    if (gaToken) {
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', gaToken, cookieDomain.replace(/^\./, ""));
+        ga('set', 'anonymizeIp', true);
+        if (sessionAnalyticsId) {
+            ga('set', 'userId', sessionAnalyticsId);
+        }
+        ga('send', 'pageview');
+    }
+};
+// Check if consent given (features/cookie-banner)
+var oaCookie = document.cookie.split('; ').find(function(cookie) {
+    return cookie.startsWith('oa=');
+});
+if(oaCookie) {
+    var oaCookieValue = oaCookie.split('=')[1];
+    if(oaCookieValue === '1') {
+        loadGA();
+    }
+}
+</script><meta name="ol-csrfToken" content="2tcfl9lZ-ma0xsZ4OObyQzF3hM03FBh888u4"><meta name="ol-baseAssetPath" content="https://cdn.overleaf.com/"><meta name="ol-mathJaxPath" content="/js/libs/mathjax-4.1.2/tex-svg.js"><meta name="ol-dictionariesRoot" content="/js/dictionaries/0.0.3/"><meta name="ol-usersEmail" content=""><meta name="ol-ab" data-type="json" content="{}"><meta name="ol-user_id"><meta name="ol-i18n" data-type="json" content="{&quot;currentLangCode&quot;:&quot;en&quot;}"><meta name="ol-ExposedSettings" data-type="json" content="{&quot;isOverleaf&quot;:true,&quot;env&quot;:&quot;saas&quot;,&quot;appName&quot;:&quot;Overleaf&quot;,&quot;adminEmail&quot;:&quot;support@overleaf.com&quot;,&quot;dropboxAppName&quot;:&quot;Overleaf&quot;,&quot;ieeeBrandId&quot;:15,&quot;hasAffiliationsFeature&quot;:true,&quot;hasSamlFeature&quot;:true,&quot;samlInitPath&quot;:&quot;/saml/ukamf/init&quot;,&quot;hasLinkUrlFeature&quot;:true,&quot;hasLinkedProjectFileFeature&quot;:true,&quot;hasLinkedProjectOutputFileFeature&quot;:true,&quot;siteUrl&quot;:&quot;https://www.overleaf.com&quot;,&quot;emailConfirmationDisabled&quot;:false,&quot;maxEntitiesPerProject&quot;:2000,&quot;maxUploadSize&quot;:52428800,&quot;projectUploadTimeout&quot;:120000,&quot;recaptchaSiteKey&quot;:&quot;6LebiTwUAAAAAMuPyjA4pDA4jxPxPe2K9_ndL74Q&quot;,&quot;recaptchaEnterpriseSiteKey&quot;:&quot;6LeKNAwtAAAAALM6pnou0sJ2kZ8FetjgvKEmgnDR&quot;,&quot;recaptchaDisabled&quot;:{&quot;login&quot;:false,&quot;passwordReset&quot;:false,&quot;register&quot;:false,&quot;addEmail&quot;:false},&quot;textExtensions&quot;:[&quot;tex&quot;,&quot;latex&quot;,&quot;sty&quot;,&quot;cls&quot;,&quot;bst&quot;,&quot;bib&quot;,&quot;bibtex&quot;,&quot;txt&quot;,&quot;tikz&quot;,&quot;mtx&quot;,&quot;rtex&quot;,&quot;md&quot;,&quot;asy&quot;,&quot;lbx&quot;,&quot;bbx&quot;,&quot;cbx&quot;,&quot;m&quot;,&quot;lco&quot;,&quot;dtx&quot;,&quot;ins&quot;,&quot;ist&quot;,&quot;def&quot;,&quot;clo&quot;,&quot;ldf&quot;,&quot;rmd&quot;,&quot;qmd&quot;,&quot;lua&quot;,&quot;py&quot;,&quot;gv&quot;,&quot;mf&quot;,&quot;yml&quot;,&quot;yaml&quot;,&quot;lhs&quot;,&quot;lean&quot;,&quot;lean4&quot;,&quot;hs&quot;,&quot;mk&quot;,&quot;xmpdata&quot;,&quot;cfg&quot;,&quot;rnw&quot;,&quot;ltx&quot;,&quot;inc&quot;],&quot;editableFilenames&quot;:[&quot;latexmkrc&quot;,&quot;.latexmkrc&quot;,&quot;makefile&quot;,&quot;gnumakefile&quot;],&quot;validRootDocExtensions&quot;:[&quot;tex&quot;,&quot;Rtex&quot;,&quot;ltx&quot;,&quot;Rnw&quot;],&quot;fileIgnorePattern&quot;:&quot;**/{{__MACOSX,.git,.texpadtmp,.R,.venv,venv}{,/**},.!(latexmkrc),*.{dvi,aux,log,toc,out,pdfsync,synctex,synctex(busy),fdb_latexmk,fls,nlo,ind,glo,gls,glg,bbl,blg,doc,docx,gz,swp}}&quot;,&quot;sentryAllowedOriginRegex&quot;:&quot;^(https://[a-z]+\\\\.overleaf.com|https://cdn.overleaf.com|https://compiles.overleafusercontent.com)/&quot;,&quot;sentryDsn&quot;:&quot;https://4f0989f11cb54142a5c3d98b421b930a@app.getsentry.com/34706&quot;,&quot;sentryEnvironment&quot;:&quot;production&quot;,&quot;sentryRelease&quot;:&quot;7bd83a057fe1c4017cbe1bf4dfd425b15f74a5bc&quot;,&quot;hotjarId&quot;:&quot;5148484&quot;,&quot;hotjarVersion&quot;:&quot;6&quot;,&quot;enableSubscriptions&quot;:true,&quot;gaToken&quot;:&quot;UA-112092690-1&quot;,&quot;gaTokenV4&quot;:&quot;G-RV4YBCCCWJ&quot;,&quot;propensityId&quot;:&quot;propensity-001384&quot;,&quot;cookieDomain&quot;:&quot;.overleaf.com&quot;,&quot;templateLinks&quot;:[{&quot;name&quot;:&quot;Journal articles&quot;,&quot;url&quot;:&quot;/gallery/tagged/academic-journal&quot;,&quot;trackingKey&quot;:&quot;academic-journal&quot;},{&quot;name&quot;:&quot;Books&quot;,&quot;url&quot;:&quot;/gallery/tagged/book&quot;,&quot;trackingKey&quot;:&quot;book&quot;},{&quot;name&quot;:&quot;Formal letters&quot;,&quot;url&quot;:&quot;/gallery/tagged/formal-letter&quot;,&quot;trackingKey&quot;:&quot;formal-letter&quot;},{&quot;name&quot;:&quot;Assignments&quot;,&quot;url&quot;:&quot;/gallery/tagged/homework&quot;,&quot;trackingKey&quot;:&quot;homework-assignment&quot;},{&quot;name&quot;:&quot;Posters&quot;,&quot;url&quot;:&quot;/gallery/tagged/poster&quot;,&quot;trackingKey&quot;:&quot;poster&quot;},{&quot;name&quot;:&quot;Presentations&quot;,&quot;url&quot;:&quot;/gallery/tagged/presentation&quot;,&quot;trackingKey&quot;:&quot;presentation&quot;},{&quot;name&quot;:&quot;Reports&quot;,&quot;url&quot;:&quot;/gallery/tagged/report&quot;,&quot;trackingKey&quot;:&quot;lab-report&quot;},{&quot;name&quot;:&quot;CVs and résumés&quot;,&quot;url&quot;:&quot;/gallery/tagged/cv&quot;,&quot;trackingKey&quot;:&quot;cv&quot;},{&quot;name&quot;:&quot;Theses&quot;,&quot;url&quot;:&quot;/gallery/tagged/thesis&quot;,&quot;trackingKey&quot;:&quot;thesis&quot;},{&quot;name&quot;:&quot;view_all&quot;,&quot;url&quot;:&quot;/latex/templates&quot;,&quot;trackingKey&quot;:&quot;view-all&quot;}],&quot;labsEnabled&quot;:true,&quot;wikiEnabled&quot;:true,&quot;templatesEnabled&quot;:true,&quot;cioWriteKey&quot;:&quot;2530db5896ec00db632a&quot;,&quot;cioSiteId&quot;:&quot;6420c27bb72163938e7d&quot;,&quot;linkedInInsightsPartnerId&quot;:&quot;7472905&quot;,&quot;enablePandocConversions&quot;:true,&quot;mixpanelLabsToken&quot;:&quot;3fd8edbe047fdcd77a3c37891081cf4e&quot;}"><meta name="ol-splitTestVariants" data-type="json" content="{&quot;hotjar-marketing&quot;:&quot;enabled&quot;}"><meta name="ol-splitTestInfo" data-type="json" content="{&quot;hotjar-marketing&quot;:{&quot;phase&quot;:&quot;release&quot;,&quot;badgeInfo&quot;:{&quot;tooltipText&quot;:&quot;&quot;,&quot;url&quot;:&quot;&quot;}}}"><meta name="ol-algolia" data-type="json" content="{&quot;appId&quot;:&quot;SK53GL4JLY&quot;,&quot;apiKey&quot;:&quot;9ac63d917afab223adbd2cd09ad0eb17&quot;,&quot;indexes&quot;:{&quot;wiki&quot;:&quot;learn-wiki&quot;,&quot;gallery&quot;:&quot;gallery-production&quot;}}"><meta name="ol-isManagedAccount" data-type="boolean"><meta name="ol-shouldLoadHotjar" data-type="boolean" content></head><body class="website-redesign" data-theme="light"><a class="skip-to-content" href="#main-content">Skip to content</a><nav class="navbar navbar-default navbar-main navbar-expand-lg website-redesign-navbar" aria-label="Primary"><div class="container-fluid navbar-container"><div class="navbar-header"><a class="navbar-brand" href="/" aria-label="Overleaf"><div class="navbar-logo"></div></a></div><button class="navbar-toggler collapsed" id="navbar-toggle-btn" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-main-collapse" aria-controls="navbar-main-collapse" aria-expanded="false" aria-label="Toggle Navigation"><span class="material-symbols" aria-hidden="true" translate="no">menu</span></button><div class="navbar-collapse collapse" id="navbar-main-collapse"><ul class="nav navbar-nav navbar-right ms-auto" role="menubar"><!-- loop over header_extras--><li class="dropdown subdued" role="none"><button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" role="menuitem" event-tracking="menu-expand" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation="{&quot;item&quot;:&quot;product&quot;,&quot;location&quot;:&quot;top-menu&quot;}">Product</button><ul class="dropdown-menu dropdown-menu-end" role="menu"><li role="none"><a class="dropdown-item" role="menuitem" href="/about/features-overview" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"premium-features","location":"top-menu"}'>Features</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/about/ai-features" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"ai-features","location":"top-menu"}'>AI</a></li></ul></li><li class="dropdown subdued" role="none"><button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" role="menuitem" event-tracking="menu-expand" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation="{&quot;item&quot;:&quot;solutions&quot;,&quot;location&quot;:&quot;top-menu&quot;}">Solutions</button><ul class="dropdown-menu dropdown-menu-end" role="menu"><li role="none"><a class="dropdown-item" role="menuitem" href="/for/enterprises" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"enterprises","location":"top-menu"}'>For business</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/for/universities" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"universities","location":"top-menu"}'>For universities</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/for/government" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"government","location":"top-menu"}'>For government</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/for/publishers" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"publishers","location":"top-menu"}'>For publishers</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/about/customer-stories" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"customer-stories","location":"top-menu"}'>Customer stories</a></li></ul></li><li class="subdued" role="none"><a class="nav-link subdued" role="menuitem" href="/latex/templates" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"templates","location":"top-menu"}'>Templates</a></li><li class="subdued" role="none"><a class="nav-link subdued" role="menuitem" href="/user/subscription/plans" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"pricing","location":"top-menu"}'>Pricing</a></li><li class="dropdown subdued nav-item-help" role="none"><button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown" role="menuitem" event-tracking="menu-expand" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation="{&quot;item&quot;:&quot;help-and-resources&quot;,&quot;location&quot;:&quot;top-menu&quot;}">Help & resources</button><ul class="dropdown-menu dropdown-menu-end" role="menu"><li role="none"><a class="dropdown-item" role="menuitem" href="https://docs.overleaf.com/" target="_blank" rel="noopener noreferrer" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"learn","location":"top-menu"}'>Documentation</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="https://learn.overleaf.com/" target="_blank" rel="noopener noreferrer" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"overleaf-learning-center","location":"top-menu"}'>Overleaf learning center</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/for/community/resources" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"help-guides","location":"top-menu"}'>Help guides</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/about/why-latex" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"why-latex","location":"top-menu"}'>Why LaTeX?</a></li><li role="none"><a class="dropdown-item" role="menuitem" href="/blog" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"blog","location":"top-menu"}'>Blog</a></li><li role="none"><a class="dropdown-item" role="menuitem" data-ol-open-contact-form-modal="contact-us" data-bs-target="#contactUsModal" href data-bs-toggle="modal" event-tracking="menu-click" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation='{"item":"contact","location":"top-menu"}'><span>Contact us</span></a></li></ul></li><!-- logged out--><!-- register link--><li class="primary" role="none"><a class="nav-link" role="menuitem" href="/register" event-tracking="menu-click" event-tracking-action="clicked" event-tracking-trigger="click" event-tracking-mb="true" event-segmentation='{"page":"/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky","item":"register","location":"top-menu"}'>Sign up</a></li><!-- login link--><li role="none"><a class="nav-link" role="menuitem" href="/login" event-tracking="menu-click" event-tracking-action="clicked" event-tracking-trigger="click" event-tracking-mb="true" event-segmentation='{"page":"/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky","item":"login","location":"top-menu"}'>Log in</a></li><!-- projects link and account menu--></ul></div></div></nav><main class="gallery content content-page" id="main-content"><div class="container"><div class="row previous-page-link-container"><div class="col-lg-6"><a class="previous-page-link" href="/latex/templates"><span class="material-symbols" aria-hidden="true" translate="no">arrow_left_alt</span>Back to all templates</a></div></div><div class="row"><div class="col-md-6 template-item-left-section"><div class="row"><div class="col-md-12"><div class="gallery-item-title"><h1 class="h2">IEEE Demo Template for Computer Society Conferences</h1><span class="gallery-item-title-badge-container"><span class="badge bg-info" data-bs-toggle="tooltip" data-bs-placement="bottom" title="This template has been approved by the publisher"> <span class="badge-content">Official</span></span></span></div></div></div><div class="row cta-links-container"><div class="col-md-12 cta-links"><a class="btn btn-primary cta-link" href="/project/new/template/8216?brandVariationId=64&amp;id=2428167&amp;mainFile=bare_conf_compsoc.tex&amp;templateName=IEEE+Demo+Template+for+Computer+Society+Conferences&amp;texImage=texlive-full%3A2026.1" event-tracking-mb="true" event-tracking="gallery-open-template" event-tracking-trigger="click">Open as Template</a><button class="btn btn-secondary cta-link" data-bs-toggle="modal" data-bs-target="#modalViewSource" event-tracking-mb="true" event-tracking="gallery-view-source" event-tracking-trigger="click">View Source</button><a class="btn btn-secondary cta-link" href="/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky.pdf" target="_blank" event-tracking-mb="true" event-tracking="gallery-download-pdf" event-tracking-trigger="click">View PDF</a></div></div><div class="template-details-container"><div class="template-detail"><div><b>Author:</b></div><div>Michael Shell</div></div><div class="template-detail"><div><b>Last Updated:</b></div><div><span data-bs-toggle="tooltip" data-bs-placement="bottom" data-timestamp-for-title="1532358845">8 years ago</span></div></div><div class="template-detail"><div><b>License:</b></div><div>Other (as stated in the work)</div></div><div class="template-detail"><div><b>Abstract:</b></div><div class="gallery-abstract" data-ol-mathjax><p>This is a skeleton file demonstrating the use of IEEEtran.cls (requires IEEEtran.cls version 1.8b or later) with an IEEE Computer
+Society conference paper.</p>
+
+<p>For other IEEE conferences, please see the <a href="/read/ypypvwjmvtdf" rel="nofollow">IEEE conference paper template</a>, and to find additional IEEE templates please use the tags below.</p>
+
+<p>IEEEtran.cls version: 1.8b</p></div></div><div class="template-detail tags"><div><b>Tags:</b></div><div><div class="badge-link-list"><a class="badge-link badge-link-light" href="/gallery/tagged/conference-paper"><span class="badge text-dark bg-light"><span class="badge-content" data-badge-tooltip data-bs-placement="bottom" data-bs-title="Conference Paper">Conference Paper</span></span></a><a class="badge-link badge-link-light" href="/gallery/tagged/twocolumn"><span class="badge text-dark bg-light"><span class="badge-content" data-badge-tooltip data-bs-placement="bottom" data-bs-title="Two-column">Two-column</span></span></a><a class="badge-link badge-link-light" href="/gallery/tagged/ieee-official"><span class="badge text-dark bg-light"><span class="badge-content" data-badge-tooltip data-bs-placement="bottom" data-bs-title="IEEE Official Templates">IEEE Official Templates</span></span></a><a class="badge-link badge-link-light" href="/gallery/tagged/ieee"><span class="badge text-dark bg-light"><span class="badge-content" data-badge-tooltip data-bs-placement="bottom" data-bs-title="IEEE (all)">IEEE (all)</span></span></a></div></div></div></div></div><div class="col-md-6 template-item-right-section"><div class="entry"><div class="row"><div class="col-md-12"><div class="gallery-large-pdf-preview"><img src="https://writelatex.s3.amazonaws.com/published_ver/8216.jpeg" alt="IEEE Demo Template for Computer Society Conferences"></div></div></div></div></div></div><div class="row section-row"><div class="col-md-12"><div class="begin-now-card"><div class="card card-pattern"><div class="card-body"><p class="dm-mono"><span class="font-size-display-xs"><span class="text-purple-bright">\begin</span><wbr><span class="text-green-bright">{</span><span>now</span><span class="text-green-bright">}</span></span></p><p>Discover why over 30 million people worldwide trust Overleaf with their work.</p><p class="card-links"><a class="btn btn-primary card-link" href="/register">Sign up for free</a><a class="btn card-link btn-secondary" href="/user/subscription/plans">Explore all plans</a></p></div></div></div></div></div></div></main><div class="modal fade" id="modalViewSource" tabindex="-1" role="dialog" aria-labelledby="modalViewSourceTitle" aria-hidden="true"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="modalViewSourceTitle">Source</h3><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close dialog"></button></div><div class="modal-body"><pre><code>%% bare_conf_compsoc.tex
+%% V1.4b
+%% 2015/08/26
+%% by Michael Shell
+%% See:
+%% http://www.michaelshell.org/
+%% for current contact information.
+%%
+%% This is a skeleton file demonstrating the use of IEEEtran.cls
+%% (requires IEEEtran.cls version 1.8b or later) with an IEEE Computer
+%% Society conference paper.
+%%
+%% Support sites:
+%% http://www.michaelshell.org/tex/ieeetran/
+%% http://www.ctan.org/pkg/ieeetran
+%% and
+%% http://www.ieee.org/
+
+%%*************************************************************************
+%% Legal Notice:
+%% This code is offered as-is without any warranty either expressed or
+%% implied; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE! 
+%% User assumes all risk.
+%% In no event shall the IEEE or any contributor to this code be liable for
+%% any damages or losses, including, but not limited to, incidental,
+%% consequential, or any other damages, resulting from the use or misuse
+%% of any information contained here.
+%%
+%% All comments are the opinions of their respective authors and are not
+%% necessarily endorsed by the IEEE.
+%%
+%% This work is distributed under the LaTeX Project Public License (LPPL)
+%% ( http://www.latex-project.org/ ) version 1.3, and may be freely used,
+%% distributed and modified. A copy of the LPPL, version 1.3, is included
+%% in the base LaTeX documentation of all distributions of LaTeX released
+%% 2003/12/01 or later.
+%% Retain all contribution notices and credits.
+%% ** Modified files should be clearly indicated as such, including  **
+%% ** renaming them and changing author support contact information. **
+%%*************************************************************************
+
+
+% *** Authors should verify (and, if needed, correct) their LaTeX system  ***
+% *** with the testflow diagnostic prior to trusting their LaTeX platform ***
+% *** with production work. The IEEE's font choices and paper sizes can   ***
+% *** trigger bugs that do not appear when using other class files.       ***                          ***
+% The testflow support page is at:
+% http://www.michaelshell.org/tex/testflow/
+
+
+
+\documentclass[conference,compsoc]{IEEEtran}
+% Some/most Computer Society conferences require the compsoc mode option,
+% but others may want the standard conference format.
+%
+% If IEEEtran.cls has not been installed into the LaTeX system files,
+% manually specify the path to it like:
+% \documentclass[conference,compsoc]{../sty/IEEEtran}
+
+
+
+
+
+% Some very useful LaTeX packages include:
+% (uncomment the ones you want to load)
+
+
+% *** MISC UTILITY PACKAGES ***
+%
+%\usepackage{ifpdf}
+% Heiko Oberdiek's ifpdf.sty is very useful if you need conditional
+% compilation based on whether the output is pdf or dvi.
+% usage:
+% \ifpdf
+%   % pdf code
+% \else
+%   % dvi code
+% \fi
+% The latest version of ifpdf.sty can be obtained from:
+% http://www.ctan.org/pkg/ifpdf
+% Also, note that IEEEtran.cls V1.7 and later provides a builtin
+% \ifCLASSINFOpdf conditional that works the same way.
+% When switching from latex to pdflatex and vice-versa, the compiler may
+% have to be run twice to clear warning/error messages.
+
+
+
+
+
+
+% *** CITATION PACKAGES ***
+%
+\ifCLASSOPTIONcompsoc
+  % IEEE Computer Society needs nocompress option
+  % requires cite.sty v4.0 or later (November 2003)
+  \usepackage[nocompress]{cite}
+\else
+  % normal IEEE
+  \usepackage{cite}
+\fi
+% cite.sty was written by Donald Arseneau
+% V1.6 and later of IEEEtran pre-defines the format of the cite.sty package
+% \cite{} output to follow that of the IEEE. Loading the cite package will
+% result in citation numbers being automatically sorted and properly
+% &quot;compressed/ranged&quot;. e.g., [1], [9], [2], [7], [5], [6] without using
+% cite.sty will become [1], [2], [5]--[7], [9] using cite.sty. cite.sty's
+% \cite will automatically add leading space, if needed. Use cite.sty's
+% noadjust option (cite.sty V3.8 and later) if you want to turn this off
+% such as if a citation ever needs to be enclosed in parenthesis.
+% cite.sty is already installed on most LaTeX systems. Be sure and use
+% version 5.0 (2009-03-20) and later if using hyperref.sty.
+% The latest version can be obtained at:
+% http://www.ctan.org/pkg/cite
+% The documentation is contained in the cite.sty file itself.
+%
+% Note that some packages require special options to format as the Computer
+% Society requires. In particular, Computer Society  papers do not use
+% compressed citation ranges as is done in typical IEEE papers
+% (e.g., [1]-[4]). Instead, they list every citation separately in order
+% (e.g., [1], [2], [3], [4]). To get the latter we need to load the cite
+% package with the nocompress option which is supported by cite.sty v4.0
+% and later.
+
+
+
+
+
+% *** GRAPHICS RELATED PACKAGES ***
+%
+\ifCLASSINFOpdf
+  % \usepackage[pdftex]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../pdf/}{../jpeg/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\else
+  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
+  % will default to the driver specified in the system graphics.cfg if no
+  % driver is specified.
+  % \usepackage[dvips]{graphicx}
+  % declare the path(s) where your graphic files are
+  % \graphicspath{{../eps/}}
+  % and their extensions so you won't have to specify these with
+  % every instance of \includegraphics
+  % \DeclareGraphicsExtensions{.eps}
+\fi
+% graphicx was written by David Carlisle and Sebastian Rahtz. It is
+% required if you want graphics, photos, etc. graphicx.sty is already
+% installed on most LaTeX systems. The latest version and documentation
+% can be obtained at: 
+% http://www.ctan.org/pkg/graphicx
+% Another good source of documentation is &quot;Using Imported Graphics in
+% LaTeX2e&quot; by Keith Reckdahl which can be found at:
+% http://www.ctan.org/pkg/epslatex
+%
+% latex, and pdflatex in dvi mode, support graphics in encapsulated
+% postscript (.eps) format. pdflatex in pdf mode supports graphics
+% in .pdf, .jpeg, .png and .mps (metapost) formats. Users should ensure
+% that all non-photo figures use a vector format (.eps, .pdf, .mps) and
+% not a bitmapped formats (.jpeg, .png). The IEEE frowns on bitmapped formats
+% which can result in &quot;jaggedy&quot;/blurry rendering of lines and letters as
+% well as large increases in file sizes.
+%
+% You can find documentation about the pdfTeX application at:
+% http://www.tug.org/applications/pdftex
+
+
+
+
+
+% *** MATH PACKAGES ***
+%
+%\usepackage{amsmath}
+% A popular package from the American Mathematical Society that provides
+% many useful and powerful commands for dealing with mathematics.
+%
+% Note that the amsmath package sets \interdisplaylinepenalty to 10000
+% thus preventing page breaks from occurring within multiline equations. Use:
+%\interdisplaylinepenalty=2500
+% after loading amsmath to restore such page breaks as IEEEtran.cls normally
+% does. amsmath.sty is already installed on most LaTeX systems. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/pkg/amsmath
+
+
+
+
+
+% *** SPECIALIZED LIST PACKAGES ***
+%
+%\usepackage{algorithmic}
+% algorithmic.sty was written by Peter Williams and Rogerio Brito.
+% This package provides an algorithmic environment fo describing algorithms.
+% You can use the algorithmic environment in-text or within a figure
+% environment to provide for a floating algorithm. Do NOT use the algorithm
+% floating environment provided by algorithm.sty (by the same authors) or
+% algorithm2e.sty (by Christophe Fiorio) as the IEEE does not use dedicated
+% algorithm float types and packages that provide these will not provide
+% correct IEEE style captions. The latest version and documentation of
+% algorithmic.sty can be obtained at:
+% http://www.ctan.org/pkg/algorithms
+% Also of interest may be the (relatively newer and more customizable)
+% algorithmicx.sty package by Szasz Janos:
+% http://www.ctan.org/pkg/algorithmicx
+
+
+
+
+% *** ALIGNMENT PACKAGES ***
+%
+%\usepackage{array}
+% Frank Mittelbach's and David Carlisle's array.sty patches and improves
+% the standard LaTeX2e array and tabular environments to provide better
+% appearance and additional user controls. As the default LaTeX2e table
+% generation code is lacking to the point of almost being broken with
+% respect to the quality of the end results, all users are strongly
+% advised to use an enhanced (at the very least that provided by array.sty)
+% set of table tools. array.sty is already installed on most systems. The
+% latest version and documentation can be obtained at:
+% http://www.ctan.org/pkg/array
+
+
+% IEEEtran contains the IEEEeqnarray family of commands that can be used to
+% generate multiline equations as well as matrices, tables, etc., of high
+% quality.
+
+
+
+
+% *** SUBFIGURE PACKAGES ***
+%\ifCLASSOPTIONcompsoc
+%  \usepackage[caption=false,font=footnotesize,labelfont=sf,textfont=sf]{subfig}
+%\else
+%  \usepackage[caption=false,font=footnotesize]{subfig}
+%\fi
+% subfig.sty, written by Steven Douglas Cochran, is the modern replacement
+% for subfigure.sty, the latter of which is no longer maintained and is
+% incompatible with some LaTeX packages including fixltx2e. However,
+% subfig.sty requires and automatically loads Axel Sommerfeldt's caption.sty
+% which will override IEEEtran.cls' handling of captions and this will result
+% in non-IEEE style figure/table captions. To prevent this problem, be sure
+% and invoke subfig.sty's &quot;caption=false&quot; package option (available since
+% subfig.sty version 1.3, 2005/06/28) as this is will preserve IEEEtran.cls
+% handling of captions.
+% Note that the Computer Society format requires a sans serif font rather
+% than the serif font used in traditional IEEE formatting and thus the need
+% to invoke different subfig.sty package options depending on whether
+% compsoc mode has been enabled.
+%
+% The latest version and documentation of subfig.sty can be obtained at:
+% http://www.ctan.org/pkg/subfig
+
+
+
+
+% *** FLOAT PACKAGES ***
+%
+%\usepackage{fixltx2e}
+% fixltx2e, the successor to the earlier fix2col.sty, was written by
+% Frank Mittelbach and David Carlisle. This package corrects a few problems
+% in the LaTeX2e kernel, the most notable of which is that in current
+% LaTeX2e releases, the ordering of single and double column floats is not
+% guaranteed to be preserved. Thus, an unpatched LaTeX2e can allow a
+% single column figure to be placed prior to an earlier double column
+% figure.
+% Be aware that LaTeX2e kernels dated 2015 and later have fixltx2e.sty's
+% corrections already built into the system in which case a warning will
+% be issued if an attempt is made to load fixltx2e.sty as it is no longer
+% needed.
+% The latest version and documentation can be found at:
+% http://www.ctan.org/pkg/fixltx2e
+
+
+%\usepackage{stfloats}
+% stfloats.sty was written by Sigitas Tolusis. This package gives LaTeX2e
+% the ability to do double column floats at the bottom of the page as well
+% as the top. (e.g., &quot;\begin{figure*}[!b]&quot; is not normally possible in
+% LaTeX2e). It also provides a command:
+%\fnbelowfloat
+% to enable the placement of footnotes below bottom floats (the standard
+% LaTeX2e kernel puts them above bottom floats). This is an invasive package
+% which rewrites many portions of the LaTeX2e float routines. It may not work
+% with other packages that modify the LaTeX2e float routines. The latest
+% version and documentation can be obtained at:
+% http://www.ctan.org/pkg/stfloats
+% Do not use the stfloats baselinefloat ability as the IEEE does not allow
+% \baselineskip to stretch. Authors submitting work to the IEEE should note
+% that the IEEE rarely uses double column equations and that authors should try
+% to avoid such use. Do not be tempted to use the cuted.sty or midfloat.sty
+% packages (also by Sigitas Tolusis) as the IEEE does not format its papers in
+% such ways.
+% Do not attempt to use stfloats with fixltx2e as they are incompatible.
+% Instead, use Morten Hogholm'a dblfloatfix which combines the features
+% of both fixltx2e and stfloats:
+%
+% \usepackage{dblfloatfix}
+% The latest version can be found at:
+% http://www.ctan.org/pkg/dblfloatfix
+
+
+
+
+% *** PDF, URL AND HYPERLINK PACKAGES ***
+%
+%\usepackage{url}
+% url.sty was written by Donald Arseneau. It provides better support for
+% handling and breaking URLs. url.sty is already installed on most LaTeX
+% systems. The latest version and documentation can be obtained at:
+% http://www.ctan.org/pkg/url
+% Basically, \url{my_url_here}.
+
+
+
+
+% *** Do not adjust lengths that control margins, column widths, etc. ***
+% *** Do not use packages that alter fonts (such as pslatex).         ***
+% There should be no need to do such things with IEEEtran.cls V1.6 and later.
+% (Unless specifically asked to do so by the journal or conference you plan
+% to submit to, of course. )
+
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+
+\begin{document}
+%
+% paper title
+% Titles are generally capitalized except for words such as a, an, and, as,
+% at, but, by, for, in, nor, of, on, or, the, to and up, which are usually
+% not capitalized unless they are the first or last word of the title.
+% Linebreaks \\ can be used within to get better formatting as desired.
+% Do not put math or special symbols in the title.
+\title{Bare Demo of IEEEtran.cls for\\ IEEE Computer Society Conferences}
+
+
+% author names and affiliations
+% use a multiple column layout for up to three different
+% affiliations
+\author{\IEEEauthorblockN{Michael Shell}
+\IEEEauthorblockA{School of Electrical and\\Computer Engineering\\
+Georgia Institute of Technology\\
+Atlanta, Georgia 30332--0250\\
+Email: http://www.michaelshell.org/contact.html}
+\and
+\IEEEauthorblockN{Homer Simpson}
+\IEEEauthorblockA{Twentieth Century Fox\\
+Springfield, USA\\
+Email: homer@thesimpsons.com}
+\and
+\IEEEauthorblockN{James Kirk\\ and Montgomery Scott}
+\IEEEauthorblockA{Starfleet Academy\\
+San Francisco, California 96678-2391\\
+Telephone: (800) 555--1212\\
+Fax: (888) 555--1212}}
+
+% conference papers do not typically use \thanks and this command
+% is locked out in conference mode. If really needed, such as for
+% the acknowledgment of grants, issue a \IEEEoverridecommandlockouts
+% after \documentclass
+
+% for over three affiliations, or if they all won't fit within the width
+% of the page (and note that there is less available width in this regard for
+% compsoc conferences compared to traditional conferences), use this
+% alternative format:
+% 
+%\author{\IEEEauthorblockN{Michael Shell\IEEEauthorrefmark{1},
+%Homer Simpson\IEEEauthorrefmark{2},
+%James Kirk\IEEEauthorrefmark{3}, 
+%Montgomery Scott\IEEEauthorrefmark{3} and
+%Eldon Tyrell\IEEEauthorrefmark{4}}
+%\IEEEauthorblockA{\IEEEauthorrefmark{1}School of Electrical and Computer Engineering\\
+%Georgia Institute of Technology,
+%Atlanta, Georgia 30332--0250\\ Email: see http://www.michaelshell.org/contact.html}
+%\IEEEauthorblockA{\IEEEauthorrefmark{2}Twentieth Century Fox, Springfield, USA\\
+%Email: homer@thesimpsons.com}
+%\IEEEauthorblockA{\IEEEauthorrefmark{3}Starfleet Academy, San Francisco, California 96678-2391\\
+%Telephone: (800) 555--1212, Fax: (888) 555--1212}
+%\IEEEauthorblockA{\IEEEauthorrefmark{4}Tyrell Inc., 123 Replicant Street, Los Angeles, California 90210--4321}}
+
+
+
+
+% use for special paper notices
+%\IEEEspecialpapernotice{(Invited Paper)}
+
+
+
+
+% make the title area
+\maketitle
+
+% As a general rule, do not put math, special symbols or citations
+% in the abstract
+\begin{abstract}
+The abstract goes here.
+\end{abstract}
+
+% no keywords
+
+
+
+
+% For peer review papers, you can put extra information on the cover
+% page as needed:
+% \ifCLASSOPTIONpeerreview
+% \begin{center} \bfseries EDICS Category: 3-BBND \end{center}
+% \fi
+%
+% For peerreview papers, this IEEEtran command inserts a page break and
+% creates the second title. It will be ignored for other modes.
+\IEEEpeerreviewmaketitle
+
+
+
+\section{Introduction}
+% no \IEEEPARstart
+This demo file is intended to serve as a ``starter file''
+for IEEE Computer Society conference papers produced under \LaTeX\ using
+IEEEtran.cls version 1.8b and later.
+% You must have at least 2 lines in the paragraph with the drop letter
+% (should never be an issue)
+I wish you the best of success.
+
+\hfill mds
+ 
+\hfill August 26, 2015
+
+\subsection{Subsection Heading Here}
+Subsection text here.
+
+
+\subsubsection{Subsubsection Heading Here}
+Subsubsection text here.
+
+
+% An example of a floating figure using the graphicx package.
+% Note that \label must occur AFTER (or within) \caption.
+% For figures, \caption should occur after the \includegraphics.
+% Note that IEEEtran v1.7 and later has special internal code that
+% is designed to preserve the operation of \label within \caption
+% even when the captionsoff option is in effect. However, because
+% of issues like this, it may be the safest practice to put all your
+% \label just after \caption rather than within \caption{}.
+%
+% Reminder: the &quot;draftcls&quot; or &quot;draftclsnofoot&quot;, not &quot;draft&quot;, class
+% option should be used if it is desired that the figures are to be
+% displayed while in draft mode.
+%
+%\begin{figure}[!t]
+%\centering
+%\includegraphics[width=2.5in]{myfigure}
+% where an .eps filename suffix will be assumed under latex, 
+% and a .pdf suffix will be assumed for pdflatex; or what has been declared
+% via \DeclareGraphicsExtensions.
+%\caption{Simulation results for the network.}
+%\label{fig_sim}
+%\end{figure}
+
+% Note that the IEEE typically puts floats only at the top, even when this
+% results in a large percentage of a column being occupied by floats.
+
+
+% An example of a double column floating figure using two subfigures.
+% (The subfig.sty package must be loaded for this to work.)
+% The subfigure \label commands are set within each subfloat command,
+% and the \label for the overall figure must come after \caption.
+% \hfil is used as a separator to get equal spacing.
+% Watch out that the combined width of all the subfigures on a 
+% line do not exceed the text width or a line break will occur.
+%
+%\begin{figure*}[!t]
+%\centering
+%\subfloat[Case I]{\includegraphics[width=2.5in]{box}%
+%\label{fig_first_case}}
+%\hfil
+%\subfloat[Case II]{\includegraphics[width=2.5in]{box}%
+%\label{fig_second_case}}
+%\caption{Simulation results for the network.}
+%\label{fig_sim}
+%\end{figure*}
+%
+% Note that often IEEE papers with subfigures do not employ subfigure
+% captions (using the optional argument to \subfloat[]), but instead will
+% reference/describe all of them (a), (b), etc., within the main caption.
+% Be aware that for subfig.sty to generate the (a), (b), etc., subfigure
+% labels, the optional argument to \subfloat must be present. If a
+% subcaption is not desired, just leave its contents blank,
+% e.g., \subfloat[].
+
+
+% An example of a floating table. Note that, for IEEE style tables, the
+% \caption command should come BEFORE the table and, given that table
+% captions serve much like titles, are usually capitalized except for words
+% such as a, an, and, as, at, but, by, for, in, nor, of, on, or, the, to
+% and up, which are usually not capitalized unless they are the first or
+% last word of the caption. Table text will default to \footnotesize as
+% the IEEE normally uses this smaller font for tables.
+% The \label must come after \caption as always.
+%
+%\begin{table}[!t]
+%% increase table row spacing, adjust to taste
+%\renewcommand{\arraystretch}{1.3}
+% if using array.sty, it might be a good idea to tweak the value of
+% \extrarowheight as needed to properly center the text within the cells
+%\caption{An Example of a Table}
+%\label{table_example}
+%\centering
+%% Some packages, such as MDW tools, offer better commands for making tables
+%% than the plain LaTeX2e tabular which is used here.
+%\begin{tabular}{|c||c|}
+%\hline
+%One &amp; Two\\
+%\hline
+%Three &amp; Four\\
+%\hline
+%\end{tabular}
+%\end{table}
+
+
+% Note that the IEEE does not put floats in the very first column
+% - or typically anywhere on the first page for that matter. Also,
+% in-text middle (&quot;here&quot;) positioning is typically not used, but it
+% is allowed and encouraged for Computer Society conferences (but
+% not Computer Society journals). Most IEEE journals/conferences use
+% top floats exclusively. 
+% Note that, LaTeX2e, unlike IEEE journals/conferences, places
+% footnotes above bottom floats. This can be corrected via the
+% \fnbelowfloat command of the stfloats package.
+
+
+
+
+\section{Conclusion}
+The conclusion goes here.
+
+
+
+
+% conference papers do not normally have an appendix
+
+
+
+% use section* for acknowledgment
+\ifCLASSOPTIONcompsoc
+  % The Computer Society usually uses the plural form
+  \section*{Acknowledgments}
+\else
+  % regular IEEE prefers the singular form
+  \section*{Acknowledgment}
+\fi
+
+
+The authors would like to thank...
+
+
+
+
+
+% trigger a \newpage just before the given reference
+% number - used to balance the columns on the last page
+% adjust value as needed - may need to be readjusted if
+% the document is modified later
+%\IEEEtriggeratref{8}
+% The &quot;triggered&quot; command can be changed if desired:
+%\IEEEtriggercmd{\enlargethispage{-5in}}
+
+% references section
+
+% can use a bibliography generated by BibTeX as a .bbl file
+% BibTeX documentation can be easily obtained at:
+% http://mirror.ctan.org/biblio/bibtex/contrib/doc/
+% The IEEEtran BibTeX style support page is at:
+% http://www.michaelshell.org/tex/ieeetran/bibtex/
+%\bibliographystyle{IEEEtran}
+% argument is your BibTeX string definitions and bibliography database(s)
+%\bibliography{IEEEabrv,../bib/paper}
+%
+% &lt;OR&gt; manually copy in the resultant .bbl file
+% set second argument of \begin to the number of references
+% (used to reserve space for the reference number labels box)
+\begin{thebibliography}{1}
+
+\bibitem{IEEEhowto:kopka}
+H.~Kopka and P.~W. Daly, \emph{A Guide to \LaTeX}, 3rd~ed.\hskip 1em plus
+  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+
+\end{thebibliography}
+
+
+
+
+% that's all folks
+\end{document}
+
+
+</code></pre></div><div class="modal-footer"><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button></div></div></div></div><footer class="fat-footer hidden-print website-redesign-fat-footer"><div class="fat-footer-container"><div class="fat-footer-sections"><div class="footer-section" id="footer-brand"><a class="footer-brand" href="/" aria-label="Overleaf"></a></div><div class="footer-section"><h2 class="footer-section-heading">About</h2><ul class="list-unstyled"><li><a href="/about">About us</a></li><li><a href="https://digitalscience.pinpointhq.com/">Careers</a></li><li><a href="/blog">Blog</a></li></ul></div><div class="footer-section"><h2 class="footer-section-heading">Solutions</h2><ul class="list-unstyled"><li><a href="/for/enterprises">For business</a></li><li><a href="/for/universities">For universities</a></li><li><a href="/for/government">For government</a></li><li><a href="/for/publishers">For publishers</a></li><li><a href="/about/customer-stories">Customer stories</a></li></ul></div><div class="footer-section"><h2 class="footer-section-heading">Learn</h2><ul class="list-unstyled"><li><a href="https://docs.overleaf.com/getting-started/latex-tutorials" target="_blank" rel="noopener noreferrer">Tutorials</a></li><li><a href="/latex/templates">Templates</a></li><li><a href="https://learn.overleaf.com/calendar" target="_blank" rel="noopener noreferrer">Webinars</a></li><li><a href="https://learn.overleaf.com/" target="_blank" rel="noopener noreferrer">Overleaf learning center</a></li><li><a href="https://docs.overleaf.com/writing-and-editing/inserting-images" target="_blank" rel="noopener noreferrer">How to insert images</a></li><li><a href="https://docs.overleaf.com/writing-and-editing/generating-and-inserting-tables" target="_blank" rel="noopener noreferrer">How to create tables</a></li></ul></div><div class="footer-section"><h2 class="footer-section-heading">Pricing</h2><ul class="list-unstyled"><li><a href="/user/subscription/plans?itm_referrer=footer-for-indv">For individuals</a></li><li><a href="/user/subscription/plans?plan=group&amp;itm_referrer=footer-for-groups">For groups and organizations</a></li><li><a href="/user/subscription/plans?plan=student&amp;period=annual&amp;itm_referrer=footer-for-students">For students</a></li></ul></div><div class="footer-section"><h2 class="footer-section-heading">Get involved</h2><ul class="list-unstyled"><li><a href="https://forms.gle/67PSpN1bLnjGCmPQ9">Let us know what you think</a></li></ul></div><div class="footer-section"><h2 class="footer-section-heading">Help</h2><ul class="list-unstyled"><li><a href="https://docs.overleaf.com/" target="_blank" rel="noopener noreferrer">Documentation</a></li><li><a href="/contact">Contact us</a></li><li><a href="https://status.overleaf.com/" target="_blank" rel="noopener noreferrer">Website status</a></li></ul></div></div><div class="fat-footer-base"><div class="fat-footer-base-section fat-footer-base-meta"><div class="fat-footer-base-item"><div class="fat-footer-base-copyright">© 2026 Overleaf</div><a href="/legal">Privacy and Terms</a><a href="https://www.digital-science.com/security-certifications/">Compliance</a></div><ul class="fat-footer-base-item list-unstyled fat-footer-base-language"><li class="dropdown dropup subdued language-picker" dropdown><button class="btn btn-link btn-inline-link" id="language-picker-toggle" dropdown-toggle data-ol-lang-selector-tooltip data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Select Language" tooltip="Language" title="Language"><span class="material-symbols" aria-hidden="true" translate="no">translate</span>&nbsp;<span class="language-picker-text">English</span></button><ul class="dropdown-menu dropdown-menu-sm-width" role="menu" aria-labelledby="language-picker-toggle"><li class="dropdown-header">Language</li><li class="lng-option"><a class="menu-indent dropdown-item active" href="https://www.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="true">English<span class="material-symbols dropdown-item-trailing-icon" aria-hidden="true" translate="no">check</span></a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://cs.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Čeština</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://es.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Español</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://pt.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Português</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://fr.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Français</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://de.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Deutsch</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://sv.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Svenska</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://tr.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Türkçe</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://it.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Italiano</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://cn.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">简体中文</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://no.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Norsk</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://ru.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Русский</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://da.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">Dansk</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://ko.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">한국어</a></li><li class="lng-option"><a class="menu-indent dropdown-item" href="https://ja.overleaf.com/latex/templates/ieee-demo-template-for-computer-society-conferences/hzzszpqfkqky" role="menuitem" aria-selected="false">日本語</a></li></ul></li></ul></div><div class="fat-footer-base-section fat-footer-base-social"><div class="fat-footer-base-item"><a class="fat-footer-social x-logo" href="https://x.com/overleaf"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1227" height="25"><path d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L144.011 79.6944H306.615L611.412 515.685L658.88 583.579L1055.08 1150.3H892.476L569.165 687.854V687.828Z"></path></svg><span class="visually-hidden">Overleaf on X</span></a><a class="fat-footer-social facebook-logo" href="https://www.facebook.com/overleaf.editor"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 666.66668 666.66717" height="25"><defs><clipPath id="a" clipPathUnits="userSpaceOnUse"><path d="M0 700h700V0H0Z"></path></clipPath></defs><g clip-path="url(#a)" transform="matrix(1.33333 0 0 -1.33333 -133.333 800)"><path class="background" d="M0 0c0 138.071-111.929 250-250 250S-500 138.071-500 0c0-117.245 80.715-215.622 189.606-242.638v166.242h-51.552V0h51.552v32.919c0 85.092 38.508 124.532 122.048 124.532 15.838 0 43.167-3.105 54.347-6.211V81.986c-5.901.621-16.149.932-28.882.932-40.993 0-56.832-15.528-56.832-55.9V0h81.659l-14.028-76.396h-67.631v-171.773C-95.927-233.218 0-127.818 0 0" fill="#0866ff" transform="translate(600 350)"></path><path class="text" d="m0 0 14.029 76.396H-67.63v27.019c0 40.372 15.838 55.899 56.831 55.899 12.733 0 22.981-.31 28.882-.931v69.253c-11.18 3.106-38.509 6.212-54.347 6.212-83.539 0-122.048-39.441-122.048-124.533V76.396h-51.552V0h51.552v-166.242a250.559 250.559 0 0 1 60.394-7.362c10.254 0 20.358.632 30.288 1.831V0Z" fill="#fff" transform="translate(447.918 273.604)"></path></g></svg><span class="visually-hidden">Overleaf on Facebook</span></a><a class="fat-footer-social linkedin-logo" href="https://www.linkedin.com/company/writelatex-limited"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" height="25"><g fill="none" fill-rule="evenodd"><path class="background" fill="#2867b2" d="M8 72h56a8 8 0 0 0 8-8V8a8 8 0 0 0-8-8H8a8 8 0 0 0-8 8v56a8 8 0 0 0 8 8"></path><path class="text" fill="#FFF" d="M62 62H51.316V43.802c0-4.99-1.896-7.777-5.845-7.777-4.296 0-6.54 2.901-6.54 7.777V62H28.632V27.333H38.93v4.67s3.096-5.729 10.453-5.729c7.353 0 12.617 4.49 12.617 13.777zM16.35 22.794c-3.508 0-6.35-2.864-6.35-6.397C10 12.864 12.842 10 16.35 10c3.507 0 6.347 2.864 6.347 6.397 0 3.533-2.84 6.397-6.348 6.397ZM11.032 62h10.736V27.333H11.033V62"></path></g></svg><span class="visually-hidden">Overleaf on LinkedIn</span></a></div></div></div></div></footer><section class="cookie-banner hidden-print hidden" aria-label="Cookie banner"><div class="cookie-banner-content">We use cookies to improve your experience on our site, for analytics, and to support marketing, which may involve the sharing of data. You can find out more in our <a href="/legal#Cookies">cookie policy</a>.</div><div class="cookie-banner-actions"><button class="btn btn-link btn-sm" type="button" data-ol-cookie-banner-set-consent="essential">Essential cookies only</button><button class="btn btn-primary btn-sm" type="button" data-ol-cookie-banner-set-consent="all">Accept all cookies</button></div></section><div class="modal fade" id="contactUsModal" tabindex="-1" aria-labelledby="contactUsModalLabel" data-ol-contact-form-modal="contact-us"><div class="modal-dialog"><form name="contactForm" data-ol-async-form data-ol-contact-form data-ol-contact-form-with-search="true" role="form" aria-label="Contact us" action="/support"><input name="inbox" type="hidden" value="support"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="contactUsModalLabel">Get in touch</h4><button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true"></span></button></div><div class="modal-body"><div data-ol-not-sent><div class="modal-form-messages"><div class="form-messages-bottom-margin" data-ol-form-messages-new-style="" role="alert"></div><div class="notification notification-type-error" hidden data-ol-custom-form-message="error_performing_request" role="alert" aria-live="polite"><div class="notification-icon"><span class="material-symbols" aria-hidden="true" translate="no">error</span></div><div class="notification-content text-left">Something went wrong. Please try again..</div></div></div><label class="form-label" for="contact-us-email-704">Email</label><div class="mb-3"><input class="form-control" name="email" id="contact-us-email-704" required type="email" spellcheck="false" maxlength="255" value="" data-ol-contact-form-email-input></div><div class="form-group"><label class="form-label" for="contact-us-subject-704">Subject</label><div class="mb-3"><input class="form-control" name="subject" id="contact-us-subject-704" required autocomplete="off" maxlength="255"><div data-ol-search-results-wrapper hidden><ul class="dropdown-menu contact-suggestions-dropdown show" data-ol-search-results aria-role="region" aria-label="Help articles matching your subject"><li class="dropdown-header">Have you checked our <a href="/learn/kb" target="_blank">knowledge base</a>?</li><li><hr class="dropdown-divider"></li><div data-ol-search-results-container></div></ul></div></div></div><label class="form-label" for="contact-us-sub-subject-704">What do you need help with?</label><div class="mb-3"><select class="form-select" name="subSubject" id="contact-us-sub-subject-704" required autocomplete="off"><option selected disabled>Please select…</option><option>Using LaTeX</option><option>Using the Overleaf Editor</option><option>Using Writefull</option><option>Logging in or managing your account</option><option>Managing your subscription</option><option>Using premium features</option><option>Contacting the Sales team</option><option>Other</option></select></div><label class="form-label" for="contact-us-project-url-704">Affected project URL (Optional)</label><div class="mb-3"><input class="form-control" name="projectUrl" id="contact-us-project-url-704"></div><label class="form-label" for="contact-us-message-704">Let us know how we can help</label><div class="mb-3"><textarea class="form-control contact-us-modal-textarea" name="message" id="contact-us-message-704" required type="text"></textarea></div><div class="mb-3 d-none"><label class="visually-hidden" for="important-message">Important message</label><input class="form-control" name="important_message" id="important-message"></div></div><div class="mt-2" data-ol-sent hidden><h5 class="message-received">Message received</h5><p>Thanks for getting in touch. Our team will get back to you by email as soon as possible.</p><p>Email:&nbsp;<span data-ol-contact-form-thank-you-email></span></p></div></div><div class="modal-footer" data-ol-not-sent><button class="btn btn-primary" type="submit" data-ol-disabled-inflight event-tracking="form-submitted-contact-us" event-tracking-mb="true" event-tracking-trigger="click" event-segmentation="{&quot;location&quot;:&quot;contact-us-form&quot;}"><span data-ol-inflight="idle">Send message</span><span hidden data-ol-inflight="pending">Sending&hellip;</span></button></div></div></form></div></div></body><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/runtime-837bde1c859c3ea4f9f2.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7538-f32cdbc4ca34110b78b6.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/3069-8e97bebaea81efef6213.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/3919-e51362ef436aa98d1df6.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/bootstrap-8ca7e4e89c7812276873.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7538-f32cdbc4ca34110b78b6.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/8329-0a9652fa03d8da5e3efc.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7446-8ce7a6f69cde47bef81a.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/5549-1e308d82e1b931e82b1b.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/6574-5cc3e4b0953025c68ef9.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/2849-9134addc7b70a11094a6.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/5895-25961d88cc610cca9c3e.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/3069-8e97bebaea81efef6213.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/8497-7db8d284fbb6993265cc.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/6258-5791951da885b3c376f4.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7354-0b728dbd985c262afd33.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7725-2ca73df57ea5799d3698.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/9678-44f796e8af33c831c0e7.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/5408-e79b54f0223f873f6a0e.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/351-b290ae589afe4c375e3d.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/9954-43d3bd83d14ddf7715b4.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/3844-8505374c6c2bb11f572c.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/4894-a399cee93efdbb4739a6.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7091-63d495e5d78a0b7491c2.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/3919-e51362ef436aa98d1df6.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/6401-3f70d24069cd91302591.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7672-ae94a28b272d2707288c.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/3013-39f1c6f51f2c6de33c22.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/6816-4140770ba1136f9ab1bc.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/4888-a328455f82480866d247.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/6185-b6f4f422ded44548ae7d.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/modules/v2-templates/pages/gallery-7642a68e80a84cf77a20.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/7538-f32cdbc4ca34110b78b6.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/8329-0a9652fa03d8da5e3efc.js" crossorigin="anonymous"></script><script type="text/javascript" nonce="/IdZ5WRWWgibrwMsF06wPA==" src="https://cdn.overleaf.com/js/tracking-ddb23eb8447dd58b1e55.js" crossorigin="anonymous"></script></html>

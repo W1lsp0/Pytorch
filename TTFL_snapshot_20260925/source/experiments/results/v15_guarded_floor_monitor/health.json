@@ -1,0 +1,353 @@
+{
+  "checked_at": 1790704253.976018,
+  "warnings": [],
+  "local": {
+    "checked_at": 1790704244.805871,
+    "host": "local",
+    "gpus": {
+      "0": {
+        "total_mib": 23028,
+        "used_mib": 12637,
+        "free_mib": 10391,
+        "utilization": 51,
+        "compute_pids": [
+          1167171,
+          1167283,
+          1167287,
+          1167284,
+          1167294,
+          1167300,
+          1167286,
+          1167293,
+          1167301,
+          1167289,
+          1167290,
+          1167291,
+          1167299,
+          1167297,
+          1167282,
+          1167296,
+          1167292,
+          1167285,
+          1167288,
+          1167295,
+          1167298
+        ]
+      },
+      "1": {
+        "total_mib": 23028,
+        "used_mib": 16759,
+        "free_mib": 6269,
+        "utilization": 100,
+        "compute_pids": [
+          1167174,
+          1167315,
+          1167304,
+          1167310,
+          1167311,
+          1167302,
+          1167303,
+          1167308,
+          1167306,
+          1167312,
+          1167318,
+          1167309,
+          1167307,
+          1167316,
+          1167319,
+          1167305,
+          1167314,
+          1167321,
+          1167320,
+          1167313,
+          1167317
+        ]
+      },
+      "2": {
+        "total_mib": 23028,
+        "used_mib": 7667,
+        "free_mib": 15361,
+        "utilization": 45,
+        "compute_pids": [
+          1161375
+        ]
+      },
+      "3": {
+        "total_mib": 23028,
+        "used_mib": 12639,
+        "free_mib": 10389,
+        "utilization": 100,
+        "compute_pids": [
+          1167168,
+          1167277,
+          1167279,
+          1167264,
+          1167269,
+          1167275,
+          1167263,
+          1167274,
+          1167272,
+          1167266,
+          1167268,
+          1167273,
+          1167270,
+          1167262,
+          1167265,
+          1167278,
+          1167267,
+          1167276,
+          1167281,
+          1167280,
+          1167271
+        ]
+      },
+      "4": {
+        "total_mib": 23028,
+        "used_mib": 23,
+        "free_mib": 23005,
+        "utilization": 0,
+        "compute_pids": []
+      }
+    },
+    "runs": [
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_original_none_s20240936",
+        "gpu": "0",
+        "pid": 1109162
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_floor_none_s20240936",
+        "gpu": "1",
+        "pid": 1109163
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_guarded_none_s20240936",
+        "gpu": "3",
+        "pid": 1109164
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_original_backdoor_s20240936",
+        "gpu": "4",
+        "pid": 1109165
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_floor_backdoor_s20240936",
+        "gpu": "4",
+        "pid": 1134437
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_guarded_backdoor_s20240936",
+        "gpu": "3",
+        "pid": 1135564
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_original_delayed_backdoor_s20240936",
+        "gpu": "0",
+        "pid": 1136776
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_floor_delayed_backdoor_s20240936",
+        "gpu": "1",
+        "pid": 1138759
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_guarded_delayed_backdoor_s20240936",
+        "gpu": "4",
+        "pid": 1156887
+      }
+    ],
+    "warnings": []
+  },
+  "remote": {
+    "checked_at": 1790703798.1941686,
+    "host": "remote",
+    "gpus": {
+      "0": {
+        "total_mib": 23028,
+        "used_mib": 11358,
+        "free_mib": 11670,
+        "utilization": 100,
+        "compute_pids": [
+          3653,
+          3693,
+          3702,
+          3697,
+          3699,
+          3695,
+          3696,
+          3706,
+          3704,
+          3690,
+          3703,
+          3692,
+          3707,
+          3708,
+          3694,
+          3700,
+          3701,
+          3709,
+          3698,
+          3691,
+          3705
+        ]
+      },
+      "1": {
+        "total_mib": 23028,
+        "used_mib": 13,
+        "free_mib": 23015,
+        "utilization": 0,
+        "compute_pids": []
+      },
+      "2": {
+        "total_mib": 23028,
+        "used_mib": 12966,
+        "free_mib": 10062,
+        "utilization": 100,
+        "compute_pids": [
+          4600,
+          4615,
+          4614,
+          4606,
+          4602,
+          4612,
+          4603,
+          4611,
+          4605,
+          4610,
+          4599,
+          4601,
+          4598,
+          4609,
+          4607,
+          4608,
+          4604,
+          4617,
+          4613,
+          4616
+        ]
+      }
+    },
+    "runs": [
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_original_none_s20240937",
+        "gpu": "0",
+        "pid": 33798
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_floor_none_s20240937",
+        "gpu": "1",
+        "pid": 33799
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_guarded_none_s20240937",
+        "gpu": "2",
+        "pid": 33800
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_original_backdoor_s20240937",
+        "gpu": "0",
+        "pid": 45932
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_floor_backdoor_s20240937",
+        "gpu": "2",
+        "pid": 46723
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_guarded_backdoor_s20240937",
+        "gpu": "1",
+        "pid": 47587
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_original_delayed_backdoor_s20240937",
+        "gpu": "0",
+        "pid": 57171
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_floor_delayed_backdoor_s20240937",
+        "gpu": "2",
+        "pid": 57930
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v15_guarded_delayed_backdoor_s20240937",
+        "gpu": "1",
+        "pid": 59052
+      }
+    ],
+    "warnings": []
+  },
+  "remote_last_sync": 1790704127.4424286,
+  "report_complete": true
+}

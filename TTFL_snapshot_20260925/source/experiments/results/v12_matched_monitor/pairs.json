@@ -1,0 +1,69 @@
+{
+  "local_monitor": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/control/monitor_status.json",
+  "remote_archive": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240933/remote_archive",
+  "pairs": [
+    {
+      "name": "local_none_s20240933",
+      "host": "local",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/base_none_s33_matched/1_ttfl_none_seed20240933",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_none_s20240933_retry/1_ttfl_none_seed20240933",
+      "historical_reference": false
+    },
+    {
+      "name": "local_backdoor_s20240933",
+      "host": "local",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/base_backdoor_s33_matched/1_ttfl_backdoor_seed20240933",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_backdoor_s20240933_retry/1_ttfl_backdoor_seed20240933",
+      "historical_reference": false
+    },
+    {
+      "name": "local_delayed_s20240933",
+      "host": "local",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/base_delayed_s33_matched/1_ttfl_delayed_backdoor_seed20240933",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/guard_delayed_s33_matched/1_ttfl_delayed_backdoor_seed20240933",
+      "historical_reference": false
+    },
+    {
+      "name": "remote_none_s20240933",
+      "host": "remote",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240933/remote_archive/v12_base_none_s20240933/1_ttfl_none_seed20240933",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240933/remote_archive/guard_none_s33_matched/1_ttfl_none_seed20240933",
+      "historical_reference": false
+    },
+    {
+      "name": "remote_backdoor_s20240933",
+      "host": "remote",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240933/remote_archive/v12_base_backdoor_s20240933/1_ttfl_backdoor_seed20240933",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240933/remote_archive/guard_backdoor_s33_matched/1_ttfl_backdoor_seed20240933",
+      "historical_reference": false
+    },
+    {
+      "name": "remote_delayed_s20240933",
+      "host": "remote",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240933/remote_archive/v12_base_delayed_s20240933/1_ttfl_delayed_backdoor_seed20240933",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240933/remote_archive/v12_guard_delayed_s20240933/1_ttfl_delayed_backdoor_seed20240933",
+      "historical_reference": false
+    },
+    {
+      "name": "local_historical_none_s20240932",
+      "host": "local_historical",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v11_c2guard_sweep_seed20240932/base_none/1_ttfl_none_seed20240932",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_none_retry/1_ttfl_none_seed20240932",
+      "historical_reference": true
+    },
+    {
+      "name": "local_historical_backdoor_s20240932",
+      "host": "local_historical",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v11_c2guard_sweep_seed20240932/base_backdoor/1_ttfl_backdoor_seed20240932",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_backdoor_retry/1_ttfl_backdoor_seed20240932",
+      "historical_reference": true
+    },
+    {
+      "name": "local_historical_delayed_s20240932",
+      "host": "local_historical",
+      "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v11_c2guard_sweep_seed20240932/base_delayed/1_ttfl_delayed_backdoor_seed20240932",
+      "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/guard_delayed_s32_oom_retry2/1_ttfl_delayed_backdoor_seed20240932",
+      "historical_reference": true
+    }
+  ]
+}

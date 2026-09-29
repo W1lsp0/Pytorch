@@ -371,3 +371,43 @@
 - candidate / delayed_backdoor：running，fit/evaluate/audit=21/21/21，GPU 3。
 
 监督器在全部运行结束后自动汇总、协议审计并运行 report_risk_soft_probation.py，生成 candidate/risk_soft_probation_report.md/json 和 closeout.json。随后必须解读正常完全排除、攻击窗口平均/峰值ASR、准确率和实际恶意阻断，未达标继续找方法；不能把新候选已启动等同于实验目的完成。
+
+## 2026-09-29 V12 配对补测与持久监控
+
+V11 两端25个运行已完成。V12首批8项中7项有效完成（其中本地持续后门s20240932由完整30轮日志恢复收尾，completion明确标记恢复）；本地延迟后门s20240932于第22轮因OOM失败，只完成21轮，禁止纳入最终比较。OOM日志包含额外进程约8.3GiB占用；不能将其直接归因于新增探针计算。V12的低熵+低准确率信号复用已有探针输出，并未新增模型前向。
+
+撤回临时 `source/experiments/results/v12_low_entropy_guard_seed20240933/v12_guard_summary.md/json`（保留 `.invalidated`）：它把s20240933本地候选与远端基线混配，并将无攻击基线错误用于延迟后门。由 `summary_invalidated.json` 标记；这些差值不得用于算法结论或论文。V11 `reports/remote_t4` 混用了t5的none/backdoor，只能视为混合阈值组，不能当作完整t4矩阵。
+
+已启动严格匹配补测；原始V12训练快照冻结于 `source/experiments/results/v12_matched_monitor/source`，不修改进行中的算法。新队列本地GPU0/1/3/4分别运行s33无攻击基线、s33持续后门基线、s32延迟候选重跑、s33延迟基线；GPU3之后接续s33延迟候选。本地GPU2存在其他共享负载，暂不使用。远端GPU0继续原s33延迟基线，GPU1/2补s33无攻击/持续后门候选。两端s33均各自配对，不跨环境求算法增益。
+
+持久化监督器：本地PID 910962、远端PID 12669；中央归档监控PID 914963（PID仅为此次快照，以实际存活/心跳为准）。每30秒检查，每5分钟同步远端证据，完成后自动生成配对审计。源脚本：`experiments/report_v12_matched.py`、`experiments/watch_v12_matched.py`；4个配对回归测试通过，拒绝错场景、错种子、错Python环境。
+
+中央入口：`source/experiments/results/v12_matched_monitor/health.json`、`health_events.jsonl`、`pairs.json`、`matched_report.md/json`、`watcher.log`。两端节点监控：各自 `v12_low_entropy_guard_seed20240932/control`（本地）和 `v12_low_entropy_guard_seed20240933/control`（远端）。监督器有独占锁，禁止重复启动。中央closeout的paired_reports_complete仅代表审计完成，goal_achieved仍为false，不代表研究目标完成。
+
+s32与V11对比仅列historical_reference（训练代码版本不同）；s33正式配对须校验训练源、初始化、完整分片、攻击时序和环境路径。V12四个开关组合改变，不能把整体收益归因于单独低熵保护。新方法仍默认关闭，目标尚未完成。
+
+用户指出论文目标路径为 `PaperWriting/main_en.tex`。本轮仅监测，未更新论文结论；现有论文实验设定/数值与当前CIFAR10开发矩阵存在差异，待正式证据审计后单独核对。
+
+## 2026-09-29 V13 layer-gate causal candidate
+
+V12 配对补测仍在进行，未提前抢占共享 GPU。对已完成 V12 运行的逐轮审计显示，很多正常客户端的 `included_layers=0` 来自逐层 RawScore 准入门槛，而不是低熵保护：RawScore 使用 `trust^3 × content × history^0.5`，常落在 0.04--0.08；原门槛 `0.05 + 0.15*S_total` 可达约 0.20。V13 因此只把逐层门槛系数改为可配置并从 0.15 降到 0.05，保持 V12 的四个风险开关、探针、攻击时序和训练参数相同。
+
+V13 代码已加入：`server/sensitivity.py` 的 `TTFL_LAYER_GATE_LAMBDA`；运行清单记录 `layer_gate_lambda` 并检查恢复配置；重探针只有在前向、准确率和熵成功后才计为 `heavy_probed`；低熵连续计数在未匹配或未测量轮次重置，不再用衰减伪造连续证据。默认系数仍为 0.15，当前 V12 冻结源未被修改。
+
+V13 计划：本地主机种子 20240934、远端主机种子 20240935，各自对 none/backdoor/delayed_backdoor 做基线 0.15 与候选 0.05 的同主机配对，共 12 个 30 轮运行。V12 全部终止后，`launch_v13_after_v12.py` 自动启动本地/远端监督器；`watch_v13_layer.py` 同步远端结果并运行严格配对审计。结果入口：`TTFL_snapshot_20260925/source/experiments/results/v13_layer_gate_monitor`。V13 仍明确 `goal_achieved:false`，只有在正常误排除下降且后门指标不出现不可接受恶化时才进入下一候选。
+
+## 2026-09-29 V12完成，V13改为按空闲GPU动态调度
+
+V12补测8/8完成；6个同主机s33配对均通过审计，3个s32历史参考单列。V12未达标：本地延迟准确率44.05%→53.68%、正常排除48.77%→5.44%，但最终ASR6.84%→14.94%；其余严格攻击配对最终ASR也上升。不能以攻击窗口均值改善抵消最终防御退步并宣布成功。
+
+用户要求充分利用全部可用资源：已停止旧的全批等待启动器和旧V13监控器，启用两端公共任务队列，不再按卡号固定分组。当前本地0/1/3/4与远端1/2共6卡运行V13；本地2和远端0有其他用户负载，21GiB完整任务不能安全放入剩余显存，释放后自动纳入调度。每30秒检查，启动前保留GPU槽，独占锁防重复调度，端口各任务唯一。源代码冻结；同主机配对不跨环境迁移。详见 `TTFL_snapshot_20260925/source/experiments/results/v13_layer_gate_monitor/HANDOFF.md`。
+
+同时修复V13报告路径指向矩阵而非实际运行目录、重复字段合并、远端监控路径漏results、无验证即发完成标记等问题。12个调度/报告/配对测试通过，启动清单与两端冻结源核对一致，首轮聚合已成功。中央监控持续记录健康与审计，失败不会伪报目标完成。
+
+更正此前断言：V12未记录可直接重建RawScore范围的字段，不能将0.04--0.08称为本批实测范围。日志阶段归因证实本地s33持续后门正常完全排除270次中221次来自逐层门槛，无攻击134次中130次；V13检验降低门槛能否改善结果，尚无有效结果。完成提醒目前只是目录里的持久文件，并不能自动唤醒助手；此前“自动提醒你”的表述不准确。
+
+## 2026-09-29 V14 风险观察期最低权重候选已排队
+
+V13 已开始动态运行，6个任务占用本地0/1/3/4、远端1/2；本地2和远端0由其他用户进程占用。V14 已准备为两端三臂配对：原始基线（四个V12开关全关）、V12复合参考（四开关全开且最低权重0）和最低权重候选（四开关全开、`RISK_PROBATION_WEIGHT_FLOOR=0.25`），场景为none/backdoor/delayed_backdoor。V14等待两端V13队列完成后自动启动，动态调度会按实际空闲GPU分配，不固定卡号。
+
+V14动机来自V12阶段审计：部分正常客户端在逐层聚合前的`risk_ema_prev`达到1或至少0.9，使风险衰减因子为0或接近0；仅降低逐层门槛不能处理该路径。新候选只给观察期风险权重设下限，黑名单、C2隔离和硬隔离仍由策略独立决定。`risk_weighting.py`和4项单元测试已加入；所有结果需通过同主机、同源、同初始化、同分片、同攻击时序审计，且最终ASR/窗口ASR/峰值ASR不退化、准确率不下降、正常排除下降才通过描述性筛选。通过筛选仍不等同于论文目标完成。

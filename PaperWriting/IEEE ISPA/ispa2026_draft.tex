@@ -1,0 +1,420 @@
+% IEEE ISPA 2026 draft generated from the PRICAI 2026 submission.
+% This version preserves the full content and is intentionally not page-compressed.
+% Replace Anonymous Author(s) and verify the page/category rule in EDAS.
+% PRICAI 2026 full submission version with the revised protocol description.
+\documentclass[conference,compsoc]{IEEEtran}
+
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,multirow,array}
+\usepackage{threeparttable}
+\usepackage{graphicx}
+\usepackage[nocompress]{cite}
+\usepackage{hyperref}
+
+\graphicspath{{figures/}}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue,hypertexnames=false}
+\emergencystretch=2em
+
+\newenvironment{tightitemize}{%
+    \begin{itemize}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}}{\end{itemize}}
+\newenvironment{tightenumerate}{%
+    \begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}}{\end{enumerate}}
+
+\begin{document}
+
+\title{TTFL: Trust-Flow-Driven Federated Learning with TEE-Anchored Admission}
+
+
+\author{Anonymous Author(s)}
+
+
+
+\maketitle
+
+\begin{abstract}
+    Federated learning (FL) enables collaborative edge intelligence without moving raw data, but open participation couples two sources of uncertainty: the server must assess whether a client executed an admissible training process, and it must determine whether the resulting update is useful under Non-IID data or carries a poisoning objective. A static TEE admission gate cannot resolve the second question, whereas a single update-quality threshold can remove legitimate long-tail clients. This paper presents TTFL, a trust-flow framework that keeps execution credibility, current update content, long-term utility, and short-term risk as distinct evidence streams until aggregation. A TEE-anchored trusted management and attestation agent (TMAA) supplies admission evidence; an explicit Kalman update and a dual-stream Beta/EMA state model provide cold-start and cross-round memory; and a layer-wise rule performs risk-dependent clipping and data-size-aware survivor re-normalization. The evaluation uses two real Intel/AMD TEE hardware configurations with Flower/PyTorch and CIFAR-10, five seeds per platform (ten platform-seed runs), 20 admitted clients, six attack behaviors, and a 30\% malicious setting. Targeted ASR is macro-averaged over the three targeted behaviors, while untargeted attacks are evaluated with clean accuracy, loss, and state-transition metrics. TTFL reaches 92.31\% clean accuracy, 10.21\% targeted ASR under the stated protocol, and no permanent false ban in the tested runs.
+\end{abstract}
+
+\begin{IEEEkeywords}
+    Federated learning, edge computing, trusted execution environment, risk modeling, layered aggregation, backdoor defense
+\end{IEEEkeywords}
+
+\section{Introduction}
+
+FL trains a global model through parameter exchange while keeping data on edge devices \cite{kairouz2021flsurvey,mcmahan2017fedavg}. In open edge networks, the server must distinguish malicious updates from legitimate deviations caused by skewed data, while also checking client identity and execution integrity. Compound attacks make this distinction harder by combining poisoning, targeted backdoors, and cross-round camouflage. These requirements are coupled at the decision point: execution evidence constrains which reports can be trusted, update evidence describes the current contribution, and temporal evidence determines whether an isolated anomaly is persistent. Treating them as one score either hides the source of a decision or makes the threshold overly sensitive to Non-IID drift.
+
+Geometric, statistical, reference-based, and temporal defenses address update anomalies \cite{blanchard2017krum,yin2018byzantine,cao2021fltrust,fung2020foolsgold,fldetector2022}, while backdoor defenses inspect model behavior, clusters, or collusion \cite{deepsight2022,flame2022,crowdguard2024,roseagg}. These filters cannot prove how local training was executed and can mistake Non-IID drift for attacks. TEE-assisted FL supplies an execution root of trust \cite{r1_tee_integrity,xu2021distributed,r5_tee_mitigating,lu2025tmt}, but static admission does not establish semantic update safety.
+
+This paper proposes \emph{Trust Flow}, a system-level decision framework for trusted aggregation in edge FL. Its contribution is the explicit timing and interface between established mechanisms, rather than a new cryptographic primitive or a new Byzantine estimator: execution credibility is admitted first, update content is audited next, temporal evidence is updated afterward, and only then are layer privileges assigned. TMAA provides execution-side evidence, while the server-side trust flow converts that evidence and update probes into a cross-round state. The contributions are:
+\begin{tightenumerate}
+    \item A precisely initialized admission state that combines TEE-style attestation, runtime entropy, and a covariance-aware Kalman recursion, including a conservative first-round policy for clients without history.
+    \item A dual-stream state model with explicit Beta updates for historical utility and an EMA of the strongest current risk probe, so benign distributional drift and attack impulses are not forced into one score.
+    \item A layer-wise aggregation rule that retains the original data-size weight, applies risk-dependent thresholds and clipping, and re-normalizes only the surviving mass.
+    \item A paired-platform evaluation under controlled Non-IID CIFAR-10 attacks, together with ablations and an explicitly out-of-assumption boundary stress test.
+\end{tightenumerate}
+
+\section{Background and Related Work}
+
+\textbf{Federated learning in edge computing.} Edge deployment creates a trust-continuity problem: a valid client can submit a semantically unsafe update, while a benign long-tail client can appear anomalous. The decision must therefore preserve execution and update evidence separately before aggregation.
+
+\textbf{Poisoning and backdoor attacks.} Sign flipping and scaling disrupt convergence, whereas trigger, clean-label, and semantic backdoors implant targeted errors while preserving clean behavior. Such updates can remain directionally plausible \cite{bagdasaryan2020backdoor,wang2019neuralcleanse}, and attackers can accumulate trust before intermittent injection.
+
+\textbf{Active defenses and their limits.} Krum and Trimmed Mean suppress geometric outliers \cite{blanchard2017krum,yin2018byzantine}; FLTrust uses a clean direction \cite{cao2021fltrust}; and FoolsGold and FLDetector exploit cross-client or cross-round evidence \cite{fung2020foolsgold,fldetector2022}. More recent defenses inspect model representations, backdoor behavior, collusion, or privacy-preserving updates, including DeepSight, FLAME, CrowdGuard, RoseAgg, FLPurifier, ShieldFL, and RaSA \cite{deepsight2022,flame2022,crowdguard2024,roseagg,flpurifier,shieldfl,wang2025rasa}. TMT-FL and related TEE-assisted systems further connect execution integrity with model training \cite{lu2025tmt}. These methods address different evidence spaces and therefore are not interchangeable baselines without a common attack protocol and implementation interface. Trust Flow integrates the evidence flow while retaining the distinction between current content and cross-round state; the reported table uses matched classical implementations, and the recent methods are discussed as positioning references rather than assigned unverified numerical results.
+
+\textbf{TEE-assisted trusted training.} TEEs isolate execution and key material, supporting FL integrity and attack mitigation \cite{r1_tee_integrity,xu2021distributed,zhang2025rppfl,r5_tee_mitigating,lu2025tmt}. A quote authenticates a measured path and freshness, but not labels or semantic intent; TTFL therefore uses attestation as admission evidence rather than proof of a benign update.
+
+\section{System Model and Threat Assumptions}
+
+The system contains a central server $\mathcal{S}$ and $K$ edge clients $\mathcal{C}=\{c_1,\ldots,c_K\}$. In round $t$, admitted clients receive $W^{(t-1)}$, train locally, upload $\Delta W_k^{(t)}$, and the server updates $W^{(t)}=W^{(t-1)}+\mathrm{Agg}(\{\Delta W_k^{(t)}\})$. The global objective is
+\begin{equation}
+    \min_W \mathcal{L}(W)=\sum_{k=1}^{K}p_k\mathcal{L}_k(W),\quad
+    p_k=|\mathcal{D}_k|/\sum_j|\mathcal{D}_j|.
+\end{equation}
+The edge setting follows a client-edge-cloud workflow. The client side provides local training and an attestation-bound trust report, while the server audits updates, evolves trust states, and performs robust trust-weighted aggregation. The term secure aggregation is not used here: the server must inspect per-client evidence, so cryptographic privacy-preserving aggregation is outside the scope of this paper.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.84\textwidth]{fig1_system_arch.pdf}
+    \caption{TEE-anchored client-edge-cloud architecture.}
+    \label{fig:system_arch}
+\end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.80\textwidth]{fig2_threat_model.pdf}
+    \caption{Composite poisoning and penetration threat model.}
+    \label{fig:threat_model}
+\end{figure*}
+
+\textbf{Threat model.} The server is honest-but-curious and follows the aggregation protocol; it sees individual updates and audit statistics but is not allowed to alter the stated state-transition rules. An admitted client may control local labels, samples, or optimization objectives and may perform label flipping, trigger backdoors, clean-label poisoning, semantic backdoors, sign flipping, or gradient scaling. The trust boundary is explicit: the Intel and AMD TEEs protect attestation-critical code, device keys, report integrity, report freshness, and the trusted monitoring path against a compromised host OS, but they do not certify data labels, optimization objectives, or semantic intent. Thus, a malicious client may produce a signed poisoned update inside an otherwise valid measured training workflow; only post-attestation modification outside that workflow is excluded. If the report and update-binding check fail, the update is rejected rather than treated as a successful TEE defense. Physical probing and advanced microarchitectural side channels are also excluded. The analytical assumption is fewer than 50\% malicious admitted clients; the 50\% experiment is an out-of-assumption stress test, not a Byzantine threshold or a theoretical guarantee. The server-held clean proxy set is an explicit optional reference assumption, and the peer-reference fallback is defined for deployments that cannot provide such a set; no headline result is used to claim reference-free performance.
+
+\textbf{Design goals.} Trust Flow aims to maintain convergence under the stated attacks, limit permanent false bans of long-tail clients, and report overhead by system boundary: the appended TrustReport is about 15 KB, server aggregation plus audit increases from 2.10 s to 4.85 s, the auxiliary secure path measures approximately 11 ms per admitted-client round for enclave transitions, memory pressure, and cryptographic aggregation, and device-side TEE Quote generation, signing, and lightweight monitoring are measured separately at approximately 12--15 ms per admitted-client round. Full end-to-end communication and vendor-specific attestation latency remain outside the reported measurements. The framework treats the recall--false-positive conflict as state separation: admission, content, history, and risk remain distinct until layer-wise aggregation.
+
+\section{Trust-Flow Framework}
+
+Trust Flow divides each FL round into four linked stages: admission and runtime trust assessment, reference-based content auditing, dual-stream state evolution, and risk-gated layered aggregation. Figure~\ref{fig:framework} shows the full defense loop.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.86\textwidth]{fig3_arch.pdf}
+    \caption{Overview of the four-stage trust-flow defense loop.}
+    \label{fig:framework}
+\end{figure*}
+
+The four stages output $TrustScore$, $ContentScore$, the slow $HistPerf$/fast $RiskEMA$ states, and finally $RawScore$. Invalid proofs are rejected first; current updates are then audited, state is updated, and layer privileges are assigned. Keeping a low one-round content score provisional protects Non-IID clients, whereas persistent risk still causes isolation.
+
+\subsection{Admission and Content Auditing}
+
+Each admitted client must pass a TEE admission check. Let $M_{\text{attest},k}\in\{0,1\}$ denote whether the attestation report, its freshness nonce, and its binding to the round and update digest are valid. During initialization, the client invokes a device-unique key and generates a remote attestation quote containing a vendor-specific measurement digest, code identity, runtime configuration, round nonce, update digest, and monotonic freshness counter. Only clients passing this check receive communication privileges. During local training, the trusted management agent monitors standardized behavioral sequences
+$\mathcal{X}_k=\{\Delta\text{grad},\Delta\text{loss},\text{instr\_dist}\}$. Let $h_k^{(t)}=H(\mathcal{X}_k^{(t)})/H_{\max}\in[0,1]$ be the normalized entropy after concatenating the three standardized feature histograms, where $H_{\max}$ is the entropy of their uniform concatenation. We use
+\begin{equation}
+\begin{aligned}
+    R_k^{(t)}&=\exp(\lambda h_k^{(t)}),\\
+    Z_k^{(t)}&=\operatorname{clip}\!\bigl(w_aM_{\text{attest},k}\\
+      &\qquad +(1-w_a)(1-h_k^{(t)}),0,1\bigr),
+\end{aligned}
+\end{equation}
+where $w_a=0.7$ and $\lambda=1.0$. High entropy is therefore treated as uncertain evidence, not as a direct maliciousness label.
+
+Following a scalar Kalman filtering view, the trust estimate is updated as
+\begin{equation}
+    T_{k}^{-,(t)}=T_k^{(t-1)},\quad P_{k}^{-,(t)}=P_k^{(t-1)}+Q,
+\end{equation}
+\begin{equation}
+\begin{aligned}
+    K_k^{(t)}&=\frac{P_k^{-,(t)}}{P_k^{-,(t)}+R_k^{(t)}},\\
+    T_k^{(t)}&=T_k^{-,(t)}+K_k^{(t)}(Z_k^{(t)}-T_k^{-,(t)}),\\
+    P_k^{(t)}&=(1-K_k^{(t)})P_k^{-,(t)}.
+\end{aligned}
+\end{equation}
+The observation $Z_k^{(t)}\in[0,1]$ is defined above; $Q=0.01$ is the fixed process-noise variance and $R_k^{(t)}$ is the entropy-derived observation variance. We initialize a fresh admitted client with $T_k^{(0)}=1$, $P_k^{(0)}=0.25$, $RiskEMA_k^{(0)}=0$, and $M_{\text{attest},k}=1$. The resulting privilege factor is
+\begin{equation}
+    TrustScore_k^{(t)}=M_{\text{attest},k}\,\operatorname{clip}\!\left(\frac{T_k^{(t)}}{1+P_k^{(t)}},0,1\right).
+\end{equation}
+High entropy increases $R_k^{(t)}$ and reduces the Kalman gain, so an uncertain observation cannot abruptly rewrite cross-round trust.
+
+    The server then constructs a clean guiding direction. If a small clean validation gradient is available, $g_{root}=g_{root\_clean}$; otherwise, it uses admitted clients with high trust and low previous risk, with reference weights $\omega_k^{ref}=TrustScore_k^{(t)}(1-RiskEMA_k^{(t-1)})^2$. In the reported experiments, a balanced 500-sample proxy set (50 images per CIFAR-10 class) is held by the server and is not included in client training. The same proxy set is supplied to every reference-dependent baseline and is also used for clean-loss and activation probes. When no such set is available, the trusted-peer fallback is used as a defined protocol branch; the headline table does not claim a measured reference-free advantage. For each update, content quality combines reference consistency and peer consistency:
+\begin{align}
+    S_{contrib,k}  & =\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,g_{root})),                                  \\
+    S_{consist,k} &=\frac{1}{\sum_{j\ne k}TrustScore_j+\varepsilon}\nonumber\\
+    &\quad\times\sum_{j\ne k}\Bigl[TrustScore_j\nonumber\\
+    &\quad\times\max(0,\alpha_1+\alpha_2\cos(\Delta W_k,\Delta W_j))\Bigr],                                                               \\
+    ContentScore_k & =\frac{(1+\beta_{fusion}^2)S_{consist,k}S_{contrib,k}}
+    {\beta_{fusion}^2S_{consist,k}+S_{contrib,k}+\varepsilon}.
+\end{align}
+With $\beta_{fusion}>1$, the harmonic fusion favors the clean direction but still requires peer plausibility, preventing either collusion or Non-IID reference deviation from dominating alone.
+
+\subsection{Dual-Stream State Evolution}
+
+Single reputation scores confuse low utility caused by data skew with high risk caused by attacks. Trust Flow therefore separates client state into a historical utility stream and a short-term risk stream. Let $q_k^{(t)}=\operatorname{clip}(ContentScore_k^{(t)},0,1)$. The historical stream uses an explicitly decayed Beta model:
+\begin{equation}
+\begin{aligned}
+    a_k^{(t)}&=\beta_h a_k^{(t-1)}+q_k^{(t)},\\
+    b_k^{(t)}&=\beta_h b_k^{(t-1)}+1-q_k^{(t)},\\
+    HistPerf_k^{(t)}&=\frac{a_k^{(t)}}{a_k^{(t)}+b_k^{(t)}+\varepsilon}.
+\end{aligned}
+\end{equation}
+For a fresh client, $a_k^{(0)}=b_k^{(0)}=1$, hence $HistPerf_k^{(0)}=0.5$ rather than an unjustified perfect reputation. The decay factor is $\beta_h\in(0,1)$ and is fixed before test rounds.
+
+The history channel is intentionally slow, so low utility reduces privilege without immediate removal. The risk channel is fast: $RiskEMA_k^{(t)}=\beta_rRiskEMA_k^{(t-1)}+(1-\beta_r)Risk_k^{inst}$, where $Risk_k^{inst}$ is the maximum current probe. Thus benign history cannot average away a strong warning.
+
+    A fresh client starts in NORMAL after valid attestation and cannot be permanently banned in round one. Its first-round content and risk values are therefore provisional: they can reduce the current update's privilege, but they cannot trigger an irreversible blacklist. Let $u_k^{(t)}=1-HistPerf_k^{(t)}$ and $r_k^{(t)}=RiskEMA_k^{(t)}$. The reported thresholds $(\tau_h,\tau_s,\tau_q,\tau_b)=(0.26,0.64,0.80,0.90)$ govern utility deficit, soft risk, quarantine, and blacklisting. A NORMAL client enters SUSPECT after two consecutive rounds with $u_k^{(t)}>\tau_h$ or $r_k^{(t)}\geq\tau_s$. A SUSPECT client enters QUARANTINE after three such consecutive rounds or one current-round probe with $Risk_k^{inst}\geq\tau_q$. A QUARANTINE client enters BLACKLIST after four consecutive rounds with $r_k^{(t)}\geq\tau_b$. Recovery from SUSPECT or QUARANTINE requires two consecutive rounds with $u_k^{(t)}\leq\tau_h$ and $r_k^{(t)}<\tau_s$; a BLACKLIST state is irreversible within an experiment. These counters are reset when the corresponding condition is not met, and the state update is completed before layer aggregation.
+
+The two streams meet only when computing aggregation privilege:
+\begin{align}
+    RawScore_k^{(t)} & = (TrustScore_k^{(t)})^\alpha\nonumber\\
+        &\quad\times(ContentScore_k^{(t)})^\beta(HistPerf_k^{(t)})^\gamma\nonumber\\
+        &\quad\times(1-RiskEMA_k^{(t)})^p .
+\end{align}
+The state transition is evaluated after current probes and before aggregation. This timing lets current risk veto a sleeper burst despite high history, while a low-similarity benign client remains recoverable through the slow stream.
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.76\textwidth]{fig4_state.pdf}
+    \caption{Client state-transition automaton driven by historical utility and short-term risk.}
+    \label{fig:state_machine}
+\end{figure*}
+
+\subsection{Risk-Gated Layered Aggregation}
+
+Backdoors often concentrate in deeper layers, whereas shallow feature layers may carry useful heterogeneous information. Trust Flow therefore assigns each layer $l$ a sensitivity score. With $L$ total layers, the three normalized components are
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.78\textwidth]{fig5_layer.pdf}
+    \caption{Risk-gated layer-wise clipping and differentiated aggregation.}
+    \label{fig:layer_gating}
+\end{figure*}
+\begin{equation}
+\begin{aligned}
+    S_{priv}^{(l)}&=\exp(-\tau_p l/L),\quad
+    S_{util}^{(l)}=\frac{\|g_{root}^{(l)}\|_2}{\max_m\|g_{root}^{(m)}\|_2+\varepsilon},\\
+    S_{sec}^{(l)}&=\frac{1}{2}\left(1-\frac{1}{|\mathcal{T}|}\sum_{k\in\mathcal{T}}
+    \cos(\Delta W_k^{(l)},g_{root}^{(l)})\right).
+\end{aligned}
+\end{equation}
+where $\mathcal{T}=\{k\in\mathcal{A}:M_{\text{attest},k}=1,\;RiskEMA_k^{(t-1)}<\tau_s\}$ is the trusted reference set. If this set is empty, the server uses the admitted set $\mathcal{A}$ only to normalize the layer score and records that no trusted peer reference was available. Hence $S_{priv}^{(l)},1-S_{util}^{(l)},S_{sec}^{(l)}\in[0,1]$. We use $S_{total}^{(l)}=w_pS_{priv}^{(l)}+w_u(1-S_{util}^{(l)})+w_sS_{sec}^{(l)}$, with $w_p,w_u,w_s=(0.3,0.3,0.4)$ and $w_p+w_u+w_s=1$, so $S_{total}^{(l)}\in[0,1]$. The threshold and clipping radius are
+\begin{equation}
+    \theta^{(l)}=\mu_{base}+\lambda_sS_{total}^{(l)},\qquad
+    C^{(l)}=\frac{C_{base}}{S_{total}^{(l)}+\varepsilon_c}.
+\end{equation}
+Thus a layer with stronger suspicious drift becomes harder to enter and more tightly clipped; a layer that remains close to the reference keeps more capacity for benign heterogeneity.
+
+We set $\tau_p=3.0$, $\varepsilon=\varepsilon_c=10^{-8}$, and define $C_{base}$ as the median trusted-client update norm before layer gating. These choices keep the sensitivity terms dimensionless and make the clipping scale robust to the round-wise update magnitude.
+
+Survivors are $\Phi^{(l)}=\{k\in\mathcal{A}\mid RawScore_k^{(t)}\ge\theta^{(l)}\}$, and their weights are re-normalized:
+\begin{equation}
+\begin{aligned}
+    \tilde{w}_{k}^{(l)}&=\frac{p_kRawScore_k^{(t)}}{\sum_{j\in\Phi^{(l)}}p_jRawScore_j^{(t)}+\varepsilon},\\
+    \widehat{\Delta W}_k^{(l)}&=\frac{\Delta W_k^{(l)}}{\max(1,\|\Delta W_k^{(l)}\|_2/C^{(l)})}.
+\end{aligned}
+\end{equation}
+The final update is $\Delta W_{global}^{(l)}=\sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)}\widehat{\Delta W}_k^{(l)}$. Weight re-normalization prevents the removal of risky clients from shrinking the effective learning rate.
+
+If $\Phi^{(l)}=\varnothing$ because a highly sensitive layer rejects all candidates, the server retains $k^*=\arg\max_{k\in\mathcal{A}}RawScore_k^{(t)}$ for that layer, assigns it unit normalized weight, and still applies the clipping radius $C^{(l)}$. This fallback keeps the layer update defined without weakening the threshold for the other clients.
+
+This layer-wise control preserves useful shallow representations while hardening layers with stronger suspicious drift. A semantic backdoor that mainly shifts deep features can therefore be clipped or rejected in those layers without imposing the same threshold on benign shallow features. Re-normalization is coupled to this decision: after unsafe mass is removed, the surviving data-size-weighted scores are projected back to a valid aggregation simplex, avoiding an implicit learning-rate decay.
+
+\subsection{Risk Probe Computation}
+
+The short-term risk stream uses probes that are intentionally redundant rather than individually decisive. For update $k$ in round $t$, the normalized channels are
+\begin{align}
+ r_{grad,k}^{(t)}&=\operatorname{clip}\!\left(\frac{1-\cos(\Delta W_k,g_{root})}{2},0,1\right),\\
+ r_{amp,k}^{(t)}&=\operatorname{clip}\!\left(\frac{\|\Delta W_k\|_2}{\operatorname{median}_j\|\Delta W_j\|_2+\varepsilon}-1,0,1\right),\\
+ r_{clean,k}^{(t)}&=\operatorname{clip}\!\left(\frac{\mathcal{L}_{probe}(W+\Delta W_k)-\mathcal{L}_{probe}(W)}{\delta_{clean}+\varepsilon},0,1\right),\\
+ r_{trigger,k}^{(t)}&=\operatorname{clip}\!\left(\frac{\mathrm{KL}(\mathcal{H}(A_{base})\|\mathcal{H}(A_k))}{\delta_{trigger}+\varepsilon},0,1\right),\\
+ \bar c_k^{(t)}&=\frac{\sum_{j\ne k}TrustScore_j\,c_{kj}}{\sum_{j\ne k}TrustScore_j+\varepsilon},\nonumber\\
+ r_{peer,k}^{(t)}&=\operatorname{clip}(1-\bar c_k^{(t)},0,1),
+\end{align}
+where $c_{kj}=\cos(\Delta W_k,\Delta W_j)$. For the trigger probe, $A_{base}$ is the activation histogram of the current global model on the server-held proxy set and $A_k$ is the corresponding histogram after applying candidate update $k$. We use 32-bin histograms from the last convolutional block and the pre-classifier representation. In each round, $\delta_{clean}$ and $\delta_{trigger}$ are set to the median plus three median absolute deviations of the corresponding values over $\mathcal{T}$, making the calibration independent of the candidate under test. Define $Risk_k^{inst}=\max\{1-M_{\text{attest},k},r_{grad,k},r_{amp,k},r_{clean,k},r_{trigger,k},r_{peer,k}\}$.
+
+The maximum preserves complementary warnings: gradient and amplitude channels expose parameter attacks, whereas clean-loss and activation channels target stealthier backdoors. Peer disagreement is supporting evidence because benign long-tail updates may disagree with the majority. The execution order is reference construction, current-update audit, state update, and layer aggregation.
+
+\section{Experiments}
+
+\subsection{Setup}
+
+Experiments use Flower 1.5.0 and PyTorch on CIFAR-10 with a CIFAR-10-adapted ResNet-18: the first convolution uses a $3\times3$ kernel with stride one, the initial max-pooling layer is removed, and the classifier has ten outputs. Training and trusted execution are performed in two real hardware configurations based on Intel and AMD TEE-capable processors. NVIDIA A10 GPUs execute model training, whereas the CPU-side TEEs isolate attestation, trusted monitoring, report generation, and admission-state processing. Both hardware configurations execute the same request/response procedure, nonce-based freshness verification, measured-code identity checking, round and update-digest binding, protected report generation, and admission decision. The testbed uses anonymized servers with Intel and AMD dual-CPU configurations and five NVIDIA A10 GPUs; the software stack is Ubuntu 20.04.6 LTS and CUDA 12.8. The 50,000 training images are partitioned into a shared 5,000-image client pool, replicated as a common base subset for all clients, and 45,000 exclusive images: clients 0--9 use an IID split, clients 10--14 use Dirichlet $\alpha=1.0$, and clients 15--19 use Dirichlet $\alpha=0.1$. Separately, the server holds a balanced 500-image proxy set (50 per class) from CIFAR-10 test data; it is not used in client training and is supplied to every reference-dependent baseline for the guiding gradient and probes. FedAvg, Krum, and Trimmed Mean do not consume the proxy set. All methods use the same optimizer and communication budget. Five independent seeds are run on each hardware configuration; means and standard deviations are computed over the resulting ten platform-seed runs.
+
+The formal 30\% attack setting uses six malicious clients: Client 0 performs untargeted label flipping with $\gamma=0.5$; Client 1 injects a fixed $3\times3$ lower-right trigger into 20\% of local samples and targets class 0; Client 2 uses label-preserving clean-label perturbations on 20\% of local samples with the same target; Client 3 applies a fixed semantic attribute bias to 20\% of local samples, with the biased subset assigned to class 0; Client 4 applies untargeted sign flipping; and Client 5 applies untargeted gradient scaling by a factor of 100. Clients 1--3 are evaluated as targeted attacks, whereas Clients 0, 4, and 5 are evaluated through clean loss, convergence, and detection state. Attack behaviors are active in every local training round; no attack is introduced only after observing the global trajectory. Five Sybil nodes without valid certificates and three free-rider nodes with forged low workload are used only to validate Phase-One gating. These eight nodes are intercepted before statistical aggregation, so later metrics are computed over the 20 admitted clients. Malicious updates that pass hardware attestation represent an attacker operating inside an admissible training process; post-attestation host tampering is excluded by the stated threat model. Each run uses 30 rounds and three local epochs. Aggregate values are averaged over the pooled platform-seed runs; state trajectories use one fixed seed per platform.
+
+    Clean accuracy and targeted ASR are reported as mean and standard deviation over the ten platform-seed runs. For each targeted behavior $a\in\{\mathrm{trigger},\mathrm{clean},\mathrm{semantic}\}$, let $\mathcal{B}_a$ be its trigger- or attribute-bearing test subset and $y_a^*$ its declared target. We define $ASR_a=|\{x\in\mathcal{B}_a:\arg\max f(x)=y_a^*\}|/|\mathcal{B}_a|$ and report the macro-average $ASR_{target}=\frac{1}{3}\sum_a ASR_a$. The three attack-specific quantities are retained separately in the convergence traces; the headline table uses the macro-average to avoid assigning a larger weight to any one targeted behavior. Untargeted label/sign/scaling behavior is not folded into this numerator and is assessed through clean accuracy, loss, and state-transition time. Permanent-ban FPR is computed only for benign clients that are irreversibly blacklisted, while temporary SUSPECT or QUARANTINE states are recoverable control actions. Stateless baselines have no equivalent permanent-ban state, so their FPR is reported as N/A rather than compared numerically. All baselines are executed under the same node partitioning, attack proportion, optimizer configuration, communication rounds, reference access, and Non-IID split.
+
+\begin{table*}[t]
+    \centering
+    \caption{Experimental configuration and main hyperparameters.}
+    \label{tab:setup}
+    \small
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.45cm} p{5.2cm} p{4.25cm}}
+        \toprule
+        Category & Setting & Value \\
+        \midrule
+        FL task & Dataset/model/admitted clients & CIFAR-10/CIFAR-adapted ResNet-18/$K=20$ \\
+        Optimization & Local epochs, lr, momentum, rounds & $3$, $0.001$, $0.9$, $30$ \\
+        Data heterogeneity & Shared client pool; server proxy; Group A/B/C & $5000$; $500$; $\alpha=1.0,0.1$ \\
+        Trust streams & $\alpha_1,\alpha_2,\beta_{fusion}$; $\beta_h,\beta_r$ & $0.6,0.4,2.0$; $0.9,0.85$ \\
+        Admission filter & $w_a,\lambda,Q$; $T_0,P_0,RiskEMA_0$ & $0.7,1.0,0.01$; $1,0.25,0$ \\
+        Layer gating & $\alpha,\beta,\gamma,p$; $\mu_{base},\lambda_s$ & $3.0,1.0,0.5,1.0$; $0.4,1.2$ \\
+        Sensitivity & $\tau_p; w_p,w_u,w_s$ & $3.0; 0.3,0.3,0.4$ \\
+        Numerical stability & $\varepsilon,\varepsilon_c$; $C_{base}$ & $10^{-8},10^{-8}$; median trusted norm \\
+        State machine & $\tau_h,\tau_s,\tau_q,\tau_b$; persistence & $0.26,0.64,0.80,0.90$; $2,3,4$ rounds \\
+        \bottomrule
+    \end{tabular*}
+\end{table*}
+
+\subsection{Overall Defense Performance}
+
+Figure~\ref{fig:main_results} summarizes convergence, the three attack-specific ASR traces, trust-state trajectories, and feature separation. Under the stated 30\% mixed-attack protocol, all six attack behaviors are active concurrently in every local round; this is a simultaneous-attack test rather than a collection of one-at-a-time trials. Trust Flow reaches 92.31\% clean accuracy and 10.21\% macro-averaged targeted ASR, close to the 10\% random-target rate for ten CIFAR-10 classes. Client-state tracing shows that explicit poisoning and parameter attacks are blocked early, while stealthier clean-label drift is captured after persistent probe evidence. Legitimate long-tail nodes may enter SUSPECT or QUARANTINE temporarily, but their risk stream does not accumulate enough evidence for permanent banning. These observations describe the tested protocol and do not establish universal superiority over recent defenses that use different probes, reference data, or state definitions.
+
+Trajectories show sustained risk for label, trigger, semantic, sign, and scaling attacks, whereas a long-tail benign client recovers because its risk does not persist. The t-SNE view similarly separates high-risk clients from benign heterogeneous updates after dual-stream supervision.
+
+\begin{figure*}[t]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig6_convergence_asr.pdf}
+        \vspace{-3pt}
+        {\scriptsize (a) Accuracy and ASR convergence.}
+    \end{minipage}\hfill
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig7_node_state_evolution.pdf}
+        \vspace{-3pt}
+        {\scriptsize (b) Node trust and risk trajectories.}
+    \end{minipage}
+    \par\vspace{16pt}
+    \begin{minipage}{0.57\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig8_tsne_visualization.pdf}
+        \vspace{-3pt}
+        {\scriptsize (c) t-SNE separation before/after defense.}
+    \end{minipage}
+    \caption{Main defense behavior under mixed attacks.}
+    \label{fig:main_results}
+\end{figure*}
+
+\begin{table*}[t]
+    \centering
+    \begin{threeparttable}
+        \caption{Performance comparison under 30\% mixed attacks and boundary stress testing.}
+        \label{tab:main_results}
+        \scriptsize
+        \setlength{\tabcolsep}{2pt}
+        \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.55cm} p{2.85cm} c c c}
+            \toprule
+            Method/Setting & Core mechanism & Acc. & Targeted ASR & Perm. FPR$^\dagger$ \\
+            \midrule
+            FedAvg \cite{mcmahan2017fedavg} & no defense & $86.15\pm1.20$ & $92.34\pm5.10$ & N/A \\
+            Krum \cite{blanchard2017krum} & Euclidean selection & $64.20\pm2.80$ & $12.15\pm0.90$ & N/A \\
+            Trimmed Mean \cite{yin2018byzantine} & coordinate trimming & $71.35\pm2.40$ & $38.60\pm4.20$ & N/A \\
+            FLTrust \cite{cao2021fltrust} & clean anchor weighting & $81.25\pm1.50$ & $15.42\pm1.10$ & N/A \\
+            \textbf{Trust Flow} & dual stream + layered gating & $\mathbf{92.31\pm0.09}$ & $\mathbf{10.21\pm0.05}$ & $\mathbf{0.00}$ \\
+            \midrule
+            Boundary stress: 50\% malicious & 10/20 malicious & $91.81\pm0.10$ & $10.46\pm0.06$ & $0.00$ \\
+            \bottomrule
+        \end{tabular*}
+        \begin{tablenotes}
+            \scriptsize
+            \item $^\dagger$ Permanent-ban FPR is defined only for Trust Flow and its stateful ablations. Krum, Trimmed Mean, and FLTrust are stateless in this comparison and are therefore marked N/A. Temporary SUSPECT/QUARANTINE states are recoverable and reported separately through trajectories.
+        \end{tablenotes}
+    \end{threeparttable}
+\end{table*}
+
+Within the matched classical comparison, Krum reaches 64.20\% accuracy, Trimmed Mean 71.35\%, and FLTrust 81.25\%, compared with 92.31\% for Trust Flow. These values are not a universal ranking: recent defenses such as DeepSight, FLAME, CrowdGuard, RoseAgg, FLPurifier, ShieldFL, and RaSA require attack-specific or privacy-preserving interfaces that are not reproduced in this submission. Their absence is therefore treated as a comparison limitation rather than as evidence that Trust Flow dominates those methods. The 50\% result is an out-of-assumption stress test, not evidence of a theoretical Byzantine boundary.
+
+\subsection{Ablation, Sensitivity, and Overhead}
+
+Table~\ref{tab:ablation_overhead} exposes the single-stream FPR/TPR tradeoff and the low recall of HistPerf-only. Measurements from the Intel and AMD TEE deployments show that the attestation-bound TrustReport adds about 15 KB and that aggregation plus audit increases from 2.10 s to 4.85 s. Optional cryptographic secure aggregation remains outside the stated system boundary.
+
+The measured auxiliary secure-path result is approximately 11 ms per
+admitted-client round for enclave transitions, memory pressure, and the
+cryptographic aggregation path. This auxiliary path is reported separately
+from the server-side headline result because the main protocol still requires
+per-client evidence inspection. Device-side TEE Quote generation, signing,
+and lightweight monitoring are measured separately at approximately 12--15 ms
+per admitted-client round.
+
+\begin{table*}[t]
+    \centering
+    \caption{Ablation and overhead summary.}
+    \label{tab:ablation_overhead}
+    \scriptsize
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} p{2.1cm} p{4.45cm} c c}
+        \toprule
+        Study & Variant / architecture & FPR or overhead & TPR / time \\
+        \midrule
+        Reputation & Single-stream EMA, aggressive & 18.25\% FPR & 95.12\% TPR \\
+        Reputation & Single-stream EMA, conservative & 2.10\% FPR & 48.33\% TPR \\
+        Reputation & HistPerf-only & 0.15\% FPR & 21.05\% TPR \\
+        Reputation & \textbf{Dual-stream Trust Flow} & \textbf{0.00\% FPR} & \textbf{100.00\% TPR} \\
+        \midrule
+        Overhead & Standard FedAvg & 0 KB extra & 2.10 s aggregation \\
+        Overhead & Trust Flow & $\sim$15 KB TrustReport & 4.85 s incl. audit \\
+        \bottomrule
+    \end{tabular*}
+\end{table*}
+
+Figures~\ref{fig:ablation_components} and \ref{fig:alpha_sensitivity} show that counting SUSPECT as recoverable review yields 88.33\% per-round malicious coverage and a 14.79\% benign review rate, with no permanent false ban in the tested runs. Activation and clean-loss probes reduce the reported clean-label ASR below 9.2\%, while re-normalization avoids implicit learning-rate decay. At $\alpha=0.1$, Trust Flow remains near 92\% accuracy on the tested hardware platforms. These ablation values are descriptive measurements under the same protocol; they are not claims of statistical significance beyond the reported repeated-run summary.
+
+The Dirichlet sweep in Fig.~\ref{fig:alpha_sensitivity} is a within-family distribution-shift test: the label space, model, optimizer, and attack protocol remain fixed while the concentration parameter changes from weak to strong heterogeneity. As $\alpha$ decreases, Krum and FLTrust increasingly reject legitimate drift; Trust Flow is less sensitive in the reported sweep because content is fused with history and risk. The default $\beta_{fusion}=2.0$ gives the best observed accuracy--ASR balance. The reported 2.10 s to 4.85 s runtime covers server-side aggregation and auditing only; client communication and vendor-specific attestation latency remain outside this measurement, while the auxiliary secure path is measured separately at approximately 11 ms per admitted-client round and device-side TEE Quote generation, signing, and lightweight monitoring are measured separately at approximately 12--15 ms per admitted-client round.
+
+\begin{figure*}[t]
+    \centering
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig9_ablation_probes.pdf}
+        \vspace{-3pt}
+        {\scriptsize (a) Multi-dimensional risk-probe ablation.}
+    \end{minipage}\hfill
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{fig10_ablation_renorm.pdf}
+        \vspace{-3pt}
+        {\scriptsize (b) Weight re-normalization effect.}
+    \end{minipage}
+    \caption{Component-level ablation of risk probes and re-normalization.}
+    \label{fig:ablation_components}
+\end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.76\textwidth]{fig11_alpha_sensitivity.pdf}
+    \caption{Robustness stress test under varying data heterogeneity.}
+    \label{fig:alpha_sensitivity}
+\end{figure*}
+
+\section{Discussion and Conclusion}
+
+Trust Flow integrates admission evidence, content auditing, temporal reputation, and layer-wise aggregation into a single trust-state pipeline. The system-level contribution is the ordering and separation of these evidence streams: execution evidence controls admission, current probes control immediate risk, historical utility controls recoverable retention, and layer scores control where an update can contribute. On the two tested Intel and AMD TEE hardware configurations, this separation keeps permanent-ban FPR near zero while maintaining high recall against the tested mixed attacks. The deployments verify the stated attestation interface, evidence binding, protected reporting, and transition semantics; TEE admission nevertheless remains distinct from semantic update-safety verification.
+
+Several limitations remain. Microarchitectural side channels and vendor-specific enclave resource contention remain outside the threat model. The clean-reference and activation-probe assumptions require a declared server-held probe set and may not transfer directly to strict cross-silo or cross-device settings without trusted domain data; the peer-reference branch is defined but not evaluated in the headline results. The comparison includes matched classical baselines but does not provide direct reimplementations of every recent temporal, backdoor, or privacy-preserving defense; consequently, the numerical results should not be read as a universal ranking. The current probe design is also tailored to vision classification, and full end-to-end attestation and communication latency, including vendor-specific components, remain outside the reported measurements; device-side TEE Quote generation, signing, and lightweight monitoring are measured separately at approximately 12--15 ms per admitted-client round, while enclave transitions, memory pressure, and the cryptographic aggregation path are measured separately as an auxiliary secure path. Cryptographic secure aggregation remains outside the main system boundary because the server must inspect individual updates. These limitations motivate reference-free evaluation, matched modern baselines, and broader task validation in future work.
+
+\begin{thebibliography}{99}
+    \setlength{\itemsep}{0pt}
+    \bibitem{kairouz2021flsurvey} Kairouz, P., McMahan, H.B., Avent, B., et al.: Advances and open problems in federated learning. Foundations and Trends in Machine Learning 14(1--2), 1--210 (2021). \url{https://doi.org/10.1561/2200000083}
+    \bibitem{mcmahan2017fedavg} McMahan, B., Moore, E., Ramage, D., Hampson, S., Aguera y Arcas, B.: Communication-efficient learning of deep networks from decentralized data. In: Proceedings of the 20th International Conference on Artificial Intelligence and Statistics, PMLR 54, pp. 1273--1282 (2017). \url{https://proceedings.mlr.press/v54/mcmahan17a.html}
+    \bibitem{blanchard2017krum} Blanchard, P., El Mhamdi, E.M., Guerraoui, R., Stainer, J.: Machine learning with adversaries: Byzantine tolerant gradient descent. In: Advances in Neural Information Processing Systems 30 (2017). \href{https://papers.nips.cc/paper/6617-machine-learning-with-adversaries-byzantine-tolerant-gradient-descent}{NeurIPS paper page}
+    \bibitem{yin2018byzantine} Yin, D., Chen, Y., Ramchandran, K., Bartlett, P.: Byzantine-robust distributed learning: Towards optimal statistical rates. In: Proceedings of the 35th International Conference on Machine Learning, PMLR 80, pp. 5650--5659 (2018). \url{https://proceedings.mlr.press/v80/yin18a.html}
+    \bibitem{cao2021fltrust} Cao, X., Fang, M., Liu, J., Gong, N.Z.: FLTrust: Byzantine-robust federated learning via trust bootstrapping. In: Proceedings 2021 Network and Distributed System Security Symposium (NDSS) (2021). \url{https://doi.org/10.14722/ndss.2021.24434}
+    \bibitem{fung2020foolsgold} Fung, C., Yoon, C.J.M., Beschastnikh, I.: The limitations of federated learning in Sybil settings. In: 23rd International Symposium on Research in Attacks, Intrusions and Defenses (RAID 2020), pp. 301--316. USENIX Association (2020). \url{https://www.usenix.org/conference/raid2020/presentation/fung}
+    \bibitem{wang2025rasa} Wang, L., Huang, M., Zhang, Z., Li, M., Wang, J., Gai, K.: RaSA: Robust and adaptive secure aggregation for edge-assisted hierarchical federated learning. IEEE Transactions on Information Forensics and Security 20, 4280--4295 (2025). \url{https://doi.org/10.1109/TIFS.2025.3559411}
+    \bibitem{fldetector2022} Zhang, Z., Cao, X., Jia, J., Gong, N.Z.: FLDetector: Defending federated learning against model poisoning attacks via detecting malicious clients. In: Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining, pp. 2545--2555 (2022). \url{https://doi.org/10.1145/3534678.3539231}
+    \bibitem{deepsight2022} Rieger, P., Nguyen, T.D., Miettinen, M., Sadeghi, A.R.: DeepSight: Mitigating backdoor attacks in federated learning through deep model inspection. In: Network and Distributed System Security Symposium (NDSS) (2022). \url{https://doi.org/10.14722/ndss.2022.23156}
+    \bibitem{flame2022} Nguyen, T.D., Rieger, P., Chen, H., et al.: FLAME: Taming backdoors in federated learning. In: 31st USENIX Security Symposium, pp. 1415--1432 (2022). \url{https://www.usenix.org/conference/usenixsecurity22/presentation/nguyen}
+    \bibitem{flpurifier} Zhang, J., Zhu, C., Sun, X., Ge, C., Chen, B., Susilo, W., Yu, S.: FLPurifier: Backdoor defense in federated learning via decoupled contrastive training. IEEE Transactions on Information Forensics and Security 19, 4752--4766 (2024). \url{https://doi.org/10.1109/TIFS.2024.3384846}
+    \bibitem{crowdguard2024} Rieger, P., Krau{\ss}, T., Miettinen, M., Dmitrienko, A., Sadeghi, A.R.: CrowdGuard: Federated backdoor detection in federated learning. In: Network and Distributed System Security Symposium (NDSS) (2024). \url{https://doi.org/10.14722/ndss.2024.23233}
+    \bibitem{roseagg} Yang, H., Xi, W., Shen, Y., Wu, C., Zhao, J.: RoseAgg: Robust defense against targeted collusion attacks in federated learning. IEEE Transactions on Information Forensics and Security 19, 2951--2966 (2024). \url{https://doi.org/10.1109/TIFS.2024.3352415}
+    \bibitem{shieldfl} Ma, Z., Ma, J., Miao, Y., Li, Y., Deng, R.H.: ShieldFL: Mitigating model poisoning attacks in privacy-preserving federated learning. IEEE Transactions on Information Forensics and Security 17, 1639--1654 (2022). \url{https://doi.org/10.1109/TIFS.2022.3169918}
+    \bibitem{r1_tee_integrity} Chen, Y., Luo, F., Li, T., Xiang, T., Liu, Z., Li, J.: A training-integrity privacy-preserving federated learning scheme with trusted execution environment. Information Sciences 522, 69--79 (2020). \url{https://doi.org/10.1016/j.ins.2020.02.037}
+    \bibitem{xu2021distributed} Xu, T., Zhu, K., Andrzejak, A., Zhang, L.: Distributed learning in trusted execution environment: A case study of federated learning in SGX. In: 2021 7th IEEE International Conference on Network Intelligence and Digital Content (IC-NIDC), pp. 450--454 (2021). \url{https://doi.org/10.1109/IC-NIDC54101.2021.9660433}
+    \bibitem{zhang2025rppfl} Zhang, X., Chen, Z., Chen, G., Feng, X., Shen, Q., Wu, Z.: RPPFL: Robust and privacy-preserving federated learning via trusted execution environments. In: ICASSP 2025 - 2025 IEEE International Conference on Acoustics, Speech and Signal Processing, pp. 1--5 (2025). \url{https://doi.org/10.1109/ICASSP49660.2025.10889398}
+    \bibitem{r5_tee_mitigating} Queyrut, S., Schiavoni, V., Felber, P.: Mitigating adversarial attacks in federated learning with trusted execution environments. In: 2023 IEEE 43rd International Conference on Distributed Computing Systems (ICDCS), pp. 626--637 (2023). \url{https://doi.org/10.1109/ICDCS57875.2023.00069}
+    \bibitem{lu2025tmt} Lu, Z., Wang, L., Zhang, Z., Huang, M., Wang, J., Li, M.: TMT-FL: Enabling trustworthy model training of federated learning with malicious participants. IEEE Transactions on Dependable and Secure Computing 22(3), 2723--2740 (2025). \url{https://doi.org/10.1109/TDSC.2024.3521377}
+
+    \bibitem{bagdasaryan2020backdoor} Bagdasaryan, E., Veit, A., Hua, Y., Estrin, D., Shmatikov, V.: How To Backdoor Federated Learning. In: Proceedings of the Twenty Third International Conference on Artificial Intelligence and Statistics, PMLR 108, pp. 2938--2948 (2020). \url{https://proceedings.mlr.press/v108/bagdasaryan20a.html}
+    \bibitem{wang2019neuralcleanse} Wang, B., Yao, Y., Shan, S., Li, H., Viswanath, B., Zheng, H., Zhao, B.Y.: Neural Cleanse: Identifying and mitigating backdoor attacks in neural networks. In: 2019 IEEE Symposium on Security and Privacy (SP), pp. 707--723 (2019). \url{https://doi.org/10.1109/SP.2019.00031}
+
+\end{thebibliography}
+
+\end{document}

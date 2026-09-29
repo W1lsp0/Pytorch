@@ -1,0 +1,14 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.6}{Background and Related Work}{}% 2
+\BOOKMARK [1][-]{section.7}{System Model and Threat Assumptions}{}% 3
+\BOOKMARK [1][-]{section.11}{Trust-Flow Framework}{}% 4
+\BOOKMARK [2][-]{subsection.13}{Admission and Content Auditing}{section.11}% 5
+\BOOKMARK [2][-]{subsection.21}{Dual-Stream State Evolution}{section.11}% 6
+\BOOKMARK [2][-]{subsection.25}{Risk-Gated Layered Aggregation}{section.11}% 7
+\BOOKMARK [2][-]{subsection.30}{Risk Probe Computation}{section.11}% 8
+\BOOKMARK [1][-]{section.36}{Experiments}{}% 9
+\BOOKMARK [2][-]{subsection.37}{Setup}{section.36}% 10
+\BOOKMARK [2][-]{subsection.39}{Overall Defense Performance}{section.36}% 11
+\BOOKMARK [2][-]{subsection.42}{Ablation, Sensitivity, and Overhead}{section.36}% 12
+\BOOKMARK [1][-]{section.46}{Discussion and Conclusion}{}% 13
+\BOOKMARK [1][-]{section*.47}{References}{}% 14

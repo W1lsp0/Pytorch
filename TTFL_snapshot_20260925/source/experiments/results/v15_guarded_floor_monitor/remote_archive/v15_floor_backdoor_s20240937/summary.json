@@ -1,0 +1,496 @@
+{
+  "protocol": {
+    "dataset": "CIFAR10_LOCAL",
+    "clients": 20,
+    "rounds": 30,
+    "local_epochs": 1,
+    "shared_client_pool_size": 0,
+    "server_proxy_size": 500,
+    "known_trigger_probe": true,
+    "seed": 20240937,
+    "purpose": "development matrix; interpret only with the run manifests"
+  },
+  "runs": [
+    {
+      "run_id": "1_ttfl_backdoor_seed20240937",
+      "status": "success",
+      "error": null,
+      "method": "ttfl",
+      "scenario": "backdoor",
+      "seed": 20240937,
+      "clients": 20,
+      "rounds": 30,
+      "clean_accuracy": [
+        0.1943,
+        0.2587,
+        0.2951,
+        0.3295,
+        0.3418,
+        0.3548,
+        0.3802,
+        0.4018,
+        0.3993,
+        0.4287,
+        0.4436,
+        0.456,
+        0.4607,
+        0.4713,
+        0.4799,
+        0.4869,
+        0.4966,
+        0.5115,
+        0.511,
+        0.5125,
+        0.5214,
+        0.532,
+        0.5307,
+        0.5391,
+        0.549,
+        0.5497,
+        0.5634,
+        0.5547,
+        0.5666,
+        0.5661
+      ],
+      "backdoor_asr": [
+        0.372888888888889,
+        0.032333333333333325,
+        0.05477777777777776,
+        0.06733333333333334,
+        0.036,
+        0.00888888888888889,
+        0.03877777777777776,
+        0.03111111111111112,
+        0.01544444444444444,
+        0.04622222222222225,
+        0.04833333333333333,
+        0.032444444444444435,
+        0.031333333333333324,
+        0.029777777777777764,
+        0.02244444444444444,
+        0.049,
+        0.043555555555555556,
+        0.044222222222222246,
+        0.024888888888888877,
+        0.02877777777777777,
+        0.03266666666666667,
+        0.042444444444444444,
+        0.02811111111111112,
+        0.04411111111111112,
+        0.03277777777777777,
+        0.03055555555555556,
+        0.039888888888888877,
+        0.038888888888888876,
+        0.033444444444444436,
+        0.03877777777777776
+      ],
+      "clean_label_asr": [
+        0.4010000000000001,
+        0.03766666666666668,
+        0.060888888888888874,
+        0.06977777777777774,
+        0.03644444444444444,
+        0.009222222222222218,
+        0.03922222222222224,
+        0.029888888888888878,
+        0.014555555555555561,
+        0.04488888888888888,
+        0.04766666666666667,
+        0.03066666666666667,
+        0.02922222222222223,
+        0.028222222222222232,
+        0.02155555555555556,
+        0.046555555555555544,
+        0.04133333333333332,
+        0.04266666666666668,
+        0.022222222222222223,
+        0.02722222222222223,
+        0.031666666666666676,
+        0.041,
+        0.027,
+        0.04333333333333333,
+        0.030333333333333327,
+        0.02944444444444444,
+        0.037888888888888875,
+        0.03655555555555556,
+        0.032111111111111125,
+        0.03744444444444444
+      ],
+      "fit_results": [
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        },
+        {
+          "results": 20,
+          "failures": 0
+        }
+      ],
+      "audit_available": true,
+      "malicious_client_ids": [
+        1
+      ],
+      "active_aggregation_clients": [
+        20,
+        19,
+        19,
+        19,
+        19,
+        18,
+        19,
+        19,
+        17,
+        19,
+        19,
+        18,
+        18,
+        18,
+        18,
+        19,
+        19,
+        18,
+        17,
+        17,
+        19,
+        19,
+        19,
+        19,
+        19,
+        18,
+        18,
+        19,
+        19,
+        18
+      ],
+      "isolated_clients": [
+        0,
+        1,
+        1,
+        1,
+        1,
+        2,
+        1,
+        1,
+        3,
+        1,
+        1,
+        2,
+        2,
+        2,
+        2,
+        1,
+        1,
+        2,
+        3,
+        3,
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        1,
+        1,
+        2
+      ],
+      "state_counts": [
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 20,
+          "QUARANTINE": 0,
+          "SUSPECT": 0
+        },
+        {
+          "NORMAL": 13,
+          "QUARANTINE": 0,
+          "SUSPECT": 7
+        },
+        {
+          "NORMAL": 12,
+          "QUARANTINE": 0,
+          "SUSPECT": 8
+        },
+        {
+          "NORMAL": 10,
+          "QUARANTINE": 0,
+          "SUSPECT": 10
+        },
+        {
+          "NORMAL": 11,
+          "QUARANTINE": 0,
+          "SUSPECT": 9
+        },
+        {
+          "NORMAL": 10,
+          "QUARANTINE": 0,
+          "SUSPECT": 10
+        },
+        {
+          "NORMAL": 10,
+          "QUARANTINE": 0,
+          "SUSPECT": 10
+        },
+        {
+          "NORMAL": 9,
+          "QUARANTINE": 3,
+          "SUSPECT": 8
+        },
+        {
+          "NORMAL": 11,
+          "QUARANTINE": 3,
+          "SUSPECT": 6
+        },
+        {
+          "NORMAL": 11,
+          "QUARANTINE": 3,
+          "SUSPECT": 6
+        },
+        {
+          "NORMAL": 12,
+          "QUARANTINE": 3,
+          "SUSPECT": 5
+        },
+        {
+          "NORMAL": 12,
+          "QUARANTINE": 3,
+          "SUSPECT": 5
+        },
+        {
+          "NORMAL": 10,
+          "QUARANTINE": 2,
+          "SUSPECT": 8
+        },
+        {
+          "NORMAL": 10,
+          "QUARANTINE": 2,
+          "SUSPECT": 8
+        },
+        {
+          "NORMAL": 11,
+          "QUARANTINE": 2,
+          "SUSPECT": 7
+        },
+        {
+          "NORMAL": 7,
+          "QUARANTINE": 2,
+          "SUSPECT": 11
+        },
+        {
+          "NORMAL": 7,
+          "QUARANTINE": 1,
+          "SUSPECT": 12
+        },
+        {
+          "NORMAL": 6,
+          "QUARANTINE": 1,
+          "SUSPECT": 13
+        },
+        {
+          "NORMAL": 6,
+          "QUARANTINE": 1,
+          "SUSPECT": 13
+        },
+        {
+          "NORMAL": 6,
+          "QUARANTINE": 1,
+          "SUSPECT": 13
+        },
+        {
+          "NORMAL": 6,
+          "QUARANTINE": 1,
+          "SUSPECT": 13
+        },
+        {
+          "NORMAL": 7,
+          "QUARANTINE": 1,
+          "SUSPECT": 12
+        },
+        {
+          "NORMAL": 7,
+          "QUARANTINE": 1,
+          "SUSPECT": 12
+        },
+        {
+          "NORMAL": 7,
+          "QUARANTINE": 1,
+          "SUSPECT": 12
+        },
+        {
+          "NORMAL": 8,
+          "QUARANTINE": 1,
+          "SUSPECT": 11
+        },
+        {
+          "NORMAL": 7,
+          "QUARANTINE": 2,
+          "SUSPECT": 11
+        },
+        {
+          "NORMAL": 4,
+          "QUARANTINE": 1,
+          "SUSPECT": 15
+        },
+        {
+          "NORMAL": 6,
+          "QUARANTINE": 2,
+          "SUSPECT": 12
+        },
+        {
+          "NORMAL": 5,
+          "QUARANTINE": 2,
+          "SUSPECT": 13
+        }
+      ],
+      "normal_client_count": 19,
+      "normal_client_exclusion_rate": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.05263157894736842,
+        0.0,
+        0.0,
+        0.10526315789473684,
+        0.0,
+        0.0,
+        0.05263157894736842,
+        0.05263157894736842,
+        0.05263157894736842,
+        0.05263157894736842,
+        0.0,
+        0.0,
+        0.05263157894736842,
+        0.10526315789473684,
+        0.10526315789473684,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.05263157894736842,
+        0.05263157894736842,
+        0.0,
+        0.0,
+        0.05263157894736842
+      ]
+    }
+  ]
+}

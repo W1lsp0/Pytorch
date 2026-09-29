@@ -1,0 +1,124 @@
+{
+  "checked_at": 1790670075.8331811,
+  "host": "local",
+  "gpus": {
+    "0": {
+      "total_mib": 23028,
+      "used_mib": 14877,
+      "free_mib": 8151,
+      "utilization": 100,
+      "compute_pids": [
+        1018749,
+        1018784,
+        1018785,
+        1018793,
+        1018781,
+        1018787,
+        1018799,
+        1018790,
+        1018786,
+        1018800,
+        1018789,
+        1018791,
+        1018794,
+        1018795,
+        1018782,
+        1018798,
+        1018783,
+        1018792,
+        1018788,
+        1018796,
+        1018797
+      ]
+    },
+    "1": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "2": {
+      "total_mib": 23028,
+      "used_mib": 8003,
+      "free_mib": 15025,
+      "utilization": 8,
+      "compute_pids": [
+        982375
+      ]
+    },
+    "3": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "4": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    }
+  },
+  "runs": [
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v13_base_none_s20240934",
+      "gpu": "0",
+      "pid": 961104
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v13_relaxed_none_s20240934",
+      "gpu": "1",
+      "pid": 961105
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v13_base_backdoor_s20240934",
+      "gpu": "3",
+      "pid": 961106
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v13_relaxed_backdoor_s20240934",
+      "gpu": "4",
+      "pid": 961107
+    },
+    {
+      "status": "failure",
+      "fit": 1,
+      "evaluate": 1,
+      "warnings": [],
+      "name": "v13_base_delayed_backdoor_s20240934",
+      "gpu": "2",
+      "pid": 980809
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v13_relaxed_delayed_backdoor_s20240934",
+      "gpu": "3",
+      "pid": 1003391
+    }
+  ],
+  "warnings": [
+    "v13_base_delayed_backdoor_s20240934: training failed"
+  ]
+}

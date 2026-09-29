@@ -1,0 +1,136 @@
+{
+  "checked_at": 1790708518.1029992,
+  "warnings": [],
+  "local": {
+    "checked_at": 1790708488.2578452,
+    "host": "local",
+    "gpus": {
+      "0": {
+        "total_mib": 23028,
+        "used_mib": 23,
+        "free_mib": 23005,
+        "utilization": 0,
+        "compute_pids": []
+      },
+      "1": {
+        "total_mib": 23028,
+        "used_mib": 23,
+        "free_mib": 23005,
+        "utilization": 0,
+        "compute_pids": []
+      },
+      "2": {
+        "total_mib": 23028,
+        "used_mib": 11543,
+        "free_mib": 11485,
+        "utilization": 99,
+        "compute_pids": [
+          1161375
+        ]
+      },
+      "3": {
+        "total_mib": 23028,
+        "used_mib": 23,
+        "free_mib": 23005,
+        "utilization": 0,
+        "compute_pids": []
+      },
+      "4": {
+        "total_mib": 23028,
+        "used_mib": 23,
+        "free_mib": 23005,
+        "utilization": 0,
+        "compute_pids": []
+      }
+    },
+    "runs": [
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v16_entropy_none_s20240936",
+        "gpu": "0",
+        "pid": 1166965
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v16_entropy_backdoor_s20240936",
+        "gpu": "1",
+        "pid": 1166966
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v16_entropy_delayed_backdoor_s20240936",
+        "gpu": "3",
+        "pid": 1166967
+      }
+    ],
+    "warnings": []
+  },
+  "remote": {
+    "checked_at": 1790708504.713383,
+    "host": "remote",
+    "gpus": {
+      "0": {
+        "total_mib": 23028,
+        "used_mib": 13,
+        "free_mib": 23015,
+        "utilization": 0,
+        "compute_pids": []
+      },
+      "1": {
+        "total_mib": 23028,
+        "used_mib": 13,
+        "free_mib": 23015,
+        "utilization": 0,
+        "compute_pids": []
+      },
+      "2": {
+        "total_mib": 23028,
+        "used_mib": 13,
+        "free_mib": 23015,
+        "utilization": 0,
+        "compute_pids": []
+      }
+    },
+    "runs": [
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v16_entropy_none_s20240937",
+        "gpu": "0",
+        "pid": 3636
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v16_entropy_backdoor_s20240937",
+        "gpu": "2",
+        "pid": 4565
+      },
+      {
+        "status": "success",
+        "fit": 30,
+        "evaluate": 30,
+        "warnings": [],
+        "name": "v16_entropy_delayed_backdoor_s20240937",
+        "gpu": "1",
+        "pid": 5723
+      }
+    ],
+    "warnings": []
+  },
+  "remote_last_sync": 1790708518.8434124,
+  "report_complete": true
+}

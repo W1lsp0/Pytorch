@@ -1,0 +1,127 @@
+{
+  "checked_at": 1790688670.7556245,
+  "host": "local",
+  "gpus": {
+    "0": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "1": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "2": {
+      "total_mib": 23028,
+      "used_mib": 11575,
+      "free_mib": 11453,
+      "utilization": 0,
+      "compute_pids": [
+        1042351
+      ]
+    },
+    "3": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "4": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    }
+  },
+  "runs": [
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_original_none_s20240933",
+      "gpu": "0",
+      "pid": 1039004
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_reference_none_s20240933",
+      "gpu": "1",
+      "pid": 1039005
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_floor_none_s20240933",
+      "gpu": "3",
+      "pid": 1039006
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_original_backdoor_s20240933",
+      "gpu": "4",
+      "pid": 1039007
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_reference_backdoor_s20240933",
+      "gpu": "3",
+      "pid": 1062167
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_floor_backdoor_s20240933",
+      "gpu": "4",
+      "pid": 1062168
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_original_delayed_backdoor_s20240933",
+      "gpu": "0",
+      "pid": 1064248
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_reference_delayed_backdoor_s20240933",
+      "gpu": "1",
+      "pid": 1065946
+    },
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v14_floor_delayed_backdoor_s20240933",
+      "gpu": "4",
+      "pid": 1084158
+    }
+  ],
+  "warnings": []
+}

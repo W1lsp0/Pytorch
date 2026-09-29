@@ -1,0 +1,64 @@
+[
+  {
+    "run": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_backdoor_retry/1_ttfl_backdoor_seed20240932",
+    "scenario": "backdoor",
+    "seed": 20240932,
+    "counts": {
+      "attacker:total_full": 29,
+      "attacker:aggregation_isolation": 29,
+      "attacker:low_guard_active_overlap": 29,
+      "normal:total_full": 38,
+      "normal:aggregation_isolation": 18,
+      "normal:pre_layer_blacklist": 20,
+      "normal:low_guard_active_overlap": 1
+    },
+    "scope": "Observed stage attribution only. Low-entropy overlaps may coincide with other gates. No saved raw_score or threshold per round in V12; cannot reconstruct score ranges or prove the effect of lowering lambda."
+  },
+  {
+    "run": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_backdoor_s20240933_retry/1_ttfl_backdoor_seed20240933",
+    "scenario": "backdoor",
+    "seed": 20240933,
+    "counts": {
+      "attacker:total_full": 29,
+      "attacker:aggregation_isolation": 29,
+      "attacker:low_guard_active_overlap": 29,
+      "normal:total_full": 270,
+      "normal:layer_gate_without_logged_isolation": 221,
+      "normal:layer_gate_previous_risk_one": 33,
+      "normal:layer_gate_previous_risk_at_least_0_9": 149,
+      "normal:aggregation_isolation": 7,
+      "normal:pre_layer_blacklist": 42,
+      "normal:low_guard_active_overlap": 2
+    },
+    "scope": "Observed stage attribution only. Low-entropy overlaps may coincide with other gates. No saved raw_score or threshold per round in V12; cannot reconstruct score ranges or prove the effect of lowering lambda."
+  },
+  {
+    "run": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_none_retry/1_ttfl_none_seed20240932",
+    "scenario": "none",
+    "seed": 20240932,
+    "counts": {
+      "normal:total_full": 42,
+      "normal:aggregation_isolation": 23,
+      "normal:layer_gate_without_logged_isolation": 3,
+      "normal:layer_gate_previous_risk_one": 1,
+      "normal:layer_gate_previous_risk_at_least_0_9": 1,
+      "normal:pre_layer_blacklist": 16,
+      "normal:low_guard_active_overlap": 1
+    },
+    "scope": "Observed stage attribution only. Low-entropy overlaps may coincide with other gates. No saved raw_score or threshold per round in V12; cannot reconstruct score ranges or prove the effect of lowering lambda."
+  },
+  {
+    "run": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v12_low_entropy_guard_seed20240932/v12_guard_none_s20240933_retry/1_ttfl_none_seed20240933",
+    "scenario": "none",
+    "seed": 20240933,
+    "counts": {
+      "normal:total_full": 134,
+      "normal:layer_gate_without_logged_isolation": 130,
+      "normal:layer_gate_previous_risk_one": 10,
+      "normal:layer_gate_previous_risk_at_least_0_9": 78,
+      "normal:aggregation_isolation": 4,
+      "normal:low_guard_active_overlap": 4
+    },
+    "scope": "Observed stage attribution only. Low-entropy overlaps may coincide with other gates. No saved raw_score or threshold per round in V12; cannot reconstruct score ranges or prove the effect of lowering lambda."
+  }
+]

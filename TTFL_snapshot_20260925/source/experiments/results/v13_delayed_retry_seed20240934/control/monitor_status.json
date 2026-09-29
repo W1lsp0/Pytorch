@@ -1,0 +1,55 @@
+{
+  "checked_at": 1790672596.1970627,
+  "host": "local",
+  "gpus": {
+    "0": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "1": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "2": {
+      "total_mib": 23028,
+      "used_mib": 14483,
+      "free_mib": 8545,
+      "utilization": 98,
+      "compute_pids": [
+        982375
+      ]
+    },
+    "3": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    },
+    "4": {
+      "total_mib": 23028,
+      "used_mib": 23,
+      "free_mib": 23005,
+      "utilization": 0,
+      "compute_pids": []
+    }
+  },
+  "runs": [
+    {
+      "status": "success",
+      "fit": 30,
+      "evaluate": 30,
+      "warnings": [],
+      "name": "v13_base_delayed_retry_s20240934",
+      "gpu": "0",
+      "pid": 1018665
+    }
+  ],
+  "warnings": []
+}

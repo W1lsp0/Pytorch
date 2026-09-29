@@ -1,0 +1,78 @@
+        Organizing Committee                                                                               Call for Papers
+General Chairs                                                    IEEE ISPA 2026 is an international forum for original research on parallel, distributed, edge, cloud and
+Geyong Min, University of Exeter, UK
+Nong Xiao, Sun Yat-sen University, China
+                                                                  large-scale computing systems. The conference welcomes academia and industrial researchers to
+Program Chairs                                                    share innovations on multi-core, heterogeneous clusters, P2P networks, AI computing architecture,
+Huazhong Liu, Zhejiang Normal University, China                   blockchain security, big data analytics and pervasive services. ISPA series has been held annually since
+Rong Gu, Nanjing University, China                                2003 across Asia, Europe, Australia and North America. The conference includes oral presentations,
+Program Vice-Chairs                                               poster sessions, tutorials, invited keynote speeches and special sessions. All accepted papers will be
+Jiawei Huang, Central South University, China
+Chubo Liu, Hunan University, China                                indexed by IEEE Xplore and EI.
+Minchen Yu, TheChineseUniversityofHongKong,Shenzhen,China
+Local Chairs
+Azreen Azman, Universiti Putra Malaysia, Malaysia                                      IEEE ISPA 2026 Tracks and Topics
+Xiangli Yang, Zhengzhou University, China
+Workshop/Special Session Chairs                                   Track 1: Systems and Architectures                        Track 3: Applications and Services
+Shaojun Zou, Hainan University, China                             - Cloud computing and data center technology              - High-performance scientific and engineering
+Zhou Zhou, Changsha University, China
+                                                                  - Migration of computations                               computing
+Publicity Chairs                                                                                                            - Grid and cluster computing
+Yangbo Jiang, Zhejiang University of Finance & Economics, China   - Multi-clouds environments, cloud federation,
+Xun Shao, Toyohashi University of Technology, Japan               interoperability                                          - Pervasive and ubiquitous computing
+Tingting Han, Hainan University, China                            - Energy management and green computing                   - Databases, data mining, and data management
+Publication Chairs                                                - Wireless and mobile networks                            - Big data and business analytics
+Zhicai Zhang, Hainan University, China                            - Systems and Architectures for artificial intelligence   - Scientific cloud systems and services
+Binbin Zhou, Hangzhou City University, China
+Wenxuan Zhang, Hainan University, China                           - Distributed/parallel algorithms and application         - Internet computing and web services
+Web Chairs                                                        - Social networks, crowdsourcing, and P2P systems         - Software defined network and its applications
+Ren Li, Hainan University, China                                  - Distributed fileandstoragesystems,I/Osystems            - LLMs powered by parallel and distributed
+Yongqin Zhang, Hainan University, China                                                                                     computing
+Steering Committee                                                Track 2: Technologies and Tools
+Minyi Guo, ShanghaiJiao Tong University, China                                                                              Track 4: Security and Block-chain
+Liang Zhao, Shenyang Aerospace University, China                  - Parallel and distributed computing paradigms
+                                                                                                                            - Security in parallel AI systems
+                                                                  - Novel parallel programming paradigms
+                                                                                                                            - Federated learning
+                                                                  - Programming models for cloud services
+               Important Dates                                                                                              - Blockchain-based applications and services
+                                                                  - Code generation and optimization
+                                                                                                                            - Blockchain security and privacy
+Workshop Proposal Due:             15 August 2026                 - Compilers for parallel computers
+                                                                                                                            - Blockchain in cyber physical systems
+Regular Paper Due:            30 September 2026                   - Middleware and tools
+Author Notification Due:          30 October 2026                                                                           - Scalability issues in blockchain
+                                                                  - Scheduling and resource management
+Paper Registration Due          30 November 2026                                                                            - Blockchain in edge and cloud computing
+                                                                  - Reliability, fault tolerance, and dependability
+Camera-ready Submission Due:    30 November 2026                                                                            - Blockchain-based applications and services
+                                                                  - Generative AI, agents, and world model
+Conference Date:             27-30 December 2026                                                                            - Decentralized blockchain-enabled AI systems
+
+Paper Submission
+All papers must be submitted electronically via EDAS at https://edas.info/N35627. Submissions must not substantially overlap with previously published
+papers or papers concurrently submitted to other journals or conferences. Full regular papers are allowed up to 8 complimentary pages, with up to 2
+additional pages available for purchase (maximum 10 pages). Regular papers or special session papers are allowed up to 6 complimentary pages, with up
+to 2 additional pages available for purchase (maximum 8 pages). All papers must be formatted in the IEEE Computer Society Proceedings Format
+(templates available at https://template-selector.ieee.org/). All submitted papers will undergo a single-blind peer review process.
+Paper Publication
+Papers accepted by ISPA 2026 will be published by the IEEE Computer Society Press. All accepted papers will be submitted to IEEE Xplore and EI.
+Distinguished papers presented at the conference, after further revision, will be invited for submission to a special issue.
+Special Issues
+    IEEE Transactions on Computational Social Systems: Cyber-Physicial Intelligence:State-of-the-art,Perspectives,and Challenges
+     https://www.ieeesmc.org/wp-content/uploads/2026/01/CFP_SI-on-Cyber-Physical-Social-Intelligence.pdf
+    Journal of Systems Architecture: Security and Efficiency for LLM-Based Edge Intelligence
+     https://www.sciencedirect.com/special-issue/328321/security-and-efficiency-for-llm-based-edge-intelligence
+    Big Data Mining and Analytics: High Performance Computing and Communications for Cyber-Physical-Social Big Data Mining and Analytics
+     https://www.sciopen.com/journal/message_news/get_by_id?id=2069618442316066818&issn=2096-0654
+    Computer Standards & Interfaces: Security and Resilience of AI Agents in Digital Critical Infrastructures
+     https://www.sciencedirect.com/special-issue/335299/security-and-resilience-of-ai-agents-in-digital-critical-infrastructures
+Co-located with Four Conferences as The IEEE AI for Science Congress 2026:
+IEEE BDCloud / IEEE SocialCom / IEEE SustainCom / IEEE SpaCCS
+ISPA 2026 Website: https://ieee-ai-for-science.org/2026/ispa/
+Sponsored and Supported by:
+
+
+
+Organizers:
+
