@@ -1,6 +1,6 @@
 {
-  "checked_at": 1790724430.9676337,
-  "complete": false,
+  "checked_at": 1790724541.7054272,
+  "complete": true,
   "goal_achieved": false,
   "pairs": [
     {
@@ -9,8 +9,49 @@
       "host": "local",
       "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v16_entropy_seed20240936/v16_entropy_none_s20240936/1_ttfl_none_seed20240936",
       "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v17_floor10_seed20240936/v17_floor10_none_s20240936/1_ttfl_none_seed20240936",
-      "validation": "audit_failed",
-      "error": "unknown comparison"
+      "statuses": [
+        "success",
+        "success"
+      ],
+      "validation": "validated",
+      "scenario": "none",
+      "seed": 20240936,
+      "metrics_baseline": {
+        "final_accuracy": 0.5667,
+        "final_asr": 0.03444444444444444,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_mean_exclusion": 0.0,
+        "normal_ever_excluded_rate": 0.0
+      },
+      "metrics_candidate": {
+        "final_accuracy": 0.5695,
+        "final_asr": 0.042444444444444444,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_mean_exclusion": 0.07333333333333333,
+        "normal_ever_excluded_rate": 0.2
+      },
+      "delta": {
+        "final_accuracy": 0.0028000000000000247,
+        "final_asr": 0.008000000000000007,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_mean_exclusion": 0.07333333333333333,
+        "normal_ever_excluded_rate": 0.2
+      },
+      "evidence": {
+        "baseline": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "5c9fb50b4e931bdba8ca05713357b2e89e639a1a31615c1d101e0339ecb1dda5",
+          "partition_sha256": "f7f870ad0424a275b2b9fb75f80ce930a4ac4803a6c2ebe0a6921ab0fbf8d580"
+        },
+        "candidate": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "5c9fb50b4e931bdba8ca05713357b2e89e639a1a31615c1d101e0339ecb1dda5",
+          "partition_sha256": "f7f870ad0424a275b2b9fb75f80ce930a4ac4803a6c2ebe0a6921ab0fbf8d580"
+        }
+      }
     },
     {
       "name": "local_backdoor_entropy01_floor10_s20240936",
@@ -18,8 +59,49 @@
       "host": "local",
       "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v16_entropy_seed20240936/v16_entropy_backdoor_s20240936/1_ttfl_backdoor_seed20240936",
       "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v17_floor10_seed20240936/v17_floor10_backdoor_s20240936/1_ttfl_backdoor_seed20240936",
-      "validation": "audit_failed",
-      "error": "unknown comparison"
+      "statuses": [
+        "success",
+        "success"
+      ],
+      "validation": "validated",
+      "scenario": "backdoor",
+      "seed": 20240936,
+      "metrics_baseline": {
+        "final_accuracy": 0.5645,
+        "final_asr": 0.041777777777777754,
+        "attack_window_mean_asr": 0.05797407407407407,
+        "attack_window_peak_asr": 0.35922222222222205,
+        "normal_mean_exclusion": 0.0,
+        "normal_ever_excluded_rate": 0.0
+      },
+      "metrics_candidate": {
+        "final_accuracy": 0.5681,
+        "final_asr": 0.04266666666666668,
+        "attack_window_mean_asr": 0.05865185185185185,
+        "attack_window_peak_asr": 0.36222222222222206,
+        "normal_mean_exclusion": 0.09473684210526315,
+        "normal_ever_excluded_rate": 0.3157894736842105
+      },
+      "delta": {
+        "final_accuracy": 0.0036000000000000476,
+        "final_asr": 0.0008888888888889251,
+        "attack_window_mean_asr": 0.0006777777777777841,
+        "attack_window_peak_asr": 0.0030000000000000027,
+        "normal_mean_exclusion": 0.09473684210526315,
+        "normal_ever_excluded_rate": 0.3157894736842105
+      },
+      "evidence": {
+        "baseline": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "5c9fb50b4e931bdba8ca05713357b2e89e639a1a31615c1d101e0339ecb1dda5",
+          "partition_sha256": "f7f870ad0424a275b2b9fb75f80ce930a4ac4803a6c2ebe0a6921ab0fbf8d580"
+        },
+        "candidate": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "5c9fb50b4e931bdba8ca05713357b2e89e639a1a31615c1d101e0339ecb1dda5",
+          "partition_sha256": "f7f870ad0424a275b2b9fb75f80ce930a4ac4803a6c2ebe0a6921ab0fbf8d580"
+        }
+      }
     },
     {
       "name": "local_delayed_backdoor_entropy01_floor10_s20240936",
@@ -27,8 +109,49 @@
       "host": "local",
       "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v16_entropy_seed20240936/v16_entropy_delayed_backdoor_s20240936/1_ttfl_delayed_backdoor_seed20240936",
       "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v17_floor10_seed20240936/v17_floor10_delayed_backdoor_s20240936/1_ttfl_delayed_backdoor_seed20240936",
-      "validation": "audit_failed",
-      "error": "unknown comparison"
+      "statuses": [
+        "success",
+        "success"
+      ],
+      "validation": "validated",
+      "scenario": "delayed_backdoor",
+      "seed": 20240936,
+      "metrics_baseline": {
+        "final_accuracy": 0.5664,
+        "final_asr": 0.038666666666666676,
+        "attack_window_mean_asr": 0.04835,
+        "attack_window_peak_asr": 0.127,
+        "normal_mean_exclusion": 0.0,
+        "normal_ever_excluded_rate": 0.0
+      },
+      "metrics_candidate": {
+        "final_accuracy": 0.5692,
+        "final_asr": 0.039333333333333324,
+        "attack_window_mean_asr": 0.05187777777777778,
+        "attack_window_peak_asr": 0.167,
+        "normal_mean_exclusion": 0.07017543859649122,
+        "normal_ever_excluded_rate": 0.2631578947368421
+      },
+      "delta": {
+        "final_accuracy": 0.0028000000000000247,
+        "final_asr": 0.0006666666666666488,
+        "attack_window_mean_asr": 0.0035277777777777825,
+        "attack_window_peak_asr": 0.04000000000000001,
+        "normal_mean_exclusion": 0.07017543859649122,
+        "normal_ever_excluded_rate": 0.2631578947368421
+      },
+      "evidence": {
+        "baseline": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "5c9fb50b4e931bdba8ca05713357b2e89e639a1a31615c1d101e0339ecb1dda5",
+          "partition_sha256": "f7f870ad0424a275b2b9fb75f80ce930a4ac4803a6c2ebe0a6921ab0fbf8d580"
+        },
+        "candidate": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "5c9fb50b4e931bdba8ca05713357b2e89e639a1a31615c1d101e0339ecb1dda5",
+          "partition_sha256": "f7f870ad0424a275b2b9fb75f80ce930a4ac4803a6c2ebe0a6921ab0fbf8d580"
+        }
+      }
     },
     {
       "name": "remote_none_entropy01_floor10_s20240937",
@@ -36,8 +159,49 @@
       "host": "remote",
       "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v16_entropy_monitor/remote_archive/v16_entropy_none_s20240937/1_ttfl_none_seed20240937",
       "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v17_floor10_monitor/remote_archive/v17_floor10_none_s20240937/1_ttfl_none_seed20240937",
-      "validation": "audit_failed",
-      "error": "unknown comparison"
+      "statuses": [
+        "success",
+        "success"
+      ],
+      "validation": "validated",
+      "scenario": "none",
+      "seed": 20240937,
+      "metrics_baseline": {
+        "final_accuracy": 0.5687,
+        "final_asr": 0.03733333333333332,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_mean_exclusion": 0.0,
+        "normal_ever_excluded_rate": 0.0
+      },
+      "metrics_candidate": {
+        "final_accuracy": 0.5751,
+        "final_asr": 0.04366666666666667,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_mean_exclusion": 0.04666666666666667,
+        "normal_ever_excluded_rate": 0.1
+      },
+      "delta": {
+        "final_accuracy": 0.006399999999999961,
+        "final_asr": 0.0063333333333333505,
+        "attack_window_mean_asr": null,
+        "attack_window_peak_asr": null,
+        "normal_mean_exclusion": 0.04666666666666667,
+        "normal_ever_excluded_rate": 0.1
+      },
+      "evidence": {
+        "baseline": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "6960fe52ac32142dff2451c743c4b21d5622f5274e24e36ba1a80d57c97bfd1e",
+          "partition_sha256": "240a2bf0be65ffce6d2e875c56acc0de43251db8659bbc4fdef5519a7cd44939"
+        },
+        "candidate": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "6960fe52ac32142dff2451c743c4b21d5622f5274e24e36ba1a80d57c97bfd1e",
+          "partition_sha256": "240a2bf0be65ffce6d2e875c56acc0de43251db8659bbc4fdef5519a7cd44939"
+        }
+      }
     },
     {
       "name": "remote_backdoor_entropy01_floor10_s20240937",
@@ -45,8 +209,49 @@
       "host": "remote",
       "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v16_entropy_monitor/remote_archive/v16_entropy_backdoor_s20240937/1_ttfl_backdoor_seed20240937",
       "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v17_floor10_monitor/remote_archive/v17_floor10_backdoor_s20240937/1_ttfl_backdoor_seed20240937",
-      "validation": "audit_failed",
-      "error": "unknown comparison"
+      "statuses": [
+        "success",
+        "success"
+      ],
+      "validation": "validated",
+      "scenario": "backdoor",
+      "seed": 20240937,
+      "metrics_baseline": {
+        "final_accuracy": 0.5704,
+        "final_asr": 0.047,
+        "attack_window_mean_asr": 0.057955555555555566,
+        "attack_window_peak_asr": 0.387888888888889,
+        "normal_mean_exclusion": 0.0,
+        "normal_ever_excluded_rate": 0.0
+      },
+      "metrics_candidate": {
+        "final_accuracy": 0.5709,
+        "final_asr": 0.04477777777777776,
+        "attack_window_mean_asr": 0.05701851851851851,
+        "attack_window_peak_asr": 0.38666666666666666,
+        "normal_mean_exclusion": 0.042105263157894736,
+        "normal_ever_excluded_rate": 0.10526315789473684
+      },
+      "delta": {
+        "final_accuracy": 0.0004999999999999449,
+        "final_asr": -0.0022222222222222435,
+        "attack_window_mean_asr": -0.0009370370370370557,
+        "attack_window_peak_asr": -0.0012222222222223467,
+        "normal_mean_exclusion": 0.042105263157894736,
+        "normal_ever_excluded_rate": 0.10526315789473684
+      },
+      "evidence": {
+        "baseline": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "6960fe52ac32142dff2451c743c4b21d5622f5274e24e36ba1a80d57c97bfd1e",
+          "partition_sha256": "240a2bf0be65ffce6d2e875c56acc0de43251db8659bbc4fdef5519a7cd44939"
+        },
+        "candidate": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "6960fe52ac32142dff2451c743c4b21d5622f5274e24e36ba1a80d57c97bfd1e",
+          "partition_sha256": "240a2bf0be65ffce6d2e875c56acc0de43251db8659bbc4fdef5519a7cd44939"
+        }
+      }
     },
     {
       "name": "remote_delayed_backdoor_entropy01_floor10_s20240937",
@@ -54,8 +259,49 @@
       "host": "remote",
       "baseline": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v16_entropy_monitor/remote_archive/v16_entropy_delayed_backdoor_s20240937/1_ttfl_delayed_backdoor_seed20240937",
       "candidate": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v17_floor10_monitor/remote_archive/v17_floor10_delayed_backdoor_s20240937/1_ttfl_delayed_backdoor_seed20240937",
-      "validation": "audit_failed",
-      "error": "unknown comparison"
+      "statuses": [
+        "success",
+        "success"
+      ],
+      "validation": "validated",
+      "scenario": "delayed_backdoor",
+      "seed": 20240937,
+      "metrics_baseline": {
+        "final_accuracy": 0.577,
+        "final_asr": 0.04166666666666668,
+        "attack_window_mean_asr": 0.05162222222222222,
+        "attack_window_peak_asr": 0.2185555555555555,
+        "normal_mean_exclusion": 0.0,
+        "normal_ever_excluded_rate": 0.0
+      },
+      "metrics_candidate": {
+        "final_accuracy": 0.5721,
+        "final_asr": 0.04188888888888888,
+        "attack_window_mean_asr": 0.05067777777777778,
+        "attack_window_peak_asr": 0.19933333333333333,
+        "normal_mean_exclusion": 0.03333333333333333,
+        "normal_ever_excluded_rate": 0.10526315789473684
+      },
+      "delta": {
+        "final_accuracy": -0.004899999999999904,
+        "final_asr": 0.00022222222222220006,
+        "attack_window_mean_asr": -0.0009444444444444422,
+        "attack_window_peak_asr": -0.01922222222222217,
+        "normal_mean_exclusion": 0.03333333333333333,
+        "normal_ever_excluded_rate": 0.10526315789473684
+      },
+      "evidence": {
+        "baseline": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "6960fe52ac32142dff2451c743c4b21d5622f5274e24e36ba1a80d57c97bfd1e",
+          "partition_sha256": "240a2bf0be65ffce6d2e875c56acc0de43251db8659bbc4fdef5519a7cd44939"
+        },
+        "candidate": {
+          "training_sha256": "e9e7c061fb26ab9156792863a6cfe53b6e61226bfe16c489b1fec712c3247b58",
+          "initial_sha256": "6960fe52ac32142dff2451c743c4b21d5622f5274e24e36ba1a80d57c97bfd1e",
+          "partition_sha256": "240a2bf0be65ffce6d2e875c56acc0de43251db8659bbc4fdef5519a7cd44939"
+        }
+      }
     }
   ],
   "scope": "V17 exploratory entropy threshold .01 versus V15 threshold .15; same-host and same-seed frozen-source comparisons."

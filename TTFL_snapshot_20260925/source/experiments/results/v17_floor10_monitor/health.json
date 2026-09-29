@@ -1,5 +1,5 @@
 {
-  "checked_at": 1790724430.7990804,
+  "checked_at": 1790724540.8234365,
   "warnings": [
     "local: queue heartbeat stale >120s"
   ],
@@ -199,6 +199,6 @@
     ],
     "warnings": []
   },
-  "remote_last_sync": 1790724219.5514677,
-  "report_complete": false
+  "remote_last_sync": 1790724541.179474,
+  "report_complete": true
 }
