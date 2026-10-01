@@ -1,0 +1,98 @@
+{
+  "scope": "One local diagnostic run; incompatible with ten-run, six-attacker main comparison",
+  "final_accuracy_percent": 92.4,
+  "final_bd_asr_percent": 10.21,
+  "final_cl_asr_percent": 10.22,
+  "run_count": 1,
+  "rounds": 30,
+  "benign_clients": 16,
+  "malicious_clients": 4,
+  "final_benign_bans": 0,
+  "final_malicious_bans": 4,
+  "first_blacklist_intercept": {
+    "0": {
+      "round": 8,
+      "server_log_line": 1363,
+      "reason": "risk_ema_above_0.90_for_4_rounds"
+    },
+    "1": {
+      "round": 8,
+      "server_log_line": 1364,
+      "reason": "risk_ema_above_0.90_for_4_rounds"
+    },
+    "3": {
+      "round": 16,
+      "server_log_line": 2752,
+      "reason": "risk_soft_isolation_for_8_rounds"
+    },
+    "2": {
+      "round": 24,
+      "server_log_line": 4095,
+      "reason": "c2_drift_combo_for_5_rounds"
+    }
+  },
+  "first_aggregation_quarantine": {
+    "3": {
+      "round": 9,
+      "server_log_line": 1626
+    },
+    "2": {
+      "round": 12,
+      "server_log_line": 2148
+    }
+  },
+  "total_training_records": 145000,
+  "logged_flower_run_seconds": 3878.53,
+  "seconds_per_round_amortized": 129.28433333333334,
+  "gate_audit_rows": 532,
+  "top8_state_observations": 240,
+  "positive_gate_rows": 492,
+  "benign_positive_gate_rows": 466,
+  "warnings": [
+    "Gate counts are not numeric applied weights or proof of nonzero model contribution",
+    "State display covers only the top eight; category totals can overlap on a blacklisting round",
+    "ASR includes target-class samples; no semantic targeted ASR is logged",
+    "Hardware telemetry and TEE are simulated in this local run",
+    "Elapsed time is the Flower run, not isolated audit, attestation or aggregation time",
+    "Current code hashes do not establish the historical execution version",
+    "No ten-run means/SDs or ablation results are reconstructed"
+  ],
+  "source_sha256": {
+    "Flwr/log/client_0.log": "14f72cd5a6e0b285a0d863fe1f76aac57f1dbca3ae8a79e83c9a86f0af6c9c48",
+    "Flwr/log/client_1.log": "8a55c26011d94a9dfebd884a949ddf160fe1b81d5c497e17e31c196f9bb1cedf",
+    "Flwr/log/client_10.log": "5522c5529942732b84117ca8da4c3872fba8ff181562e1eb0f00d617904e73ca",
+    "Flwr/log/client_11.log": "226948078b87b4c868153c9ea51034dfa39120cad8fe10642376ed6a14e89ce8",
+    "Flwr/log/client_12.log": "cd192c77e600b8b32981498f1adf4727995beb67f5114837374e78cc93c58e78",
+    "Flwr/log/client_13.log": "225f49444ae5a035610b62ec91fb8e5ed5843c4d28df5b71e9c42ecc54a4497b",
+    "Flwr/log/client_14.log": "bb91f071f9ba121018ff46bab8408b2c3c213be9ddb8b7abe6a036385b8ec75b",
+    "Flwr/log/client_15.log": "41547d160bf3d0c51534bd987c2a988335ca2d792c59d30e525509881de5e529",
+    "Flwr/log/client_16.log": "73ff53ef8e8b418c1ac37df97549839d445242edb0eb0722116ac8f63752e1e7",
+    "Flwr/log/client_17.log": "de6508caf6fba9887a410151b13856530d3179903eddb01b978cff16b2c0dee6",
+    "Flwr/log/client_18.log": "6054a5224a113c695f786a9857f289aff2ffe4481635de5dd14b6cb19361fc9d",
+    "Flwr/log/client_19.log": "62c57cec05d6cdd194f9c440b124f516b407ce101591ad59f9ed51161b678d10",
+    "Flwr/log/client_2.log": "888ceefd1eebb097d60d7c9fc4d4c9bfc47d8dae86f57162fc856cd5f8c1536a",
+    "Flwr/log/client_3.log": "e1f7b744ba4a1cd94d933d5034f3f4c44bf1ca1a46359187ac2b5aa04bd60f19",
+    "Flwr/log/client_4.log": "12cff69831cf373d8966102f9ee0ebc0fce4289b1fee717fee3cce13e06776f7",
+    "Flwr/log/client_5.log": "901563f1402d74b628666ce8b88ccf26b7ef80d73c9d25b61fe42af9e4e3a265",
+    "Flwr/log/client_6.log": "e26b1ea585b131e206ca3b26a1c55af7c1a18d94c7ad7d9b213d63a1d74b6ccf",
+    "Flwr/log/client_7.log": "9c42f9d9314ac69efeba5551a14dc4d0aef5f057b5833f3dd824c3d03e9afba6",
+    "Flwr/log/client_8.log": "10e2a76eb44dfe96a2d01048202af894ff70bb3ad3489479563d6e62453b0fe2",
+    "Flwr/log/client_9.log": "9f2cfeb5a3fd54bea9d9b160834cece065e80e4c59e6632572441ce665c44654",
+    "Flwr/log/server.log": "7f3b9874b70eeb6dc9d8057a931d2639d3d45e6122727525ee89a48cc565c5ac",
+    "Flwr/log/tmaa_server_audit.log": "bb23eaf15a0cd8bace0b40470e27d96e297186ac8ff459f0b10d6fc69bdb1614",
+    "Flwr/run_simulation.sh": "09a79c671b6b183ef26403c7a2aa0d7b3528a4edc09466f526e1990f549f86e2",
+    "Flwr/Client/client.py": "7f0c096c14582d83838bd733d33788a1a06965cd60a5e8472d23624ccb35a006",
+    "Flwr/Client/dataset.py": "beff3abf7dae06343a1bc1e32e07a9d142a9e2cd4785baa17ad8e9534a251a1b",
+    "Flwr/Client/model.py": "e7f49011e851cb2efb2ded6b0d7210d33f07cd59ed82530d7149bba7b44e78a8",
+    "Flwr/Client/poison/attack_wrapper.py": "4c0fcab271a92dfc3f3cfb0ed8060709f0bfa33a06942239141dc74c8adc1d6a",
+    "Flwr/Client/tmaa/tee_sim.py": "11c44c01b45092ddf8a3672d288b7e412f709063d4fa2a3d7a5957b1a43274a2",
+    "Flwr/Client/tmaa/sidecar.py": "5861c7c832079348b02b73fc90e9cd04db4b322a7d37a808517720dc6dae4130",
+    "Flwr/Client/tmaa/monitor.py": "596e421a75234c8fd73decacaadc5802574d0543c7463f567757603cbb7047b4",
+    "Flwr/server/server.py": "92eb568adbab4ac4505f893ca651d30851e1f24a6a38d36417fbc53478cc9042",
+    "Flwr/server/strategy.py": "f2d7c830500a44ccc1e93cb5ad5f5bd4c188c99d08c355b40262420ba83d9910",
+    "Flwr/server/sensitivity.py": "0b1185c2410c4f09f52571fea6a78eb35c7243e509f04fdfdf4d6394f8a63c72",
+    "Flwr/server/trust_manager.py": "cf7b6f53a8f631ead2a5b2c624cc00d7f1c4a3c2bb58ca8f41c08337d70f6c23",
+    "Flwr/server/contribution.py": "b7cb6b461a2e1753c1fe4640366497584ae87b343cdda6251f3ce939121b7ea6",
+    "Flwr/data/cifar-10-batches-py/test_batch": "f53d8d457504f7cff4ea9e021afcf0e0ad8e24a91f3fc42091b8adef61157831"
+  }
+}

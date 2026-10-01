@@ -21,3 +21,4 @@ cifar-*/
 cifar-*
 # 日志文件
 *.log
+/PaperWriting/IEEE ISPA/Template/official_sources/overleaf_ieee_compsoc_template.html
