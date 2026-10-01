@@ -1,0 +1,24 @@
+name                                 type              encoding         emb sub uni object ID
+------------------------------------ ----------------- ---------------- --- --- --- ---------
+XDFSIP+NimbusRomNo9L-Medi            Type 1            Custom           yes yes yes      7  0
+JAJZJL+NimbusRomNo9L-Regu            Type 1            Custom           yes yes yes      8  0
+LHSKPT+NimbusRomNo9L-ReguItal        Type 1            Custom           yes yes yes      9  0
+LREKMX+NimbusRomNo9L-MediItal        Type 1            Custom           yes yes yes     10  0
+KXYRPZ+CMMI10                        Type 1            Builtin          yes yes yes     16  0
+VMKHPE+CMMI7                         Type 1            Builtin          yes yes yes     17  0
+ARDAIP+CMSY7                         Type 1            Builtin          yes yes yes     18  0
+QLBSWT+CMR7                          Type 1            Builtin          yes yes yes     19  0
+IQIEBK+CMR10                         Type 1            Builtin          yes yes yes     20  0
+WRIELA+CMSY10                        Type 1            Builtin          yes yes yes     21  0
+XWLZCW+CMEX10                        Type 1            Builtin          yes yes yes     22  0
+KZETDM+CMMI8                         Type 1            Builtin          yes yes yes     23  0
+GBKQXV+CMMI6                         Type 1            Builtin          yes yes yes     24  0
+HBIEHQ+CMSY6                         Type 1            Builtin          yes yes yes     25  0
+WIRDCL+CMR6                          Type 1            Builtin          yes yes yes     26  0
+DCGEID+CMR8                          Type 1            Builtin          yes yes yes     30  0
+ABXTFM+CMSY8                         Type 1            Builtin          yes yes yes     31  0
+HVMMVS+CMMI5                         Type 1            Builtin          yes yes yes     35  0
+UAGOMC+CMBX10                        Type 1            Builtin          yes yes yes     40  0
+BMQQDV+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     47  0
+BMQQDV+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     83  0
+BMQQDV+DejaVuSans                    CID TrueType      Identity-H       yes yes yes    103  0

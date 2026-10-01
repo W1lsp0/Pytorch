@@ -1,8 +1,0 @@
-{
-  "status": "success",
-  "started_at": null,
-  "elapsed_seconds": null,
-  "recovered_after_supervisor_exit": true,
-  "validated_fit_rounds": 30,
-  "validated_evaluate_rounds": 30
-}

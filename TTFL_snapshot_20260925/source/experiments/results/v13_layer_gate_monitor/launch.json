@@ -1,8 +1,0 @@
-{
-  "started_at": 1790660562.1203916,
-  "local_pid": 961098,
-  "remote_pid": 32749,
-  "watcher_pid": 964328,
-  "mode": "host-local dynamic queue",
-  "reason": "User authorized immediate scheduling on free GPUs; V12 has finished."
-}

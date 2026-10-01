@@ -1,7 +1,0 @@
-{
-  "status": "complete",
-  "verified_runs": 6,
-  "audit_recovered_blacklist_records": true,
-  "report": "/data1/lab409/W1lsp0/Pytorch/TTFL_snapshot_20260925/source/experiments/results/v9_risk_soft_probation_matrix_seed20240930_retry/candidate/risk_soft_probation_report.md",
-  "decision": "Candidate reduces false exclusions but does not meet joint objective: persistent-backdoor ASR worsens; keep RISK_SOFT_PROBATION off by default. Continue mechanism search."
-}

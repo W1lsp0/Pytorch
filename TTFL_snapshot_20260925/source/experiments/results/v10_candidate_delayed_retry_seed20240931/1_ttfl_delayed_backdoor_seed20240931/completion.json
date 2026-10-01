@@ -1,6 +1,0 @@
-{
-  "status": "failure",
-  "started_at": 1790599357.8744147,
-  "error": "temporary directory must be under the allowed root and at most 70 bytes long",
-  "elapsed_seconds": 0.01525735855102539
-}

@@ -108,7 +108,7 @@ acc_line, = ax.plot(
     marker="o",
     markersize=4,
     linewidth=2.4,
-    label="Accuracy (Trust Flow, from Fig.10)",
+    label="Accuracy (Trust Flow)",
 )
 asr_line, = ax2.plot(
     rounds,

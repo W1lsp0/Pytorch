@@ -1,6 +1,0 @@
-{
-  "status": "success",
-  "recovered_after_supervisor_exit": true,
-  "validated_fit_rounds": 30,
-  "validated_evaluate_rounds": 30
-}

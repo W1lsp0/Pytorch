@@ -1,0 +1,492 @@
+{
+  "standard": [
+    {
+      "scenario": "backdoor",
+      "method": "fedavg",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5461499999999999,
+        "sd": 0.009545941546018361
+      },
+      "final_asr": {
+        "mean": 0.09505555555555555,
+        "sd": 0.014220703043862748
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.18667962962962964,
+        "sd": 0.009236909693499832
+      },
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "backdoor",
+      "method": "fltrust",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.4803,
+        "sd": 0.06873077913133246
+      },
+      "final_asr": {
+        "mean": 0.18116666666666664,
+        "sd": 0.24536605307173195
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.19113518518518519,
+        "sd": 0.011578218813428593
+      },
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "backdoor",
+      "method": "single_stream",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5603,
+        "sd": 0.0009899494936612145
+      },
+      "final_asr": {
+        "mean": 0.053388888888888895,
+        "sd": 0.036376715521041283
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.13814814814814816,
+        "sd": 0.02154318660015014
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.13684210526315788,
+        "sd": 0.02977291710259147
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.2894736842105263,
+        "sd": 0.03721614637823934
+      }
+    },
+    {
+      "scenario": "backdoor",
+      "method": "ttfl",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.56085,
+        "sd": 0.005727564927611032
+      },
+      "final_asr": {
+        "mean": 0.07505555555555557,
+        "sd": 0.017206265008872675
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.15037222222222224,
+        "sd": 0.015365168463783236
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.04298245614035087,
+        "sd": 0.00620269106303989
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.07894736842105263,
+        "sd": 0.03721614637823934
+      }
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "method": "fedavg",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5526500000000001,
+        "sd": 0.007707463914933383
+      },
+      "final_asr": {
+        "mean": 0.09377777777777774,
+        "sd": 0.011627978179512133
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.1376111111111111,
+        "sd": 0.01843191676292934
+      },
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "method": "fltrust",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.48805,
+        "sd": 0.055649303679381285
+      },
+      "final_asr": {
+        "mean": 0.17077777777777786,
+        "sd": 0.2333452377915608
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.18304444444444445,
+        "sd": 0.013898576621322257
+      },
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "method": "single_stream",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.55855,
+        "sd": 0.007707463914933304
+      },
+      "final_asr": {
+        "mean": 0.10727777777777775,
+        "sd": 0.020191826973882495
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.10488611111111112,
+        "sd": 0.01721019337987925
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.16140350877192983,
+        "sd": 0.019848611401727653
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.3157894736842105,
+        "sd": 0.0
+      }
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "method": "ttfl",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5667500000000001,
+        "sd": 0.005020458146424484
+      },
+      "final_asr": {
+        "mean": 0.062499999999999986,
+        "sd": 0.02569154638311121
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.11547222222222221,
+        "sd": 0.018769756669496252
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.05789473684210526,
+        "sd": 0.019848611401727653
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.15789473684210525,
+        "sd": 0.0
+      }
+    },
+    {
+      "scenario": "none",
+      "method": "fedavg",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5652999999999999,
+        "sd": 0.0038183766184073284
+      },
+      "final_asr": {
+        "mean": 0.042833333333333334,
+        "sd": 0.006835365551469962
+      },
+      "attack_window_mean_asr": null,
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "none",
+      "method": "fltrust",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5460499999999999,
+        "sd": 0.016192745289171962
+      },
+      "final_asr": {
+        "mean": 0.054000000000000006,
+        "sd": 0.03566960873985475
+      },
+      "attack_window_mean_asr": null,
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "none",
+      "method": "single_stream",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5711999999999999,
+        "sd": 0.009050966799187833
+      },
+      "final_asr": {
+        "mean": 0.04705555555555556,
+        "sd": 0.010763736558061893
+      },
+      "attack_window_mean_asr": null,
+      "normal_mean_exclusion": {
+        "mean": 0.1475,
+        "sd": 0.022391714737574012
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.3,
+        "sd": 0.0
+      }
+    },
+    {
+      "scenario": "none",
+      "method": "ttfl",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.57345,
+        "sd": 0.0033234018715767215
+      },
+      "final_asr": {
+        "mean": 0.043166666666666687,
+        "sd": 0.0071496352319973195
+      },
+      "attack_window_mean_asr": null,
+      "normal_mean_exclusion": {
+        "mean": 0.05333333333333334,
+        "sd": 0.009428090415820635
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.1,
+        "sd": 0.0
+      }
+    }
+  ],
+  "known_trigger": [
+    {
+      "scenario": "backdoor",
+      "method": "single_stream",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5035499999999999,
+        "sd": 0.10769236277471118
+      },
+      "final_asr": {
+        "mean": 0.052944444444444454,
+        "sd": 0.026005816063638585
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.041212962962962965,
+        "sd": 0.005539003119294621
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.3640350877192982,
+        "sd": 0.1749158879777249
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.7894736842105263,
+        "sd": 0.29772917102591473
+      }
+    },
+    {
+      "scenario": "backdoor",
+      "method": "ttfl",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.55515,
+        "sd": 0.025667976157071674
+      },
+      "final_asr": {
+        "mean": 0.027166666666666672,
+        "sd": 0.011235141078852935
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.05575740740740741,
+        "sd": 0.010855398548215713
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.17982456140350878,
+        "sd": 0.058305295992574974
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.2894736842105263,
+        "sd": 0.03721614637823934
+      }
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "method": "single_stream",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.49069999999999997,
+        "sd": 0.1163897761833057
+      },
+      "final_asr": {
+        "mean": 0.024499999999999997,
+        "sd": 0.01626345596729059
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.04294722222222222,
+        "sd": 0.009675577789235924
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.44561403508771924,
+        "sd": 0.30517240030156256
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.763157894736842,
+        "sd": 0.3349453174041541
+      }
+    },
+    {
+      "scenario": "delayed_backdoor",
+      "method": "ttfl",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5612,
+        "sd": 0.013010764773832454
+      },
+      "final_asr": {
+        "mean": 0.025722222222222223,
+        "sd": 0.004164073266987451
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.04268611111111111,
+        "sd": 0.005739350040630816
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.1570175438596491,
+        "sd": 0.0334945317404154
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.2894736842105263,
+        "sd": 0.11164843913471803
+      }
+    },
+    {
+      "scenario": "none",
+      "method": "single_stream",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.56725,
+        "sd": 0.007848885271170676
+      },
+      "final_asr": {
+        "mean": 0.027000000000000007,
+        "sd": 0.007385337492392839
+      },
+      "attack_window_mean_asr": null,
+      "normal_mean_exclusion": {
+        "mean": 0.2375,
+        "sd": 0.04831896338108074
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.45,
+        "sd": 0.07071067811865474
+      }
+    },
+    {
+      "scenario": "none",
+      "method": "ttfl",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5649500000000001,
+        "sd": 0.01378858223313765
+      },
+      "final_asr": {
+        "mean": 0.026888888888888893,
+        "sd": 0.010999438818457406
+      },
+      "attack_window_mean_asr": null,
+      "normal_mean_exclusion": {
+        "mean": 0.155,
+        "sd": 0.04949747468305833
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.225,
+        "sd": 0.03535533905932737
+      }
+    }
+  ],
+  "recovery": [
+    {
+      "scenario": "recovery_backdoor",
+      "method": "fedavg",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.56215,
+        "sd": 0.004313351365237936
+      },
+      "final_asr": {
+        "mean": 0.038833333333333345,
+        "sd": 0.006206826190415272
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.2681984126984127,
+        "sd": 0.003647773077549598
+      },
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "recovery_backdoor",
+      "method": "fltrust",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5404,
+        "sd": 0.0164048773235279
+      },
+      "final_asr": {
+        "mean": 0.028944444444444446,
+        "sd": 0.0016499158227686254
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.21144444444444446,
+        "sd": 0.02357022603955162
+      },
+      "normal_mean_exclusion": null,
+      "normal_ever_excluded_rate": null
+    },
+    {
+      "scenario": "recovery_backdoor",
+      "method": "single_stream",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5660000000000001,
+        "sd": 0.00777817459305203
+      },
+      "final_asr": {
+        "mean": 0.0405,
+        "sd": 0.017677669529663688
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.1993888888888889,
+        "sd": 0.03895821646823027
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.12631578947368421,
+        "sd": 0.039697222803455286
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.2894736842105263,
+        "sd": 0.03721614637823934
+      }
+    },
+    {
+      "scenario": "recovery_backdoor",
+      "method": "ttfl",
+      "n": 2,
+      "final_accuracy": {
+        "mean": 0.5705,
+        "sd": 0.00509116882454321
+      },
+      "final_asr": {
+        "mean": 0.045333333333333344,
+        "sd": 0.010999438818457408
+      },
+      "attack_window_mean_asr": {
+        "mean": 0.2383015873015873,
+        "sd": 0.011358604167631481
+      },
+      "normal_mean_exclusion": {
+        "mean": 0.07105263157894737,
+        "sd": 0.031013455315199452
+      },
+      "normal_ever_excluded_rate": {
+        "mean": 0.15789473684210525,
+        "sd": 0.07443229275647868
+      }
+    }
+  ]
+}

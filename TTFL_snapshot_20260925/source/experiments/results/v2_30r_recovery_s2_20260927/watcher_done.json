@@ -1,7 +1,0 @@
-{
-  "status": "complete",
-  "completed_at": 1790472715.0896678,
-  "training_runs": 8,
-  "protocol_audit": "passed",
-  "recovery_report": "regenerated_after_missing-audit handling fix"
-}
