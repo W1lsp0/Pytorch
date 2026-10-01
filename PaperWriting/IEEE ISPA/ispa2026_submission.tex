@@ -141,6 +141,8 @@ The harmonic fusion requires both reference consistency and peer consistency, wi
 
 \subsection{Dual-Stream State Evolution}
 
+\textbf{Cold start and first-round evidence.} At $t=1$, $HistPerf_k^{(0)}$ and $RiskEMA_k^{(0)}$ represent initial conditions rather than accumulated client behavior; the runtime trust estimate and covariance likewise start from their filter initialization. In the reference-assisted experimental setting, the server can construct $g_{root\_clean}$ without a client history. Once the first local updates arrive, runtime reports, reference alignment, peer consistency, and the available risk probes provide current-round evidence. These checks do not require a previously established reputation: they assess the first submitted update, while the two temporal streams begin accumulating evidence for later decisions.
+
 A low content score can reflect either a useful client's skewed data or a harmful update. Since those cases require different participation decisions, Trust Flow retains historical utility and short-term risk separately. The historical stream treats normalized content quality as soft evidence in a decayed Beta reputation model. Good evidence increases $\alpha_k$, while weak evidence increases $\beta_k$; the expected historical utility is
 \begin{equation}
     HistPerf_k^{(t)}=\frac{\alpha_k^{(t)}}{\alpha_k^{(t)}+\beta_k^{(t)}+\varepsilon}.
@@ -158,6 +160,8 @@ The two streams meet only when computing aggregation privilege:
                      & \quad\times(1-RiskEMA_k^{(t-1)})^p .
 \end{align}
 The resulting state machine distinguishes NORMAL, SUSPECT, QUARANTINE, and BLACKLIST, as shown in Fig.~\ref{fig:state_machine}. A sleeper-burst attacker may accumulate historical utility during benign rounds, but a later trigger injection activates the risk probes and restricts its influence. A benign long-tail client follows a different path: low current similarity mainly affects its utility stream, and later positive contributions allow recovery. Keeping those paths separate avoids using one threshold for both contribution filtering and permanent exclusion.
+
+The previous-round indices in $RawScore_k^{(t)}$ apply to the temporal factors, whereas $TrustScore_k^{(t)}$ and $ContentScore_k^{(t)}$ use the current submission. First-round evidence can therefore lower the score used by the layer gates, and clipping bounds the surviving update. The first probe observations also enter $RiskEMA_k^{(1)}$, providing risk history for subsequent rounds. This distinguishes immediate control of an update's influence from persistent-risk blacklisting: an initial deviation can affect aggregation without, by itself, establishing sustained malicious behavior.
 
 \begin{figure}[!htb]
     \centering
