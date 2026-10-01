@@ -1,50 +1,86 @@
 # Submission 数据来源与复现
 
-当前稿件只有 `ispa2026_submission.tex` 和 `ispa2026_submission.pdf` 两个入口，文献库为 `ispa2026_references.bib`。不另存编号稿或图件对照册。
+当前只维护 `ispa2026_submission.tex`、`ispa2026_submission.pdf`，不另存编号稿或对照册。文献库为 `ispa2026_references.bib`。
 
 ## 文件用途
 
-- `figures/`：当前稿件使用的11个图像文件及三张逻辑图的imagegen提示词。
-- `protocol/`：构造输入下的控制器、固定配置、验证与绘图脚本、事件CSV和测试结论。
-- `local_evidence/`、`extract_local_evidence.py`：已有局部Flwr运行的只读提取材料，不代表作者完整实验。
-- `old/ispa2026_submission.tex/.pdf`：作者最初提供的ISPA底稿，作为原始来源保留；不是当前投稿入口。
-- `修改.md`、`修改1.md`、`修改2.md`、`修改3.md`：作者提供的修改意见。
-- `Template/`、`sources/`：模板和会议原始资料。
+- `figures/`：当前使用的图、逻辑图提示词及聚合图展示脚本。
+- `protocol/`：构造控制测试、配置、事件 CSV 和验证结果；不包含完整训练适配器。
+- `local_evidence/`、`extract_local_evidence.py`：已提取的局部 Flwr 诊断资料，不代表完整论文实验。
+- `old/`、`../Figure/`、`../main.tex`、PRICAI PDF：原始来源，未覆盖或改写。
+- `修改.md` 至 `修改4.md`：作者提供的修改意见。
+- `Template/`、`sources/`：原始模板与会议资料。
 
 ## 当前图表与正文引用
 
-旧图编号以作者提供的ISPA底稿为准。旧状态图和旧数据图直接复制原PDF，图内数据、文字、箭头、坐标、事件标记及训练轮数均未修改。
-
-| 正文图号 | 内容与来源 | 正文引用 |
+| 正文图号 | 内容与处理 | 正文引用 |
 |---|---|---|
-| Fig.1 | 系统／威胁边界；三角色逻辑图，使用imagegen | 系统边界段落 |
-| Fig.2 | 五阶段总览；参考旧Fig.3，使用imagegen | 状态控制章节开头 |
-| Fig.3 | 原四状态机；旧Fig.4 | 历史与状态小节 |
-| Fig.4 | 三栏分层聚合；参考旧Fig.5，使用imagegen | 聚合章节开头 |
-| Fig.5(a)(b)(c) | 旧Fig.6全部三个子图 | 原训练研究第一个小节，逐个引用(a)(b)(c) |
-| Fig.6(a)(b) | 旧Fig.7全部两个子图 | 组件分析小节，逐个引用(a)(b) |
-| Fig.7 | 旧Fig.8异质性图 | 数据异质性小节 |
-| Fig.8，附录A | 构造恢复测试，来源为控制器事件CSV | 恢复测试小节及附录 |
+| Fig.1 | 系统与报告边界；原 imagegen 图保持，缩至 0.94 倍版心宽度 | 系统边界 |
+| Fig.2 | 五阶段流程；保留当前结构 | 状态控制开头 |
+| Fig.3 | 沿用作者旧状态图的圆形节点、颜色和上下分区，使用 imagegen 重构五条边并加入条件 | 历史、风险与持续转移 |
+| Fig.4 | 三栏分层聚合；保留图内内容 | 聚合章节 |
+| Fig.5(a)(b) | 训练实测曲线和客户端轨迹；移除 t-SNE 子图，曲线 PDF 本身不变 | 训练结果逐个引用 |
+| Fig.6(a)(b) | 聚合变体和异质性；数值不变，中性标题，移除 Renorm Benefit 箭头及差值线 | 组件与数据划分逐个引用 |
+| Fig.7，附录 | 构造恢复测试；保持原图，未伪装成训练曲线 | 控制验证与附录 |
 
-三张逻辑图使用内置 `image_gen.imagegen` 工具，完整提示词位于 `figures/imagegen_prompts.json`。原图来源位于 `../Figure/`。旧四状态图的直接跨级箭头属于原设计，Table 1规定当前控制器的逐级规则；图注保留此区别。探针图原ASR标签不改，正文没有将untargeted攻击柱高解释成统一targeted ASR或精度下降。旧训练图列在 `Original Training Study`，没有冒充重新运行控制器的结果。
+状态转移表已删除；具体规则由 Fig.3 和正文给出。Fig.3 只含 NORMAL→SUSPECT、SUSPECT→QUARANTINE、QUARANTINE→BLACKLIST、QUARANTINE→SUSPECT、SUSPECT→NORMAL 五条边，BLACKLIST 表示服务器永久拒收，不表示厂商撤销 TEE 凭据。原状态图完整保留在 `../Figure/fig4_state.pdf`。
 
-## 构造验证与局部日志
+`figures/imagegen_prompts.json` 保存四张当前逻辑图的完整提示词。未采用最初生成的横排矩形状态图，采用的是作者确认可重构后生成的原圆形布局图。
 
-`protocol/results/validation.json` 保存11组构造控制测试的结论及实现、配置、测试脚本哈希。`state_events.csv`、`block_events.csv`、`layer_events.csv`记录实际执行该测试得到的状态、权重与增量；它们不是CIFAR-10训练或硬件测量。
+Fig.5(a) 的旧标题含 “ASR Baseline”；LaTeX 仅裁去顶部 21 bp 标题带并排入中性标题，数据区域、坐标和事件不变。红线根据作者确认按实测 ASR 曲线说明，不称固定基准线，不擅自等同于每轮三类攻击宏平均。图中终点 92.30% 与主表的重复运行均值 92.31% 分开解释。
 
-恢复测试让20个客户端从QUARANTINE开始，每次提交相同二维向量和有利审计证据：第4次产生非零贡献、第6次回到NORMAL。纯EMA最大风险序列第18次进入BLACKLIST。测试没有产生分类准确率、ASR、平台耗时或重复训练SD。
+Fig.6(a) 由 `figures/plot_aggregation_comparison.py` 输出。三条数组逐项保持 `../Figure/plot_ablation_final.py` 的值和完整 0–50 轮范围；没有新插值、拟合或导入局部日志。仅改标题、删除因果箭头及差值标记；第 30 轮参考线保留。Fig.6(b) 由 LaTeX 仅覆盖旧标题所在的上方区域并排入中性标题，原 PDF、坐标轴、刻度和所有数值、曲线不变。
 
-`local_evidence/`及`protocol/results/legacy_observed_events.csv`来自此前核查过的单次局部Flwr日志。缺失瞬时风险、实际权重等字段保持空值；本地代码不是完整原实验的替代品。没有因某项本地指标有利而合并不同配置或补出原消融结果。
+探针柱图的 untargeted 类别缺少可核验的统计量定义，t-SNE 缺少特征、点身份和拟合说明，两图暂不用于正文或附录效果证据；原始文件完整保留在 `../Figure/`，本目录已清理未使用的重复副本，不修改其轴标签来假装解决指标问题。
+
+## 修改4的数据确认与未补造项目
+
+- 作者于 2026-10-01 明确答复上述曲线“就是实测”。据此保留测量语义；原脚本中的 “Interpolated data” 注释及收敛草稿中的重构/插值事实如实记录，不因该注释单独否定作者确认，也不宣称已核验原始逐轮日志。
+- 正文补充的设置来自 `../main.tex` 和作者对两平台各五次的确认。PRICAI 曾写轻量 CNN / 五次，不能自动将其每条旧曲线绑定到 ResNet-18 / 十次；具体图件的模型、划分与运行身份仍需原记录建立对应。
+- 主结果表仅列作者确认的 TTFL 原报告：Acc 92.31±0.09、reported targeted ASR 10.21±0.05、最终正常客户端封禁 FPR 0.00%。这是原报告汇总，未根据单次本地日志重算，不当作修订控制器的训练成绩。
+- 未恢复缺少逐运行对应关系的基线主表行；三类 ASR 的分子分母、目标类排除、C2 扰动预算、C3 属性、SD 统计脚本仍未补出。
+- 原共享池为 5,000/50,000 张唯一训练图像，不能写成每客户端 10%；本地占比应为 5000/(5000+独占样本数)。Dirichlet 描述独占部分。敏感性扫描的逐客户端分配清单和池比例消融仍缺失。
+- 500 张 proxy 来自 CIFAR-10 测试源划分；与最终评价及 calibration 的索引交集尚不能核验。没有凭空改为 9,500 张独立测试集，也没有宣称三者已证明不相交。
+- 没有新增硬件参数、耗时、训练结果、整数封禁人数或统计显著性；没有导入新的局部日志数值。
+
+## 原训练实现与当前控制器：内部核对
+
+下表的代码列仅指当前可读的局部快照，**不是**已确定的原论文完整执行版本。它能发现接口差异，不能证明原论文实际运行采用了这些差异。
+
+| 操作 | 原文／局部快照的可核对事实 | 当前控制器 | 结论 |
+|---|---|---|---|
+| 无同伴恢复 | 原文未完整规定；`Flwr/server/contribution.py` 单客户端回退到服务器贡献评分，`strategy.py` 有全体客户端参考兜底 | 无可用同伴时使用服务器质量与范数；隔离客户端不进入同轮同伴统计 | 不能宣称旧运行必然同伴死锁 |
+| 历史与持续次数 | PRICAI 图写 HistPerf<0.26；`trust_manager.py:update_history` 使用相对/绝对信号的 EMA，风险更新另有瞬时覆盖和攻击专门分支 | 单位 Beta 证据、纯 RiskEMA、五条持续转移 | 不仅是记号变化；不能由局部代码证明全实现一致 |
+| 门控分数 | `strategy.py:884` 按 raw_score 与门槛比较 | 门控用 G=F/U，权重保留 F | 需匹配训练核对效果 |
+| 裁剪尺度 | `sensitivity.py` 使用常数 c_base=2.0 与敏感度 | 每参数块中位范数，空统计集用服务器块范数 | 局部快照不匹配当前尺度 |
+| 权重与空集合 | `strategy.py:894` 空 survivor 跳过；权重 raw_score/(sum+1e-9)，未乘样本数 | 正权重 nF/sum(nF)，空集不更新 | 空集规则有共同点，实际权重不同 |
+
+目前没有配置完整且可对应原结果的训练适配器，因此没有宣称完成原实现与修订实现的同配置训练对照。正文说明了这项缺口，构造测试不替代它。
+
+## 构造验证与复现
+
+`protocol/results/validation.json` 保存 11 组控制测试结果及源码哈希。`state_events.csv`、`block_events.csv`、`layer_events.csv` 是实际执行构造输入得到的记录，不是 CIFAR-10 或硬件测量。
+
+集体恢复组现在含同条件双分支：20 个客户端初始 QUARANTINE、风险 0.95、历史 0.5、相同二维更新和服务器观测；服务器审计分支第 4 次恢复非零聚合、第 6 次全部 NORMAL。另一分支仅要求审计还必须具有可用同伴，十次尝试均冻结、聚合为零。两个分支分别标为 `collective_recovery`、`peer_required_recovery`。附录恢复图仍仅绘制原服务器审计轨迹，未改动。
+
+`threshold_peer_counterexample.csv` 是故意将阈值解释为 0.74 并强制同伴的反例，原 `legacy_deadlock.csv` 已改名；不代表 PRICAI 或原训练实现确实采用该阈值。最大风险第 18 次进入 BLACKLIST 的既有构造结果保持。
+
+`local_evidence/` 与 `legacy_observed_events.csv` 保持为先前局部日志诊断，缺失字段不补造，未作为十次运行的替代来源。
 
 复现命令（在本目录执行）：
 
 ```bash
 ./build_submission.sh
-python protocol/validate.py
+PYTHONDONTWRITEBYTECODE=1 python protocol/validate.py
 python protocol/plot_validation.py
+python figures/plot_aggregation_comparison.py
 ```
 
-构建脚本只输出 `ispa2026_submission.pdf`，编译中间文件在临时目录中生成并自动清理。后两条命令只执行构造控制测试及绘图，需要NumPy与Matplotlib；不会启动联邦训练或连接数据库。局部日志的只读提取命令是 `python extract_local_evidence.py`，合并已记录事件使用 `python protocol/audit_old_trace.py`，两者与构造验证分别处理。
+构建仅更新 submission PDF，中间文件在临时目录内自动清理。后三项仅做控制测试或重现图件，不启动联邦训练或连接数据库。
+
+## 当前交付核验
+
+submission PDF 为 10 页；7 组图（含附录）及 3 张表均有正文引用，9 个图像依赖完整，字体均嵌入且没有 Type 3 字体。没有未定义引用、重复标签或 overfull box。LaTeX 对第 9 页仅由表格和恢复图组成的右栏发出 float-only 提示，已检查渲染，二者均位于附录且在第 10 页参考文献之前，无裁切或重叠。原始图目录、main.tex、PRICAI PDF 和 old 底稿哈希保持不变；三条聚合数组逐项不变；原有控制事件逐项保持，新增事件仅属于标记清楚的 peer-required 构造分支。
 
 ## 原实验条件与作者确认
 
@@ -79,7 +115,7 @@ PRICAI PDF 描述轻量 CNN / 五次运行，main.tex 描述 ResNet-18 / 两个�
 | 主表 FLTrust：Acc / ASR | 81.25±1.50 / 15.42±1.10 | [main.tex:519](/root/code/Pytorch/PaperWriting/main.tex:519) | 同上 |
 | 主表 Trust Flow：Acc / ASR / 最终 FPR | 92.31±0.09 / 10.21±0.05 / 0.00% | [main.tex:520](/root/code/Pytorch/PaperWriting/main.tex:520) | 同上；不作为新门控规则的实证 |
 | 50% 边界测试：Acc / ASR / 最终 FPR | 91.81±0.10 / 10.46±0.06 / 0.00% | [main.tex:459](/root/code/Pytorch/PaperWriting/main.tex:459) | 仅原报告压力测试，不从 Flwr-half 取数 |
-| 单流 aggressive：最终 FPR / TPR | 18.25% / 95.12% | [main.tex:546](/root/code/Pytorch/PaperWriting/main.tex:546) | 不改标成 review；计数口径有待核实，表中加标记 |
+| 单流 aggressive：最终 FPR / TPR | 18.25% / 95.12% | [main.tex:546](/root/code/Pytorch/PaperWriting/main.tex:546) | 不改标成 review；计数口径有待核实，当前正文不列该消融行 |
 | 单流 conservative：最终 FPR / TPR | 2.10% / 48.33% | [main.tex:547](/root/code/Pytorch/PaperWriting/main.tex:547) | 同上 |
 | HistPerf-only：最终 FPR / TPR | 0.15% / 21.05% | [main.tex:549](/root/code/Pytorch/PaperWriting/main.tex:549) | 同上 |
 | Trust Flow：最终 FPR / TPR | 0.00% / 100.00% | [main.tex:550](/root/code/Pytorch/PaperWriting/main.tex:550) | 独立的最终封禁列 |
@@ -96,4 +132,4 @@ PRICAI PDF 描述轻量 CNN / 五次运行，main.tex 描述 ResNet-18 / 两个�
 
 若每次运行固定有 14 个正常客户端、6 个恶意客户端，共十次，并按最终二元封禁事件等权平均，则 FPR 的步进为 `100/140 ≈ 0.714286` 个百分点，TPR 步进为 `100/60 ≈ 1.666667` 个百分点。前三组消融数字不能由这一计数规则四舍五入得到。
 
-这**不等于认定原结果错误**；可能存在其他运行数、客户端数、试验组合或加权方式，但核查时没有依据选定其中任何一种。稿件保留用户确认的最终封禁语义和原值，同时明确计数/汇总规则待核实。不能把它们擅自解释成逐轮 review 来消除矛盾。
+这**不等于认定原结果错误**；可能存在其他运行数、客户端数、试验组合或加权方式，但核查时没有依据选定其中任何一种。来源记录保留作者确认的最终封禁语义和原值；因计数/汇总规则待核实，相关消融行未纳入当前正文。不能把它们擅自解释成逐轮 review 来消除矛盾。

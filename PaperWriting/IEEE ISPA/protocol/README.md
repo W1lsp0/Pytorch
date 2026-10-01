@@ -34,15 +34,23 @@ included and must not mistake a state dictionary's buffers for these blocks.
 `results/validation.json` records the eleven test groups and hashes of the
 controller, configuration and validation script. The fixtures have no measured
 accuracy or attack success rate. `state_events.csv`, `block_events.csv`, and
-`layer_events.csv` are executed synthetic traces; `legacy_deadlock.csv` is an
-independent reproduction of the prior manuscript's failure condition.
+`layer_events.csv` are executed synthetic traces; `threshold_peer_counterexample.csv` evaluates a deliberately wrong utility
+cutoff of 0.74 combined with mandatory peers; it is not a reconstruction of a
+training run or evidence that the original implementation used that cutoff.
 
 `legacy_observed_events.csv` is different: it joins the *existing local logs*
 and keeps unrecorded instantaneous risk, full state and applied-update fields
 empty. Displayed state is not asserted to be a complete state-machine truth.
 The local snapshot's risk override and blacklist branches differ from this controller.
 
-The figure `../figures/collective_recovery.pdf` uses only the new recovery trace.
+The collective-recovery test also executes a matched peer-required arm with
+identical initial states, update/reference vectors, proxy observations, and
+controller parameters. Only audit admission additionally requires usable peers.
+This arm remains quarantined with zero updates through ten attempted audits;
+its events are labeled `peer_required_recovery` in the same CSV files. This is
+a constructed policy comparison, not a rerun of the partial training code.
+
+The figure `../figures/collective_recovery.pdf` uses only the server-supported recovery trace.
 All 20 clients have identical inputs in that fixture; the plotted state and risk
 are their common trajectory, not an average with omitted variability. The
 bottom panel is the actual aggregate increment norm of a two-dimensional toy
@@ -50,4 +58,5 @@ block. Its arbitrary units must not be relabeled as model performance.
 
 For this project, new non-data logic diagrams use the imagegen skill as requested
 by the author. Quantitative figures use reproducible plotting tools and recorded
-data. Existing figures remain unchanged.
+data. Measured plot values remain unchanged; presentation-only changes are documented
+in the parent `DATA_PROVENANCE.md`.

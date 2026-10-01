@@ -1,4 +1,4 @@
-"""Executable control core for revision 7; no training, database or TEE claims.
+"""Executable TTFL control core; no training, database or TEE claims.
 
 The server supplies gradient/proxy measurements and an ordered trainable tensor
 manifest. The validation fixtures deliberately inject constructed evidence.

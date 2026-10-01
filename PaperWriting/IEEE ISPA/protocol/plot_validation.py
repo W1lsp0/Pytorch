@@ -15,7 +15,8 @@ FIGURES = HERE.parent / "figures"
 FIGURES.mkdir(exist_ok=True)
 states = [r for r in csv.DictReader((RESULTS/"state_events.csv").open())
           if r["case"] == "collective_recovery" and r["client_id"] == "0"]
-layers = list(csv.DictReader((RESULTS/"layer_events.csv").open()))
+layers = [r for r in csv.DictReader((RESULTS/"layer_events.csv").open())
+          if r["case"] == "collective_recovery"]
 plt.rcParams.update({"font.family":"DejaVu Serif", "font.size":8, "pdf.fonttype":42,
                      "svg.fonttype":"none", "axes.spines.top":False,
                      "axes.spines.right":False, "axes.linewidth":.7,

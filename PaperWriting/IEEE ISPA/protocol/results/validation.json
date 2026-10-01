@@ -2,7 +2,7 @@
   "evidence_type": "Constructed control tests; not training or hardware measurements",
   "tests": [
     {
-      "test": "legacy_deadlock_reproduced",
+      "test": "threshold_peer_counterexample",
       "passed": true,
       "details": {
         "suspect_round": 2,
@@ -27,7 +27,10 @@
         "clients": 20,
         "initial_risk": 0.95,
         "first_nonzero_applied_round": 4,
-        "all_normal_round": 6
+        "all_normal_round": 6,
+        "matched_peer_required_rounds": 10,
+        "peer_required_recovered_clients": 0,
+        "peer_required_applied_norm": 0.0
       }
     },
     {
@@ -116,8 +119,8 @@
   ],
   "passed": 11,
   "source_sha256": {
-    "controller.py": "2feb410ef6f5efd972d24250aa5759d83d73e78f97d6e176fcdd7c1966041da2",
+    "controller.py": "59d1158b33cb5cd60a11377df52b65d98386ea870a1306e7e7b7794e5cf86087",
     "config.json": "e6f3ab33ffff593942be3a99e8feed1cfcdced3c328166837cb6f4504292c26c",
-    "validate.py": "67220b7b0606394b6101e70bd09720ff88a8ee8dbb4cd19f8df061feeac07131"
+    "validate.py": "c944756ec23b50cf3219e0916f1f4c01c894010db668f73a98bd42ac24fedbe7"
   }
 }

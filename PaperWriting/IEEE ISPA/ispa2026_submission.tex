@@ -1,5 +1,5 @@
 % ISPA submission manuscript.
-% Original-study figures retain their data and labels; constructed checks remain separate.
+% Training-study measurements and constructed controller tests have distinct scopes.
 \documentclass[conference,compsoc]{IEEEtran}
 
 \usepackage[T1]{fontenc}
@@ -8,6 +8,7 @@
 \usepackage{booktabs,multirow,array}
 \usepackage{threeparttable}
 \usepackage{graphicx}
+\usepackage{xcolor}
 \usepackage{flafter} % Keep floats after their source position and first mention.
 \usepackage{placeins} % Keep experimental floats out of the conclusion and references.
 \usepackage[nocompress]{cite}
@@ -35,22 +36,23 @@
 \maketitle
 
 \begin{abstract}
-    Federated learning must distinguish a client's past contribution from the risk
-    of its current update. Reversible restrictions can nevertheless become
-    permanent in practice if recovery requires an eligible peer population that
-    is itself empty. Trust Flow uses separate historical-utility and risk states,
-    a server-supported recovery audit, and layer gates scaled to an attainable
-    score envelope. The controller preserves quarantine exclusion while allowing
-    recovery evidence to advance without eligible peers. Parameter blocks receive
-    sample-size-weighted, clipped updates only after current-state and score
-    checks. An executable reference controller is evaluated with deterministic
-    boundary cases and bounded randomized inputs. In a constructed test with
-    all twenty clients initially quarantined, nonzero aggregation resumes at the
-    fourth successful recovery audit and all clients return to NORMAL at the
-    sixth. A maximal-risk sequence reaches BLACKLIST at submission eighteen,
-    consistent with the specified EMA and persistence rules. These results
-    establish the tested control behavior; classification robustness and hardware
-    attestation performance remain outside this verification scope.
+    Federated learning at the edge must distinguish benign data heterogeneity
+    from harmful updates without allowing past contributions to conceal current
+    risk. TTFL combines authenticated execution reports, server-side content
+    audits, and separate historical-utility and short-term-risk streams. The
+    streams control reversible participation states and layer-wise aggregation.
+    Server-supported recovery audits remove the need for eligible peers during
+    quarantine, while attainable score gates, block clipping, and survivor
+    normalization specify how admitted updates contribute. Evaluation has two
+    scopes: a CIFAR-10 training study of the original implementation under mixed
+    attacks, and executable checks of the explicit controller rules. The training
+    study reports accuracy, attack outcomes, client trajectories, and aggregation
+    comparisons; its results are not measurements of a retrained controller.
+    In a constructed test with twenty initially quarantined clients, aggregation
+    resumes at the fourth successful audit and all clients return to NORMAL at
+    the sixth; a matched peer-dependent audit remains frozen. The checks establish
+    conditional recovery and aggregation behavior. Matched training is still
+    needed to quantify the effect of the controller refinements on model quality.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -63,11 +65,24 @@ FL enables edge devices to train a shared model through parameter exchange while
 
 Existing defenses use geometric, statistical, reference-based, or temporal evidence to flag unusual updates \cite{blanchard2017krum,yin2018byzantine,cao2021fltrust,fung2020foolsgold,fldetector2022}. Backdoor-oriented methods additionally examine model behavior, learned representations, clusters, and collusion \cite{deepsight2022,flame2022,crowdguard2024,roseagg}. Such tests say little about how local training was executed, and the same tests can interpret Non-IID drift as an attack. TEE-assisted FL contributes a hardware-rooted execution boundary \cite{r1_tee_integrity,xu2021distributed,r5_tee_mitigating,lu2025tmt}; admission based on that boundary still leaves the semantic safety of an admitted update unresolved.
 
-The proposed \emph{Trust Flow} policy addresses this tension by maintaining historical utility and short-term risk as separate states. Historical utility records contribution, while current risk can restrict an update despite a favorable earlier record. These states connect TEE-based execution admission, content auditing, and layer-wise aggregation. Their separation permits different responses to weak contribution and persistent risk, but does not by itself identify the cause of a deviation. The contributions are:
+The proposed \emph{Trust Flow} policy maintains historical utility and
+short-term risk as separate states. Historical utility records contribution,
+while current risk can restrict an update despite a favorable earlier record.
+These states connect execution admission, content auditing, and layer-wise
+aggregation. A recovery path must also remain usable when the eligible peer
+population is empty, and layer thresholds must respect the range of the
+credibility score. The contributions are:
 \begin{tightenumerate}
-    \item A recovery audit uses server evidence independently of eligible peers, removing the circular dependency between quarantine exit and peer-reference availability.
-    \item A layer gate is scaled to the best attainable score at each client's evidence age, so uncertainty initialization cannot make every admissible score smaller than a fixed gate. State exclusion and an empty-survivor no-update rule remain explicit.
-    \item An executable controller and event-level verification connect evidence, transition counters, eligibility, numerical weights, and applied updates under constructed boundary conditions.
+    \item An evidence-driven dual-stream framework connects authenticated reports,
+    current-update audits, and persistent participation states, separating
+    recoverable restrictions from permanent server-side rejection.
+    \item Server-supported recovery and attainable layer gates make the control
+    rules explicit. Updated states determine eligibility; clipped survivors
+    receive sample-size- and credibility-weighted contributions.
+    \item A training study characterizes the original framework on CIFAR-10,
+    while executable boundary tests verify the specified recovery, state,
+    weighting, and empty-set behavior. The two evaluations retain separate
+    implementation and evidence scopes.
 \end{tightenumerate}
 
 \section{Background and Related Work}
@@ -76,7 +91,7 @@ The proposed \emph{Trust Flow} policy addresses this tension by maintaining hist
 
 \textbf{Poisoning and backdoor attacks.} Sign flipping and gradient scaling disrupt optimization by changing update directions or magnitudes. Trigger, clean-label, and semantic backdoors instead seek targeted errors while preserving plausible main-task behavior, so their updates can remain close to an expected direction \cite{bagdasaryan2020backdoor,wang2019neuralcleanse}. Across rounds, an attacker may also accumulate a favorable history before injecting a harmful update, making current behavior and past contribution potentially conflicting sources of evidence.
 
-\textbf{Active defenses and their limits.} Krum and Trimmed Mean remove geometric outliers \cite{blanchard2017krum,yin2018byzantine}, FLTrust weights updates against a clean direction \cite{cao2021fltrust}, and FoolsGold and FLDetector use cross-client or cross-round evidence \cite{fung2020foolsgold,fldetector2022}. DeepSight, FLAME, CrowdGuard, RoseAgg, FLPurifier, ShieldFL, and RaSA inspect representations, backdoor behavior, collusion, or privacy-preserving updates \cite{deepsight2022,flame2022,crowdguard2024,roseagg,flpurifier,shieldfl,wang2025rasa}. TMT-FL and related systems connect execution integrity to model training \cite{lu2025tmt}. These approaches observe different evidence spaces. Trust Flow places an interface between them: attestation determines execution eligibility, privacy-aware checks expose bounded statistics, content probes inspect the current update, and the two temporal streams decide future privileges. One observation can therefore alter a layer weight, a recoverable state, or a persistent state only when the corresponding rule is satisfied. The present evaluation isolates controller behavior; it does not rank these defenses by classification accuracy or attack success.
+\textbf{Active defenses and their limits.} Krum and Trimmed Mean remove geometric outliers \cite{blanchard2017krum,yin2018byzantine}, FLTrust weights updates against a clean direction \cite{cao2021fltrust}, and FoolsGold and FLDetector use cross-client or cross-round evidence \cite{fung2020foolsgold,fldetector2022}. DeepSight, FLAME, CrowdGuard, RoseAgg, FLPurifier, ShieldFL, and RaSA inspect representations, backdoor behavior, collusion, or privacy-preserving updates \cite{deepsight2022,flame2022,crowdguard2024,roseagg,flpurifier,shieldfl,wang2025rasa}. TMT-FL and related systems connect execution integrity to model training \cite{lu2025tmt}. These approaches observe different evidence spaces. Trust Flow places an interface between them: attestation determines execution eligibility, privacy-aware checks expose bounded statistics, content probes inspect the current update, and the two temporal streams decide future privileges. One observation can therefore alter a layer weight, a recoverable state, or a persistent state only when the corresponding rule is satisfied. The training study below retains only comparisons supported by the supplied study records; it does not establish a ranking against these recent defenses.
 
 \textbf{TEE-assisted trusted training.} TEEs protect execution and key material and have been used to support FL integrity and attack mitigation \cite{r1_tee_integrity,xu2021distributed,zhang2025rppfl,r5_tee_mitigating,lu2025tmt}. Attestation can bind a measured environment to a reporting key; the signed report must additionally bind freshness and the submitted update. TTFL treats this authenticated reporting interface as a system assumption and evaluates the downstream controller separately.
 
@@ -104,12 +119,12 @@ No platform-specific attestation or hardware timing result is claimed here.
 
 \begin{figure*}[!t]
     \centering
-    \includegraphics[width=\textwidth]{figures/system_boundary.png}
+    \includegraphics[width=0.94\textwidth]{figures/system_boundary.png}
     \caption{System roles and assumed reporting boundary. Red dashed paths locate
         attacks on inputs, objectives, or updates before signing. The protected
         agent binds identity, freshness, and model/update digests; the server audits
-        individual updates before aggregation. This boundary does not protect GPU
-        memory or establish sample and externally collected telemetry truth.}
+        individual updates before aggregation. The protected process authenticates reports, while content safety remains a
+        server-audit responsibility.}
     \label{fig:system_arch}
 \end{figure*}
 
@@ -137,7 +152,8 @@ freeze
     \end{split}
 \end{equation}
 A quarantined client supplies recovery evidence but never enters this round's
-peer statistics. Peer comparisons exclude the evaluated client itself.
+peer statistics. Here $\tau_s=0.64$ is the review-risk threshold.
+Peer comparisons exclude the evaluated client itself.
 
 \begin{figure*}[!t]
     \centering
@@ -147,7 +163,7 @@ peer statistics. Peer comparisons exclude the evaluated client itself.
         A client starting in QUARANTINE may provide server-audited recovery
         evidence without entering that round's peer statistics. Recovery to
         SUSPECT restores conditional aggregation eligibility in the same round;
-        Table~\ref{tab:states} specifies the transition rules.}
+        Section~\ref{sec:transitions} specifies the transition rules.}
     \label{fig:framework}
 \end{figure*}
 
@@ -185,10 +201,10 @@ available reference cosine. The direction risk is $(1-c_k)/2$ and the
 reference quality is $v_k=0.6+0.4c_k$. When the reference direction is
 unavailable, proxy behavior defines $v_k=(1-r_{loss,k})(1-r_{act,k})$.
 For usable peers $j\in\mathcal R_t\setminus\{k\}$, positive trust weights
-produce a mean cosine $\bar c_k$ and $a_k=0.6+0.4\bar c_k$. Then
+produce a mean cosine $\bar c_k$ and $S_{\mathrm{peer},k}=0.6+0.4\bar c_k$. Then
 \begin{equation}
     q_k=\begin{cases}
-        5a_kv_k/(4a_k+v_k), & \text{usable peers exist}, \\
+        5S_{\mathrm{peer},k}v_k/(4S_{\mathrm{peer},k}+v_k), & \text{usable peers exist}, \\
         v_k,                & \text{otherwise}.
     \end{cases}
 \end{equation}
@@ -224,9 +240,9 @@ are required inputs to the controller. Recovery fixtures use synthetic zero
 loss/activation changes and scales of one; those are test inputs, not fitted
 CIFAR-10 calibration values.
 
-Amplitude risk is $\operatorname{clip}(\|\Delta W_k\|/b_k-1,0,1)$, where
-$b_k$ is the median nonzero norm of usable peer updates. With no usable peer,
-$b_k=\|g\|$. The channel is omitted if this scale is at most $\varepsilon_n$.
+Amplitude risk is $\operatorname{clip}(\|\Delta W_k\|/m_{\mathrm{norm},k}-1,0,1)$, where
+$m_{\mathrm{norm},k}$ is the median nonzero norm of usable peer updates. With no usable peer,
+$m_{\mathrm{norm},k}=\|g\|$. The channel is omitted if this scale is at most $\varepsilon_n$.
 Instantaneous risk $z_k$ is the maximum of the two mandatory server channels
 and all available geometric channels. Missing proxy evidence freezes history,
 risk, and counters and yields zero aggregation weight. A full-update norm at
@@ -239,18 +255,20 @@ server. Loss of the server audit service intentionally suspends recovery;
 that external dependency is distinct from a circular peer-state dependency.
 
 \subsection{History, Risk, and Persistent Transitions}
+\label{sec:transitions}
 
-Figure~\ref{fig:state_machine} presents the four-state participation design
-from the original study. The executable controller uses the explicit
-transition and persistence rules in Table~\ref{tab:states}.
+Figure~\ref{fig:state_machine} connects the four participation states using
+explicit persistence conditions. Historical utility and short-term risk
+jointly determine review, while the starting state determines the available
+transition. BLACKLIST is enforced by the server rejecting future submissions.
 
 \begin{figure*}[!t]
     \centering
-    \includegraphics[width=0.84\textwidth]{figures/fig4_state.pdf}
-    \caption{Original four-state participation design, with its original arrows
-        and labels retained. The direct shortcut paths shown here belong to that
-        design; Table~\ref{tab:states} specifies the stepwise transitions used
-        in the executable controller verification.}
+    \includegraphics[width=0.90\textwidth]{figures/state_machine.png}
+    \caption{Four-state participation policy with explicit transition conditions.
+        $B_k=(H_k'<0.26)\lor(r_k'\ge0.64)$; the diagram suppresses the client
+        subscript. Counts refer to consecutive complete observations in the
+        starting state. Escalation takes priority, and BLACKLIST is terminal.}
     \label{fig:state_machine}
 \end{figure*}
 
@@ -269,32 +287,19 @@ independent evidence streams.
     B_k=(H_k'<0.26)\ \lor\ (r_k'\ge0.64).
 \end{equation}
 Thus 0.26 is a lower bound on historical utility, not a threshold on $1-H_k$.
-A favorable recovery observation satisfies $\neg B_k$. The transitions in
-Table~\ref{tab:states} are evaluated using the starting state and updated
+A favorable recovery observation satisfies $\neg B_k$. Transitions are
+evaluated using the starting state and updated
 history/risk. At most one transition occurs per complete submission; escalation
 has priority. Each counter counts consecutive qualifying observations in its
 starting state, resets on a failed condition, and all counters reset after a
 transition. Missing or no-operation submissions freeze counters. There is no
 instantaneous override of the EMA or extra attack-specific blacklist branch.
 
-\begin{table}[!htb]
-    \centering
-    \caption{Controller transitions; all thresholds apply to updated evidence.}
-    \label{tab:states}
-    \footnotesize
-    \setlength{\tabcolsep}{3pt}
-    \begin{tabular}{@{}p{1.95cm}p{3.8cm}p{1.85cm}@{}}
-        \toprule
-        Start      & Condition                                & End        \\
-        \midrule
-        NORMAL     & $B_k$ for 2 complete submissions         & SUSPECT    \\
-        SUSPECT    & $B_k$ for 3 submissions, or $z_k\ge0.80$ & QUARANTINE \\
-        QUARANTINE & $r_k'\ge0.90$ for 4 submissions          & BLACKLIST  \\
-        QUARANTINE & $\neg B_k$ for 2 submissions             & SUSPECT    \\
-        SUSPECT    & $\neg B_k$ for 2 submissions             & NORMAL     \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+From NORMAL, two consecutive $B_k$ observations lead to SUSPECT.
+From SUSPECT, three consecutive $B_k$ observations or a current $z_k\ge0.80$
+lead to QUARANTINE; two consecutive $\neg B_k$ observations restore NORMAL.
+From QUARANTINE, four consecutive $r_k'\ge0.90$ observations lead to BLACKLIST;
+otherwise, two consecutive $\neg B_k$ observations restore SUSPECT.
 
 Newly quarantined or blacklisted updates are excluded immediately. BLACKLIST
 also rejects future submissions. Recovery to SUSPECT restores conditional
@@ -408,169 +413,235 @@ normalized weight, pre/post-clipping norms, and applied contribution norm.
 Per-block logs additionally record survivor count, clipping radius, skipped
 updates, and the norm of the summed increment.
 
-\section{Original Training Study}
+\section{Training Study}
 \label{sec:original_study}
 
-The original CIFAR-10 study examines model learning, client-level behavior,
-component effects, and sensitivity to data heterogeneity. Its figures are
-reproduced below with their plotted values, event labels, and training horizons
-preserved. These results describe the original implementation; the constructed
-tests in Section~\ref{sec:verification} evaluate the revised executable
-controller separately. Restoring the figures does not constitute a new
-training run of that controller.
+\subsection{Protocol, Provenance, and Metrics}
 
-\subsection{Learning and Client Behavior}
+The CIFAR-10 results in this section concern the original training
+implementation. The author-confirmed protocol uses five matched seed, partition,
+and attack schedules on each of Intel and AMD platforms, giving ten
+platform--seed runs. Table~\ref{tab:training_setup} records this study's settings;
+it does not infer training settings from the controller fixtures. Admission
+tests additionally used five Sybil and three free-rider identities that were
+rejected before the twenty-client training statistics were collected.
+The supplied figures are confirmed by the authors as measurements, but their
+individual platform/seed identifiers and the complete aggregation script are
+not available in the current reproducibility bundle. The study summary and
+representative curves therefore have distinct statistical roles. The model and
+partition manifest associated with each retained curve is also not independently
+linked to Table~\ref{tab:training_setup}; the curves provide descriptive
+training evidence rather than a newly matched comparison.
+Section~\ref{sec:verification} separately checks the explicit controller;
+no unchanged training behavior is inferred for its recovery, gate, or clipping
+refinements.
 
-Figure~\ref{fig:main_results}(a) shows the original accuracy trajectory across
-communication rounds and the ASR baseline as labeled in the original plot.
-Figure~\ref{fig:main_results}(b) shows that client historical utility and risk
-can evolve differently. Detection, interception, and quarantine retain their
-original event labels rather than being reinterpreted as permanent blacklist
-events. Figure~\ref{fig:main_results}(c) provides a qualitative feature-space
-view rather than a separability guarantee.
+\begin{table}[!htb]
+    \centering
+    \caption{Reported training protocol. Missing run-level details are stated
+        explicitly; controller-test parameters do not fill those gaps.}
+    \label{tab:training_setup}
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}p{1.65cm}p{6.2cm}@{}}
+        \toprule
+        Item & Training-study setting \\
+        \midrule
+        Model & CIFAR-10 ResNet-18: $3\!\times\!3$ stride-1 stem, no initial
+        max pool, ten outputs; initialization checkpoint/seed list unavailable. \\
+        Clients & 20 admitted clients; 14 benign and 6 malicious. \\
+        Partition & 45,000 exclusive training images: clients 0--9 IID,
+        10--14 Dirichlet $\alpha=1$, 15--19 $\alpha=0.1$. \\
+        Shared pool & 5,000 training images copied to every client, in addition
+        to its exclusive partition; each local copy counts in $n_k$. \\
+        Server proxy & 500 balanced CIFAR-10 test-source images (50/class),
+        excluded from client training; exact indices unavailable. \\
+        Attacks & C0 label flipping ($0.5$); C1 trigger, C2 clean-label,
+        C3 semantic; C4 sign flipping; C5 $100\times$ scaling. \\
+        Optimizer & SGD, learning rate $0.001$, momentum $0.9$; three local
+        epochs; 30 rounds for the main study, 50 for aggregation comparison. \\
+        Repetitions & Intel and AMD, five matched schedules each; ten-run
+        reported mean and SD, without a platform-effect test. \\
+        Evaluation & Clean accuracy and reported targeted ASR; final-test and
+        calibration indices, overlap audit, and per-attack counts unavailable. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The trigger attack modifies 20\% of local samples with a bottom-right
+$3\times3$ patch and target class 0. The clean-label and semantic attacks also
+use 20\% subsets and target class 0; their perturbation budget and semantic
+attribute are not recoverable from the supplied study description. The five
+matched schedules control repeated data/attack randomization across platforms;
+ten platform--seed observations do not imply ten independent partitions.
+The shared pool is 10\% of unique training images, not 10\% of each client's
+local dataset. Its local fraction is $5000/(5000+n_k^{\mathrm{exclusive}})$.
+The Dirichlet parameters describe the exclusive portions; a shared component
+remains present in every client.
+
+Clean accuracy is the fraction of correctly classified evaluation images.
+For targeted attack $a$, the reported definition is
+$\mathrm{ASR}_a=|\{x\in\mathcal B_a:\arg\max f(x)=y_a^*\}|/|\mathcal B_a|$,
+and the study reports the macro-average over trigger, clean-label, and semantic
+attacks. The underlying per-attack counts and target-class exclusion rule are
+not supplied, so these values cannot be recomputed under a harmonized ASR
+protocol. Untargeted label/sign/scaling attacks are not terms in that average.
+Permanent-ban FPR counts benign clients ending in BLACKLIST, not temporary
+review or quarantine. Because the proxy originates from the test-source split,
+independence from final evaluation requires an index-level check that is not
+available here; held-out generalization is not established by this provenance.
+
+\subsection{Main Performance and Client Behavior}
+
+Table~\ref{tab:training_summary} retains the author-confirmed TTFL summary
+from the original manuscript. It is a reported aggregate, not a recomputation
+from partial local logs. Baseline rows without a complete matching run record
+are omitted from this table, so it supports no new method-ranking or
+significance claim. The zero permanent-ban FPR describes the tested benign
+clients; it does not imply that all their updates passed every layer gate.
+
+\begin{table}[!htb]
+    \centering
+    \caption{Reported TTFL training summary under 30\% mixed attacks.
+        Accuracy and ASR are the reported mean $\pm$ SD over ten platform--seed
+        runs; the per-attack ASR audit remains incomplete.}
+    \label{tab:training_summary}
+    \small
+    \begin{tabular}{@{}lc@{}}
+        \toprule
+        Metric & Reported value (\%) \\
+        \midrule
+        Clean accuracy & $92.31\pm0.09$ \\
+        Targeted ASR (reported macro-average) & $10.21\pm0.05$ \\
+        Benign permanent-ban FPR & $0.00$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Figure~\ref{fig:main_results}(a) shows the measured accuracy and recorded
+backdoor-ASR trajectories. The red series is an attack-success measurement,
+not a fixed reference line. Its mapping to the three per-attack outcomes is
+not documented, so it is not identified with the macro-average at every round.
+The displayed accuracy endpoint is 92.30\%, whereas Table~\ref{tab:training_summary}
+reports the repeated-run mean of 92.31\%; the curve is not used to recover that
+mean or its SD. Figure~\ref{fig:main_results}(b) shows distinct historical-utility
+and risk trajectories. Its detection, interception, and isolation annotations
+retain their original meanings and are not converted into BLACKLIST times for
+the executable controller. Together the panels describe learning and client
+behavior without equating temporary restriction with permanent removal.
 
 \begin{figure*}[!t]
     \centering
     \begin{minipage}[t]{0.49\textwidth}
+        \vspace{0pt}
         \centering
-        \includegraphics[width=\linewidth]{figures/fig6_convergence_asr.pdf}
+        {\small\bfseries Training accuracy and recorded backdoor ASR\par}
+        \smallskip
+        \includegraphics[width=\linewidth,trim=0 0 0 21bp,clip]{figures/fig6_convergence_asr.pdf}
         \par\smallskip
-        {\footnotesize (a) Original accuracy trajectory and ASR baseline.}
+        {\footnotesize (a) Accuracy and measured attack-success trajectory.}
     \end{minipage}\hfill
     \begin{minipage}[t]{0.49\textwidth}
+        \vspace{0pt}
         \centering
         \includegraphics[width=\linewidth]{figures/fig7_node_state_evolution_ispa.pdf}
         \par\smallskip
-        {\footnotesize (b) Original client history and risk traces.}
+        {\footnotesize (b) Client historical utility and risk.}
     \end{minipage}
-    \par\medskip
-    \begin{minipage}{0.67\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figures/fig8_tsne_visualization_ispa.pdf}
-        \par\smallskip
-        {\footnotesize (c) Original qualitative t-SNE visualization.}
-    \end{minipage}
-    \caption{Original-study learning trajectory and ASR baseline (a), client
-        history and risk (b), and qualitative t-SNE view (c).}
+    \caption{CIFAR-10 training behavior: (a) accuracy and recorded backdoor ASR
+        over 30 rounds; (b) representative client trajectories with detection
+        and restriction events. Curves describe the training implementation,
+        not the constructed controller tests.}
     \label{fig:main_results}
 \end{figure*}
 
-\subsection{Component Analysis}
+\subsection{Aggregation Variants and Data Partitions}
 
-Figure~\ref{fig:ablation_components}(a) compares the
-clean-reference, shallow-probe, and full-probe variants. Its untargeted attack
-categories and targeted backdoor category are not interpreted as a common
-targeted-ASR comparison. Figure~\ref{fig:ablation_components}(b) compares Global-Clipping, hierarchical
-gating without re-normalization, and the full method over the original
-50-round horizon. Its round-30 annotation is retained. Because those variants
-also differ in their aggregation operations, their entire performance gap
-cannot be attributed to normalization alone.
+Figure~\ref{fig:aggregation_partitions}(a) compares three operations over
+50 rounds. Global-Clipping applies a common clipping policy; hierarchical
+gating without renormalization removes disallowed layer contributions without
+redistributing their weights; the full method normalizes weights over each
+layer's survivors. The displayed curves also differ in gating and clipping,
+so the full performance gap cannot be attributed solely to normalization.
+The 30-round marker is a within-curve reference, not the end of this comparison.
+
+Figure~\ref{fig:aggregation_partitions}(b) compares the reported Dirichlet
+settings. The TTFL series changes less across the displayed settings than
+Krum and FLTrust. The shared pool remains part of the training protocol;
+$\alpha$ describes the exclusive data rather than the full local distribution.
+The sweep's exact per-client allocation manifests and repeated-run summaries
+are unavailable, so the plot does not establish distribution-independent
+robustness or isolate the effect of the shared pool.
 
 \begin{figure*}[!t]
     \centering
     \begin{minipage}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{figures/fig9_ablation_probes.pdf}
-        \par\smallskip
-        {\footnotesize (a) Original risk-probe comparison.}
-    \end{minipage}\hfill
-    \begin{minipage}[t]{0.49\textwidth}
+        \vspace{0pt}
         \centering
         \includegraphics[width=\linewidth]{figures/fig10_ablation_renorm.pdf}
         \par\smallskip
-        {\footnotesize (b) Original aggregation and re-normalization ablation.}
+        {\footnotesize (a) Aggregation variants over 50 rounds.}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \vspace{0pt}
+        \centering
+        % Cover only the old title band; all axes and data stay visible.
+        \begingroup
+        \setlength{\unitlength}{\linewidth}
+        \begin{picture}(1,0.65866)
+            \put(0,0){\includegraphics[width=\linewidth]{figures/fig11_alpha_sensitivity_ispa.pdf}}
+            \put(0.13,0.618){\color{white}\rule{0.87\linewidth}{0.041\linewidth}}
+            \put(0.56,0.635){\makebox(0,0){\small\bfseries Accuracy across data-partition settings}}
+        \end{picture}
+        \endgroup
+        \par\smallskip
+        {\footnotesize (b) Accuracy at the reported Dirichlet settings.}
     \end{minipage}
-    \caption{Original-study probe comparison (a) and aggregation ablation (b).
-        Original axes and category labels are retained; panel (b) shows the
-        complete 50-round horizon.}
-    \label{fig:ablation_components}
+    \caption{Training-study comparisons. (a) Global clipping, hierarchical
+        gating without weight renormalization, and full TTFL; the comparison
+        changes multiple aggregation operations. (b) Accuracy across exclusive-data
+        partition settings in the presence of a shared training pool. No
+        unreported uncertainty estimates are inferred from either panel.}
+    \label{fig:aggregation_partitions}
 \end{figure*}
 
-\subsection{Data-Heterogeneity Sensitivity}
-
-Figure~\ref{fig:alpha_sensitivity} reproduces the original accuracy comparison
-across Dirichlet parameters. In that reported sweep, the Trust Flow series
-varies less than the Krum and FLTrust series. The plot characterizes the
-original data-partition setting; the Dirichlet parameter alone does not
-describe the full local distribution when clients also use a shared pool.
-No additional uncertainty estimates or shared-pool ablation results are
-inferred from the plotted points.
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/fig11_alpha_sensitivity_ispa.pdf}
-    \caption{Accuracy under the data-heterogeneity settings reported in the
-        original study. Original points, methods, and axis labels are retained.}
-    \label{fig:alpha_sensitivity}
-\end{figure}
-
+\FloatBarrier
 \section{Executable Protocol Verification}
 \label{sec:verification}
 
 \subsection{Scope and Reproduction}
 
-The evidence in this section is generated by the reference
-controller and fixed configuration, not by training a classifier.
-\texttt{protocol/controller.py} implements the audit, states, envelope,
-and block aggregation; \texttt{config.json} fixes its parameters.
-\texttt{validate.py} executes eleven test groups and exports state, block,
-and layer events plus SHA-256 hashes. Constructed observations are explicitly
-identified as test inputs. The randomized check uses seed 20261001, 100
-sequences, and 100 observations per sequence. No repeated-training SD or
-statistical superiority is inferred from these checks.
-Table~\ref{tab:verification} lists the fixed conditions and checked endpoints.
+The controller in \path{protocol/controller.py} implements the
+specified audit, temporal states, and aggregation; \texttt{config.json} fixes
+its parameters. Eleven test groups export state, block, and layer events with
+source hashes. These are constructed control tests, not classifier training.
+The randomized check uses seed 20261001 and 100 sequences of 100 observations.
+Table~\ref{tab:verification} in the appendix lists the conditions and endpoints.
 
-Section~\ref{sec:original_study} reports the original training figures.
-The tests below establish specific executable properties of the revised
-controller and expose the conditions under which recovery is possible;
-they do not remeasure the original classification results.
-
-\begin{table*}[!t]
-    \centering
-    \caption{Executed control tests. Inputs are constructed; none is a CIFAR-10 or hardware measurement.}
-    \label{tab:verification}
-    \footnotesize
-    \begin{tabular}{@{}p{4.1cm}p{6.0cm}p{6.1cm}@{}}
-        \toprule
-        Case                          & Fixed condition                                                      & Checked result                                                 \\
-        \midrule
-        Legacy deadlock reproduction  & $q=0.8$, $z=0.3$, utility cutoff $0.74$, mandatory peers             & SUSPECT at 2, QUARANTINE at 5; frozen at 6--40                 \\
-        Healthy startup               & $q=0.8$, $z=0.3$, utility floor $0.26$                               & NORMAL throughout 40 complete observations                     \\
-        Collective recovery           & 20 clients initially quarantined, $r_0=0.95$; server audit available & Nonzero aggregate at 4; all NORMAL at 6                        \\
-        Maximal risk                  & $q=1$, $z=1$, $r_0=0$, pure EMA                                      & SUSPECT at 8; QUARANTINE at 9; BLACKLIST at 18                 \\
-        Gate envelope                 & Ideal evidence for 100 ages, 101 sensitivities                       & All 10,100 age--sensitivity checks pass                        \\
-        Empty survivors               & Low-score candidate; high-score quarantined client                   & Zero increment, no backfill                                    \\
-        Missing evidence / one client & Missing proxy; then valid server audit without peers                 & Freeze on missing proxy; sole survivor weight 1                \\
-        Zero / tiny update            & Norms $0$, $10^{-15}$, $10^{-12}$                                    & No direction alarm, history gain, or applied update            \\
-        Sample weights / clipping     & Equal scores, training counts in ratio $1:3$                         & Weights $0.25/0.75$; aggregate norm within radius              \\
-        Calibration / activation      & Zero calibration values; two-sample activations                      & Positive $10^{-6}$ floor; KL uses sample-wise softmax          \\
-        Bounded random evidence       & 10,000 bounded observations                                          & Bounded states and scores; excluded states have no eligibility \\
-        \bottomrule
-    \end{tabular}
-\end{table*}
+The partial training-code snapshot differs in its history update, raw-score
+gating, clipping scales, and weighting. It is not the complete implementation
+underlying Section~\ref{sec:original_study}, so a matched training comparison
+is still needed to quantify the effect of the explicit controller rules.
 
 \subsection{Recovery and Startup Behavior}
 
-The previous utility-deficit interpretation triggered review whenever
-$H<0.74$. With $q=0.8$, $z=0.3$, and the stated initial evidence, the first five
-history values are $0.6071$, $0.6619$, $0.6951$, $0.7171$, and $0.7328$.
-The legacy two/three-step review policy enters collective quarantine at the
-fifth observation. When mandatory peer evidence is then unavailable, the
-history freezes. The independent reproduction retains that frozen value
-through round 40. Using the utility floor $H<0.26$ removes this startup
-restriction for the same constructed sequence.
+A counterexample combines the deliberately incorrect cutoff $H<0.74$ with
+mandatory peers: $q=0.8$, $z=0.3$ lead to quarantine at observation five and
+frozen history through forty. This does not describe the training
+implementation, whose state annotation already uses $H<0.26$. With that
+utility floor, the constructed startup sequence remains NORMAL.
 
-To test recovery independently of that threshold correction, a second test
-places all twenty clients directly in QUARANTINE with initial risk 0.95,
-initial history 0.5, and reset counters. Every subsequent submission is valid,
-nonzero, aligned with the server reference $(1,0)$, and has zero proxy loss and
-activation change. Calibration scales are one and entropy is zero. Thus the
-recovery audit has $q=1$, $z=0$ even while $\mathcal R_t=\varnothing$.
-Risk falls below 0.64 at the third audit; the second favorable audit at round
-four permits QUARANTINE$\to$SUSPECT. All clients receive positive weights and
-produce a nonzero aggregate in that round. They return to NORMAL at round six
-(Fig.~\ref{fig:recovery} in the appendix). This is a conditional recovery result under favorable
-trusted-server evidence, not a guarantee for every benign data distribution.
+The matched recovery test instead initializes twenty clients in QUARANTINE
+with risk 0.95, history 0.5, and reset counters. Each submits the server-aligned
+update $(1,0)$ with zero loss/activation change, unit calibration scales, and
+zero entropy. Thus $q=1$, $z=0$ despite an empty peer set. Risk falls below
+0.64 at audit three; the next favorable observation restores SUSPECT and
+nonzero aggregation at four. All clients return to NORMAL at six
+(Fig.~\ref{fig:recovery}). In the matched arm, only the requirement for usable
+peers before state advancement changes. All clients remain quarantined and
+aggregation remains zero through ten attempted audits. This isolates the peer
+dependency under favorable server evidence; it is not a training comparison or
+a universal guarantee of benign recovery.
 
 \subsection{Risk Timing and Gate Reachability}
 
@@ -580,38 +651,73 @@ first crossing is at $t=15$. Four consecutive qualifying observations while
 quarantined therefore cannot finish before $t=18$. The maximal-risk test
 matches that bound and rejects the next submission at $t=19$.
 
-For the earlier unscaled gate $0.4+1.2S_l$, the best first-round raw score is
-only $0.469222$. Together with the depth component, this excludes blocks with
-$l/L<0.549594$ in the first round even under favorable other evidence. Its
-asymptotic raw-score ceiling is about $0.761393$, so simply clipping gates to
-one would leave another unreachable region. These are analytical bounds,
-not measured gate frequencies. The revised normalized comparison attains one
-under ideal evidence at every age, while the maximum gate is $0.727273$.
-The 10,100-case sweep verifies the executable formulas against this envelope.
-It establishes reachability, not an acceptable survivor rate on trained models.
+An unscaled gate $0.4+1.2S_l$ can exceed the first-observation raw-score
+ceiling $0.469222$, or the asymptotic ceiling of about $0.761393$. The normalized
+comparison instead attains one under ideal evidence at every age, while its
+maximum gate is $0.727273$. The 10,100 age--sensitivity checks verify these
+formulas. They establish gate reachability, not an acceptable survivor rate
+on trained models.
 
+\FloatBarrier
 \section{Limitations and Conclusion}
 
-The controller removes a circular dependency in recovery and aligns layer
-gates with the score range produced by filter initialization. Its tests link
-persistent state transitions to numerical aggregation behavior, including
-empty gates, missing peers, zero updates, and sample-size weighting. They
-also distinguish reversible state restrictions from permanent bans and
-selected blocks from applied updates.
+TTFL combines authenticated reports, current-update audits, separate utility
+and risk streams, and layer-wise aggregation. The training study characterizes
+model and client behavior under mixed attacks; the controller checks establish
+conditional recovery, attainable gates, and bounded normalized aggregation.
+The matched constructed test shows why recovery audits must remain available
+when eligible peers disappear.
 
-The verification does not measure clean accuracy, targeted attack success,
-benign recovery under real distribution shifts, shared-pool dependence, or
-hardware cost. Those claims require training runs whose configuration and
-logs match this protocol, disjoint proxy/calibration/final-evaluation records,
-and per-attack outcomes with explicit target-class exclusions. Trusted-server
-availability and calibration quality remain substantive assumptions. Separate
-history and risk states do not establish Byzantine robustness or superiority
-over a tuned single-state policy. The executable specification and event logs
-provide a concrete basis for those subsequent comparisons.
+The training summary does not measure the effect of these controller
+refinements. That requires matched training, run-level configuration identities,
+per-attack counts, and disjoint proxy/calibration/evaluation indices. The shared
+pool also limits the heterogeneity analysis. The partial code cannot establish
+full implementation correspondence. Hardware attestation performance, general
+Byzantine robustness, and superiority over a tuned single-stream policy remain
+outside the verified claims.
 
 \FloatBarrier
 \appendices
-\section{Constructed Recovery Trace}
+\section{Supplementary Controller Checks}
+
+\begin{table}[!htb]
+    \centering
+    \caption{Constructed controller checks and verified endpoints.}
+    \label{tab:verification}
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}p{1.75cm}p{6.2cm}@{}}
+        \toprule
+        Case & Condition and checked endpoint \\
+        \midrule
+        Cutoff/peers & $q=0.8$, $z=0.3$, cutoff $0.74$,
+        mandatory peers: SUSPECT at 2, QUARANTINE at 5; frozen through 40. \\
+        Healthy startup & Same $q,z$, utility floor $0.26$: NORMAL through 40
+        complete observations. \\
+        Collective recovery & 20 quarantined clients, $r_0=0.95$: server audit
+        restores aggregation at 4, NORMAL at 6; matched mandatory-peer arm
+        stays frozen with zero aggregate through 10. \\
+        Maximal risk & $q=z=1$, $r_0=0$: SUSPECT at 8, QUARANTINE at 9,
+        BLACKLIST at 18. \\
+        Gate envelope & Ideal evidence at 100 ages and 101 sensitivities:
+        all 10,100 gate checks pass. \\
+        Empty survivors & Low-score candidate plus high-score quarantined
+        client: zero increment, no backfill. \\
+        Missing evidence & Missing proxy freezes state; server audit with
+        one client gives sole-survivor weight 1. \\
+        Zero/tiny updates & Norms $0$, $10^{-15}$, $10^{-12}$: no direction
+        alarm, history gain, or applied update. \\
+        Weights/ clipping & Equal scores, sample counts $1:3$: weights
+        $0.25/0.75$; aggregate norm bounded by the radius. \\
+        Calibration & Zero calibration inputs: positive
+        $10^{-6}$ floor; two-sample KL uses feature-wise softmax. \\
+        Random inputs & 100 sequences of 100 observations:
+        bounded states/scores; excluded states have no eligibility. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Constructed Recovery Trace}
 
 Figure~\ref{fig:recovery} shows the fixed-input controller test described in
 Section~\ref{sec:verification}. All clients submit the same two-dimensional
@@ -622,15 +728,14 @@ learning curves.
 \begin{figure}[!htb]
     \centering
     \includegraphics[width=\columnwidth]{figures/collective_recovery.pdf}
-    \caption{Constructed collective-quarantine recovery test. All twenty
-        clients have identical inputs and states; one common state/risk
-        trajectory is shown. The bottom panel is the applied aggregate increment
-        of the two-dimensional test block, in arbitrary units. Peer statistics
-        are empty when aggregation resumes at audit four.}
+    \caption{Constructed collective recovery: common risk/state trajectory
+        for twenty clients and applied two-dimensional update norm in arbitrary
+        units.}
     \label{fig:recovery}
 \end{figure}
 
-\IEEEtriggeratref{15}
+\clearpage
+\IEEEtriggeratref{11}
 \bibliographystyle{IEEEtran}
 \bibliography{ispa2026_references}
 \end{document}

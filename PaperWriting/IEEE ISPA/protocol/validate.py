@@ -29,7 +29,8 @@ def log_event(case, round_id, cid, event):
     traces.append(dict(case=case, round=round_id, client_id=cid, **event))
 
 
-def legacy_counterexample():
+def threshold_peer_counterexample():
+    """Deliberately wrong utility cutoff plus mandatory peers; not an old run."""
     status, bad, history, risk = "NORMAL", 0, .5, 0.0
     rows = []
     for t in range(1, 41):
@@ -48,7 +49,7 @@ def legacy_counterexample():
                          peer_set_empty=status == "QUARANTINE"))
     assert rows[1]["state"] == "SUSPECT" and rows[4]["state"] == "QUARANTINE"
     assert all(x["history"] == rows[4]["history"] for x in rows[5:])
-    save_csv("legacy_deadlock.csv", rows)
+    save_csv("threshold_peer_counterexample.csv", rows)
     return dict(suspect_round=2, quarantine_round=5, frozen_rounds="6--40", history_at_freeze=history)
 
 
@@ -66,6 +67,7 @@ def healthy_startup():
 
 def collective_recovery():
     states = {k: State(status="QUARANTINE", risk=.95) for k in range(20)}
+    peer_required = {k: State(status="QUARANTINE", risk=.95) for k in range(20)}
     first_selected, first_normal = None, None
     root = np.array([1., 0.])
     for t in range(1, 11):
@@ -93,8 +95,33 @@ def collective_recovery():
             assert all(not row["stats_member"] for row in rows)
         if all(s.status == "NORMAL" for s in states.values()) and first_normal is None:
             first_normal = t
+        # Matched control: identical state, inputs, and controller; only require
+        # a usable peer before the audit is allowed to advance temporal state.
+        required_refs = {k for k, s in peer_required.items()
+                         if s.status in ("NORMAL", "SUSPECT") and s.risk < .64}
+        required_events = {}
+        for k, s in peer_required.items():
+            peers = [(root.copy(), peer_required[j].trust / (1 + peer_required[j].covariance))
+                     for j in required_refs if j != k]
+            ev = audit(root, root, peers, 0, 0, 1, 1)
+            e = advance(s, **{a: b for a, b in ev.items() if a != "channels" and a != "valid"},
+                        valid=ev["valid"] and bool(peers))
+            log_event("peer_required_recovery", t, k, e)
+            required_events[k] = e
+            assert s.status == "QUARANTINE" and s.risk == .95 and s.history == .5
+            assert s.n == 0 and e["reason"] == "missing_audit"
+        required_applied, required_rows, required_layers = aggregate(
+            updates, required_events, {k: 1 for k in peer_required},
+            required_refs, [root], ["toy.weight"])
+        assert not required_refs and np.array_equal(required_applied[0], np.zeros(2))
+        for row in required_rows:
+            block_traces.append(dict(case="peer_required_recovery", round=t, **row))
+        for row in required_layers:
+            layer_traces.append(dict(case="peer_required_recovery", round=t, **row))
     assert (first_selected, first_normal) == (4, 6)
-    return dict(clients=20, initial_risk=.95, first_nonzero_applied_round=first_selected, all_normal_round=first_normal)
+    return dict(clients=20, initial_risk=.95, first_nonzero_applied_round=first_selected,
+                all_normal_round=first_normal, matched_peer_required_rounds=10,
+                peer_required_recovered_clients=0, peer_required_applied_norm=0.)
 
 
 def maximal_risk():
@@ -223,7 +250,7 @@ def save_csv(name, rows):
 
 
 for name, fn in [
-    ("legacy_deadlock_reproduced", legacy_counterexample),
+    ("threshold_peer_counterexample", threshold_peer_counterexample),
     ("healthy_startup", healthy_startup),
     ("collective_quarantine_recovery", collective_recovery),
     ("pure_ema_blacklist_timing", maximal_risk),
