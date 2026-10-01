@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 
 HERE = Path(__file__).resolve().parent
 RESULTS = HERE / "results"
+FIGURES = HERE.parent / "figures"
+FIGURES.mkdir(exist_ok=True)
 states = [r for r in csv.DictReader((RESULTS/"state_events.csv").open())
           if r["case"] == "collective_recovery" and r["client_id"] == "0"]
 layers = list(csv.DictReader((RESULTS/"layer_events.csv").open()))
@@ -34,6 +36,5 @@ for ax in axes:
     ax.set_xlim(0,10)
     ax.set_xticks(range(0,11,2))
     ax.grid(axis="y", alpha=.2, linewidth=.5)
-for ext in ("pdf", "svg", "png"):
-    fig.savefig(RESULTS/f"collective_recovery.{ext}", dpi=300)
+fig.savefig(FIGURES / "collective_recovery.pdf", dpi=300)
 plt.close(fig)

@@ -1,5 +1,5 @@
-% Revision 7: executable controller specification and constructed verification.
-% Historical training/diagnostic outputs are archived, not reused as new results.
+% ISPA submission manuscript.
+% Original-study figures retain their data and labels; constructed checks remain separate.
 \documentclass[conference,compsoc]{IEEEtran}
 
 \usepackage[T1]{fontenc}
@@ -8,8 +8,6 @@
 \usepackage{booktabs,multirow,array}
 \usepackage{threeparttable}
 \usepackage{graphicx}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
 \usepackage{flafter} % Keep floats after their source position and first mention.
 \usepackage{placeins} % Keep experimental floats out of the conclusion and references.
 \usepackage[nocompress]{cite}
@@ -106,29 +104,12 @@ No platform-specific attestation or hardware timing result is claimed here.
 
 \begin{figure*}[!t]
     \centering
-    \begin{tikzpicture}[font=\small, box/.style={draw,rounded corners,align=left,
-                    text width=4.6cm,minimum height=2.3cm,inner sep=7pt}, >=Latex]
-        \node[box] (train) {\textbf{Client training / attack logic}\\
-            Private and shared training data\\
-            GPU model and update $\Delta W_k$\\
-            Outside CPU TEE memory boundary};
-        \node[box,right=5mm of train] (agent) {\textbf{Protected reporting agent}\\
-            Identity, nonce, round, model digest\\
-            Bind received update digest to report\\
-            Sign with attested key};
-        \node[box,right=5mm of agent] (server) {\textbf{Server: individual-update audit}\\
-            Verify quote, signature, freshness\\
-            Compute content, history, and risk\\
-            Apply state and layer gates};
-        \draw[->,thick] (train)--(agent);
-        \draw[->,thick] (agent)--(server);
-        \draw[->,thick] (server.south)--++(0,-0.6)-|node[pos=0.25,below]
-        {Global model and round identifier} (train.south);
-    \end{tikzpicture}
-    \caption{System and threat boundary. A signed update can contain poisoning
-        introduced before signing. Report protection does not establish the truth of
-        statistics collected outside the protected process. The server sees individual
-        updates; cryptographic secure aggregation is not part of this protocol.}
+    \includegraphics[width=\textwidth]{figures/system_boundary.png}
+    \caption{System roles and assumed reporting boundary. Red dashed paths locate
+        attacks on inputs, objectives, or updates before signing. The protected
+        agent binds identity, freshness, and model/update digests; the server audits
+        individual updates before aggregation. This boundary does not protect GPU
+        memory or establish sample and externally collected telemetry truth.}
     \label{fig:system_arch}
 \end{figure*}
 
@@ -141,6 +122,7 @@ from both this manifest and the controller's output; a training adapter must
 handle them separately without treating them as scored learning updates.
 
 \section{Evidence and State Control}
+\label{sec:control}
 
 Each round freezes the peer population, audits current updates, advances the
 states, and then aggregates eligible parameter blocks, as in
@@ -157,23 +139,17 @@ freeze
 A quarantined client supplies recovery evidence but never enters this round's
 peer statistics. Peer comparisons exclude the evaluated client itself.
 
-\begin{figure}[!htb]
+\begin{figure*}[!t]
     \centering
-    \begin{tikzpicture}[font=\small, node distance=3.5mm, >=Latex,
-            box/.style={draw,rounded corners,align=center,text width=7.2cm,inner sep=5pt}]
-        \node[box] (admission) {\textbf{1. Admission}\\Verify report binding; receive valid recovery evidence};
-        \node[box,below=of admission] (audit) {\textbf{2. Content audit}\\Freeze eligible peer statistics; compute content and probes};
-        \node[box,below=of audit] (states) {\textbf{3. State evolution}\\Update $HistPerf^{(t)}$, $RiskEMA^{(t)}$, and client state};
-        \node[box,below=of states] (layers) {\textbf{4. Layer aggregation}\\NORMAL/SUSPECT candidates $\to$ score gate $\to$ clipping\\
-        Normalize $p_k RawScore_k^{(t)}$; empty survivors: no update};
-        \node[box,below=of layers] (global) {\textbf{5. Model update}\\Apply surviving layer increments; broadcast next model};
-        \draw[->] (admission)--(audit); \draw[->] (audit)--(states);
-        \draw[->] (states)--(layers); \draw[->] (layers)--(global);
-    \end{tikzpicture}
-    \caption{Round order. Quarantined submissions can supply recovery
-        evidence but cannot enter shared peer statistics or current aggregation.}
+    \includegraphics[width=\textwidth]{figures/five_stage_framework.png}
+    \caption{Five-stage trust-flow loop. The peer set is frozen before state
+        transitions, while aggregation eligibility uses the updated state.
+        A client starting in QUARANTINE may provide server-audited recovery
+        evidence without entering that round's peer statistics. Recovery to
+        SUSPECT restores conditional aggregation eligibility in the same round;
+        Table~\ref{tab:states} specifies the transition rules.}
     \label{fig:framework}
-\end{figure}
+\end{figure*}
 
 \subsection{Admission and Runtime Reliability}
 
@@ -264,6 +240,20 @@ that external dependency is distinct from a circular peer-state dependency.
 
 \subsection{History, Risk, and Persistent Transitions}
 
+Figure~\ref{fig:state_machine} presents the four-state participation design
+from the original study. The executable controller uses the explicit
+transition and persistence rules in Table~\ref{tab:states}.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=0.84\textwidth]{figures/fig4_state.pdf}
+    \caption{Original four-state participation design, with its original arrows
+        and labels retained. The direct shortcut paths shown here belong to that
+        design; Table~\ref{tab:states} specifies the stepwise transitions used
+        in the executable controller verification.}
+    \label{fig:state_machine}
+\end{figure*}
+
 Each complete nonzero submission adds unit evidence to the history model:
 \begin{align}
     a_k' & =\beta_h a_k+q_k,  & b_k' & =\beta_h b_k+1-q_k,          \\
@@ -312,6 +302,22 @@ current-round eligibility. Recovery does not itself imply passing a layer gate
 or applying a nonzero model update; those endpoints are logged separately.
 
 \section{Aggregation with Attainable Gates}
+
+Figure~\ref{fig:layer_gating} separates the evidence inputs, layer decisions,
+and constrained execution. The normalized score $G_k$ determines gate passage,
+whereas the raw credibility $F_k$ determines each survivor's relative weight.
+
+\begin{figure*}[!t]
+    \centering
+    \includegraphics[width=\textwidth]{figures/layer_aggregation.png}
+    \caption{Layer-wise aggregation after state transitions. Only eligible
+        NORMAL/SUSPECT submissions can survive a gate. The comparison uses
+        $G_k=F_k/U_{n_k^e}$, but weights retain $n_kF_k$. Depth is a heuristic
+        prior; clipping uses a separate scale for each parameter block.
+        An empty survivor set or a radius at most $\varepsilon_n$ produces no
+        block update, without bypassing state exclusion.}
+    \label{fig:layer_gating}
+\end{figure*}
 
 Let $\mathcal E_t$ contain complete nonzero audited submissions. After state
 transitions, form $\mathcal A_t=\{k\in\mathcal E_t:
@@ -402,13 +408,110 @@ normalized weight, pre/post-clipping norms, and applied contribution norm.
 Per-block logs additionally record survivor count, clipping radius, skipped
 updates, and the norm of the summed increment.
 
+\section{Original Training Study}
+\label{sec:original_study}
+
+The original CIFAR-10 study examines model learning, client-level behavior,
+component effects, and sensitivity to data heterogeneity. Its figures are
+reproduced below with their plotted values, event labels, and training horizons
+preserved. These results describe the original implementation; the constructed
+tests in Section~\ref{sec:verification} evaluate the revised executable
+controller separately. Restoring the figures does not constitute a new
+training run of that controller.
+
+\subsection{Learning and Client Behavior}
+
+Figure~\ref{fig:main_results}(a) shows the original accuracy trajectory across
+communication rounds and the ASR baseline as labeled in the original plot.
+Figure~\ref{fig:main_results}(b) shows that client historical utility and risk
+can evolve differently. Detection, interception, and quarantine retain their
+original event labels rather than being reinterpreted as permanent blacklist
+events. Figure~\ref{fig:main_results}(c) provides a qualitative feature-space
+view rather than a separability guarantee.
+
+\begin{figure*}[!t]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/fig6_convergence_asr.pdf}
+        \par\smallskip
+        {\footnotesize (a) Original accuracy trajectory and ASR baseline.}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/fig7_node_state_evolution_ispa.pdf}
+        \par\smallskip
+        {\footnotesize (b) Original client history and risk traces.}
+    \end{minipage}
+    \par\medskip
+    \begin{minipage}{0.67\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/fig8_tsne_visualization_ispa.pdf}
+        \par\smallskip
+        {\footnotesize (c) Original qualitative t-SNE visualization.}
+    \end{minipage}
+    \caption{Original-study learning trajectory and ASR baseline (a), client
+        history and risk (b), and qualitative t-SNE view (c).}
+    \label{fig:main_results}
+\end{figure*}
+
+\subsection{Component Analysis}
+
+Figure~\ref{fig:ablation_components}(a) compares the
+clean-reference, shallow-probe, and full-probe variants. Its untargeted attack
+categories and targeted backdoor category are not interpreted as a common
+targeted-ASR comparison. Figure~\ref{fig:ablation_components}(b) compares Global-Clipping, hierarchical
+gating without re-normalization, and the full method over the original
+50-round horizon. Its round-30 annotation is retained. Because those variants
+also differ in their aggregation operations, their entire performance gap
+cannot be attributed to normalization alone.
+
+\begin{figure*}[!t]
+    \centering
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/fig9_ablation_probes.pdf}
+        \par\smallskip
+        {\footnotesize (a) Original risk-probe comparison.}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/fig10_ablation_renorm.pdf}
+        \par\smallskip
+        {\footnotesize (b) Original aggregation and re-normalization ablation.}
+    \end{minipage}
+    \caption{Original-study probe comparison (a) and aggregation ablation (b).
+        Original axes and category labels are retained; panel (b) shows the
+        complete 50-round horizon.}
+    \label{fig:ablation_components}
+\end{figure*}
+
+\subsection{Data-Heterogeneity Sensitivity}
+
+Figure~\ref{fig:alpha_sensitivity} reproduces the original accuracy comparison
+across Dirichlet parameters. In that reported sweep, the Trust Flow series
+varies less than the Krum and FLTrust series. The plot characterizes the
+original data-partition setting; the Dirichlet parameter alone does not
+describe the full local distribution when clients also use a shared pool.
+No additional uncertainty estimates or shared-pool ablation results are
+inferred from the plotted points.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/fig11_alpha_sensitivity_ispa.pdf}
+    \caption{Accuracy under the data-heterogeneity settings reported in the
+        original study. Original points, methods, and axis labels are retained.}
+    \label{fig:alpha_sensitivity}
+\end{figure}
+
 \section{Executable Protocol Verification}
+\label{sec:verification}
 
 \subsection{Scope and Reproduction}
 
-The evidence in this section is generated by the revision's reference
+The evidence in this section is generated by the reference
 controller and fixed configuration, not by training a classifier.
-\texttt{protocol\_v7/controller.py} implements the audit, states, envelope,
+\texttt{protocol/controller.py} implements the audit, states, envelope,
 and block aggregation; \texttt{config.json} fixes its parameters.
 \texttt{validate.py} executes eleven test groups and exports state, block,
 and layer events plus SHA-256 hashes. Constructed observations are explicitly
@@ -417,11 +520,10 @@ sequences, and 100 observations per sequence. No repeated-training SD or
 statistical superiority is inferred from these checks.
 Table~\ref{tab:verification} lists the fixed conditions and checked endpoints.
 
-The prior classification tables and partial implementation trace are retained
-in the accompanying provenance archive. They do not evaluate this controller
-and are not used as its accuracy, attack-success, ablation, or hardware-cost
-results. The tests below establish specific executable properties and expose
-the conditions under which recovery is possible.
+Section~\ref{sec:original_study} reports the original training figures.
+The tests below establish specific executable properties of the revised
+controller and expose the conditions under which recovery is possible;
+they do not remeasure the original classification results.
 
 \begin{table*}[!t]
     \centering
@@ -467,19 +569,8 @@ recovery audit has $q=1$, $z=0$ even while $\mathcal R_t=\varnothing$.
 Risk falls below 0.64 at the third audit; the second favorable audit at round
 four permits QUARANTINE$\to$SUSPECT. All clients receive positive weights and
 produce a nonzero aggregate in that round. They return to NORMAL at round six
-(Fig.~\ref{fig:recovery}). This is a conditional recovery result under favorable
+(Fig.~\ref{fig:recovery} in the appendix). This is a conditional recovery result under favorable
 trusted-server evidence, not a guarantee for every benign data distribution.
-
-\begin{figure}[!htb]
-    \centering
-    \includegraphics[width=\columnwidth]{protocol_v7/results/collective_recovery.pdf}
-    \caption{Constructed collective-quarantine recovery test, not a classifier
-        experiment. All twenty clients have identical inputs and states; one common
-        state/risk trajectory is shown. The bottom panel is the actually applied
-        aggregate increment of the two-dimensional toy block, in arbitrary units.
-        Peer statistics are empty when aggregation resumes at round four.}
-    \label{fig:recovery}
-\end{figure}
 
 \subsection{Risk Timing and Gate Reachability}
 
@@ -519,7 +610,27 @@ over a tuned single-state policy. The executable specification and event logs
 provide a concrete basis for those subsequent comparisons.
 
 \FloatBarrier
-\IEEEtriggeratref{18}
+\appendices
+\section{Constructed Recovery Trace}
+
+Figure~\ref{fig:recovery} shows the fixed-input controller test described in
+Section~\ref{sec:verification}. All clients submit the same two-dimensional
+update at every audit. The discrete state steps and constant applied-update
+norm after recovery follow from those test inputs; they are not classifier
+learning curves.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/collective_recovery.pdf}
+    \caption{Constructed collective-quarantine recovery test. All twenty
+        clients have identical inputs and states; one common state/risk
+        trajectory is shown. The bottom panel is the applied aggregate increment
+        of the two-dimensional test block, in arbitrary units. Peer statistics
+        are empty when aggregation resumes at audit four.}
+    \label{fig:recovery}
+\end{figure}
+
+\IEEEtriggeratref{15}
 \bibliographystyle{IEEEtran}
 \bibliography{ispa2026_references}
 \end{document}

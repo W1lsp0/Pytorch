@@ -1,6 +1,6 @@
 """Join existing partial observations, leaving absent fields empty, not inferred.
 
-This is archival diagnosis of Flwr/log/server.log, not v7 verification.
+This is archival diagnosis of Flwr/log/server.log, not controller verification.
 """
 import csv
 from pathlib import Path

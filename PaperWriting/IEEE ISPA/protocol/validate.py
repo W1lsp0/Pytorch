@@ -1,6 +1,6 @@
 """Deterministic protocol tests, not CIFAR-10 or hardware measurements.
 
-Run: python protocol_v7/validate.py
+Run: python protocol/validate.py
 Artifacts include exact event/weight traces and source hashes.
 """
 import csv

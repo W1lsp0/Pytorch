@@ -1,4 +1,4 @@
-# TTFL control v7
+# TTFL controller
 
 This directory is an executable controller specification and a deterministic
 verification bundle. It does **not** reproduce historical CIFAR-10 training or
@@ -8,9 +8,9 @@ used to tune them against a final classification test set.
 From the parent ISPA directory:
 
 ```bash
-python protocol_v7/validate.py
-python protocol_v7/audit_old_trace.py
-python protocol_v7/plot_validation.py
+python protocol/validate.py
+python protocol/audit_old_trace.py
+python protocol/plot_validation.py
 ```
 
 The controller requires NumPy; plotting additionally requires Matplotlib.
@@ -40,9 +40,9 @@ independent reproduction of the prior manuscript's failure condition.
 `legacy_observed_events.csv` is different: it joins the *existing local logs*
 and keeps unrecorded instantaneous risk, full state and applied-update fields
 empty. Displayed state is not asserted to be a complete state-machine truth.
-The local snapshot's risk override and blacklist branches differ from v7.
+The local snapshot's risk override and blacklist branches differ from this controller.
 
-The figure `collective_recovery.pdf/.svg/.png` uses only the new recovery trace.
+The figure `../figures/collective_recovery.pdf` uses only the new recovery trace.
 All 20 clients have identical inputs in that fixture; the plotted state and risk
 are their common trajectory, not an average with omitted variability. The
 bottom panel is the actual aggregate increment norm of a two-dimensional toy
