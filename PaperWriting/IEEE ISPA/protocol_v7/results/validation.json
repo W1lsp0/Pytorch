@@ -1,0 +1,123 @@
+{
+  "evidence_type": "Constructed control tests; not training or hardware measurements",
+  "tests": [
+    {
+      "test": "legacy_deadlock_reproduced",
+      "passed": true,
+      "details": {
+        "suspect_round": 2,
+        "quarantine_round": 5,
+        "frozen_rounds": "6--40",
+        "history_at_freeze": 0.7328490091128262
+      }
+    },
+    {
+      "test": "healthy_startup",
+      "passed": true,
+      "details": {
+        "rounds": 40,
+        "review_events": 0,
+        "quarantine_events": 0
+      }
+    },
+    {
+      "test": "collective_quarantine_recovery",
+      "passed": true,
+      "details": {
+        "clients": 20,
+        "initial_risk": 0.95,
+        "first_nonzero_applied_round": 4,
+        "all_normal_round": 6
+      }
+    },
+    {
+      "test": "pure_ema_blacklist_timing",
+      "passed": true,
+      "details": {
+        "NORMAL": 1,
+        "SUSPECT": 8,
+        "QUARANTINE": 9,
+        "BLACKLIST": 18,
+        "first_blacklist_gate": 19
+      }
+    },
+    {
+      "test": "attainable_gate_envelope",
+      "passed": true,
+      "details": {
+        "legacy_first_cap": 0.46922231334313896,
+        "legacy_forbidden_depth_fraction": 0.5495935912154187,
+        "legacy_asymptotic_cap": 0.7613932332932506,
+        "new_max_gate": 0.7272727272727273,
+        "minimum_ideal_margin": 0.27272727272727193,
+        "checks": 10100
+      }
+    },
+    {
+      "test": "empty_gate_no_backfill",
+      "passed": true,
+      "details": {
+        "survivors": 0,
+        "quarantined_high_score_backfilled": false,
+        "model_unchanged": true
+      }
+    },
+    {
+      "test": "missing_proxy_and_single_client",
+      "passed": true,
+      "details": {
+        "missing_proxy_freezes": true,
+        "missing_peer_audit_valid": true,
+        "sole_client_weight": 1.0
+      }
+    },
+    {
+      "test": "zero_and_near_zero_updates",
+      "passed": true,
+      "details": {
+        "norms": [
+          0.0,
+          1e-15,
+          1e-12
+        ],
+        "false_direction_risk": false,
+        "history_increase": false
+      }
+    },
+    {
+      "test": "sample_weights_and_clipping",
+      "passed": true,
+      "details": {
+        "weights": [
+          0.25,
+          0.75
+        ],
+        "clip_radius": 9.852836841565471,
+        "applied_norm": 9.852836841565471
+      }
+    },
+    {
+      "test": "calibration_and_activation_axis",
+      "passed": true,
+      "details": {
+        "calibration_floor": 1e-06,
+        "kl_sample_axis_verified": true
+      }
+    },
+    {
+      "test": "bounded_random_evidence",
+      "passed": true,
+      "details": {
+        "seed": 20261001,
+        "sequences": 100,
+        "steps_per_sequence": 100
+      }
+    }
+  ],
+  "passed": 11,
+  "source_sha256": {
+    "controller.py": "2feb410ef6f5efd972d24250aa5759d83d73e78f97d6e176fcdd7c1966041da2",
+    "config.json": "e6f3ab33ffff593942be3a99e8feed1cfcdced3c328166837cb6f4504292c26c",
+    "validate.py": "c79c0e80ef35a7568d49115592b522b71b38ed86f2f4962c614789b20d9d5702"
+  }
+}

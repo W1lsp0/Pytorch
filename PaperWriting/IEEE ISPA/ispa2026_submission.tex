@@ -1,5 +1,5 @@
-% Original main-study results and a separately identified local diagnostic trace.
-% See DATA_PROVENANCE.md and local_evidence/ for source and scope.
+% Revision 7: executable controller specification and constructed verification.
+% Historical training/diagnostic outputs are archived, not reused as new results.
 \documentclass[conference,compsoc]{IEEEtran}
 
 \usepackage[T1]{fontenc}
@@ -37,8 +37,22 @@
 \maketitle
 
 \begin{abstract}
-    Federated learning (FL) must assess both the execution that produced an update and the update's effect on the global model. Under heterogeneous data, a useful long-tail client can look anomalous, whereas an attacker can build a favorable history before submitting a harmful update. Trust Flow separates hardware-anchored admission, current content evidence, historical utility, and recent risk before layer-wise aggregation. A Kalman filter handles runtime evidence; decayed Beta evidence and a risk EMA drive persistent state transitions. Layer gates, clipping, and sample-size-weighted normalization control each surviving update. The reported Flower/PyTorch experiments use CIFAR-10, ResNet-18, a replicated shared training pool, and six concurrent attack classes. Across two platforms with five runs each, the experimental record reports 92.31\% clean accuracy and 10.21\% macro targeted attack success rate at 30\% malicious participation, with no final benign bans. A separate implementation trace provides attack-specific evaluation and gate-selection records. The evidence distinguishes final retention from participation and identifies the validation limits of the specified aggregation and calibration rules.
-
+    Federated learning must distinguish a client's past contribution from the risk
+    of its current update. Reversible restrictions can nevertheless become
+    permanent in practice if recovery requires an eligible peer population that
+    is itself empty. Trust Flow uses separate historical-utility and risk states,
+    a server-supported recovery audit, and layer gates scaled to an attainable
+    score envelope. The controller preserves quarantine exclusion while allowing
+    recovery evidence to advance without eligible peers. Parameter blocks receive
+    sample-size-weighted, clipped updates only after current-state and score
+    checks. An executable reference controller is evaluated with deterministic
+    boundary cases and bounded randomized inputs. In a constructed test with
+    all twenty clients initially quarantined, nonzero aggregation resumes at the
+    fourth successful recovery audit and all clients return to NORMAL at the
+    sixth. A maximal-risk sequence reaches BLACKLIST at submission eighteen,
+    consistent with the specified EMA and persistence rules. These results
+    establish the tested control behavior; classification robustness and hardware
+    attestation performance remain outside this verification scope.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -53,9 +67,9 @@ Existing defenses use geometric, statistical, reference-based, or temporal evide
 
 The proposed \emph{Trust Flow} policy addresses this tension by maintaining historical utility and short-term risk as separate states. Historical utility records contribution, while current risk can restrict an update despite a favorable earlier record. These states connect TEE-based execution admission, content auditing, and layer-wise aggregation. Their separation permits different responses to weak contribution and persistent risk, but does not by itself identify the cause of a deviation. The contributions are:
 \begin{tightenumerate}
-    \item A dual-stream state representation gives historical contribution and short-term risk separate roles, supporting reversible restrictions and persistent-risk escalation.
-    \item A state-to-aggregation policy links recoverable suspicion, persistent-risk escalation, and layer-specific weighting. Content quality can lower a contribution without, by itself, forcing irreversible exclusion.
-    \item An evaluation separates final-ban outcomes, reversible review, and layer selection, combining the reported repeated-run comparison with a separately scoped implementation trace.
+    \item A recovery audit uses server evidence independently of eligible peers, removing the circular dependency between quarantine exit and peer-reference availability.
+    \item A layer gate is scaled to the best attainable score at each client's evidence age, so uncertainty initialization cannot make every admissible score smaller than a fixed gate. State exclusion and an empty-survivor no-update rule remain explicit.
+    \item An executable controller and event-level verification connect evidence, transition counters, eligibility, numerical weights, and applied updates under constructed boundary conditions.
 \end{tightenumerate}
 
 \section{Background and Related Work}
@@ -64,740 +78,448 @@ The proposed \emph{Trust Flow} policy addresses this tension by maintaining hist
 
 \textbf{Poisoning and backdoor attacks.} Sign flipping and gradient scaling disrupt optimization by changing update directions or magnitudes. Trigger, clean-label, and semantic backdoors instead seek targeted errors while preserving plausible main-task behavior, so their updates can remain close to an expected direction \cite{bagdasaryan2020backdoor,wang2019neuralcleanse}. Across rounds, an attacker may also accumulate a favorable history before injecting a harmful update, making current behavior and past contribution potentially conflicting sources of evidence.
 
-\textbf{Active defenses and their limits.} Krum and Trimmed Mean remove geometric outliers \cite{blanchard2017krum,yin2018byzantine}, FLTrust weights updates against a clean direction \cite{cao2021fltrust}, and FoolsGold and FLDetector use cross-client or cross-round evidence \cite{fung2020foolsgold,fldetector2022}. DeepSight, FLAME, CrowdGuard, RoseAgg, FLPurifier, ShieldFL, and RaSA inspect representations, backdoor behavior, collusion, or privacy-preserving updates \cite{deepsight2022,flame2022,crowdguard2024,roseagg,flpurifier,shieldfl,wang2025rasa}. TMT-FL and related systems connect execution integrity to model training \cite{lu2025tmt}. These approaches observe different evidence spaces. Trust Flow places an interface between them: attestation determines execution eligibility, privacy-aware checks expose bounded statistics, content probes inspect the current update, and the two temporal streams decide future privileges. One observation can therefore alter a layer weight, a recoverable state, or a persistent state only when the corresponding rule is satisfied. The experiments use classical methods as matched aggregation baselines and stateful variants to isolate this temporal interface.
+\textbf{Active defenses and their limits.} Krum and Trimmed Mean remove geometric outliers \cite{blanchard2017krum,yin2018byzantine}, FLTrust weights updates against a clean direction \cite{cao2021fltrust}, and FoolsGold and FLDetector use cross-client or cross-round evidence \cite{fung2020foolsgold,fldetector2022}. DeepSight, FLAME, CrowdGuard, RoseAgg, FLPurifier, ShieldFL, and RaSA inspect representations, backdoor behavior, collusion, or privacy-preserving updates \cite{deepsight2022,flame2022,crowdguard2024,roseagg,flpurifier,shieldfl,wang2025rasa}. TMT-FL and related systems connect execution integrity to model training \cite{lu2025tmt}. These approaches observe different evidence spaces. Trust Flow places an interface between them: attestation determines execution eligibility, privacy-aware checks expose bounded statistics, content probes inspect the current update, and the two temporal streams decide future privileges. One observation can therefore alter a layer weight, a recoverable state, or a persistent state only when the corresponding rule is satisfied. The present evaluation isolates controller behavior; it does not rank these defenses by classification accuracy or attack success.
 
-\textbf{TEE-assisted trusted training.} TEEs protect execution and key material and have been used to support FL integrity and attack mitigation \cite{r1_tee_integrity,xu2021distributed,zhang2025rppfl,r5_tee_mitigating,lu2025tmt}. A quote authenticates the measured path, freshness, and update provenance. TTFL combines that hardware evidence with privacy-aware verification and cloud-side semantic auditing before assigning aggregation privileges.
+\textbf{TEE-assisted trusted training.} TEEs protect execution and key material and have been used to support FL integrity and attack mitigation \cite{r1_tee_integrity,xu2021distributed,zhang2025rppfl,r5_tee_mitigating,lu2025tmt}. Attestation can bind a measured environment to a reporting key; the signed report must additionally bind freshness and the submitted update. TTFL treats this authenticated reporting interface as a system assumption and evaluates the downstream controller separately.
 
-\section{System Model and Threat Assumptions}
 
-Figure~\ref{fig:system_arch} presents the client-edge-cloud environment, consisting of a central aggregation server $\mathcal{S}$ and $K$ edge clients $\mathcal{C}=\{c_1,\ldots,c_K\}$. In round $t$, admitted clients train from the distributed model $W^{(t-1)}$ and submit updates $\Delta W_k^{(t)}$ for auditing and aggregation. The server then computes $W^{(t)}=W^{(t-1)}+\mathrm{Agg}(\{\Delta W_k^{(t)}\})$, with the global learning objective
-\begin{equation}
-    \min_W \mathcal{L}(W)=\sum_{k=1}^{K}p_k\mathcal{L}_k(W),\quad
-    p_k=|\mathcal{D}_k|/\sum_j|\mathcal{D}_j|.
-\end{equation}
-The client side performs local training and supplies an attestation-bound report, while privacy-aware verification exposes the declared data and runtime statistics needed for admission and audit. Raw samples remain local. In the stated system boundary, the CPU-side TEE protects the measured admission agent, device keys, report integrity, nonce freshness, and admission state; GPU training memory and the semantic correctness of labels, samples, objectives, and updates are outside that boundary. Thus an attacker may produce a signed poisoned update inside an otherwise measured training process, while post-attestation host tampering is excluded. Using the submitted update and this evidence, the cloud server evolves the client's trust states and determines its aggregation privilege. Because these decisions require individual updates and audit evidence, cryptographic secure aggregation is not enabled in the evaluated protocol.
+\section{System Boundary and Evidence Interface}
+
+The server receives an update $\Delta W_k$ and an authenticated report from
+client $k$, and applies $W^{(t)}=W^{(t-1)}+\Delta W_{global}^{(t)}$.
+The local-data factor is $p_k=n_k/\sum_j n_j$, where $n_k$ counts the client's
+training records. If a shared pool is replicated across clients, each local
+copy is counted in $n_k$. Filtering and clipping change the optimization
+trajectory, so sample-size weighting does not establish equivalence to the
+unfiltered objective over unique images.
+
+The threat model permits poisoning of labels, inputs, objectives, and updates
+before report signing. The server follows the specified policy, sees individual
+updates, and holds a trusted proxy unavailable for client modification.
+Cryptographic secure aggregation is therefore outside this protocol. The
+reporting boundary in Fig.~\ref{fig:system_arch} protects a device key and binds
+identity, round, nonce, model digest, and update digest. GPU memory and sample
+semantics are outside that boundary. Protection of a report does not make
+externally collected telemetry truthful. Trusted acquisition is an assumption
+on the reporting interface, not a property demonstrated by the controller tests.
+No platform-specific attestation or hardware timing result is claimed here.
 
 \begin{figure*}[!t]
-\centering
-\begin{tikzpicture}[font=\small, box/.style={draw,rounded corners,align=left,
- text width=4.6cm,minimum height=2.3cm,inner sep=7pt}, >=Latex]
-\node[box] (train) {\textbf{Client training / attack logic}\\
-Private and shared training data\\
-GPU model and update $\Delta W_k$\\
-Outside CPU TEE memory boundary};
-\node[box,right=5mm of train] (agent) {\textbf{Protected reporting agent}\\
-Identity, nonce, round, model digest\\
-Bind received update digest to report\\
-Sign with attested key};
-\node[box,right=5mm of agent] (server) {\textbf{Server: individual-update audit}\\
-Verify quote, signature, freshness\\
-Compute content, history, and risk\\
-Apply state and layer gates};
-\draw[->,thick] (train)--(agent);
-\draw[->,thick] (agent)--(server);
-\draw[->,thick] (server.south)--++(0,-0.6)-|node[pos=0.25,below]
- {Global model and round identifier} (train.south);
-\end{tikzpicture}
-\caption{System and threat boundary. A signed update can contain poisoning
-introduced before signing. Report protection does not establish the truth of
-statistics collected outside the protected process. The server sees individual
-updates; cryptographic secure aggregation is not part of this protocol.}
-\label{fig:system_arch}
+    \centering
+    \begin{tikzpicture}[font=\small, box/.style={draw,rounded corners,align=left,
+                    text width=4.6cm,minimum height=2.3cm,inner sep=7pt}, >=Latex]
+        \node[box] (train) {\textbf{Client training / attack logic}\\
+            Private and shared training data\\
+            GPU model and update $\Delta W_k$\\
+            Outside CPU TEE memory boundary};
+        \node[box,right=5mm of train] (agent) {\textbf{Protected reporting agent}\\
+            Identity, nonce, round, model digest\\
+            Bind received update digest to report\\
+            Sign with attested key};
+        \node[box,right=5mm of agent] (server) {\textbf{Server: individual-update audit}\\
+            Verify quote, signature, freshness\\
+            Compute content, history, and risk\\
+            Apply state and layer gates};
+        \draw[->,thick] (train)--(agent);
+        \draw[->,thick] (agent)--(server);
+        \draw[->,thick] (server.south)--++(0,-0.6)-|node[pos=0.25,below]
+        {Global model and round identifier} (train.south);
+    \end{tikzpicture}
+    \caption{System and threat boundary. A signed update can contain poisoning
+        introduced before signing. Report protection does not establish the truth of
+        statistics collected outside the protected process. The server sees individual
+        updates; cryptographic secure aggregation is not part of this protocol.}
+    \label{fig:system_arch}
 \end{figure*}
 
-\textbf{Threat model.} The boundary in Fig.~\ref{fig:system_arch} separates report integrity from update semantics. The server is honest-but-curious and follows the aggregation protocol. It can see individual updates and audit statistics, but it does not change the stated state-transition rules. An admitted client may alter labels, samples, or optimization objectives and may conduct label flipping, trigger backdoors, clean-label poisoning, semantic backdoors, sign flipping, or gradient scaling.
+The executable core accepts a valid-admission flag, normalized runtime entropy
+$h\in[0,1]$, trainable update blocks, a server reference increment, and measured
+proxy loss and activation changes. It does not implement a TEE or a complete
+training application. A block is one named, floating-point trainable parameter
+tensor in a fixed manifest. Running statistics and integer buffers are excluded
+from both this manifest and the controller's output; a training adapter must
+handle them separately without treating them as scored learning updates.
 
-The original protocol reports Intel- and AMD-capable TEE platforms. The
-protected path binds the identity, round, nonce, global-model digest, and
-received update digest before signing. The server verifies the quote/key
-binding, signature, freshness, and digest consistency before semantic audit.
-This sequence does not establish the integrity of externally collected gradient,
-loss, or instruction statistics. Their collection must be protected or supported
-by separately authenticated instrumentation. Per-platform TEE mechanisms and
-instrumentation are not specified in the available experiment record. The CPU-side TEE protects attestation-critical code, device keys, report integrity, nonce freshness, and the binding among client identity, round number, global-model digest, update digest, and signing key. It does not authenticate labels, samples, optimization objectives, semantic intent, or GPU memory. Consequently, the six attacks below may operate inside a valid measured training process; tampering with the update after attestation or attacks on the TEE implementation itself are excluded. Physical probing and advanced microarchitectural side channels are also excluded. The assumed malicious fraction is below 50\%; the 50\% experiment is a boundary stress test rather than evidence of a Byzantine guarantee. The main experiments use a 500-sample server proxy for reference and probes. The peer-reference branch only supplies a direction when that clean direction is unavailable; clean-loss and activation probes still require the proxy and are not silently treated as reference-free.
+\section{Evidence and State Control}
 
-\textbf{Design goals.} Trust Flow aims to retain useful heterogeneous
-contributions while restricting persistent risk. Execution provenance, current
-content, historical utility, and recent risk retain separate meanings until
-layer-wise aggregation. Recovery and low false-ban rates are empirical goals,
-not consequences of attestation alone.
-
-\section{Trust-Flow Framework}
-
-Each FL round passes through four linked decision stages: admission and runtime assessment, reference-based content auditing, dual-stream state evolution, and risk-gated layered aggregation. Global model update and feedback close the five-phase loop shown in Fig.~\ref{fig:framework}.
+Each round freezes the peer population, audits current updates, advances the
+states, and then aggregates eligible parameter blocks, as in
+Fig.~\ref{fig:framework}. Let $\mathcal D_t$ contain valid submissions from
+clients not previously blacklisted. Before processing any state transition,
+freeze
+\begin{equation}
+    \begin{split}
+        \mathcal R_t=\{k\in\mathcal D_t:\; & s_k^{(t-1)}\in
+        \{\mathrm{NORMAL},\mathrm{SUSPECT}\},                      \\
+                                           & r_k^{(t-1)}<\tau_s\}.
+    \end{split}
+\end{equation}
+A quarantined client supplies recovery evidence but never enters this round's
+peer statistics. Peer comparisons exclude the evaluated client itself.
 
 \begin{figure}[!htb]
-\centering
-\begin{tikzpicture}[font=\small, node distance=3.5mm, >=Latex,
- box/.style={draw,rounded corners,align=center,text width=7.2cm,inner sep=5pt}]
-\node[box] (admission) {\textbf{1. Admission}\\Verify report binding; receive valid recovery evidence};
-\node[box,below=of admission] (audit) {\textbf{2. Content audit}\\Freeze eligible peer statistics; compute content and probes};
-\node[box,below=of audit] (states) {\textbf{3. State evolution}\\Update $HistPerf^{(t)}$, $RiskEMA^{(t)}$, and client state};
-\node[box,below=of states] (layers) {\textbf{4. Layer aggregation}\\NORMAL/SUSPECT candidates $\to$ score gate $\to$ clipping\\
-Normalize $p_k RawScore_k^{(t)}$; empty survivors: no update};
-\node[box,below=of layers] (global) {\textbf{5. Model update}\\Apply surviving layer increments; broadcast next model};
-\draw[->] (admission)--(audit); \draw[->] (audit)--(states);
-\draw[->] (states)--(layers); \draw[->] (layers)--(global);
-\end{tikzpicture}
-\caption{Round order. Quarantined submissions can supply recovery
- evidence but cannot enter shared peer statistics or current aggregation.}
-\label{fig:framework}
+    \centering
+    \begin{tikzpicture}[font=\small, node distance=3.5mm, >=Latex,
+            box/.style={draw,rounded corners,align=center,text width=7.2cm,inner sep=5pt}]
+        \node[box] (admission) {\textbf{1. Admission}\\Verify report binding; receive valid recovery evidence};
+        \node[box,below=of admission] (audit) {\textbf{2. Content audit}\\Freeze eligible peer statistics; compute content and probes};
+        \node[box,below=of audit] (states) {\textbf{3. State evolution}\\Update $HistPerf^{(t)}$, $RiskEMA^{(t)}$, and client state};
+        \node[box,below=of states] (layers) {\textbf{4. Layer aggregation}\\NORMAL/SUSPECT candidates $\to$ score gate $\to$ clipping\\
+        Normalize $p_k RawScore_k^{(t)}$; empty survivors: no update};
+        \node[box,below=of layers] (global) {\textbf{5. Model update}\\Apply surviving layer increments; broadcast next model};
+        \draw[->] (admission)--(audit); \draw[->] (audit)--(states);
+        \draw[->] (states)--(layers); \draw[->] (layers)--(global);
+    \end{tikzpicture}
+    \caption{Round order. Quarantined submissions can supply recovery
+        evidence but cannot enter shared peer statistics or current aggregation.}
+    \label{fig:framework}
 \end{figure}
 
-The stages in Fig.~\ref{fig:framework} pass progressively different evidence to the aggregation decision. Admission and runtime assessment produce $TrustScore$, content auditing produces $ContentScore$, and state evolution accumulates evidence in $HistPerf$ and $RiskEMA$. Their combination yields $RawScore$, which controls layer privileges. The server first removes clients that fail the admission proof, then scores the remaining updates against the reference and peer group. Keeping contribution and risk distinct allows a weak single-round contribution to reduce influence without immediately ending a benign client's opportunity to recover.
+\subsection{Admission and Runtime Reliability}
 
-\subsection{Admission and Content Auditing}
-
-Each admitted client passes a TEE admission check. Let
-$M_{\mathrm{attest},k}\in\{0,1\}$ indicate whether the quote, nonce freshness,
-code identity, round identifier, current global-model digest, update digest, and
-signing-key binding are valid. The runtime observation is defined from the standardized behavior sequence
-$\mathcal{X}_k^{(t)}=\{\Delta\mathrm{grad},\Delta\mathrm{loss},
-\mathrm{instr\_dist}\}$. For a declared histogram with $B$ bins and probabilities $v_b$,
-$H=-\sum_b v_b\log v_b$ and $H_{\max}=\log B$. The entropy is normalized as
-$h_k^{(t)}=H(\mathcal{X}_k^{(t)})/H_{\max}\in[0,1]$. The observation and
-measurement-noise terms are
-\begin{equation}
-\begin{aligned}
-    R_k^{(t)}&=\exp(\lambda h_k^{(t)}),\\
-    Z_k^{(t)}&=\operatorname{clip}\!\left(
-    w_aM_{\mathrm{attest},k}+(1-w_a)(1-h_k^{(t)}),0,1\right).
-\end{aligned}
-\end{equation}
-where $w_a=0.7$ and $\lambda=1.0$. For a valid proof, $Z=1-0.3h$:
-entropy both increases measurement uncertainty and applies a soft reliability
-penalty to the observation mean. It is not a maliciousness label. The scalar random-walk Kalman recursion is
-\begin{equation}
-    T_k^{-,(t)}=T_k^{(t-1)},\quad P_k^{-,(t)}=P_k^{(t-1)}+Q,
-\end{equation}
-\begin{equation}
-\begin{aligned}
-    K_k^{(t)}&=\frac{P_k^{-,(t)}}{P_k^{-,(t)}+R_k^{(t)}},\\
-    T_k^{(t)}&=T_k^{-,(t)}+K_k^{(t)}
-        \left(Z_k^{(t)}-T_k^{-,(t)}\right),\\
-    P_k^{(t)}&=(1-K_k^{(t)})P_k^{-,(t)} .
-\end{aligned}
-\end{equation}
-with $Q=0.01$, $T_k^{(0)}=1$, and $P_k^{(0)}=0.25$. The admission score is
-\begin{equation}
-    TrustScore_k^{(t)}=M_{\mathrm{attest},k}
-    \operatorname{clip}\!\left(\frac{T_k^{(t)}}{1+P_k^{(t)}},0,1\right).
-\end{equation}
-A newly attested client starts in NORMAL; first-round evidence may reduce its
-current aggregation privilege but cannot directly create an irreversible blacklist.
-
-\textbf{Frozen peer statistics.} Let $\mathcal D_t$ be valid current submissions
-from clients not previously blacklisted. Before updating states, define
-\begin{equation}
-\begin{split}
-\mathcal R_t=\{k\in\mathcal D_t:\;&s_k^{(t-1)}\in
-\{\mathrm{NORMAL},\mathrm{SUSPECT}\},\\
-&RiskEMA_k^{(t-1)}<\tau_s\}.
-\end{split}
-\end{equation}
-This revision restricts shared reference and norm statistics to $\mathcal R_t$.
-Quarantined updates are audited against those frozen statistics for recovery
-but do not enter them. Peer comparisons for client $k$ exclude $k$ itself.
-If required peer or proxy evidence is absent, the audit is marked incomplete:
-the client's temporal states are held and its update is not aggregated.
-The original experiments must be checked for the same reference-set policy.
-
-The server next constructs a reference direction. In the reported protocol,
-$g_{\mathrm{root}}=g_{\mathrm{root\_clean}}$ is obtained from a server-held
-balanced proxy set of 500 CIFAR-10 test samples (50 per class), separate
-from client training. The direction must have the sign of a model increment,
-for example $-\eta_{ref}\nabla_W\mathcal L_{proxy}(W)$ with $\eta_{ref}>0$,
-because updates are applied as $W+\Delta W$. The exact reference optimizer and
-the proxy/evaluation split identifiers remain run-configuration requirements.
-If a clean direction is unavailable,
-the fallback is the normalized weighted mean of updates in $\mathcal R_t$, with
-$\omega_k^{\mathrm{ref}}=TrustScore_k(1-RiskEMA_k^{\mathrm{prev}})^2$.
-This fallback changes only the reference direction; the clean-loss and activation
-probes still require proxy inputs. For each update, content quality combines
-reference and peer consistency:
+Let $M_k\in\{0,1\}$ be the admission-verification result. Invalid admission
+excludes the update and freezes its temporal state. For valid nonzero
+submissions with complete server evidence, the runtime filter uses
 \begin{align}
-    S_{\mathrm{contrib},k}
-      &=\max\!\left(0,\alpha_1+\alpha_2
-        \cos(\Delta W_k,g_{\mathrm{root}})\right),\\
-    \rho_{kj}
-      &=\max\!\left(0,\alpha_1+\alpha_2
-        \cos(\Delta W_k,\Delta W_j)\right),\\
-    S_{\mathrm{consist},k}
-      &=\frac{\sum_{j\in\mathcal R_t\setminus\{k\}}TrustScore_j\rho_{kj}}
-        {\sum_{j\in\mathcal R_t\setminus\{k\}}TrustScore_j+\varepsilon},\\
-    ContentScore_k
-      &=\frac{(1+\beta_{\mathrm{fusion}}^2)
-        S_{\mathrm{consist},k}S_{\mathrm{contrib},k}}{D_k},\\
-    D_k&=\beta_{\mathrm{fusion}}^2S_{\mathrm{consist},k}
-        +S_{\mathrm{contrib},k}+\varepsilon.
+    R_k          & =\exp(\lambda h_k),                 \\
+    Z_k          & =w_a+(1-w_a)(1-h_k),                \\
+    P_k^-        & =P_k+Q,\quad K_k=P_k^-/(P_k^-+R_k), \\
+    T_k'         & =T_k+K_k(Z_k-T_k),                  \\
+    P_k'         & =(1-K_k)P_k^-,                      \\
+    TrustScore_k & =M_k T_k'/(1+P_k').
 \end{align}
-Here $\alpha_1=0.6$, $\alpha_2=0.4$, and $\beta_{\mathrm{fusion}}=2.0$.
-The score describes current update quality; it is not itself a permanent
-reputation decision.
+The fixed controller parameters are $w_a=0.7$, $\lambda=1$, $Q=0.01$,
+$T_0=1$, and $P_0=0.25$. Entropy increases measurement uncertainty and reduces
+the observation mean; it is not a label of maliciousness. Tests supply $h$
+directly, so their results do not validate a particular telemetry histogram,
+instruction-counter collector, or TEE deployment.
 
-\subsection{Dual-Stream State Evolution}
+\subsection{Server Audit and Optional Peer Evidence}
 
-\textbf{Cold start and first-round evidence.} At $t=1$, $HistPerf_k^{(0)}$ and $RiskEMA_k^{(0)}$ represent initial conditions rather than accumulated client behavior; the runtime trust estimate and covariance likewise start from their filter initialization. In the reference-assisted experimental setting, the server can construct $g_{root\_clean}$ without a client history. Once the first local updates arrive, runtime reports, reference alignment, peer consistency, and the available risk probes provide current-round evidence. These checks do not require a previously established reputation: they assess the first submitted update, while the two temporal streams begin accumulating evidence for later decisions.
+The mandatory audit uses a server reference and proxy measurements. For a
+training adapter, the reference increment is one full-proxy cross-entropy
+SGD step, $g=-10^{-3}\nabla_W\mathcal L_{proxy}(W)$, without momentum or weight
+decay. The controller consumes the resulting vector. Deterministic tests
+supply an explicit reference vector instead of running a model optimizer.
 
-A low content score can reflect either a useful client's skewed data or a harmful update. Since those cases require different participation decisions, Trust Flow retains historical utility and short-term risk separately. Let $q_k^{(t)}\in[0,1]$ denote normalized content quality. With the coefficients in Table~\ref{tab:setup} and nonnegative trust weights, $ContentScore_k^{(t)}$ already lies in this interval and serves directly as $q_k^{(t)}$. The unit-evidence form of the decayed Beta model adds $q_k^{(t)}$ to positive evidence and $1-q_k^{(t)}$ to negative evidence:
+A cosine is available only when both vector norms exceed
+$\varepsilon_n=10^{-12}$. An unavailable cosine is omitted from risk fusion;
+it is not set to zero and interpreted as disagreement. Let $c_k$ denote the
+available reference cosine. The direction risk is $(1-c_k)/2$ and the
+reference quality is $v_k=0.6+0.4c_k$. When the reference direction is
+unavailable, proxy behavior defines $v_k=(1-r_{loss,k})(1-r_{act,k})$.
+For usable peers $j\in\mathcal R_t\setminus\{k\}$, positive trust weights
+produce a mean cosine $\bar c_k$ and $a_k=0.6+0.4\bar c_k$. Then
 \begin{equation}
-    \begin{aligned}
-        \alpha_k^{(t)} &= \beta_h\alpha_k^{(t-1)}+q_k^{(t)},\\
-        \beta_k^{(t)} &= \beta_h\beta_k^{(t-1)}+1-q_k^{(t)}.
-    \end{aligned}
+    q_k=\begin{cases}
+        5a_kv_k/(4a_k+v_k), & \text{usable peers exist}, \\
+        v_k,                & \text{otherwise}.
+    \end{cases}
 \end{equation}
-Here $0<\beta_h<1$ is the history retention factor, distinct from the
-negative-evidence mass, and the reported protocol initializes
-$\alpha_k^{(0)}=\beta_k^{(0)}=1$, so $HistPerf_k^{(0)}=0.5$. The historical
-utility is
-\begin{equation}
-    HistPerf_k^{(t)}=\frac{\alpha_k^{(t)}}{\alpha_k^{(t)}+\beta_k^{(t)}+\varepsilon}.
-\end{equation}
-Decay allows later observations to revise the contribution history rather than preserving early evidence indefinitely.
+All available quantities lie in $[0,1]$; no peer value is imputed when the set
+is empty. The peer-risk channel, when available, is
+$r_{peer,k}=\operatorname{clip}(1-\bar c_k,0,1)$.
 
-After its initial transient, the history channel retains evidence across rounds. For a legitimate long-tail client, low similarity can lower aggregation privilege while leaving later rounds available for recovery. The risk channel instead retains recent warnings through $RiskEMA_k^{(t)}=\beta_rRiskEMA_k^{(t-1)}+(1-\beta_r)Risk_k^{inst}$, where $Risk_k^{inst}$ is the maximum current probe. Taking the maximum preserves a strong warning across probe channels; maintaining risk separately prevents a favorable history from altering that risk estimate. The state-transition rules then determine whether the evidence warrants review, quarantine, or permanent exclusion.
-
-The separation changes how borderline clients are treated. A client with weak content quality but no rising risk can remain in the system with reduced influence, giving later rounds an opportunity to clarify whether the deviation was benign. A client with favorable historical utility but rising attack risk instead faces restricted aggregation privileges. Low historical utility can lead to temporary soft isolation, while the risk stream records sustained anomalies separately from the contribution deficit.
-
-The two streams meet only when computing aggregation privilege:
+Write $\Delta\mathcal L_k=\mathcal L_{proxy}(W+\Delta W_k)-
+    \mathcal L_{proxy}(W)$. The mandatory server channels are
 \begin{align}
-    RawScore_k^{(t)} & = (TrustScore_k^{(t)})^\alpha\nonumber                                      \\
-                     & \quad\times(ContentScore_k^{(t)})^\beta(HistPerf_k^{(t)})^\gamma\nonumber \\
-                     & \quad\times(1-RiskEMA_k^{(t)})^p .
+    r_{loss,k} & =\operatorname{clip}\left(
+    \frac{\max\{0,\Delta\mathcal L_k\}}
+    {\delta_{loss}},0,1\right),                                    \\
+    r_{act,k}  & =\operatorname{clip}(d_{act,k}/\delta_{act},0,1).
 \end{align}
-The resulting state machine distinguishes NORMAL, SUSPECT, QUARANTINE, and
-BLACKLIST (Table~\ref{tab:state_transitions}). Historical utility does not cancel
-the risk estimate. However, geometric deviation affects both content quality
-and risk; separate states therefore do not imply independent evidence or
-guaranteed discrimination between heterogeneity and attacks.
+For a batch of $B$ matched inputs and activation vectors $A_i$ at a declared
+representation, activation drift is
+\begin{equation}
+    d_{act,k}=\frac1B\sum_{i=1}^B
+    \operatorname{KL}\!\left(\operatorname{softmax}(A_{base,i})
+    \Vert\operatorname{softmax}(A_{k,i})\right).
+\end{equation}
+Softmax is taken over flattened features of each sample, never over the batch.
+The same inputs and evaluation mode are used before and after the candidate
+update. For a ResNet-18 adapter, the declared representation is the 512-vector
+after global average pooling. The array implementation tests this sample axis;
+it does not claim a trained ResNet measurement.
 
-The current-round states enter the reported aggregation decision. Evidence is
-computed first, the state transition is applied second, the candidate set is
-formed third, and layer filtering and aggregation are performed last. A newly
-attested client can therefore lose current-round influence without being
-permanently banned; BLACKLIST becomes a gate on subsequent rounds.
+Each scale uses trusted calibration observations of its own nonnegative
+quantity: $\delta=\max\{10^{-6},\operatorname{median}(z)+3\operatorname{MAD}(z)\}$.
+Calibration inputs are separate from final evaluation inputs. Positive scales
+are required inputs to the controller. Recovery fixtures use synthetic zero
+loss/activation changes and scales of one; those are test inputs, not fitted
+CIFAR-10 calibration values.
 
-Let $u_k^{(t)}=1-HistPerf_k^{(t)}$ and $r_k^{(t)}=RiskEMA_k^{(t)}$.
-The thresholds $(\tau_h,\tau_s,\tau_q,\tau_b)=(0.26,0.64,0.80,0.90)$
-refer to contribution deficit, persistent review risk, instantaneous quarantine
-risk, and persistent blacklist risk, respectively.
+Amplitude risk is $\operatorname{clip}(\|\Delta W_k\|/b_k-1,0,1)$, where
+$b_k$ is the median nonzero norm of usable peer updates. With no usable peer,
+$b_k=\|g\|$. The channel is omitted if this scale is at most $\varepsilon_n$.
+Instantaneous risk $z_k$ is the maximum of the two mandatory server channels
+and all available geometric channels. Missing proxy evidence freezes history,
+risk, and counters and yields zero aggregation weight. A full-update norm at
+most $\varepsilon_n$ is a no-operation submission with the same freeze rule;
+it cannot build reputation or create a direction alarm.
+
+This separates recovery from peer availability: when all clients are
+quarantined, valid nonzero updates can still be evaluated against the trusted
+server. Loss of the server audit service intentionally suspends recovery;
+that external dependency is distinct from a circular peer-state dependency.
+
+\subsection{History, Risk, and Persistent Transitions}
+
+Each complete nonzero submission adds unit evidence to the history model:
+\begin{align}
+    a_k' & =\beta_h a_k+q_k,  & b_k' & =\beta_h b_k+1-q_k,          \\
+    H_k' & =a_k'/(a_k'+b_k'), & r_k' & =\beta_r r_k+(1-\beta_r)z_k.
+\end{align}
+Initialization is $a_0=b_0=1$, $r_0=0$; $\beta_h=0.9$ and $\beta_r=0.85$.
+The strictly positive evidence masses require no additive denominator offset.
+History and risk share some geometric inputs and are not statistically
+independent evidence streams.
+
+\textbf{Utility threshold.} The review condition is
+\begin{equation}
+    B_k=(H_k'<0.26)\ \lor\ (r_k'\ge0.64).
+\end{equation}
+Thus 0.26 is a lower bound on historical utility, not a threshold on $1-H_k$.
+A favorable recovery observation satisfies $\neg B_k$. The transitions in
+Table~\ref{tab:states} are evaluated using the starting state and updated
+history/risk. At most one transition occurs per complete submission; escalation
+has priority. Each counter counts consecutive qualifying observations in its
+starting state, resets on a failed condition, and all counters reset after a
+transition. Missing or no-operation submissions freeze counters. There is no
+instantaneous override of the EMA or extra attack-specific blacklist branch.
 
 \begin{table}[!htb]
     \centering
-    \caption{State-transition order used in every communication round.}
-    \label{tab:state_transitions}
-    \scriptsize
-    \setlength{\tabcolsep}{1pt}
-    \begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}>{\raggedright\arraybackslash}p{1.8cm}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{2.4cm}@{}}
+    \caption{Controller transitions; all thresholds apply to updated evidence.}
+    \label{tab:states}
+    \footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}p{1.95cm}p{3.8cm}p{1.85cm}@{}}
         \toprule
-        From & Trigger and persistence & Action \\
+        Start      & Condition                                & End        \\
         \midrule
-        NORMAL & $u>\tau_h$ or $r\ge\tau_s$ for 2 submitted rounds & SUSPECT; current update remains conditional \\
-        SUSPECT & same condition for 3 rounds, or $Risk^{inst}\ge\tau_q$ & QUARANTINE; current update excluded \\
-        QUARANTINE & $r\ge\tau_b$ for 4 rounds & BLACKLIST; next-round gate \\
-        SUSPECT or QUARANTINE & $u\le\tau_h$ and $r<\tau_s$ for 2 rounds & recover one state level \\
+        NORMAL     & $B_k$ for 2 complete submissions         & SUSPECT    \\
+        SUSPECT    & $B_k$ for 3 submissions, or $z_k\ge0.80$ & QUARANTINE \\
+        QUARANTINE & $r_k'\ge0.90$ for 4 submissions          & BLACKLIST  \\
+        QUARANTINE & $\neg B_k$ for 2 submissions             & SUSPECT    \\
+        SUSPECT    & $\neg B_k$ for 2 submissions             & NORMAL     \\
         \bottomrule
-    \end{tabular*}
+    \end{tabular}
 \end{table}
 
-The instantaneous quarantine branch applies to clients entering the round in
-SUSPECT, as in the original state rule. For NORMAL clients, instantaneous risk
-still affects the current risk EMA and score. To make the transition order
-explicit, this revision specifies at most one transition per submitted round,
-with escalation taking precedence over recovery. Recovery is QUARANTINE
-$\to$ SUSPECT or SUSPECT $\to$ NORMAL. Counters are local to the starting state,
-reset on a state change or a failed condition, and advance only on valid
-submissions. Missing submissions freeze historical evidence, risk, and counters.
-BLACKLIST excludes the current update and rejects future submissions; it is
-irreversible within a run. These timing conventions require checking against
-the implementation that produced the retained results.
+Newly quarantined or blacklisted updates are excluded immediately. BLACKLIST
+also rejects future submissions. Recovery to SUSPECT restores conditional
+current-round eligibility. Recovery does not itself imply passing a layer gate
+or applying a nonzero model update; those endpoints are logged separately.
 
-\subsection{Risk-Gated Layered Aggregation}
+\section{Aggregation with Attainable Gates}
 
-Backdoor effects may concentrate in deeper layers even when shallow features
-retain useful heterogeneous information. Layer sensitivity sets both the score
-gate and clipping radius. With $L$ layers and $l=1,\ldots,L$, the original
-sensitivity components are
+Let $\mathcal E_t$ contain complete nonzero audited submissions. After state
+transitions, form $\mathcal A_t=\{k\in\mathcal E_t:
+    s_k^{(t)}\in\{\mathrm{NORMAL},\mathrm{SUSPECT}\}\}$.
+The unnormalized credibility score remains
+\begin{equation}
+    F_k=TrustScore_k^3 q_k\sqrt{H_k'}(1-r_k').
+\end{equation}
+A fixed gate near one is unsuitable because filter uncertainty suppresses the
+entire attainable score range. Instead, normalize only the gate comparison by
+a deterministic best-evidence envelope at the client's evidence age $n_k^e$.
+Here $n_k^e$ counts complete nonzero submissions and is distinct from the
+training-record count $n_k$.
+
+Starting from $\underline P_0=0.25$, $a_0^+=b_0^-=1$, define
 \begin{align}
- S_{priv}^{(l)}&=\exp(-\tau_p l/L),\\
- S_{util}^{(l)}&=\frac{\|g_{root}^{(l)}\|_2}
- {\max_m\|g_{root}^{(m)}\|_2+\varepsilon},\\
- S_{sec}^{(l)}&=\frac{1}{2}\left(1-\frac{1}{|\mathcal T_t|}
- \sum_{k\in\mathcal T_t}\cos(\Delta W_k^{(l)},g_{root}^{(l)})\right).
+    \underline P_n & =\frac{\underline P_{n-1}+Q}{1+\underline P_{n-1}+Q},                          \\
+    a_n^+          & =0.9a_{n-1}^++1,                                      & b_n^- & =0.9b_{n-1}^-, \\
+    U_n            & =(1+\underline P_n)^{-3}
+    \sqrt{a_n^+/(a_n^++b_n^-)}.
 \end{align}
-Here $\mathcal T_t$ contains aggregation candidates with previous risk below
-$\tau_s$; if empty, the original rule uses the aggregation candidates for
-these statistics. If neither set contains an update, the layer remains unchanged.
-$C_{base}$ is the median update norm over the same nonempty set. A zero median
-is handled by leaving the layer unchanged. The indexing and numerical
-stabilizers, including $\varepsilon_c$, must be recorded in the run configuration.
+Since $R\ge1$, $T\le1$, $q\le1$, and $r\ge0$, induction gives $F_k\le U_{n_k^e}$.
+The bound is attained with valid admission, $h=0$, $q=1$, and $z=0$ at every
+complete observation. The dimensionless gate score is $G_k=F_k/U_{n_k^e}$;
+actual weights continue to use $F_k$, preserving the covariance penalty there.
 
-The privacy term decreases with depth, the utility term reflects the relative reference-gradient norm of the layer, and the security term measures deviation from the reference direction. The combined sensitivity is
-\begin{equation}
-    S_{total}^{(l)}=w_pS_{priv}^{(l)}+w_u(1-S_{util}^{(l)})+w_sS_{sec}^{(l)},
-\end{equation}
-where $w_p,w_u,w_s$ are the nonnegative component weights. The resulting sensitivity determines both the admission threshold and clipping radius:
-\begin{equation}
-    \theta^{(l)}=\mu_{base}+\lambda_sS_{total}^{(l)},\qquad
-    C^{(l)}=\frac{C_{base}}{S_{total}^{(l)}+\varepsilon_c}.
-\end{equation}
-A layer showing stronger suspicious drift therefore has a higher entry threshold and a smaller clipping radius. Here $C_{base}>0$ is the base update-norm scale, while $\varepsilon_c>0$ stabilizes the denominator. Layers that remain close to the reference retain more capacity for benign heterogeneity.
+\subsection{Layer Statistics and Clipping}
 
-\textbf{Audit eligibility and aggregation eligibility.} A quarantined client
-may supply recovery evidence without entering the frozen peer reference.
-Let $\mathcal E_t\subseteq\mathcal D_t$ contain submissions with a complete
-audit and $s_k^{(t)}$ denote the resulting state. The aggregation candidates are
-\begin{equation}
-    \mathcal A_t=\{k\in\mathcal E_t\mid
-    s_k^{(t)}\in\{\mathrm{NORMAL},\mathrm{SUSPECT}\}\}.
-\end{equation}
-SUSPECT retains conditional eligibility under the score and layer gates, whereas QUARANTINE and BLACKLIST have no aggregation weight. State transitions are applied before forming $\mathcal A_t$: a quarantine decision removes the current update, and the current-round score is used for the remaining candidates. Recovery restores eligibility only after the state transition has occurred.
-
-The round therefore proceeds from valid submissions to current evidence, state updates, candidate selection, and finally layer filtering and aggregation. The surviving clients are $\Phi_t^{(l)}=\{k\in\mathcal A_t\mid RawScore_k^{(t)}\ge\theta^{(l)}\}$, written as $\Phi^{(l)}$ below for brevity. For a nonempty survivor set, their weights are re-normalized:
-\begin{equation}
-    \begin{aligned}
-        \tilde{w}_{k}^{(l)}        & =\frac{p_k\,RawScore_k^{(t)}}{\sum_{j\in\Phi^{(l)}}p_jRawScore_j^{(t)}+\varepsilon}, \\
-        \widehat{\Delta W}_k^{(l)} & =\frac{\Delta W_k^{(l)}}{\max(1,\|\Delta W_k^{(l)}\|_2/C^{(l)})}.
-    \end{aligned}
-\end{equation}
-The final layer update is $\Delta W_{global}^{(l)}=\sum_{k\in\Phi^{(l)}}\tilde{w}_{k}^{(l)}\widehat{\Delta W}_k^{(l)}$. When $\Phi^{(l)}$ is empty, the layer is left unchanged; no client is backfilled across the layer gate. This rule prevents an empty gate from being bypassed by selecting the largest raw score, and a quarantined or blacklisted client therefore never contributes through a fallback. The data-size factor $p_k$ retains sample-size information in the credibility-adjusted aggregation, while filtering and clipping mean that the original unfiltered objective is not claimed to be preserved exactly. For survivor mass $Z_l=\sum_{j\in\Phi^{(l)}}p_jRawScore_j$, the normalized weights sum to $Z_l/(Z_l+\varepsilon)$. This compensates for removed mass up to the denominator stabilizer; it is score normalization, not a simplex projection.
-
-
-
-Layer-wise control allows the same client update to receive different treatment across the network. When a semantic backdoor mainly alters deep features, sensitivity-dependent thresholds and clipping can constrain those layers while allowing more of a consistent shallow-layer update to contribute. Re-normalization addresses a separate optimization effect: removing clients also removes aggregation weight, which would otherwise reduce the update magnitude merely because filtering occurred. The normalized survivor weights separate that magnitude effect from the intended clipping operation.
-
-\paragraph{Cold-start gate bound.} With the stated initialization and the
-most favorable first-round evidence, the equations imply
-\begin{equation}
-\begin{split}
-P^{(1)}&=0.26/1.26,\quad HistPerf^{(1)}\leq1.9/2.8,\\
-RawScore^{(1)}&\leq(1+0.26/1.26)^{-3}\sqrt{1.9/2.8}\\
-&\approx0.46922.
-\end{split}
-\end{equation}
-Thus $S_{total}^{(l)}>0.05769$ rules out first-round survivors under
-$\theta^{(l)}=0.4+1.2S_{total}^{(l)}$. These are analytical consequences of the
-reported parameters, not measured gate frequencies. The threshold range can
-also exceed one, above every possible raw score. Removing the original
-highest-score fallback therefore changes an operationally significant branch;
-per-layer survival and skipped-update counts are needed to validate it.
-
-\paragraph{Interpretation of the history stream.} The decayed Beta evidence has a
-finite effective mass and therefore behaves as a startup-corrected exponential
-smoother: early observations have larger gain, while later evidence is retained
-with factor $\beta_h$. Its first-observation gain is $1/2.8$, whereas the risk
-EMA gain is $0.15$; the history stream is slower only in the steady-state
-sense (gain approaching $0.1$). Bounded observations keep states bounded;
-recovery additionally requires subsequent evidence to satisfy the recovery
-conditions. Neither boundedness nor separate state storage guarantees recovery.
-
-\subsection{Risk Probe Computation}
-
-All instantaneous risk channels are mapped to $[0,1]$ before fusion. For a
-candidate update, the geometric and amplitude probes are
+Layer statistics use $\mathcal T_t=\mathcal R_t\cap\mathcal A_t$. This is a
+current-eligibility filter on the frozen peer set. Newly recovered clients may
+aggregate but cannot influence the same-round layer statistics. For blocks
+$l=1,\ldots,L$, define
 \begin{align}
- r_{\mathrm{grad},k}^{(t)}
- &=\operatorname{clip}\!\left(
- \frac{1-\cos(\Delta W_k,g_{\mathrm{root}})}{2},0,1\right),\\
- r_{\mathrm{amp},k}^{(t)}
- &=\operatorname{clip}\!\left(
- \frac{\|\Delta W_k\|_2}{\operatorname{median}_{j\in\mathcal R_t}\|\Delta W_j\|_2+\varepsilon}
- -1,0,1\right).
+    S_{depth}^{(l)} & =e^{-3l/L},                                                 \\
+    S_{util}^{(l)}  & =\|g^{(l)}\|/\max_m\|g^{(m)}\|,                             \\
+    S_{sec}^{(l)}   & =\tfrac12(1-\operatorname{mean}_{k\in\mathcal T_t}
+    \cos(\Delta W_k^{(l)},g^{(l)})),                                              \\
+    S_l             & =0.3S_{depth}^{(l)}+0.3(1-S_{util}^{(l)})+0.4S_{sec}^{(l)}.
 \end{align}
-The clean-loss probe uses the server proxy:
+Only available cosines enter the mean. An empty cosine set gives no peer
+disagreement contribution, $S_{sec}=0$, and is recorded as missing peer evidence.
+If all root blocks have zero norm, set $S_{util}=0$.
+The depth component is a heuristic prior, not a measured privacy risk or a
+privacy guarantee.
+
+The bounded gate and clipping radius are
 \begin{equation}
-    r_{\mathrm{probe},k}^{(t)}
-    =\operatorname{clip}\!\left(
-     \frac{\mathcal L_{\mathrm{proxy}}(W+\Delta W_k)
-           -\mathcal L_{\mathrm{proxy}}(W)}
-          {\delta_{\mathrm{clean}}},0,1\right),
+    \theta_l=0.4+0.6\frac{1.2S_l}{1+1.2S_l},\qquad
+    C_l=\frac{C_{base,l}}{1+S_l}.
 \end{equation}
-where $z_j=\max\{0,\mathcal L_{\mathrm{proxy}}(W+\Delta W_j)-
-\mathcal L_{\mathrm{proxy}}(W)\}$ is computed on trusted calibration updates and
-$\delta_{\mathrm{clean}}=\max\{\varepsilon_\delta,\operatorname{median}_j(z_j)+
-3\operatorname{MAD}_j(z_j)\}>0$, with $\varepsilon_\delta>0$ and
-$\operatorname{MAD}(z)=\operatorname{median}|z-\operatorname{median}(z)|$.
-The positive-part calibration is a revised specification; its calibration
-updates and scale must be supplied before attributing measured results to it.
-The activation-drift probe follows the original softmax-normalized activation
-definition, with $\mathcal H(A)=\operatorname{softmax}(\operatorname{vec}A)$
-on the same proxy inputs and the same monitored representation:
+Here $C_{base,l}$ is the median norm of block $l$ over $\mathcal T_t$;
+it is not the norm of the complete model update. If $\mathcal T_t$ is empty,
+use the corresponding server-reference norm $\|g^{(l)}\|$. A radius at most
+$\varepsilon_n$ leaves that block unchanged. Thus trusted server evidence also
+supplies a defined aggregation path after collective quarantine, without
+using quarantined updates to set their own thresholds or clipping radii.
+
+Because $0\le S_l\le1$, $0.4\le\theta_l\le0.727273<1$. The attainable
+best-evidence score $G_k=1$ passes every such gate, including at the first
+complete submission. This eliminates structural impossibility caused by the
+score envelope; it does not guarantee that noisy or heterogeneous updates pass.
+
+\subsection{Survivors and Applied Updates}
+
+For a positive clipping radius, survivors are
 \begin{equation}
- r_{\mathrm{trigger},k}^{(t)}
- =\operatorname{clip}\!\left(
- \frac{\mathrm{KL}\!\left(\mathcal H(A_{\mathrm{base}})
- \Vert\mathcal H(A_k)\right)}
- {\delta_{\mathrm{trigger}}+\varepsilon},0,1\right).
+    \Phi_l=\{k\in\mathcal A_t:G_k\ge\theta_l,\ F_k>0,
+    \|\Delta W_k^{(l)}\|>\varepsilon_n\}.
 \end{equation}
-Here $\delta_{trigger}>0$ is the original trusted activation-drift scale.
-The monitored layer, calibration updates, and numeric scale are unresolved
-configuration details; a 32-bin histogram is not assumed. The probe does not
-require knowledge of the attacker's trigger. Peer disagreement uses the
-original weighted mean of pairwise cosines:
-\begin{equation}
-\begin{split}
-\bar c_k&=\frac{\sum_{j\in\mathcal R_t\setminus\{k\}}TrustScore_j
-\cos(\Delta W_k,\Delta W_j)}
-{\sum_{j\in\mathcal R_t\setminus\{k\}}TrustScore_j+\varepsilon},\\
-r_{peer,k}&=\operatorname{clip}(1-\bar c_k,0,1).
-\end{split}
-\end{equation}
-Cosines with a zero-norm argument are assigned zero in the revised definition.
-The instantaneous risk is
-\begin{equation}
-\begin{aligned}
- Risk_k^{\mathrm{inst}}&=\max\{r_{\mathrm{grad},k},r_{\mathrm{amp},k},
- r_{\mathrm{probe},k},\\
- &\qquad r_{\mathrm{trigger},k},r_{\mathrm{peer},k}\},\\
- RiskEMA_k^{(t)}&=\beta_rRiskEMA_k^{(t-1)}
- +(1-\beta_r)Risk_k^{\mathrm{inst}}.
-\end{aligned}
-\end{equation}
-with $\beta_r=0.85$. The maximum preserves a strong warning while the common
-range bounds each channel but does not equalize false-alarm probabilities.
-At zero cosine, the direction probe is $0.5$ while the peer probe can be $1$.
-Per-channel distributions for benign IID, benign heterogeneous, and malicious
-updates are therefore needed to assess the maximum fusion rule.
+If $\Phi_l$ is empty, $\Delta W_{global}^{(l)}=0$. No state exclusion or gate
+is bypassed by a fallback. Otherwise positive survivor mass permits exact
+normalization:
+\begin{align}
+    w_k^{(l)}                  & =\frac{n_k F_k}{\sum_{j\in\Phi_l}n_j F_j},             \\
+    \widehat{\Delta W}_k^{(l)} & =\Delta W_k^{(l)}
+    \min\{1,C_l/\|\Delta W_k^{(l)}\|\},                                                 \\
+    \Delta W_{global}^{(l)}    & =\sum_{k\in\Phi_l}w_k^{(l)}\widehat{\Delta W}_k^{(l)}.
+\end{align}
+Weights sum to one on a nonempty survivor set. Each clipped block norm is at
+most $C_l$, so the triangle inequality also bounds the aggregate norm by $C_l$.
+Individual nonzero contributions can cancel; a selected block, a positive
+weight, and a nonzero aggregate increment are therefore distinct endpoints.
 
-\subsection{Assurance Composition and Reference Role}
+The audit records client, round, trainable-block name, starting/ending state,
+quality, instantaneous and smoothed risk, history, persistence counters,
+transition reason, raw and gate scores, threshold, survivor membership,
+normalized weight, pre/post-clipping norms, and applied contribution norm.
+Per-block logs additionally record survivor count, clipping radius, skipped
+updates, and the norm of the summed increment.
 
-The evidence sources complement one another because each resolves a different uncertainty. Attestation and privacy-aware verification establish execution provenance and bounded statistics for admission, while cloud auditing examines the submitted update against reference and peer evidence. Temporal states retain the distinction between a transient deviation and persistent risk. Passing the measured execution path therefore leads into semantic auditing; it does not bypass it. A single low-similarity observation can reduce contribution without causing permanent exclusion, whereas sustained direction or probe risk can still drive quarantine and later blacklisting through the state machine.
+\section{Executable Protocol Verification}
 
-A clean validation gradient supplies a stable reference when available, while the peer-reference branch constructs a guiding direction from admitted updates when it is unavailable. Reference agreement contributes to content quality alongside peer consistency; historical contribution and recent risk then influence participation. The reference is therefore one input to auditing rather than a substitute for the dual-stream policy.
+\subsection{Scope and Reproduction}
 
-\subsection{From Separate States to Participation Decisions}
+The evidence in this section is generated by the revision's reference
+controller and fixed configuration, not by training a classifier.
+\texttt{protocol\_v7/controller.py} implements the audit, states, envelope,
+and block aggregation; \texttt{config.json} fixes its parameters.
+\texttt{validate.py} executes eleven test groups and exports state, block,
+and layer events plus SHA-256 hashes. Constructed observations are explicitly
+identified as test inputs. The randomized check uses seed 20261001, 100
+sequences, and 100 observations per sequence. No repeated-training SD or
+statistical superiority is inferred from these checks.
+Table~\ref{tab:verification} lists the fixed conditions and checked endpoints.
 
-The distinction between historical contribution and recent risk matters most for clients near a participation boundary. A client with low utility but low risk may receive reduced influence or reversible review, allowing later evidence to clarify whether its deviation was benign. A client with substantial past utility and rising risk instead faces restrictions despite that history. Persistent high risk is required for irreversible blacklisting, so the same threshold need not serve simultaneously as a contribution filter and a permanent-exclusion rule.
-
-Let $B_k$ collect the fixed admission, content, and history factors in
-$RawScore_k=B_k(1-r)^p$. For $p>0$ and $0\leq r<1$,
-\begin{equation}
-    \begin{aligned}
-        \frac{\partial [B_k(1-r)^p]}{\partial r} & =-pB_k(1-r)^{p-1}\leq0, \\
-        r                                        & =RiskEMA_k^{(t)}.
-    \end{aligned}
-\end{equation}
-At $r=1$, the score is zero. This statement concerns the unnormalized score with the other factors fixed; layer selection and normalization determine the update that is eventually applied. SUSPECT and QUARANTINE are recoverable states, allowing later evidence to revise a temporary restriction. Low similarity alone is therefore not a one-round permanent-ban trigger, but a sustained risk signal can still cause exclusion under the explicit persistence rules.
-
-The empirical evaluation must distinguish the state policy from its evidence inputs. A temporal-policy comparison requires identical probes and a matched tuning budget; a probe ablation requires the same state policy. Final-ban outcomes alone do not establish contribution or recovery during training.
-
-\section{Experiments}
-
-\subsection{Reported Setup}
-
-The tests involve twenty admitted training clients and eight additional
-admission-test identities: five Sybils without valid certificates and three
-free-riders with invalid workload evidence, rejected before training statistics.
-The main training setting has fourteen benign and six malicious clients;
-the boundary stress test has ten of each.
-
-The experimental record follows the original manuscript: Flower 1.5.0 and
-PyTorch train a CIFAR-10-adapted ResNet-18 with a $3\times3$, stride-one first
-convolution, no initial max pooling, and ten output classes. It reports two
-Intel/AMD TEE-capable CPU platforms with five NVIDIA A10 GPUs, Ubuntu 20.04.6
-LTS, and CUDA 12.8. CPU-side protection covers admission and reporting; GPU
-training is outside that boundary. Each platform has five runs, for ten
-platform--seed runs in total. Both platforms use the same five seeds, data
-partitions, and attack schedules, giving five paired experimental conditions
-and ten executions. Per-platform aggregates are unavailable in the retained
-record.
-
-\textbf{Evidence scope.} Tables~\ref{tab:main_results}--\ref{tab:ablation}
-retain the original reported values. The author confirms ten platform--seed
-runs, final-ban semantics, and the stated transition timing and reference-set
-conventions. The explicit empty-survivor and positive-part calibration rules
-remain specification changes without matched repeated-run results. A separate
-local diagnostic trace is reported in Table~\ref{tab:local_trace}; its different
-attack configuration, probe access, and simulated attestation prevent pooling
-it with the main comparison.
-
-\begin{table}[!htb]
-\centering
-\caption{Original experimental configuration.}
-\label{tab:setup}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}p{1.3cm}p{3.0cm}p{3.4cm}@{}}
-\toprule
-Category & Setting & Value \\
-\midrule
-Task & Model & ResNet-18 \\
-Training & Local epochs; lr; momentum; rounds & $3$; $0.001$; $0.9$; $30$ \\
-Data & Shared / exclusive images & $5000$ / $45000$ \\
-Admission & $w_a,\lambda,Q$ & $0.7,1.0,0.01$ \\
-Initial state & $T_0,P_0,RiskEMA_0$ & $1,0.25,0$ \\
-Content & $\alpha_1,\alpha_2,\beta_{fusion}$ & $0.6,0.4,2.0$ \\
-Memory & $\beta_h,\beta_r$ & $0.9,0.85$ \\
-States & $(\tau_h,\tau_s,\tau_q,\tau_b)$ & $(0.26,0.64,0.80,0.90)$ \\
-Persistence & Review; quarantine; blacklist; recovery & $2$; $3$; $4$; $2$ submissions \\
-Score & $(\alpha,\beta,\gamma,p)$ & $(3.0,1.0,0.5,1.0)$ \\
-Layers & $\mu_{base},\lambda_s,\tau_p$ & $0.4,1.2,3.0$ \\
-Sensitivity & $(w_p,w_u,w_s)$ & $(0.3,0.3,0.4)$ \\
-\bottomrule
-\end{tabular}
-\end{table}
+The prior classification tables and partial implementation trace are retained
+in the accompanying provenance archive. They do not evaluate this controller
+and are not used as its accuracy, attack-success, ablation, or hardware-cost
+results. The tests below establish specific executable properties and expose
+the conditions under which recovery is possible.
 
 \begin{table*}[!t]
-\centering
-\begin{threeparttable}
-\caption{Reported main comparison. Accuracy and macro targeted ASR are
-percentages (mean $\pm$ SD over ten platform--seed runs).}
-\label{tab:main_results}
-\footnotesize
-\setlength{\tabcolsep}{5pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}llccc@{}}
-\toprule
-Method / setting & Mechanism & Accuracy & Macro target ASR & Final-ban FPR \\
-\midrule
-FedAvg \cite{mcmahan2017fedavg} & No defense & $86.15\pm1.20$ & $92.34\pm5.10$ & N/A \\
-Krum \cite{blanchard2017krum} & Geometric selection & $64.20\pm2.80$ & $12.15\pm0.90$ & N/A \\
-Trimmed Mean \cite{yin2018byzantine} & Coordinate trimming & $71.35\pm2.40$ & $38.60\pm4.20$ & N/A \\
-FLTrust \cite{cao2021fltrust} & Clean reference & $81.25\pm1.50$ & $15.42\pm1.10$ & N/A \\
-Trust Flow & Dual states + layer gates & $92.31\pm0.09$ & $10.21\pm0.05$ & $0.00$ \\
-\midrule
-Trust Flow: 50\% malicious & Boundary stress, 10/20 malicious & $91.81\pm0.10$ & $10.46\pm0.06$ & $0.00$ \\
-\bottomrule
-\end{tabular*}
-\begin{tablenotes}\footnotesize
-\item Final-ban FPR is the fraction of benign clients permanently blacklisted
-at the end of a run. It is undefined for stateless aggregation baselines (N/A).
-The original pooling script and per-platform values are unavailable.
-\end{tablenotes}
-\end{threeparttable}
+    \centering
+    \caption{Executed control tests. Inputs are constructed; none is a CIFAR-10 or hardware measurement.}
+    \label{tab:verification}
+    \footnotesize
+    \begin{tabular}{@{}p{4.1cm}p{6.0cm}p{6.1cm}@{}}
+        \toprule
+        Case                          & Fixed condition                                                      & Checked result                                                 \\
+        \midrule
+        Legacy deadlock reproduction  & $q=0.8$, $z=0.3$, utility cutoff $0.74$, mandatory peers             & SUSPECT at 2, QUARANTINE at 5; frozen at 6--40                 \\
+        Healthy startup               & $q=0.8$, $z=0.3$, utility floor $0.26$                               & NORMAL throughout 40 complete observations                     \\
+        Collective recovery           & 20 clients initially quarantined, $r_0=0.95$; server audit available & Nonzero aggregate at 4; all NORMAL at 6                        \\
+        Maximal risk                  & $q=1$, $z=1$, $r_0=0$, pure EMA                                      & SUSPECT at 8; QUARANTINE at 9; BLACKLIST at 18                 \\
+        Gate envelope                 & Ideal evidence for 100 ages, 101 sensitivities                       & All 10,100 age--sensitivity checks pass                        \\
+        Empty survivors               & Low-score candidate; high-score quarantined client                   & Zero increment, no backfill                                    \\
+        Missing evidence / one client & Missing proxy; then valid server audit without peers                 & Freeze on missing proxy; sole survivor weight 1                \\
+        Zero / tiny update            & Norms $0$, $10^{-15}$, $10^{-12}$                                    & No direction alarm, history gain, or applied update            \\
+        Sample weights / clipping     & Equal scores, training counts in ratio $1:3$                         & Weights $0.25/0.75$; aggregate norm within radius              \\
+        Calibration / activation      & Zero calibration values; two-sample activations                      & Positive $10^{-6}$ floor; KL uses sample-wise softmax          \\
+        Bounded random evidence       & 10,000 bounded observations                                          & Bounded states and scores; excluded states have no eligibility \\
+        \bottomrule
+    \end{tabular}
 \end{table*}
 
-\begin{table*}[!t]
-\centering
-\begin{threeparttable}
-\caption{Reported state outcomes, separated by endpoint (\%). N/R: not reported.}
-\label{tab:ablation}
-\footnotesize
-\setlength{\tabcolsep}{5pt}
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lcccc@{}}
-\toprule
-Variant & Final-ban FPR & Final-ban TPR & Review FPR & Review TPR \\
-\midrule
-Single-stream EMA, aggressive & $18.25^{\dagger}$ & $95.12^{\dagger}$ & N/R & N/R \\
-Single-stream EMA, conservative & $2.10^{\dagger}$ & $48.33^{\dagger}$ & N/R & N/R \\
-HistPerf-only & $0.15^{\dagger}$ & $21.05^{\dagger}$ & N/R & N/R \\
-Trust Flow & $0.00$ & $100.00$ & $14.79$ & $88.33$ \\
-\bottomrule
-\end{tabular*}
-\begin{tablenotes}\footnotesize
-\item $\dagger$ Original reported values, with final-ban semantics confirmed by
-the author; exact numerators, denominators, and pooling remain unresolved.
-The marked entries cannot be reconstructed from equally weighted final-state
-counts over ten runs of 14 benign and 6 malicious clients. They are not used
-to infer a matched-count advantage over the other policies.
-\end{tablenotes}
-\end{threeparttable}
-\end{table*}
+\subsection{Recovery and Startup Behavior}
 
-The 50,000 CIFAR-10 training images are divided into a 5,000-image shared
-pool replicated at every client and 45,000 exclusive images. The exclusive
-partition is IID for clients 0--9, Dirichlet $\alpha=1.0$ for clients 10--14,
-and $\alpha=0.1$ for clients 15--19. For a client with the average exclusive
-size of 2,250, shared images account for $5000/(5000+2250)=68.97\%$ of its
-training set. This is a calculation from the stated split, not a measured
-mean of client-specific ratios. The ratios depend on the actual exclusive
-sizes. Dirichlet concentration therefore describes only the exclusive portion,
-not the full local distribution.
+The previous utility-deficit interpretation triggered review whenever
+$H<0.74$. With $q=0.8$, $z=0.3$, and the stated initial evidence, the first five
+history values are $0.6071$, $0.6619$, $0.6951$, $0.7171$, and $0.7328$.
+The legacy two/three-step review policy enters collective quarantine at the
+fifth observation. When mandatory peer evidence is then unavailable, the
+history freezes. The independent reproduction retains that frozen value
+through round 40. Using the utility floor $H<0.26$ removes this startup
+restriction for the same constructed sequence.
 
-Writing $\mathcal D_k=\mathcal D_{shared}\cup\mathcal D_{k,exclusive}$ gives
-$\sum_k|\mathcal D_k|=145{,}000$ training records under replication. If $p_k$
-uses the full local training size as defined in Section~3, shared images are
-counted at each client; this differs from the objective over 50,000 unique
-images. The run configuration must establish which counts generated the
-retained results. The server additionally has a balanced 500-image proxy
-from CIFAR-10 test data, with 50 images per class. It is separate from client
-training and supplied to reference-dependent baselines. Proxy, calibration,
-and final evaluation indices must be checked for overlap; the available
-record does not establish that split. FedAvg, Krum, and Trimmed Mean do not
-use the proxy.
+To test recovery independently of that threshold correction, a second test
+places all twenty clients directly in QUARANTINE with initial risk 0.95,
+initial history 0.5, and reset counters. Every subsequent submission is valid,
+nonzero, aligned with the server reference $(1,0)$, and has zero proxy loss and
+activation change. Calibration scales are one and entropy is zero. Thus the
+recovery audit has $q=1$, $z=0$ even while $\mathcal R_t=\varnothing$.
+Risk falls below 0.64 at the third audit; the second favorable audit at round
+four permits QUARANTINE$\to$SUSPECT. All clients receive positive weights and
+produce a nonzero aggregate in that round. They return to NORMAL at round six
+(Fig.~\ref{fig:recovery}). This is a conditional recovery result under favorable
+trusted-server evidence, not a guarantee for every benign data distribution.
 
-C0 performs
-untargeted label flipping with $\gamma=0.5$. C1 poisons 20\% of local images
-with a lower-right $3\times3$ trigger targeting class 0. C2 applies clean-label
-poisoning to 20\% with the same target. C3 introduces a semantic attribute
-bias in 20\% targeting class 0. C4 flips update signs and C5 scales the update
-by $100$. All six malicious identities fall in the IID group; the setting does
-not establish robustness when malicious identities occupy the Dirichlet
-groups. The precise C2 perturbation construction/budget and C3 attribute
-remain required configuration details for this six-attack experiment.
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\columnwidth]{protocol_v7/results/collective_recovery.pdf}
+    \caption{Constructed collective-quarantine recovery test, not a classifier
+        experiment. All twenty clients have identical inputs and states; one common
+        state/risk trajectory is shown. The bottom panel is the actually applied
+        aggregate increment of the two-dimensional toy block, in arbitrary units.
+        Peer statistics are empty when aggregation resumes at round four.}
+    \label{fig:recovery}
+\end{figure}
 
-For targeted attack $a\in\{\mathrm{trigger},\mathrm{clean},\mathrm{semantic}\}$,
-let $\mathcal B_a$ be the attack-specific test subset and $y_a^*$ its target:
-\begin{align}
- ASR_a&=\frac{|\{x\in\mathcal B_a:\arg\max f(x)=y_a^*\}|}{|\mathcal B_a|},\\
- ASR_{target}&=\frac{1}{3}\sum_a ASR_a.
-\end{align}
-The per-attack test counts and treatment of originally target-class samples
-are not specified in the available record. The macro ASR is therefore retained
-as reported, without reconstructing its three constituent values. Untargeted
-C0, C4, and C5 are assessed using accuracy, loss, and influence, not this
-targeted ASR definition.
+\subsection{Risk Timing and Gate Reachability}
 
-\subsection{Reported Main Results}
+With $r_0=0$ and $z_t\le1$, pure EMA satisfies $r_t\le1-0.85^t$.
+At $t=14$ its upper bound is $0.89723$, below the blacklist threshold; the
+first crossing is at $t=15$. Four consecutive qualifying observations while
+quarantined therefore cannot finish before $t=18$. The maximal-risk test
+matches that bound and rejects the next submission at $t=19$.
 
-Table~\ref{tab:main_results} preserves the reported means and standard
-deviations. The original comparison uses the same training budget, client
-partition, attack proportion, and reference access where applicable. This
-revision does not add unverified baseline results or assert statistical
-significance. A contemporary backdoor defense and a temporal detection or
-reputation method remain necessary matched comparisons. The 50\% malicious
-setting is outside the assumed fraction below 50\% and provides no theoretical
-Byzantine guarantee.
+For the earlier unscaled gate $0.4+1.2S_l$, the best first-round raw score is
+only $0.469222$. Together with the depth component, this excludes blocks with
+$l/L<0.549594$ in the first round even under favorable other evidence. Its
+asymptotic raw-score ceiling is about $0.761393$, so simply clipping gates to
+one would leave another unreachable region. These are analytical bounds,
+not measured gate frequencies. The revised normalized comparison attains one
+under ideal evidence at every age, while the maximum gate is $0.727273$.
+The 10,100-case sweep verifies the executable formulas against this envelope.
+It establishes reachability, not an acceptable survivor rate on trained models.
 
+\section{Limitations and Conclusion}
 
+The controller removes a circular dependency in recovery and aligns layer
+gates with the score range produced by filter initialization. Its tests link
+persistent state transitions to numerical aggregation behavior, including
+empty gates, missing peers, zero updates, and sample-size weighting. They
+also distinguish reversible state restrictions from permanent bans and
+selected blocks from applied updates.
 
-\subsection{Separate Implementation Trace}
-
-A preserved local trace contains one 30-round run with four attacking clients
-(C0--C3) and sixteen benign clients. C0 uses 50\% label flipping and C1 uses
-20\% trigger poisoning; C2 and C3 are configured at 50\%. In this snapshot,
-C2 adds a $3\times3$ upper-left patch only to selected target-class training
-images without relabeling. C3 adds Gaussian noise of standard deviation $0.1$
-to selected normalized inputs and clamps them to $[-1,1]$; it does not implement
-the semantic attribute attack specified for the main experiment. Known-trigger
-server probes are enabled, and attestation and runtime telemetry are simulated.
-Consequently, this trace is an implementation diagnostic rather than a
-replication of the main threat configuration.
-
-\begin{table}[!htb]
-\centering
-\caption{Separate local diagnostic trace: one run, four attackers.}
-\label{tab:local_trace}
-\footnotesize
-\begin{tabular}{@{}p{5.0cm}p{2.7cm}@{}}
-\toprule
-Endpoint & Observed value \\
-\midrule
-Final clean accuracy & $92.40\%$ \\
-Lower-right trigger ASR & $10.21\%$ \\
-Upper-left trigger ASR & $10.22\%$ \\
-Final benign / malicious bans & $0/16$; $4/4$ \\
-Benign client--rounds with at least one selected layer & $466/480$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-All twenty client logs agree with the server's clean accuracy and lower-right
-ASR history. Both targeted evaluations use all 10,000 test images, including
-original target-class images; no semantic targeted ASR is recorded. The
-current data-selection code places all 500 proxy images inside this evaluation
-set. These values therefore do not establish held-out, non-target-only attack
-success or a three-attack macro average. The logged final percentages imply
-1,021 and 1,022 target predictions, respectively, under these denominators;
-per-example predictions are not retained.
-
-The layer audit records selected-array counts for each processed client.
-Sixteen benign clients yield 480 client--round opportunities, of which 466
-select at least one array. Selection does not establish a nonzero applied
-update, because numerical weights and layer updates are not logged. C3 and
-C2 first enter aggregation isolation in rounds 9 and 12; the first blacklist
-interceptions for C0/C1, C3, and C2 occur in rounds 8, 16, and 24. This trace
-contains no benign aggregation-quarantine event from which to estimate benign
-post-quarantine recovery time.
-
-\subsection{Final Bans, Review, and Contribution}
-
-A final-ban rate uses a client-level denominator. A review rate uses eligible
-client--round events. Neither establishes that a client contributes nonzero
-aggregation weight. Table~\ref{tab:ablation} keeps these outcomes separate.
-The first three final-ban pairs are retained under the author's interpretation
-and the original manuscript label; their underlying event counts and averaging
-rule remain to be verified. Missing review results are marked N/R and are not
-inferred from final outcomes.
-
-
-
-The reported Trust Flow final retention is 100\%, consistent with zero final
-benign bans, while its reported review FPR is 14.79\%. These values do not imply
-zero review false alarms or 100\% per-round detection. Recovery should be
-assessed by the fraction of eligible benign submissions receiving positive
-weight, quarantine duration, and rounds until the first positive contribution
-after quarantine. Malicious cumulative aggregation weight before isolation
-is a separate exposure measure. The local trace supplies layer-selection
-counts, but neither final retention nor those counts supplies applied weights
-or benign quarantine-recovery times.
-
-The retained single-stream values describe a threshold tradeoff, but the
-records do not establish equal evidence inputs and tuning budgets across
-variants. A same-evidence comparison should include history-only, risk-only,
-single-stream, and dual-stream policies, evaluated at comparable benign
-restriction levels. The current values cannot establish general superiority
-of two stored states over a tuned single-stream policy.
-
-\subsection{Overhead and Remaining Validation}
-
-\begin{table}[!htb]
-\centering
-\caption{Original reported component costs; platform breakdown unavailable.}
-\label{tab:overhead}
-\footnotesize
-\begin{tabular}{@{}p{5.0cm}p{2.7cm}@{}}
-\toprule
-Component and scope & Reported value \\
-\midrule
-FedAvg server aggregation & $2.10$ s \\
-Trust Flow server aggregation + audit & $4.85$ s \\
-Additional TrustReport per client submission & About $15$ KB \\
-Auxiliary security path per admitted-client round & About $11$ ms \\
-Quote, signing, monitoring per admitted-client round & About $12$--$15$ ms \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Table~\ref{tab:overhead} retains the original component timings. Platform
-assignment, measurement counts, variability, and possible overlap between the
-11 ms and 12--15 ms paths are not established; these values are not summed.
-The server timing excludes communication and vendor-specific attestation
-latency. CPU-side TEE capability is not evidence of GPU protection, nor does
-one timing set characterize both platforms' end-to-end deployment costs.
-The separate local Flower trace reports 3,878.53 s for its complete 30-round
-run, or 129.28 s per round when amortized. This single run-level timer includes
-training and evaluation within the Flower execution; it is not a measurement
-of isolated aggregation, attestation, or either hardware platform.
-
-The current shared pool must be varied independently of the server proxy to
-assess dependence on common training data. Experiments should compare no
-shared pool, a smaller pool, and the reported pool, with realized class
-histograms and malicious identities distributed across the data groups.
-A Dirichlet sweep on exclusive data alone cannot establish these properties.
-The loss and activation scales also require calibration records and channel
-trigger rates for benign IID, benign heterogeneous, and malicious updates.
-
-Validation of the revised gate requires per-layer sensitivity, threshold,
-score distribution, survivor count, skipped updates, and actual applied
-weights. A client trajectory must link evidence, state, and nonzero model
-contribution, rather than showing risk or history alone. The local audit
-provides client-level layer counts and probe thresholds, but does not retain
-numerical per-layer weights or complete counterfactual probe results. Missing
-attack-specific or recovery curves are not reconstructed from plotted points.
+The verification does not measure clean accuracy, targeted attack success,
+benign recovery under real distribution shifts, shared-pool dependence, or
+hardware cost. Those claims require training runs whose configuration and
+logs match this protocol, disjoint proxy/calibration/final-evaluation records,
+and per-attack outcomes with explicit target-class exclusions. Trusted-server
+availability and calibration quality remain substantive assumptions. Separate
+history and risk states do not establish Byzantine robustness or superiority
+over a tuned single-state policy. The executable specification and event logs
+provide a concrete basis for those subsequent comparisons.
 
 \FloatBarrier
-\section{Discussion and Conclusion}
-
-Trust Flow connects execution admission, current content, temporal evidence,
-and layer-wise influence through separate historical-utility and risk states.
-The revised specification makes recoverable restrictions, permanent exclusion,
-and aggregation eligibility distinct. It also avoids bypassing a failed layer
-gate when no update survives. Sustained geometric disagreement can still drive
-exclusion, and benign recovery requires subsequent favorable evidence.
-
-The original record reports 92.31\% accuracy, 10.21\% macro target ASR,
-and zero final benign bans for 30\% mixed attacks. Its scope is CIFAR-10 with
-a large shared pool, a server proxy, and malicious identities in the IID group.
-The separate trace makes layer selection and two targeted evaluation
-denominators inspectable without expanding the scope of the main comparison.
-Matched validation of the explicit empty-survivor and calibration rules,
-run-level statistics, actual contribution and recovery, shared-pool sensitivity,
-and platform-specific TEE instrumentation remain open evaluation requirements.
-
-\FloatBarrier
-
-\IEEEtriggeratref{12} % Balance the final bibliography page without changing template dimensions.
+\IEEEtriggeratref{18}
 \bibliographystyle{IEEEtran}
 \bibliography{ispa2026_references}
-
 \end{document}
