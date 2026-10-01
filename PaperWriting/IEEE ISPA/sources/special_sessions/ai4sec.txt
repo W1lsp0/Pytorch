@@ -1,0 +1,102 @@
+IEEE ISPA 2026 | IEEE AI for Science Congress 2026
+ISPA 2026
+Home
+Call for Papers
+Call for Papers
+Conferences
+BDCloud 2026
+SocialCom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Special Sessions
+DAAA 2026
+ANS 2026
+SEOI 2026
+PIVOTS 2026
+GAI4Net 2026
+AI4SEC 2026
+PDICEL-SE 2026
+Special Issues
+Authors
+Coming Soon
+Attendance
+Coming Soon
+Contact
+The 24th IEEE International Symposium on Parallel and Distributed Processing with Applications
+(IEEE ISPA 2026)
+Kuala Lumpur, Malaysia
+27-30 December 2026
+Important Dates
+Paper Submission
+30  October 2026 (AoE time)
+Author Notification
+15 November 2026
+Camera-Ready Submission
+30 November 2026
+Conference Dates
+27-30 December 2026
+Organizing Committee
+Chairs
+Zhou Zhou, Changsha University, China
+Zhenli He, Yunnan University, China
+Jing Liu, Wuhan University of Science and Technology, China
+AI4SEC 2026
+AI4SEC 2026: IEEE ISPA 2026 Special Session on AI-Driven Optimization for Sustainable Edge-Cloud Continuum
+The rapid proliferation of Internet of Things (IoT), 5G/6G networks, and data-intensive applications has accelerated the evolution of the edge-cloud continuum, where computation seamlessly spans from resource-constrained edge devices to powerful cloud infrastructures. While this paradigm enables low-latency services and scalable intelligence, it also introduces significant challenges in terms of energy consumption, resource allocation, system efficiency, and sustainability.
+Artificial Intelligence (AI), particularly machine learning and deep learning techniques, has emerged as a transformative enabler for optimizing the edge-cloud continuum. AI-driven approaches can dynamically manage resources, improve energy efficiency, enhance service quality, and support sustainable computing infrastructures.
+This Special Session aims to bring together cutting-edge research and innovative solutions that leverage AI to optimize the performance, efficiency, and sustainability of edge-cloud systems. We invite original research articles, surveys, and application-driven studies addressing theoretical advancements, system architectures, and real-world deployments.
+We invite submissions from academia, government and industry that present novel research on the topics as following areas:
+1.AI for Resource Optimization
+Intelligent resource provisioning in edge-cloud environments
+Reinforcement learning for dynamic orchestration
+Federated learning for distributed optimization
+2.Energy Efficiency and Sustainability
+Green AI for edge-cloud systems
+Energy-aware computing and scheduling
+Renewable energy integration in edge/cloud computing
+3.Edge Intelligence and Distributed AI
+Collaborative intelligence between edge and cloud
+Model partitioning and split learning
+On-device AI and lightweight models
+Privacy-preserving AI in edge environments
+4.Network Optimization and Communication Efficiency
+AI-driven network slicing and traffic management
+Adaptive communication protocols
+Latency-aware optimization strategies
+5G/6G-enabled edge-cloud systems
+5.Security, Privacy, and Trust
+Secure AI frameworks for edge-cloud continuum
+Privacy-preserving data analytics
+Blockchain-enabled edge-cloud systems
+6.Applications and Use Cases
+Smart cities and intelligent transportation
+Industrial IoT and Industry 4.0
+Autonomous systems and robotics
+7.System Architectures and Frameworks
+Serverless and microservices in edge-cloud systems
+Digital twins for system optimization
+Benchmarking and performance evaluation
+Paper Submission
+All papers must be submitted electronically via EDAS at
+https://edas.info/N35739
+. Submissions must not substantially overlap with previously published papers or papers concurrently submitted to other journals or conferences. Special Session papers are limited to 6 pages, and must be formatted in the IEEE Computer Society Proceedings Format. Templates and formatting guidelines are available at
+https://template-selector.ieee.org/
+. All submitted papers will undergo a single-blind peer review process.
+Paper Publication
+Papers accepted by IEEE ISPA 2026 Special Session will be published by the IEEE Computer Society Press. All accepted papers will be submitted to IEEE Xplore and EI.
+Submit Paper to AI4SEC 2026
+Sponsored and Organized by
+Conferences
+ISPA 2026
+BDCloud 2026
+Socialcom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Contact
+ispa-2026@googlegroups.com
+About
+The IEEE AI for Science Congress 2026 will be held in
+          Kuala Lumpur, Malaysia, 27-30 December, 2026, focusing on advancements in cyber-enabled technologies like IoT, AI, cyber-physical systems, and cybersecurity.
+© 2026 IEEE AI for Science Congress 2026

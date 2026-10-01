@@ -1,0 +1,27 @@
+Source: https://conferences.ieeeauthorcenter.ieee.org/write-your-paper/meet-ieee-xplore-requirements/
+Checked: 2026-10-01 (Asia/Shanghai)
+Capture: text extracted by web reader; direct HTML download returned HTTP 403. This is not an original HTML snapshot.
+
+iframe — www.googletagmanager.com 
+IEEE Publishing Portal — publishingportal.ieee.org Submit to TechRxiv — www.techrxiv.org Join IEEE — ieeeauthorcenter.ieee.org 
+Resources & Tools for Authors — ieeeauthorcenter.ieee.org 
+[Input] [Input: Search this section] Search
+# Meet IEEE Xplore^{®} Requirements
+
+IEEE wants to make sure that your paper is published accurately. Use IEEE PDF eXpress — ieee-pdf-express.org to check that your paper is compliant with the requirements of the IEEE Xplore Digital Library — ieeexplore.ieee.org .
+
+IEEE PDF eXpress checks the following.
+  1. The PDF is version 1.4 (Acrobat 5) or later, but not Acrobat 9, X, or XI.
+  2. The PDF was created with PDF distiller. Scanning is not permitted.
+  3. All fonts are embedded or subset. This ensures that mathematics appear as intended and that text is searchable.
+  4. No password or other security settings are included.
+  5. No bookmarks or links are included.
+  6. There are no crop marks, registration marks, date stamps, timestamps, or any other mark that does not appear in the official version of the paper.
+  7. There are no PostScript settings that can override the settings file.
+  8. No PDF attachments are included.
+  9. The file is not a PDF Package or Merged PDF.
+Please note that not all conferences use IEEE PDF eXpress. If your conference uses this tool, you will receive an invitation email with a customized link to give you access to the tool.
+
+If your conference does not use IEEE PDF eXpress, you can still check that your PDF meets IEEE Xplore requirements by using the IEEE PDF Checker. — www.ieee.org 
+Subscribe to our newsletter — engage.ieee.org
+ 

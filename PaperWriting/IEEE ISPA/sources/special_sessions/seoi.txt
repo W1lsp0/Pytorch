@@ -1,0 +1,89 @@
+IEEE ISPA 2026 | IEEE AI for Science Congress 2026
+ISPA 2026
+Home
+Call for Papers
+Call for Papers
+Conferences
+BDCloud 2026
+SocialCom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Special Sessions
+DAAA 2026
+ANS 2026
+SEOI 2026
+PIVOTS 2026
+GAI4Net 2026
+AI4SEC 2026
+PDICEL-SE 2026
+Special Issues
+Authors
+Coming Soon
+Attendance
+Coming Soon
+Contact
+The 24th IEEE International Symposium on Parallel and Distributed Processing with Applications
+(IEEE ISPA 2026)
+Kuala Lumpur, Malaysia
+27-30 December 2026
+Important Dates
+Paper Submission
+30 September 2026 (AoE time)
+Author Notification
+30 October 2026
+Camera-Ready Submission
+30 November 2026
+Conference Dates
+27-30 December 2026
+Organizing Committee
+Chairs
+Weitao Zou, Northeast Forestry University, China
+Lianhui Liang, Guangxi University, China
+Chonghe Zhao, Guangzhou University, China
+Hu Zhang, Qilu University of Technology (Shandong Academy of Sciences), China
+SEOI 2026
+SEOI 2026: IEEE ISPA 2026 Special Session on Scalable Earth Observation Intelligence
+With the rapid development of satellite, airborne, UAV, and ground-based sensing technologies, Earth observation (EO) is producing data at unprecedented scale, diversity, and complexity. At the same time, advances in foundation models and large-scale artificial intelligence are transforming how remote sensing and geospatial information are analyzed and interpreted. These developments are driving growing demands for efficient, scalable, and reliable computing capabilities to support large-scale EO data processing and intelligent analysis.
+Scalable Earth observation intelligence seeks to address the computational and system-level challenges of large-scale EO applications by integrating advanced intelligent methods with scalable computing infrastructures. This integration enables efficient processing of massive geospatial data, supports large-scale model training and inference, and facilitates secure and reliable collaboration across distributed platforms. These capabilities provide an essential foundation for trustworthy and scalable EO intelligence across diverse application scenarios.
+This special session is now soliciting relevant research findings from a wide range of researchers and looks forward to your active contributions!
+We invite submissions from academia, government and industry that present novel research on the topics as following areas:
+Parallel and Distributed Processing of Large-Scale Earth Observation Data
+High-Performance and Heterogeneous Computing for Earth Observation
+Distributed Storage, Indexing, and Retrieval of Massive Geospatial Data
+Space-Air-Ground-Edge-Cloud Collaborative Computing for Earth Observation
+Onboard and Edge Intelligence for Resource-Constrained Earth Observation Platforms
+Scheduling and Resource Management for Earth Observation Computing Systems
+Trustworthy Data Sharing, Provenance, and Model Integrity in Decentralized Earth Observation Systems
+Foundation Models for Earth Observation and Geospatial Intelligence
+Distributed Training and Optimization of Earth Observation Foundation Models
+Scalable Inference and Deployment of Large-Scale Earth Observation Models
+Federated and Decentralized Learning for Distributed Earth Observation Systems
+Multimodal Fusion and Cross-Modal Alignment for Earth Observation Data
+Large-Scale Self-Supervised Learning for Earth Observation
+Generative AI and World Models for Earth Observation
+Performance Benchmarking and Scalability Analysis of Earth Observation Computing Systems
+Scalable Intelligent Applications and Services for Earth Observation
+Paper Submission
+All papers must be submitted electronically via EDAS at
+https://edas.info/N35737
+. Submissions must not substantially overlap with previously published papers or papers concurrently submitted to other journals or conferences. Special Session papers are limited to 6 pages, and must be formatted in the IEEE Computer Society Proceedings Format. Templates and formatting guidelines are available at
+https://template-selector.ieee.org/
+. All submitted papers will undergo a single-blind peer review process.
+Paper Publication
+Papers accepted by IEEE ISPA 2026 Special Session will be published by the IEEE Computer Society Press. All accepted papers will be submitted to IEEE Xplore and EI.
+Submit Paper to SEOI 2026
+Sponsored and Organized by
+Conferences
+ISPA 2026
+BDCloud 2026
+Socialcom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Contact
+ispa-2026@googlegroups.com
+About
+The IEEE AI for Science Congress 2026 will be held in
+          Kuala Lumpur, Malaysia, 27-30 December, 2026, focusing on advancements in cyber-enabled technologies like IoT, AI, cyber-physical systems, and cybersecurity.
+© 2026 IEEE AI for Science Congress 2026

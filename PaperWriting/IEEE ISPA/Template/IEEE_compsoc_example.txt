@@ -1,0 +1,39 @@
+                                           Bare Demo of IEEEtran.cls for
+                                         IEEE Computer Society Conferences
+
+                    Michael Shell                                   Homer Simpson         James Kirk
+             School of Electrical and                Twentieth Century Fox          and Montgomery Scott
+              Computer Engineering                      Springfield, USA                Starfleet Academy
+        Georgia Institute of Technology          Email: homer@thesimpsons.com San Francisco, California 96678-2391
+         Atlanta, Georgia 30332–0250                                               Telephone: (800) 555–1212
+ Email: http://www.michaelshell.org/contact.html                                      Fax: (888) 555–1212
+
+
+
+Abstract—The abstract goes here.
+
+1. Introduction
+    This demo file is intended to serve as a “starter file” for
+IEEE Computer Society conference papers produced under
+LATEX using IEEEtran.cls version 1.8b and later. I wish you
+the best of success.
+                                                           mds
+                                            August 26, 2015
+
+1.1. Subsection Heading Here
+
+    Subsection text here.
+
+1.1.1. Subsubsection Heading Here. Subsubsection text
+here.
+
+2. Conclusion
+    The conclusion goes here.
+
+Acknowledgments
+    The authors would like to thank...
+
+References
+[1] H. Kopka and P. W. Daly, A Guide to LATEX, 3rd ed. Harlow, England:
+    Addison-Wesley, 1999.
+

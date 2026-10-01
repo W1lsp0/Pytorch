@@ -1,0 +1,84 @@
+IEEE ISPA 2026 | IEEE AI for Science Congress 2026
+ISPA 2026
+Home
+Call for Papers
+Call for Papers
+Conferences
+BDCloud 2026
+SocialCom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Special Sessions
+DAAA 2026
+ANS 2026
+SEOI 2026
+PIVOTS 2026
+GAI4Net 2026
+AI4SEC 2026
+PDICEL-SE 2026
+Special Issues
+Authors
+Coming Soon
+Attendance
+Coming Soon
+Contact
+The 24th IEEE International Symposium on Parallel and Distributed Processing with Applications
+(IEEE ISPA 2026)
+Kuala Lumpur, Malaysia
+27-30 December 2026
+Important Dates
+Paper Submission
+30 September 2026 (AoE time)
+Author Notification
+30 October 2026
+Camera-Ready Submission
+30 November 2026
+Conference Dates
+27-30 December 2026
+Organizing Committee
+Chairs
+Xixun Yu, Hainan University, China
+Xuyang Jing, Xidian University, China
+Jie Wang, Xidian University, China
+PIVOTS 2026
+PIVOTS 2026: IEEE ISPA 2026 Special Session on Privacy, Integrity, Verifiability, Operational Resilience, Trustworthiness, and Security for Parallel and Distributed AI
+Artificial intelligence (AI) is increasingly trained, deployed, and coordinated across accelerator clusters, federated clients, cloud, edge, and device platforms, decentralized networks, and multi-agent systems. These architectures improve scalability, data locality, availability, and resource utilization, but they also expand trust boundaries and expose AI services to data and model poisoning, Byzantine behavior, privacy leakage, rollback and equivocation, compromised orchestration, and unverifiable training or inference.
+Addressing these challenges requires security mechanisms to be co-designed with the underlying parallel and distributed infrastructure. Privacy, integrity, verifiability, operational resilience, trustworthiness, and security must be maintained under communication and computation constraints, heterogeneous resources, dynamic participation, and partial failures. Effective solutions should therefore provide rigorous guarantees while preserving scalability, efficiency, and deployability.
+The PIVOTS Special Session solicits original theoretical, system-oriented, experimental, and application-driven contributions from researchers and practitioners in cybersecurity, parallel and distributed systems, artificial intelligence, networking, data management, and applied cryptography. It aims to advance secure, privacy-preserving, verifiable, accountable, and resilient parallel and distributed AI systems.
+We invite submissions from academia, government and industry that present novel research on the topics as following areas:
+Security, privacy, and trustworthiness of parallel and distributed AI systems
+Secure federated, split, decentralized, swarm, and multi-agent learning
+Security of distributed large language models, retrieval-augmented generation, and agentic AI
+Data and model poisoning, backdoor attacks, and adversarial manipulation
+Byzantine, Sybil, collusion, free-riding, and compromised-participant attacks
+Gradient leakage, membership inference, model inversion, and model extraction
+Secure aggregation and privacy-preserving distributed learning
+Differential privacy, secure multiparty computation, homomorphic encryption, zero-knowledge proofs, and confidential computing
+Trusted execution environments, secure accelerators, and remote attestation
+Verifiable training, aggregation, inference, retrieval, and distributed data processing
+Data and model provenance, integrity, freshness, consistency, auditing, and accountability
+Operational resilience, fault tolerance, secure recovery, and security of cloud, edge, storage, networking, orchestration, and decentralized trust
+Paper Submission
+All papers must be submitted electronically via EDAS at
+https://edas.info/N35731
+. Submissions must not substantially overlap with previously published papers or papers concurrently submitted to other journals or conferences. Special Session papers are limited to 6 pages, and must be formatted in the IEEE Computer Society Proceedings Format. Templates and formatting guidelines are available at
+https://template-selector.ieee.org/
+. All submitted papers will undergo a single-blind peer review process.
+Paper Publication
+Papers accepted by IEEE ISPA 2026 Special Session will be published by the IEEE Computer Society Press. All accepted papers will be submitted to IEEE Xplore and EI.
+Submit Paper to PIVOTS 2026
+Sponsored and Organized by
+Conferences
+ISPA 2026
+BDCloud 2026
+Socialcom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Contact
+ispa-2026@googlegroups.com
+About
+The IEEE AI for Science Congress 2026 will be held in
+          Kuala Lumpur, Malaysia, 27-30 December, 2026, focusing on advancements in cyber-enabled technologies like IoT, AI, cyber-physical systems, and cybersecurity.
+© 2026 IEEE AI for Science Congress 2026

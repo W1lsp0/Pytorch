@@ -1,0 +1,82 @@
+IEEE ISPA 2026 | IEEE AI for Science Congress 2026
+ISPA 2026
+Home
+Call for Papers
+Call for Papers
+Conferences
+BDCloud 2026
+SocialCom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Special Sessions
+DAAA 2026
+ANS 2026
+SEOI 2026
+PIVOTS 2026
+GAI4Net 2026
+AI4SEC 2026
+PDICEL-SE 2026
+Special Issues
+Authors
+Coming Soon
+Attendance
+Coming Soon
+Contact
+The 24th IEEE International Symposium on Parallel and Distributed Processing with Applications
+(IEEE ISPA 2026)
+Kuala Lumpur, Malaysia
+27-30 December 2026
+Important Dates
+Paper Submission
+30 September 2026 (AoE time)
+Author Notification
+30 October 2026
+Camera-Ready Submission
+30 November 2026
+Conference Dates
+27-30 December 2026
+Organizing Committee
+Chairs
+Ying He, Shenzhen University, China
+Chao Qiu, Beijing University of Posts and Telecommunications
+Yiming Liu, Beijing University of Posts and Telecommunications
+Jianbo Du, Xi’an University of Posts and Telecommunications
+GAI4Net 2026
+GAI4Net 2026: IEEE ISPA 2026 Special Session on Generative AI for 6G Networks
+In 5G or pre-5G networks, Artificial Intelligence (AI), as an auxiliary tool, has been widely applied in wireless network channel modeling, traffic analysis, and resource optimization to enhance network efficiency. Currently, wireless networks are evolving toward the Sixth Generation of Mobile Networks (6G), which imposes higher demands on speed, latency, reliability, and connection density. However, traditional AI technologies exhibit multidimensional shortcomings in meeting the performance requirements of 6G networks, such as low integration with network architecture, insufficient adaptability to network performance, and scarcity of computation/data resources. These limitations hinder 6G network evolve toward an “AI-native network”. Generative AI (GAI), as a key empowering technology, offers new solutions to address these challenges. GAI for network leverages advanced technologies such as Large Language Models (LLM), intelligent agents, and world models to achieve deep integration of AI and networks. Its goal is to evolve networks from “data transmission channels” into “intelligent agents”capable of generation, comprehension, and reasoning, thereby enhancing network performance, user service experience, and industrial ecosystem expansion.
+Although GAI has achieved significant success, it has encountered a series of challenges during the integration with 6G, such as network architecture design, high computational resource demand, complex heterogeneous agents collaboration, and the construction of network world models. Addressing these challenges is crucial for unleashing the full potential of GAI in shaping 6G networks. The goal of this workshop is to gather experts, scholars, and industry professionals from academia, industry, and government to discuss state-of-the-art approaches, methodologies, and technologies enabling efficient and practical GAI towards the realization of 6G.
+We invite submissions from academia, government and industry that present novel research on the topics as following areas:
+GAI-enabled 6G network frameworks
+GAI-based resource scheduling optimization for 6G networks
+GAI-enabled computation offloading over 6G networks
+GAI-enabled computing power networks
+GAI-enabled low-altitude intelligent networks
+GAI-enabled semantic communication for 6G
+GAI-enabled network agents
+Agentic AI for 6G networks
+World model for Integrated sensing-communication-computation
+World model-enabled wireless channel estimation and prediction
+Paper Submission
+All papers must be submitted electronically via EDAS at
+https://edas.info/N35738
+. Submissions must not substantially overlap with previously published papers or papers concurrently submitted to other journals or conferences. Special Session papers are limited to 6 pages, and must be formatted in the IEEE Computer Society Proceedings Format. Templates and formatting guidelines are available at
+https://template-selector.ieee.org/
+. All submitted papers will undergo a single-blind peer review process.
+Paper Publication
+Papers accepted by IEEE ISPA 2026 Special Session will be published by the IEEE Computer Society Press. All accepted papers will be submitted to IEEE Xplore and EI.
+Submit Paper to GAI4Net 2026
+Sponsored and Organized by
+Conferences
+ISPA 2026
+BDCloud 2026
+Socialcom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Contact
+ispa-2026@googlegroups.com
+About
+The IEEE AI for Science Congress 2026 will be held in
+          Kuala Lumpur, Malaysia, 27-30 December, 2026, focusing on advancements in cyber-enabled technologies like IoT, AI, cyber-physical systems, and cybersecurity.
+© 2026 IEEE AI for Science Congress 2026

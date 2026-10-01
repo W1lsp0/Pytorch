@@ -1,0 +1,52 @@
+Source: https://conferences.ieeeauthorcenter.ieee.org/write-your-paper/improve-your-graphics/
+Checked: 2026-10-01 (Asia/Shanghai)
+Capture: text extracted by web reader; direct HTML download returned HTTP 403. This is not an original HTML snapshot.
+
+iframe — www.googletagmanager.com 
+IEEE Publishing Portal — publishingportal.ieee.org Submit to TechRxiv — www.techrxiv.org Join IEEE — ieeeauthorcenter.ieee.org 
+Resources & Tools for Authors — ieeeauthorcenter.ieee.org 
+[Input] [Input: Search this section] Search
+
+# Improve Your Graphics
+
+Communicate your findings visually. Follow the IEEE graphic guidelines to create more effective graphics for your paper. Help with your graphics is just an email away via authors@ieee.org.
+### Lena Image
+
+IEEE’s diversity statement and supporting policies such as the IEEE Code of Ethics speak to IEEE’s commitment to promoting an inclusive and equitable culture that welcomes all.  In alignment with this culture and with respect to the wishes of the subject of the image, Lena Forsén, IEEE will no longer accept submitted papers which include the “Lena image.”
+### Accepted Graphics File Formats
+
+Make sure your submitted file formats can be processed by IEEE. Compare your files to the IEEE accepted graphics file formats.
+
+  * IEEE accepts PS, EPS, PDF, PNG, or TIFF formats for graphics submission.
+  * It is acceptable to submit Microsoft Office documents (DOC, PPT, XLS) only when the graphic was originally drawn in the program.
+  * High-resolution JPEG files are acceptable for author photos only. IEEE also continues to accept PS, EPS, and TIFF.
+Most graphics are published at one column width (3.5 inches / 21 picas wide) or two column width (7.16 inches / 43 picas wide). Graphics prepared as VSD, GIF, JPEG, BMP, or any other file formats not listed as acceptable cannot be processed except in the case of an author photo.
+### Embedding Fonts
+
+Follow the guidelines for embedding fonts to ensure all parts of your graphic can be viewed when opened on another computer. As you prepare your graphics, select fonts from the recommended list:
+
+  * Helvetica
+  * Times New Roman
+  * Arial
+  * Cambria
+  * Symbol
+If you are supplying EPS, PS, or PDF files: either convert all text to outlines or embed the fonts. Some fonts may be native only to your operating system. If the fonts are not embedded, parts of the graphic may be distorted or missing when opened on another computer.
+
+Typefaces and type sizes should be consistent in all your graphics and tables. Type should appear approximately 9-10 point when viewed at full size.
+### Compressing Your Graphics Files
+
+If your graphics files are very large, you will need to take some steps to reduce their file size prior to submitting to IEEE. Follow the IEEE guidelines for compressing your graphics files.
+  * Make sure that all image layers are flattened and your graphic is of the correct resolution (dpi) and dimensions (no larger than 7.16 x 8.8 inches, 182 x 220 millimeters, or 43 x 52 picas).
+  * If your file is still large, you can use a variety of compression methods in order to create a ZIP, SIT, or TAR.Z file:
+    * pkzip — pkware.com     * Stuffit — www.stuffit.com Condensing your graphics could have a small negative effect on their final quality. IEEE suggests using this option only when absolutely necessary.
+### Making Line Graphs More Accessible to All Readers
+
+Readers with Color Vision Deficiency (CVD) can have difficulty distinguishing between red and green, blue and green, or yellow and red. Evaluate your graphs by checking whether they can be interpreted correctly from a greyscale printout. If they cannot, follow these tips to communicate more effectively with all readers.
+  * Use both color and shape to convey the same meaning; for example, solid and dashed lines or different fill patterns can help readers understand the figure without relying solely on color.
+  * Make each line of your line graph a thick line with a unique data point symbol.
+  * Contrast different elements of the figure with both color and brightness.
+  * Connect the data label to the data line rather than relying on a color key.
+
+Subscribe to our newsletter — engage.ieee.org
+
+ 

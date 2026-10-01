@@ -1,0 +1,218 @@
+                                         Paper Title (use style: paper title)
+                                                        Subtitle as needed
+
+
+
+    Authors Name/s per 1st Affiliation (Author)                         Authors Name/s per 2nd Affiliation (Author)
+    line 1 (of Affiliation): dept. name of organization                  line 1 (of Affiliation): dept. name of organization
+   line 2: name of organization, acronyms acceptable                    line 2: name of organization, acronyms acceptable
+                    line 3: City, Country                                                line 3: City, Country
+              line 4: e-mail: name@xyz.com                                         line 4: e-mail: name@xyz.com
+
+
+Abstract—This electronic document is a “live” template. The
+various components of your paper [title, text, heads, etc.] are                            III.   EASE OF USE
+already defined on the style sheet, as illustrated by the portions
+given in this document. DO NOT USE SPECIAL                           A. Selecting a Template (Heading 2)
+CHARACTERS, SYMBOLS, OR MATH IN YOUR TITLE                               First, confirm that you have the correct template for your
+OR ABSTRACT. (Abstract)                                              paper size. This template has been tailored for output on the
+                                                                     US-letter paper size. If you are using A4-sized paper, please
+   Keywords-component; formatting; style; styling; insert (key
+                                                                     close this template and download the file for A4 paper
+words)
+                                                                     format called “CPS_A4_format”.
+               I.         INTRODUCTION (HEADING 1)                   B. Maintaining the Integrity of the Specifications
+    All manuscripts must be in English. These guidelines                 The template is used to format your paper and style the
+include complete descriptions of the fonts, spacing, and             text. All margins, column widths, line spaces, and text fonts
+related information for producing your proceedings                   are prescribed; please do not alter them. You may note
+manuscripts. Please follow them and if you have any                  peculiarities. For example, the head margin in this template
+questions, direct them to the production editor in charge of         measures proportionately more than is customary. This
+your proceedings at Conference Publishing Services (CPS):            measurement and others are deliberate, using specifications
+Phone +1 (714) 821-8380 or Fax +1 (714) 761-1784.                    that anticipate your paper as one part of the entire
+    This template provides authors with most of the                  proceedings, and not as an independent document. Please do
+formatting specifications needed for preparing electronic            not revise any of the current designations.
+versions of their papers. All standard paper components have
+                                                                            IV.    PREPARE YOUR PAPER BEFORE STYLING
+been specified for three reasons: (1) ease of use when
+formatting individual papers, (2) automatic compliance to                Before you begin to format your paper, first write and
+electronic requirements that facilitate the concurrent or later      save the content as a separate text file. Keep your text and
+production of electronic products, and (3) conformity of style       graphic files separate until after the text has been formatted
+throughout a conference proceedings. Margins, column                 and styled. Do not use hard tabs, and limit use of hard returns
+widths, line spacing, and type styles are built-in; examples of      to only one return at the end of a paragraph. Do not add any
+the type styles are provided throughout this document and            kind of pagination anywhere in the paper. Do not number
+are identified in italic type, within parentheses, following the     text heads-the template will do that for you.
+example. PLEASE DO NOT RE-ADJUST THESE                                   Finally, complete content and organizational editing
+MARGINS. Some components, such as multi-leveled                      before formatting. Please take note of the following items
+equations, graphics, and tables are not prescribed, although         when proofreading spelling and grammar:
+the various table text styles are provided. The formatter will       A. Abbreviations and Acronyms
+need to create these components, incorporating the
+applicable criteria that follow.                                         Define abbreviations and acronyms the first time they are
+                                                                     used in the text, even after they have been defined in the
+                    II.    TYPE STYLE AND FONTS                      abstract. Abbreviations such as IEEE, SI, MKS, CGS, sc, dc,
+   Wherever Times is specified, Times Roman or Times                 and rms do not have to be defined. Do not use abbreviations
+New Roman may be used. If neither is available on your               in the title or heads unless they are unavoidable.
+word processor, please use the font closest in appearance to         B. Units
+Times. Avoid using bit-mapped fonts if possible. True-Type
+                                                                        • Use either SI (MKS) or CGS as primary units. (SI
+1 or Open Type fonts are preferred. Please embed symbol
+                                                                           units are encouraged.) English units may be used as
+fonts, as well, for math, etc.
+                                                                           secondary units (in parentheses). An exception
+        would be the use of English units as identifiers in                “alternately” (unless you really mean something that
+        trade, such as “3.5-inch disk drive”.                              alternates).
+   •    Avoid combining SI and CGS units, such as current              • Do not use the word “essentially” to mean
+        in amperes and magnetic field in oersteds. This often              “approximately” or “effectively”.
+        leads to confusion because equations do not balance            • In your paper title, if the words “that uses” can
+        dimensionally. If you must use mixed units, clearly                accurately replace the word “using”, capitalize the
+        state the units for each quantity that you use in an               “u”; if not, keep using lower-cased.
+        equation.                                                      • Be aware of the different meanings of the
+   •    Do not mix complete spellings and abbreviations of                 homophones “affect” and “effect”, “complement”
+        units: “Wb/m2” or “webers per square meter”, not                   and “compliment”, “discreet” and “discrete”,
+        “webers/m2”. Spell out units when they appear in                   “principal” and “principle”.
+        text: “. . . a few henries”, not “. . . a few H”.              • Do not confuse “imply” and “infer”.
+   •    Use a zero before decimal points: “0.25”, not “.25”.           • The prefix “non” is not a word; it should be joined to
+C. Equations                                                               the word it modifies, usually without a hyphen.
+                                                                       • There is no period after the “et” in the Latin
+    The equations are an exception to the prescribed                       abbreviation “et al.”.
+specifications of this template. You will need to determine            • The abbreviation “i.e.” means “that is”, and the
+whether or not your equation should be typed using either                  abbreviation “e.g.” means “for example”.
+the Times New Roman or the Symbol font (please no other                An excellent style manual for science writers is [7].
+font). To create multileveled equations, it may be necessary
+to treat the equation as a graphic and insert it into the text                       V.    USING THE TEMPLATE
+after your paper is styled.
+                                                                        After the text edit has been completed, the paper is ready
+    Number equations consecutively. Equation numbers,
+                                                                    for the template. Duplicate the template file by using the
+within parentheses, are to position flush right, as in (1), using
+                                                                    Save As command, and use the naming convention
+a right tab stop. To make your equations more compact, you
+                                                                    prescribed by your conference for the name of your paper. In
+may use the solidus ( / ), the exp function, or appropriate
+                                                                    this newly created file, highlight all of the contents and
+exponents. Italicize Roman symbols for quantities and
+                                                                    import your prepared text file. You are now ready to style
+variables, but not Greek symbols. Use a long dash rather than
+                                                                    your paper.
+a hyphen for a minus sign. Punctuate equations with commas
+or periods when they are part of a sentence, as in               A. Authors and Affiliations
+                                                                     The template is designed so that author affiliations are
+                          α + β = χ.                         (1) not repeated each time for multiple authors of the same
+                                                                 affiliation. Please keep your affiliations as succinct as
+   Note that the equation is centered using a center tab stop.   possible (for example, do not differentiate among
+Be sure that the symbols in your equation have been defined      departments of the same organization). This template was
+before or immediately following the equation. Use “(1)”, not     designed for two affiliations.
+“Eq. (1)” or “equation (1)”, except at the beginning of a          1) For author/s of only one affiliation (Heading 3): To
+sentence: “Equation (1) is . . .”                                change the default, adjust the template as follows.
+D. Some Common Mistakes                                                a) Selection (Heading 4): Highlight all author and
+   • The word “data” is plural, not singular.                    affiliation lines.
+   • The subscript for the permeability of vacuum μ0, and              b) Change number of columns: Select Format >
+        other common scientific constants, is zero with          Columns >Presets > One Column.
+        subscript formatting, not a lowercase letter “o”.              c) Deletion: Delete the author and affiliation lines for
+   • In American English, commas, semi-/colons,                  the second affiliation.
+        periods, question and exclamation marks are located            d) For author/s of more than two affiliations: To
+        within quotation marks only when a complete
+                                                                 change the default, adjust the template as follows.
+        thought or name is cited, such as a title or full
+        quotation. When quotation marks are used, instead              e) Selection: Highlight all author and affiliation lines.
+        of a bold or italic typeface, to highlight a word or           f) Change number of columns: Select Format >
+        phrase, punctuation should appear outside of the         Columns > Presets > One Column.
+        quotation marks. A parenthetical phrase or statement           g) Highlight author and affiliation lines of affiliation 1
+        at the end of a sentence is punctuated outside of the    and copy this selection.
+        closing parenthesis (like this). (A parenthetical
+                                                                       h) Formatting: Insert one hard return immediately after
+        sentence is punctuated within the parentheses.)
+                                                                 the last character of the last affiliation line. Then paste the
+   • A graph within a graph is an “inset”, not an “insert”.
+        The word alternatively is preferred to the word          copy of affiliation 1. Repeat as necessary for each additional
+                                                                 affiliation.
+     i) Reassign number of columns: Place your cursor to                                        Figure 1. Example of a ONE-COLUMN figure caption.
+the right of the last character of the last affiliation line of an
+even numbered affiliation (e.g., if there are five affiliations,                             Please see last page of this document for AN EXAMPLE
+place your cursor at end of fourth affiliation). Drag the                                of a 2-COLUMN Figure.
+                                                                                             Figure Labels: Use 8 point Times New Roman for Figure
+cursor up to highlight all of the above author and affiliation
+                                                                                         labels. Use words rather than symbols or abbreviations when
+lines. Go to Format > Columns and select “2 Columns”. If                                 writing Figure axis labels to avoid confusing the reader. As
+you have an odd number of affiliations, the final affiliation                            an example, write the quantity “Magnetization”, or
+will be centered on the page; all previous will be in two                                “Magnetization, M”, not just “M”. If including units in the
+columns.                                                                                 label, present them within parentheses. Do not label axes
+B. Identify the Headings                                                                 only with units. In the example, write “Magnetization
+                                                                                         (A/m)” or “Magnetization {A[m(1)]}”, not just “A/m”. Do
+    Headings, or heads, are organizational devices that guide                            not label axes with a ratio of quantities and units. For
+the reader through your paper. There are two types:                                      example, write “Temperature (K)”, not “Temperature/K”.
+component heads and text heads.
+    Component heads identify the different components of                                 D. Footnotes
+your paper and are not topically subordinate to each other.                                  Use footnotes sparingly (or not at all) and place them at
+Examples include Acknowledgments and References and,                                     the bottom of the column on the page on which they are
+for these, the correct style to use is “Heading 5”. Use “figure                          referenced. Use Times 8-point type, single-spaced. To help
+caption” for your Figure captions, and “table head” for your                             your readers, avoid using footnotes altogether and include
+table title. Run-in heads, such as “Abstract”, will require you                          necessary peripheral observations in the text (within
+to apply a style (in this case, italic) in addition to the style                         parentheses, if you prefer, as in this sentence).
+provided by the drop down menu to differentiate the head
+from the text.                                                                                 VI.    COPYRIGHT FORMS AND REPRINT ORDERS
+    Text heads organize the topics on a relational,                                         You must submit the IEEE Electronic Copyright Form
+hierarchical basis. For example, the paper title is the primary                          (ECF) per Step 7 of the CPS author kit’s web page. THIS
+text head because all subsequent material relates and                                    FORM MUST BE SUBMITTED IN ORDER TO PUBLISH
+elaborates on this one topic. If there are two or more sub-                              YOUR PAPER.
+topics, the next level head (uppercase Roman numerals)                                      Please see Step 9 for ordering reprints of your paper.
+should be used and, conversely, if there are not at least two                            Reprints may be ordered using the form provided as
+sub-topics, then no subheads should be introduced. Styles                                <reprint.doc> or <reprint.pdf>.
+named “Heading 1”, “Heading 2”, “Heading 3”, and
+“Heading 4” are prescribed.                                                                                  ACKNOWLEDGMENT
+C. Figures and Tables                                                                        The preferred spelling of the word “acknowledgment” in
+    1) Positioning Figures and Tables: Place figures and                                 America is without an “e” after the “g”. Avoid the stilted
+tables at the top and bottom of columns. Avoid placing them                              expression, “One of us (R.B.G.) thanks . . .” Instead, try
+in the middle of columns. Large figures and tables may span                              “R.B.G. thanks”. Put applicable sponsor acknowledgments
+across both columns. Figure captions should be below the                                 here; DO NOT place them on the first page of your paper or
+figures; table heads should appear above the tables. Insert                              as a footnote.
+figures and tables after they are cited in the text. Use the
+abbreviation “Fig. 1”, even at the beginning of a sentence.
+                                                                                                                 REFERENCES
+                TABLE I.         TABLE TYPE STYLES                                           List and number all bibliographical references in 9-point
+                               Table Column Head
+                                                                                         Times, single-spaced, at the end of your paper. When
+  Table
+  Head                                                                                   referenced in the text, enclose the citation number in square
+                Table column subhead                Subhead           Subhead
+                                                                                         brackets, for example [1]. Where appropriate, include the
+                           a
+ copy      More table copy                                                               name(s) of editors of referenced books. The template will
+                                       a. Sample of a Table footnote. (Table footnote)   number citations consecutively within brackets [1]. The
+                                                                                         sentence punctuation follows the bracket [2]. Refer simply to
+      We suggest that you use a text box to insert a graphic                             the reference number, as in [3]—do not use “Ref. [3]” or
+  (ideally 300 dpi), with all fonts embedded) because, in an                             “reference [3]” except at the beginning of a sentence:
+  MSW document, this method is somewhat more stable than                                 “Reference [3] was the first . . .”
+  directly inserting a picture.                                                              Number footnotes separately in superscripts. Place the
+      To have non-visible rules on your frame, use the                                   actual footnote at the bottom of the column in which it was
+  MSWord pull-down menu, select Format > Borders and                                     cited. Do not put footnotes in the reference list. Use letters
+  Shading > Select “None”.                                                               for table footnotes.
+                                                                                             Unless there are six authors or more give all authors’
+                                                                                         names; do not use “et al.”. Papers that have not been
+                                                                                         published, even if they have been submitted for publication,
+should be cited as “unpublished” [4]. Papers that have been                    [5]   R. Nicole, “Title of paper with only first word capitalized,” J. Name
+accepted for publication should be cited as “in press” [5].                          Stand. Abbrev., in press.
+Capitalize only the first word in a paper title, except for                    [6] Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, “Electron
+                                                                                     spectroscopy studies on magneto-optical media and plastic substrate
+proper nouns and element symbols.                                                    interface,” IEEE Transl. J. Magn. Japan, vol. 2, pp. 740–741, August
+    For papers published in translation journals, please give                        1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
+the English citation first, followed by the original foreign-                  [7] M. Young, The Technical Writer’s Handbook. Mill Valley, CA:
+language citation [6].                                                               University Science, 1989.
+                                                                               [8] Electronic Publication: Digital Object Identifiers (DOIs):
+[1]   G. Eason, B. Noble, and I. N. Sneddon, “On certain integrals of          Article in a journal:
+      Lipschitz-Hankel type involving products of Bessel functions,” Phil.
+      Trans. Roy. Soc. London, vol. A247, pp. 529–551, April 1955.             [9] D. Kornack and P. Rakic, “Cell Proliferation without Neurogenesis in
+      (references)                                                                   Adult Primate Neocortex,” Science, vol. 294, Dec. 2001, pp. 2127-
+                                                                                     2130, doi:10.1126/science.1065467.
+[2]   J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed.,
+      vol. 2. Oxford: Clarendon, 1892, pp.68–73.                               Article in a conference proceedings:
+[3]   I. S. Jacobs and C. P. Bean, “Fine particles, thin films and exchange    [10] H. Goto, Y. Hasegawa, and M. Tanaka, “Efficient Scheduling
+      anisotropy,” in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds.              Focusing on the Duality of MPL Representatives,” Proc. IEEE Symp.
+      New York: Academic, 1963, pp. 271–350.                                         Computational Intelligence in Scheduling (SCIS 07), IEEE Press,
+                                                                                     Dec. 2007, pp. 57-64, doi:10.1109/SCIS.2007.357670.
+[4]   K. Elissa, “Title of paper if known,” unpublished.
+
+
+
+
+                       Figure 2. Example of a TWO-COLUMN figure caption: (a) this is the format for referencing parts of a figure.
+

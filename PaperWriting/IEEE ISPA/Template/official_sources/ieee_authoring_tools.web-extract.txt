@@ -1,0 +1,26 @@
+Source: https://conferences.ieeeauthorcenter.ieee.org/write-your-paper/authoring-tools-and-templates/
+Checked: 2026-10-01 (Asia/Shanghai)
+Capture: text extracted by web reader; direct HTML download returned HTTP 403. This is not an original HTML snapshot.
+
+iframe — www.googletagmanager.com 
+IEEE Publishing Portal — publishingportal.ieee.org Submit to TechRxiv — www.techrxiv.org Join IEEE — ieeeauthorcenter.ieee.org 
+Resources & Tools for Authors — ieeeauthorcenter.ieee.org 
+[Input] [Input: Search this section] Search
+
+# Authoring Tools and Templates
+
+Creating your conference paper for IEEE should be seamless. Save time and effort with authoring tools and templates that will help you write, prepare, and share your research better.
+### Write
+Use IEEE conference templates — www.ieee.org in Word or LaTeX to easily format your paper for publication. Write collaboratively with your co-authors in Overleaf — www.overleaf.com , an authoring tool for LaTeX and rich text documents. Overleaf is preloaded with IEEE templates for your convenience. Overleaf and LaTeX resources — www.overleaf.com are available online for both beginners and advanced users.
+Choose from a variety of quick guides, tutorials, webinars, and detailed documentation based upon your individual needs and level of expertise.
+### Prepare
+
+Get your paper ready for publication with IEEE Author Tools. Find the right conference  — publication-recommender.ieee.org for your paper. Validate your references — refassist.ieee.org and LaTeX — latexqc.ieee.org files. Claim your unique ORCID identifier — www.orcid.org to get full credit for your work.
+
+### Share
+
+Enhance your article by sharing associated data or code .
+
+Subscribe to our newsletter — engage.ieee.org
+
+ 

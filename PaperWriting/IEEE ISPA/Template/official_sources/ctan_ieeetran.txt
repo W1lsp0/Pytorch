@@ -1,0 +1,119 @@
+CTAN: Package IEEEtran
+CTAN
+Comprehensive T
+e
+X Archive Network
+Login
+Join
+Settings
+Help
+Cover
+Cover
+Starting out with T
+e
+X...
+CTAN Background
+Mirrors
+T
+e
+X user groups
+Privacy
+Credits
+Upload
+Upload
+Upload basics
+Upload addendum
+Licenses
+Browse
+T
+e
+X Archive
+Packages
+Topics
+Contributors
+Announcements
+Search
+Extended search
+File search
+Location:
+CTAN
+Packages
+ieeetran
+IEEEtran – Document class for IEEE Transactions journals and conferences
+The class and its
+Bib
+T
+e
+X
+style enable authors to produce
+      officially-correct output for the Institute of Electrical and
+      Electronics Engineers (IEEE) transactions, journals and
+      conferences.
+Sources
+/macros/latex/contrib/IEEEtran
+Documentation
+README
+Package documentation
+Home page
+https://www.michaelshell.org/tex/ieeetran/
+Version
+1.8b
+Licenses
+The
+L
+a
+T
+e
+X
+Project Public License 1.3
+Copyright
+2001–2015 Michael Shell
+Maintainer
+Michael Shell
+Contained in
+T
+e
+X Live
+as ieeetran
+MiKT
+e
+X
+as ieeetran
+Topics
+Tagged PDF – incompatible
+Journal
+Class
+Download
+the contents of this package in one zip archive
+        (1.6M).
+Community Comments
+Loading...
+Announcements
+Here you can see a respective diagram in newer browsers.
+2015-08-28 CTAN update: IEEEtran
+2014-09-21 CTAN Update: ieeetran
+2013-01-03 CTAN Update: IEEEtran
+more
+Suggestions
+Maybe you are interested in the following packages as well.
+leaflet: Create small handouts (flyers)
+memoir: Typeset fiction, non-fiction and mathematical books
+asmejour: A template for ASME journal papers
+acmart: Class for typesetting publications of ACM
+more
+Package Links
+Home page
+Guest Book
+Sitemap
+Contact
+Contact Author
+Feedback
+
+
+
+
+
+
+
+
+2026-10-01 01:53 CEST

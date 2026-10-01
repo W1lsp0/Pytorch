@@ -1,0 +1,154 @@
+IEEE ISPA 2026 | IEEE AI for Science Congress 2026
+ISPA 2026
+Home
+Call for Papers
+Call for Papers
+Conferences
+BDCloud 2026
+SocialCom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Special Sessions
+DAAA 2026
+ANS 2026
+SEOI 2026
+PIVOTS 2026
+GAI4Net 2026
+AI4SEC 2026
+PDICEL-SE 2026
+Special Issues
+Authors
+Coming Soon
+Attendance
+Coming Soon
+Contact
+The 24th IEEE International Symposium on Parallel and Distributed Processing with Applications
+(IEEE ISPA 2026)
+Kuala Lumpur, Malaysia
+27-30 December 2026
+Important Dates
+Workshop Proposal Due
+15 August 2026
+Regular Paper Due
+30 September 2026 (AoE time)
+Author Notification Due
+30 October 2026
+Paper Registration Due
+30 November 2026
+Camera-ready Submission Due
+30 November 2026
+Conference Dates
+27-30 December 2026
+Organizing Committee
+General Chairs
+Geyong Min, University of Exeter, UK
+Nong Xiao, Sun Yat-sen University, China
+Program Chairs
+Huazhong Liu, Zhejiang Normal University, China
+Rong Gu, Nanjing University, China
+Program Vice-Chairs
+Jiawei Huang, Central South University, China
+Chubo Liu, Hunan University, China
+Minchen Yu, The Chinese University of Hong Kong, Shenzhen, China
+Local Chairs
+Azreen Azman, Universiti Putra Malaysia, Malaysia
+Xiangli Yang, Zhengzhou University, China
+Workshop/Special Session Chairs
+Shaojun Zou, Hainan University, China
+Zhou Zhou, Changsha University, China
+Publicity Chairs
+Yangbo Jiang, Zhejiang University of Finance & Economics, China
+Xun Shao, Toyohashi University of Technology, Japan
+TingtingHan,HainanUniversity, China
+Publication Chairs
+Zhicai Zhang, Hainan University, China
+Binbin Zhou, Hangzhou City University, China
+Wenxuan Zhang,HainanUniversity, China
+Web Chairs
+Ren Li, Hainan University, China
+Yongqin Zhang, Hainan University, China
+Steering Committee
+Jiannong Cao, HongKong Polytechnic University, China
+Jamal Deen (Chair), McMaster University, Canada
+Beniamino Di Martino, Second University of Naples, Italy
+Didier El Baz, LAAS-CNRS, France
+Miny Guo (Chair), Shanghai Jiaotong University, China
+Hai Jiang, Arkansas State University, USA
+Rajiv Ranjan, Newcastle University, UK
+Thomas Rauber, University of Bayreuth, Germany
+Gudula Runger, Chemnitz University of Technology, Germany
+Dustdar Schahram, Technical University of Vienna, Austria
+Call For Papers
+IEEE ISPA 2026 is an international forum for original research on parallel, distributed, edge, cloud and large-scale computing systems. The conference welcomes academia and industrial researchers to share innovations on multi-core, heterogeneous clusters, P2P networks, AI computing architecture, blockchain security, big data analytics and pervasive services. ISPA series has been held annually since 2003 across Asia, Europe, Australia and North America. The conference includes oral presentations, poster sessions, tutorials, invited keynote speeches and special sessions. All accepted papers will be indexed by IEEE Xplore.
+We invite submissions from academia, government and industry that present novel research on all aspects of parallel and distributed processing with applications. Topics of ISPA include but are not limited to the following areas:
+Track 1: Systems and Architectures
+–	Cloud computing and data center technology
+–   Migration of computations
+–	Multi-clouds environments, cloud federation, interoperability
+–	Energy management and green computing
+–	Wireless and mobile networks
+–	Systems and Architectures for artificial intelligence
+–	Distributed/parallel algorithms and application
+–	Social networks, crowdsourcing, and P2P systems
+–	Distributed file and storage systems, I/O systems
+Track 2: Technologies and Tools
+– Parallel and distributed computing paradigms
+– Novel parallel programming paradigms
+– Programming models for cloud services
+– Code generation and optimization
+– Compilers for parallel computers
+– Middleware and tools
+– Scheduling and resource management
+– Reliability, fault tolerance, and dependability
+– Generative AI, agents, and world model
+Track 3: Applications and Services
+– High-performance scientific and engineering computing
+– Grid and cluster computing
+– Pervasive and ubiquitous computing
+– Databases, data mining, and data management
+– Big data and business analytics
+– Scientific cloud systems and services
+– Internet computing and web services
+– Software defined network and its applications
+– LLMs powered by parallel and distributed computing
+Track 4: Security and Block-chain
+– Security in parallel AI systems
+– Federated learning
+– Blockchain-based applications and services
+– Blockchain security and privacy
+– Blockchain in cyber physical systems
+– Scalability issues in blockchain
+– Blockchain in edge and cloud computing
+– Blockchain-based applications and services
+– Decentralized blockchain-enabled AI systems
+Page limits are as follows:
+Full Regular Paper:
+8 pages allowed (up to 10 pages with over-length charge)
+Regular Paper or Special Session Paper:
+6 pages allowed (up to 8 pages with over-length charge)
+PDF files must embed all fonts; avoid scanned images, conversion errors, encryption, and obsolete Type-3 fonts, as these issues can prevent successful upload.
+All papers must be formatted in the IEEE Computer Society Proceedings Format (templates available at
+https://template-selector.ieee.org/
+)
+Anonymity:
+All submitted papers will be reviewed under a
+single-blind
+peer review process.
+Paper Publication:
+Papers accepted by ISPA 2026 conference will be published by the IEEE Computer Society Press. All accepted papers will be submitted to IEEE Xplore and EI. Distinguished papers presented at the conference, after further revision, will be invited for submission to a special issue.
+Submit Paper to ISPA 2026
+Sponsored and Organized by
+Conferences
+ISPA 2026
+BDCloud 2026
+Socialcom 2026
+SustainCom 2026
+SpaCCS 2026
+AI for Science Congress
+Call for Papers
+Call for Papers and Proposals
+About
+The IEEE AI for Science Congress 2026 will be held in
+          Kuala Lumpur, Malaysia, 27-30 December, 2026, focusing on advancements in cyber-enabled technologies like IoT, AI, cyber-physical systems, and cybersecurity.
+© 2026 IEEE AI for Science Congress 2026
