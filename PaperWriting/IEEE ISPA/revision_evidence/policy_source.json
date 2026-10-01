@@ -1,5 +1,0 @@
-{
-  "source": "TTFL_snapshot_20260925/source/experiments/results/v2_30r_s2_20260927/4_ttfl_none_seed20240925/work/server/trust_manager.py",
-  "sha256": "0e5dfe547b8a2a75af23d3650432f01c0b70e8f07c053eb99a570b6dca0cc269",
-  "transformation": "AST extraction; remove database configuration and persistence; retain numerical decision expressions"
-}
